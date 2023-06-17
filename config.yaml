@@ -1,0 +1,4 @@
+proxy: 127.0.0.1
+port: 1080
+format: 'best'
+ouput_path: 'not set'

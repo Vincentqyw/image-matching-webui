@@ -1,0 +1,10 @@
+build/
+
+lib/
+bin/
+
+cmake_modules/
+cmake-build-debug/
+.idea/
+.vscode/
+*.pyc
