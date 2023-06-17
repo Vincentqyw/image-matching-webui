@@ -30,6 +30,15 @@ pip install -r requirements.txt
 ``` bash
 python3 ./main.py
 ```
+then open http://localhost:7860/ in your browser.
+
+## Contributions welcome!
+
+External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using a linter like flake8. This is a non-exhaustive list of features that might be valuable additions:
+
+- [ ] add more image matching algorithms with submodules
+- [ ] add config file to set default parameters
+
 ## Acknowledgement
 
 This code is built based on [Hierarchical-Localization](https://github.com/cvg/Hierarchical-Localization). We express our gratitude to the authors for their valuable source code.
