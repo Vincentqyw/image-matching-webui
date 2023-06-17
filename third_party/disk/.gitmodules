@@ -1,0 +1,11 @@
+[submodule "submodules/unets"]
+	path = submodules/unets
+	url = https://github.com/jatentaki/unets.git
+	branch = no_norm_at_start
+[submodule "submodules/torch-localize"]
+	path = submodules/torch-localize
+	url = https://github.com/jatentaki/torch-localize.git
+	branch = flatten
+[submodule "submodules/torch-dimcheck"]
+	path = submodules/torch-dimcheck
+	url = https://github.com/jatentaki/torch-dimcheck.git

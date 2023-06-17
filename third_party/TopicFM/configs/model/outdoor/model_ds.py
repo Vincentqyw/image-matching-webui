@@ -1,0 +1,16 @@
+from src.config.default import _CN as cfg
+
+cfg.MODEL.MATCH_COARSE.MATCH_TYPE = 'dual_softmax'
+cfg.MODEL.COARSE.N_SAMPLES = 8
+
+cfg.TRAINER.CANONICAL_LR = 1e-2
+cfg.TRAINER.WARMUP_STEP = 1875  # 3 epochs
+cfg.TRAINER.WARMUP_RATIO = 0.1
+cfg.TRAINER.MSLR_MILESTONES = [3, 6, 9, 12, 16, 20, 24, 28]
+
+# pose estimation
+cfg.TRAINER.RANSAC_PIXEL_THR = 0.5
+
+cfg.TRAINER.OPTIMIZER = "adamw"
+cfg.TRAINER.ADAMW_DECAY = 0.1
+cfg.MODEL.MATCH_COARSE.TRAIN_COARSE_PERCENT = 0.3

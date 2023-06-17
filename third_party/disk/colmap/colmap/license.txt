@@ -1,0 +1,2 @@
+Files in this folder are obtained from COLMAP and carry their own license.
+Please refer to the files themselves for the license terms.
