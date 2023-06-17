@@ -31,11 +31,6 @@ matcher_zoo = {
         'model': get_model(match_dense.confs['topicfm']),
         'dense': True
     },
-    'DKMv3': {
-        'config': match_dense.confs['dkm'],
-        'model': get_model(match_dense.confs['dkm']),
-        'dense': True
-    },
     'aspanformer': {
         'config': match_dense.confs['aspanformer'],
         'model': get_model(match_dense.confs['aspanformer']),
@@ -76,6 +71,11 @@ matcher_zoo = {
         'model_feature': get_feature_model(extract_features.confs['sift']),
         'dense': False
     },
+    'DKMv3': {
+        'config': match_dense.confs['dkm'],
+        'model': get_model(match_dense.confs['dkm']),
+        'dense': True
+    },
 }
 
 def run_matching(key, image0, image1):
@@ -100,7 +100,6 @@ def run_matching(key, image0, image1):
         mconf = pred['mconf']
     else:
         mconf = np.ones(len(mkpts0))
-
     fig = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi = 300)
     return fig, len(mkpts0)
 
