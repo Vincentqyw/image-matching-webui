@@ -6,10 +6,12 @@
 
 This simple tool efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
 
-![](assets/gui.png)
+[![video demo](assets/gui.png)](assets/video.mp4)
 
 The tool currently supports various popular image matching algorithms, namely:
-
+- [ ] [DeepLSD](https://github.com/cvg/DeepLSD), CVPR 2023
+- [ ] [SOLD2](https://github.com/cvg/SOLD2), CVPR 2021
+- [ ] [LineTR](https://github.com/yosungho/LineTR), RA-L 2021
 - [ ] [DKM](https://github.com/Parskatt/DKM), CVPR 2023
 - [x] [TopicFM](https://github.com/TruongKhang/TopicFM), AAAI 2023
 - [x] [AspanFormer](https://github.com/apple/ml-aspanformer), ECCV 2022
@@ -30,13 +32,16 @@ pip install -r requirements.txt
 ``` bash
 python3 ./main.py
 ```
-then open http://localhost:7860/ in your browser.
+then open http://localhost:7860 in your browser.
+
+![](assets/gui.png)
 
 ## Contributions welcome!
 
 External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using a linter like flake8. This is a non-exhaustive list of features that might be valuable additions:
 
 - [ ] add more image matching algorithms with submodules
+- [ ] add [line feature matching](https://github.com/Vincentqyw/LineSegmentsDetection) algorithms
 - [ ] add config file to set default parameters
 
 ## Acknowledgement

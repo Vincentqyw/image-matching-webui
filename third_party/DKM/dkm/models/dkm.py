@@ -608,7 +608,7 @@ class RegressionMatcher(nn.Module):
         if "balanced" not in self.sample_mode:
             return good_matches, good_certainty
 
-        from dkm.utils.kde import kde
+        from ..utils.kde import kde
         density = kde(good_matches, std=0.1)
         p = 1 / (density+1)
         p[density < 10] = 1e-7 # Basically should have at least 10 perfect neighbours, or around 100 ok ones

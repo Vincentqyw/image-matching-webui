@@ -21,6 +21,8 @@ from .extract_features import read_image, resize_image
 from .utils.io import list_h5_names
 import cv2
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 # Default usage:
 # dense_conf = confs['loftr'] 
 # features, matches = main(dense_conf, pairs, images, export_dir=outputs)
@@ -127,8 +129,8 @@ confs = {
             'grayscale': False,
             'force_resize': True,
             'resize_max': 1024,
-            'width': 320,
-            'height': 240,
+            'width': 80,
+            'height': 60,
             'dfactor': 8
         },
     },
@@ -304,7 +306,6 @@ def match(model, path_0, path_1, conf):
         'width': 320,
         'height': 240,
     }
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     def preprocess(image: np.ndarray):
         image = image.astype(np.float32, copy=False)
         size = image.shape[:2][::-1]
@@ -358,7 +359,7 @@ def match(model, path_0, path_1, conf):
     return ret
 
 @torch.no_grad()
-def match_images(model, image_0, image_1, conf):
+def match_images(model, image_0, image_1, conf, device='cpu'):
     default_conf = {
         'grayscale': True,
         'resize_max': 1024,
@@ -368,7 +369,6 @@ def match_images(model, image_0, image_1, conf):
         'width': 320,
         'height': 240,
     }
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     def preprocess(image: np.ndarray):
         image = image.astype(np.float32, copy=False)
         size = image.shape[:2][::-1]
@@ -457,7 +457,6 @@ def match_dense(conf: Dict,
                 match_path: Path,  # out
                 existing_refs: Optional[List] = []):
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     Model = dynamic_load(matchers, conf['model']['name'])
     model = Model(conf['model']).eval().to(device)
 

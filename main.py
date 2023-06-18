@@ -7,6 +7,7 @@ import gradio as gr
 from hloc import match_dense, match_features, matchers,extractors, extract_features
 from hloc.utils.base_model import dynamic_load
 from utils.plotting import draw_matches
+
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # @brief: Load model from configuration file
@@ -83,7 +84,7 @@ def run_matching(key, image0, image1):
     matcher = model['model']
     match_conf = model['config']
     if model['dense']:
-        pred = match_dense.match_images(matcher,image0, image1, match_conf['preprocessing'])
+        pred = match_dense.match_images(matcher,image0, image1, match_conf['preprocessing'],device=device)
     else:
         extractor = model['model_feature']
         extract_conf = model['config_feature']
