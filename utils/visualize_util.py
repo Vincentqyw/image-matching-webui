@@ -279,6 +279,7 @@ def plot_images(imgs, titles=None, cmaps='gray', dpi=100, size=6, pad=.5):
         if titles:
             ax[i].set_title(titles[i])
     fig.tight_layout(pad=pad)
+    return fig
 
 
 def plot_keypoints(kpts, colors='lime', ps=4):
@@ -369,7 +370,7 @@ def plot_lines(lines, line_colors='orange', point_colors='cyan',
         a.scatter(pts[:, 0], pts[:, 1],
                   c=pc, s=ps, linewidths=0, zorder=2)
 
-
+    return fig
 def plot_line_matches(kpts0, kpts1, color=None, lw=1.5, indices=(0, 1), a=1.):
     """Plot matches for a pair of existing images, parametrized by their middle point.
     Args:
@@ -442,6 +443,7 @@ def plot_color_line_matches(lines, correct_matches=None,
             zorder=1, transform=fig.transFigure, c=colors[i],
             alpha=alphas[i], linewidth=lw) for i in range(n_lines)]
 
+    return fig
 
 def plot_color_lines(lines, correct_matches, wrong_matches,
                      lw=2, indices=(0, 1)):

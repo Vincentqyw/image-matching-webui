@@ -103,6 +103,20 @@ confs = {
             'dfactor': 8
         },
     },
+    'sold2': {
+        'output': 'matches-sold2',
+        'model': {
+            'name': 'sold2',
+        },
+        'preprocessing': {
+            'grayscale': True,
+            'force_resize': True,
+            'resize_max': 1024,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
+        },
+    },
 }
 
 def scale_keypoints(kpts, scale):
@@ -239,14 +253,15 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
     image1 = image1.to(device)[None]
     pred = model({'image0': image0, 'image1': image1})
     
+    s0 = np.array(image_0.shape[:2][::-1]) / np.array(image0.shape[-2:][::-1])
+    s1 = np.array(image_1.shape[:2][::-1]) / np.array(image1.shape[-2:][::-1])
+
     # Rescale keypoints and move to cpu
     if 'keypoints0' in pred.keys() and 'keypoints1' in pred.keys():
         kpts0, kpts1 = pred['keypoints0'], pred['keypoints1']
         kpts0 = scale_keypoints(kpts0 + 0.5, scale0) - 0.5
         kpts1 = scale_keypoints(kpts1 + 0.5, scale1) - 0.5
         
-        s0 = np.array(image_0.shape[:2][::-1]) / np.array(image0.shape[-2:][::-1])
-        s1 = np.array(image_1.shape[:2][::-1]) / np.array(image1.shape[-2:][::-1])
         kpts0_origin = scale_keypoints(kpts0 + 0.5, s0) - 0.5
         kpts1_origin = scale_keypoints(kpts1 + 0.5, s1) - 0.5
 
@@ -270,10 +285,23 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
             ret['mconf'] = pred['mconf'].cpu().numpy()
     if 'lines0' in pred.keys() and 'lines1' in pred.keys():
         lines0, lines1 = pred['lines0'], pred['lines1']
+        lines0_raw, lines1_raw = pred['raw_lines0'], pred['raw_lines1']
+
+        lines0_raw = torch.from_numpy(lines0_raw.copy())
+        lines1_raw = torch.from_numpy(lines1_raw.copy())
+        lines0_raw = scale_lines(lines0_raw + 0.5, s0) - 0.5
+        lines1_raw = scale_lines(lines1_raw + 0.5, s1) - 0.5
+        
+        lines0 = torch.from_numpy(lines0.copy())
+        lines1 = torch.from_numpy(lines1.copy())
+        lines0 = scale_lines(lines0 + 0.5, s0) - 0.5
+        lines1 = scale_lines(lines1 + 0.5, s1) - 0.5
         ret = {
             'image0_orig': image_0,
             'image1_orig': image_1,
-            'line0_orig': lines0,
-            'line1_orig': lines1,
+            'line0': lines0_raw.cpu().numpy(),
+            'line1': lines1_raw.cpu().numpy(),
+            'line0_orig': lines0.cpu().numpy(),
+            'line1_orig': lines1.cpu().numpy(),
         }  
     return ret

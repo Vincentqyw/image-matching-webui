@@ -24,8 +24,6 @@ class SOLD2(BaseModel):
         'image1',
     ]
     # Initialize the line matcher
-    
-
     def _init(self, conf):
         checkpoint_path = conf['checkpoint_dir'] / conf['weights']
         mode = 'dynamic' # 'dynamic' or 'static'
@@ -130,11 +128,4 @@ class SOLD2(BaseModel):
         pred['raw_lines0'], pred['raw_lines1'] = line_seg1, line_seg2
         pred['lines0'], pred['lines1'] = matched_lines1, matched_lines2
         pred = {**pred, **data}
-
-        
-        # plot_images([img1, img2], ['Image 1 - detected lines', 'Image 2 - detected lines'])
-        # plot_lines([line_seg1[:, :, ::-1], line_seg2[:, :, ::-1]], ps=3, lw=2)
-        # plot_images([img1, img2], ['Image 1 - matched lines', 'Image 2 - matched lines'])
-        # plot_color_line_matches([matched_lines1, matched_lines2], lw=2)
-
         return pred

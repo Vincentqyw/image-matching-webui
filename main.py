@@ -6,7 +6,8 @@ import gradio as gr
 
 from hloc import match_dense, match_features, matchers,extractors, extract_features
 from hloc.utils.base_model import dynamic_load
-from utils.plotting import draw_matches
+from utils.plotting import draw_matches, fig2im
+from utils.visualize_util import plot_images, plot_lines, plot_line_matches, plot_color_line_matches, plot_keypoints
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -22,6 +23,11 @@ def get_feature_model(conf):
     return model
 
 matcher_zoo = {
+    'sold2': {
+        'config': match_dense.confs['sold2'],
+        'model': get_model(match_dense.confs['sold2']),
+        'dense': True
+    },
     'loftr': {
         'config': match_dense.confs['loftr'],
         'model': get_model(match_dense.confs['loftr']),
@@ -92,17 +98,35 @@ def run_matching(key, image0, image1):
         pred1 = extract_features.extract(extractor, image1, extract_conf['preprocessing'])
         pred = match_features.match_images(matcher, pred0, pred1)
 
-    mkpts0 = pred['keypoints0_orig']
-    mkpts1 = pred['keypoints1_orig']
     img0 = pred['image0_orig']
     img1 = pred['image1_orig']
 
-    if 'mconf' in pred.keys():
-        mconf = pred['mconf']
-    else:
-        mconf = np.ones(len(mkpts0))
-    fig = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi = 300)
-    return fig, len(mkpts0)
+    num_inliers = 0
+    if 'keypoints0_orig' in pred.keys() and 'keypoints1_orig' in pred.keys():
+        mkpts0 = pred['keypoints0_orig']
+        mkpts1 = pred['keypoints1_orig']
+        num_inliers = len(mkpts0)
+        if 'mconf' in pred.keys():
+            mconf = pred['mconf']
+        else:
+            mconf = np.ones(len(mkpts0))
+        fig = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi = 300)
+    elif 'line0_orig' in pred.keys() and 'line1_orig' in pred.keys():
+        mtlines0 = pred['line0_orig']
+        mtlines1 = pred['line1_orig']
+        lines0 = pred['line0']
+        lines1 = pred['line1']
+        # fig0 = plot_images([img0.squeeze(), img1.squeeze()], ['Image 1 - detected lines', 'Image 2 - detected lines'])
+        # fig0 = plot_lines([lines0[:, :, ::-1], lines1[:, :, ::-1]], ps=3, lw=2)
+        # fig0 = fig2im(fig0)
+        fig1 = plot_images([img0.squeeze(), img1.squeeze()], ['Image 1 - matched lines', 'Image 2 - matched lines'])
+        fig1 = plot_color_line_matches([mtlines0, mtlines1], lw=2)
+        num_inliers = len(mtlines0)
+
+        fig1 = fig2im(fig1)
+        # fig = np.concatenate([fig0, fig1], axis=0)
+        fig = fig1
+    return fig, num_inliers
 
 def run(config):
     matcher_list = gr.Dropdown(choices=list(matcher_zoo.keys()))
