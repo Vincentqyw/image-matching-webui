@@ -6,7 +6,7 @@
 
 This simple tool efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
 
-[![video demo](assets/gui.png)](assets/video.mp4)
+![demo](assets/demo.gif)
 
 The tool currently supports various popular image matching algorithms, namely:
 - [ ] [DeepLSD](https://github.com/cvg/DeepLSD), CVPR 2023
