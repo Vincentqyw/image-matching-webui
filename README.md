@@ -10,7 +10,7 @@ This simple tool efficiently matches image pairs using multiple famous image mat
 
 The tool currently supports various popular image matching algorithms, namely:
 - [ ] [DeepLSD](https://github.com/cvg/DeepLSD), CVPR 2023
-- [ ] [SOLD2](https://github.com/cvg/SOLD2), CVPR 2021
+- [x] [SOLD2](https://github.com/cvg/SOLD2), CVPR 2021
 - [ ] [LineTR](https://github.com/yosungho/LineTR), RA-L 2021
 - [ ] [DKM](https://github.com/Parskatt/DKM), CVPR 2023
 - [x] [TopicFM](https://github.com/TruongKhang/TopicFM), AAAI 2023
