@@ -8,3 +8,7 @@ cmake-build-debug/
 .idea/
 .vscode/
 *.pyc
+flagged
+.ipynb_checkpoints
+__pycache__
+Untitled*
