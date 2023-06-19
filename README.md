@@ -10,15 +10,19 @@ This simple tool efficiently matches image pairs using multiple famous image mat
 
 The tool currently supports various popular image matching algorithms, namely:
 - [ ] [DeepLSD](https://github.com/cvg/DeepLSD), CVPR 2023
+- [ ] [GlueStick](https://github.com/cvg/GlueStick), ArXiv 2023
 - [ ] [ConvMatch](https://github.com/SuhZhang/ConvMatch), AAAI 2023
 - [x] [SOLD2](https://github.com/cvg/SOLD2), CVPR 2021
 - [ ] [LineTR](https://github.com/yosungho/LineTR), RA-L 2021
 - [ ] [DKM](https://github.com/Parskatt/DKM), CVPR 2023
+- [ ] [RoMa](https://github.com/Parskatt/RoMa), Arxiv 2023
+- [ ] [NCMNet](https://github.com/xinliu29/NCMNet), CVPR 2023
 - [x] [TopicFM](https://github.com/TruongKhang/TopicFM), AAAI 2023
 - [x] [AspanFormer](https://github.com/apple/ml-aspanformer), ECCV 2022
 - [ ] [LANet](https://github.com/wangch-g/lanet), ACCV 2022
 - [ ] [LISRD](https://github.com/rpautrat/LISRD), ECCV 2022
 - [ ] [REKD](https://github.com/bluedream1121/REKD), CVPR 2022
+- [ ] [ALIKE](https://github.com/Shiaoming/ALIKE), ArXiv 2022
 - [x] [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork), CVPRW 2018
 - [x] [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork), CVPR 2020
 - [x] [D2Net](https://github.com/mihaidusmanu/d2-net), CVPR 2019
