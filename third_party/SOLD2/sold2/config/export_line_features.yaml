@@ -1,0 +1,80 @@
+### [Model config]
+model_cfg:
+  ### [Model parameters]
+  model_name: "lcnn_simple"
+  model_architecture: "simple"
+  # Backbone related config
+  backbone: "lcnn"
+  backbone_cfg:
+    input_channel: 1 # Use RGB images or grayscale images.
+    depth: 4
+    num_stacks: 2
+    num_blocks: 1
+    num_classes: 5
+  # Junction decoder related config
+  junction_decoder: "superpoint_decoder"
+  junc_decoder_cfg:
+  # Heatmap decoder related config
+  heatmap_decoder: "pixel_shuffle"
+  heatmap_decoder_cfg:
+  # Descriptor decoder related config
+  descriptor_decoder: "superpoint_descriptor"
+  descriptor_decoder_cfg:
+  # Shared configurations
+  grid_size: 8
+  keep_border_valid: True
+  # Threshold of junction detection
+  detection_thresh: 0.0153846 # 1/65
+  max_num_junctions: 300
+  # Threshold of heatmap detection
+  prob_thresh: 0.5
+
+  ### [Loss parameters]
+  weighting_policy: "dynamic"
+  # [Heatmap loss]
+  w_heatmap: 0.
+  w_heatmap_class: 1
+  heatmap_loss_func: "cross_entropy"
+  heatmap_loss_cfg:
+    policy: "dynamic"
+  # [Junction loss]
+  w_junc: 0.
+  junction_loss_func: "superpoint"
+  junction_loss_cfg:
+    policy: "dynamic"
+  # [Descriptor loss]
+  w_desc: 0.
+  descriptor_loss_func: "regular_sampling"
+  descriptor_loss_cfg:
+    dist_threshold: 8
+    grid_size: 4
+    margin: 1
+    policy: "dynamic"
+
+### [Line detector config]
+line_detector_cfg:
+  detect_thresh: 0.5
+  num_samples: 64
+  sampling_method: "local_max"
+  inlier_thresh: 0.99
+  use_candidate_suppression: True
+  nms_dist_tolerance: 3.
+  use_heatmap_refinement: True
+  heatmap_refine_cfg:
+    mode: "local"
+    ratio: 0.2
+    valid_thresh: 0.001
+    num_blocks: 20
+    overlap_ratio: 0.5
+  use_junction_refinement: True
+  junction_refine_cfg:
+    num_perturbs: 9
+    perturb_interval: 0.25
+
+### [Line matcher config]
+line_matcher_cfg:
+  cross_check: True
+  num_samples: 5
+  min_dist_pts: 8
+  top_k_candidates: 10
+  grid_size: 4

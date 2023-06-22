@@ -1,0 +1,3 @@
+[submodule "graph-cut-ransac"]
+	path = graph-cut-ransac
+	url = https://github.com/danini/graph-cut-ransac.git

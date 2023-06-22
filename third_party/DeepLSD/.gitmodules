@@ -1,0 +1,15 @@
+[submodule "third_party/progressive-x"]
+	path = third_party/progressive-x
+	url = https://github.com/danini/progressive-x.git
+[submodule "third_party/pytlbd"]
+	path = third_party/pytlbd
+	url = https://github.com/iago-suarez/pytlbd.git
+[submodule "line_refinement/pybind11"]
+	path = line_refinement/pybind11
+	url = https://github.com/pybind/pybind11
+[submodule "third_party/homography_est"]
+	path = third_party/homography_est
+	url = https://github.com/rpautrat/homography_est.git
+[submodule "third_party/pytlsd"]
+	path = third_party/pytlsd
+	url = https://github.com/iago-suarez/pytlsd.git

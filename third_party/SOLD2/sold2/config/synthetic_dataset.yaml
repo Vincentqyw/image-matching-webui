@@ -1,0 +1,48 @@
+### General dataset parameters
+dataset_name: "synthetic_shape"
+primitives: "all"
+add_augmentation_to_all_splits: True
+test_augmentation_seed: 200
+# Shape generation configuration
+generation:
+    split_sizes: {'train': 20000, 'val': 2000, 'test': 400}
+    random_seed: 10
+    image_size: [960, 1280]
+    min_len: 0.0985
+    min_label_len: 0.099
+    params:
+        generate_background:
+            min_kernel_size: 150
+            max_kernel_size: 500
+            min_rad_ratio: 0.02
+            max_rad_ratio: 0.031
+        draw_stripes:
+            transform_params: [0.1, 0.1]
+        draw_multiple_polygons:
+            kernel_boundaries: [50, 100]
+
+### Data preprocessing configuration.
+preprocessing:
+    resize: [400, 400]
+    blur_size: 11
+augmentation:
+    photometric:
+        enable: True
+        primitives: 'all'
+        params: {}
+        random_order: True
+    homographic:
+        enable: True
+        params:
+            translation: true
+            rotation: true
+            scaling: true
+            perspective: true
+            scaling_amplitude: 0.2
+            perspective_amplitude_x: 0.2
+            perspective_amplitude_y: 0.2
+            patch_ratio: 0.8
+            max_angle: 1.57
+            allow_artifacts: true
+            translation_overflow: 0.05
+        valid_border_margin: 0

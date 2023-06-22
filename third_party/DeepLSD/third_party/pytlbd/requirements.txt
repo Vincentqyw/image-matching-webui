@@ -1,0 +1,6 @@
+build>=0.4.0
+numpy>=1.19.5
+opencv-python>=4.5.2.54
+Pillow>=8.2.0
+scikit-image>=0.17.2
+scipy>=1.5.4

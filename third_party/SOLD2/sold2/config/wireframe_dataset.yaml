@@ -1,0 +1,75 @@
+### General dataset parameters
+dataset_name: "wireframe"
+add_augmentation_to_all_splits: False
+gray_scale: True
+# Ground truth source ('official' or path to the exported h5 dataset.)
+# gt_source_train: ""  # Fill with your own export file
+# gt_source_test: ""  # Fill with your own export file
+# Return type: (1) single (to train the detector only)
+# or (2) paired_desc (to train the detector + descriptor)
+return_type: "single"
+random_seed: 0
+
+### Descriptor training parameters
+# Number of points extracted per line
+max_num_samples: 10
+# Max number of training line points extracted in the whole image
+max_pts: 1000
+# Min distance between two points on a line (in  pixels)
+min_dist_pts: 10
+# Small jittering of the sampled points during training
+jittering: 0
+
+### Data preprocessing configuration
+preprocessing:
+    resize: [512, 512]
+    blur_size: 11
+augmentation:
+    random_scaling:
+        enable: True
+        range: [0.7, 1.5]
+    photometric:
+        enable: True
+        primitives: ['random_brightness', 'random_contrast',
+                     'additive_speckle_noise', 'additive_gaussian_noise',
+                     'additive_shade', 'motion_blur' ]
+        params:
+            random_brightness: {brightness: 0.2}
+            random_contrast: {contrast: [0.3, 1.5]}
+            additive_gaussian_noise: {stddev_range: [0, 10]}
+            additive_speckle_noise: {prob_range: [0, 0.0035]}
+            additive_shade:
+                transparency_range: [-0.5, 0.5]
+                kernel_size_range: [100, 150]
+            motion_blur: {max_kernel_size: 3}
+        random_order: True
+    homographic:
+        enable: True
+        params:
+            translation: true
+            rotation: true
+            scaling: true
+            perspective: true
+            scaling_amplitude: 0.2
+            perspective_amplitude_x: 0.2
+            perspective_amplitude_y: 0.2
+            patch_ratio: 0.85
+            max_angle: 1.57
+            allow_artifacts: true
+        valid_border_margin: 3
+
+### Homography adaptation configuration
+homography_adaptation:
+    num_iter: 100
+    valid_border_margin: 3
+    min_counts: 30
+    homographies:
+        translation: true
+        rotation: true
+        scaling: true
+        perspective: true
+        scaling_amplitude: 0.2
+        perspective_amplitude_x: 0.2
+        perspective_amplitude_y: 0.2
+        allow_artifacts: true
+        patch_ratio: 0.85
