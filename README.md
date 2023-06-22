@@ -14,7 +14,7 @@ The tool currently supports various popular image matching algorithms, namely:
 - [ ] [ConvMatch](https://github.com/SuhZhang/ConvMatch), AAAI 2023
 - [x] [SOLD2](https://github.com/cvg/SOLD2), CVPR 2021
 - [ ] [LineTR](https://github.com/yosungho/LineTR), RA-L 2021
-- [ ] [DKM](https://github.com/Parskatt/DKM), CVPR 2023
+- [x] [DKM](https://github.com/Parskatt/DKM), CVPR 2023
 - [ ] [RoMa](https://github.com/Parskatt/RoMa), Arxiv 2023
 - [ ] [NCMNet](https://github.com/xinliu29/NCMNet), CVPR 2023
 - [x] [TopicFM](https://github.com/TruongKhang/TopicFM), AAAI 2023

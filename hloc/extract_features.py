@@ -94,11 +94,7 @@ confs = {
         },
         'preprocessing': {
             'grayscale': False,
-            'force_resize': True,
             'resize_max': 1600,
-            'width': 640,
-            'height': 480,
-            'dfactor': 8
         },
     },
     'sift': {
@@ -138,11 +134,7 @@ confs = {
         },
         'preprocessing': {
             'grayscale': False,
-            'force_resize': True,
             'resize_max': 1600,
-            'width': 640,
-            'height': 480,
-            'dfactor': 8
         },
     },
     # Global descriptors

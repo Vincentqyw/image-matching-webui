@@ -4,7 +4,8 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 from PIL import Image
-
+import subprocess
+import logging
 from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / '../../third_party'))
@@ -12,15 +13,11 @@ from DKM.dkm import DKMv3_outdoor
 
 dkm_path = Path(__file__).parent / '../../third_party/DKM'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-# "DKMv3": {
-#     "outdoor": "https://github.com/Parskatt/storage/releases/download/dkmv3/DKMv3_outdoor.pth",
-#     "indoor": "https://github.com/Parskatt/storage/releases/download/dkmv3/DKMv3_indoor.pth",
-# },
+logger = logging.getLogger(__name__)
 
 class DKMv3(BaseModel):
     default_conf = {
-        'weights': 'outdoor',
+        'model_name': 'DKMv3_outdoor.pth',
         'match_threshold': 0.2,
         'checkpoint_dir': dkm_path / 'pretrained',
     }
@@ -28,9 +25,25 @@ class DKMv3(BaseModel):
         'image0',
         'image1',
     ]
+        # Models exported using
+    dkm_models = {
+        'DKMv3_outdoor.pth': 'https://github.com/Parskatt/storage/releases/download/dkmv3/DKMv3_outdoor.pth',
+        'DKMv3_indoor.pth': 'https://github.com/Parskatt/storage/releases/download/dkmv3/DKMv3_indoor.pth'
+    }
+
     def _init(self, conf):
-        path_to_weights = conf['checkpoint_dir'] / f'DKMv3_{conf["weights"]}.pth'
-        self.net = DKMv3_outdoor(path_to_weights = str(path_to_weights), device=device)
+        model_path = dkm_path / 'pretrained' / conf['model_name']
+
+        # Download the model.
+        if not model_path.exists():
+            model_path.parent.mkdir(exist_ok=True)
+            link = self.dkm_models[conf['model_name']]
+            cmd = ['wget', link, '-O', str(model_path)]
+            logger.info(f'Downloading the DKMv3 model with `{cmd}`.')
+            subprocess.run(cmd, check=True)
+        logger.info(f'Loading fire model...')
+        self.net = DKMv3_outdoor(path_to_weights = str(model_path), device=device)
+
     def _forward(self, data):
         img0 = data['image0'].cpu().numpy().squeeze() * 255
         img1 = data['image1'].cpu().numpy().squeeze() * 255
