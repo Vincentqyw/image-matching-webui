@@ -1,0 +1,8 @@
+/build/
+/dist/
+.idea/*
+*.pyc
+cmake-build-*
+/venv/*
+*.egg-info/
+*.so

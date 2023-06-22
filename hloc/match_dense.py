@@ -117,6 +117,20 @@ confs = {
             'dfactor': 8
         },
     },
+    'gluestick': {
+        'output': 'matches-gluestick',
+        'model': {
+            'name': 'gluestick',
+        },
+        'preprocessing': {
+            'grayscale': True,
+            'force_resize': True,
+            'resize_max': 1024,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
+        },
+    },
 }
 
 def scale_keypoints(kpts, scale):
@@ -259,9 +273,8 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
     # Rescale keypoints and move to cpu
     if 'keypoints0' in pred.keys() and 'keypoints1' in pred.keys():
         kpts0, kpts1 = pred['keypoints0'], pred['keypoints1']
-        kpts0 = scale_keypoints(kpts0 + 0.5, scale0) - 0.5
-        kpts1 = scale_keypoints(kpts1 + 0.5, scale1) - 0.5
-        
+        # kpts0 = scale_keypoints(kpts0 + 0.5, scale0) - 0.5
+        # kpts1 = scale_keypoints(kpts1 + 0.5, scale1) - 0.5
         kpts0_origin = scale_keypoints(kpts0 + 0.5, s0) - 0.5
         kpts1_origin = scale_keypoints(kpts1 + 0.5, s1) - 0.5
 
@@ -284,6 +297,14 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
         if 'mconf' in pred.keys():
             ret['mconf'] = pred['mconf'].cpu().numpy()
     if 'lines0' in pred.keys() and 'lines1' in pred.keys():
+        if 'keypoints0' in pred.keys() and 'keypoints1' in pred.keys():
+            kpts0, kpts1 = pred['keypoints0'], pred['keypoints1']
+            kpts0_origin = scale_keypoints(kpts0 + 0.5, s0) - 0.5
+            kpts1_origin = scale_keypoints(kpts1 + 0.5, s1) - 0.5
+            kpts0_origin = kpts0_origin.cpu().numpy()
+            kpts1_origin = kpts1_origin.cpu().numpy()
+        else:
+            kpts0_origin, kpts1_origin = np.zeros([0]), np.zeros([0])
         lines0, lines1 = pred['lines0'], pred['lines1']
         lines0_raw, lines1_raw = pred['raw_lines0'], pred['raw_lines1']
 
@@ -296,6 +317,7 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
         lines1 = torch.from_numpy(lines1.copy())
         lines0 = scale_lines(lines0 + 0.5, s0) - 0.5
         lines1 = scale_lines(lines1 + 0.5, s1) - 0.5
+
         ret = {
             'image0_orig': image_0,
             'image1_orig': image_1,
@@ -303,5 +325,7 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
             'line1': lines1_raw.cpu().numpy(),
             'line0_orig': lines0.cpu().numpy(),
             'line1_orig': lines1.cpu().numpy(),
+            'line_keypoints0_orig': kpts0_origin,
+            'line_keypoints1_orig': kpts1_origin,
         }  
     return ret

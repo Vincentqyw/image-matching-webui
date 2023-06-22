@@ -1,0 +1,24 @@
+data:
+    name: york_urban
+    dataset_dir: YorkUrbanDB
+    batch_size: 1
+    num_workers: 4
+model:
+    name: deeplsd
+    tiny: False
+    sharpen: True
+    line_neighborhood: 5
+    loss_weights:
+        df: 1.
+        angle: 1.
+    detect_lines: True
+    multiscale: False
+    scale_factors: [1., 1.5]
+    line_detection_params:
+        grad_nfa: True
+        merge: False
+        optimize: False
+        use_vps: True
+        optimize_vps: True
+        filtering: True
+        grad_thresh: 3

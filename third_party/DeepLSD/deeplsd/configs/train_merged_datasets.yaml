@@ -1,0 +1,56 @@
+data:
+    name: merge_dataset
+    names: ['minidepth', 'wireframe_ha']
+    dataset_dir: ['MiniDepth', 'Wireframe_raw']
+    gt_dir: ['export_datasets/minidepth_ha3', 'export_datasets/wireframe_ha5']
+    weights: [0.5, 0.5]
+    num_workers: 4
+    batch_size: 5
+    resize: [512, 512]
+    photometric_augmentation:
+        enable: True
+        primitives: ['random_brightness', 'random_contrast',
+                     'additive_speckle_noise', 'additive_gaussian_noise',
+                     'additive_shade', 'motion_blur']
+        params:
+            random_brightness:
+                brightness: 0.5
+            random_contrast:
+                strength_range: [0.5, 1.5]
+            additive_gaussian_noise:
+                stddev_range: [5, 95]
+            additive_speckle_noise:
+                prob_range: [0, 0.01]
+            additive_shade:
+                transparency_range: [-0.8, 0.8]
+                kernel_size_range: [100, 150]
+            motion_blur:
+                max_kernel_size: 3
+    warped_pair: False
+    homographic_augmentation: True
+    seed: 0
+model:
+    name: deeplsd
+    sharpen: True
+    line_neighborhood: 5
+    loss_weights:
+        df: 1.
+        angle: 1.
+    detect_lines: False
+    line_detection_params:
+        merge: False
+        optimize: False
+        use_vps: False
+        optimize_vps: False
+        filtering: True
+        grad_thresh: 3
+train:
+    epochs: 300
+    lr: 0.001
+    scheduler: 'ReduceLROnPlateau'
+    patience: 10
+    eval_every_iter: 600
+    log_every_iter: 100
+    save_every_iter: 1200
+    keep_last_checkpoints: 3
+    seed: 0

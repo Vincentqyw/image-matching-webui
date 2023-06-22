@@ -21,11 +21,13 @@ def _compute_conf_thresh(data):
 
 # --- VISUALIZATION --- #
 
+
+    
 def make_matching_figure(
         img0, img1, mkpts0, mkpts1, color,
         kpts0=None, kpts1=None, text=[], dpi=75, path=None):
     # draw image pair
-    assert mkpts0.shape[0] == mkpts1.shape[0], f'mkpts0: {mkpts0.shape[0]} v.s. mkpts1: {mkpts1.shape[0]}'
+    # assert mkpts0.shape[0] == mkpts1.shape[0], f'mkpts0: {mkpts0.shape[0]} v.s. mkpts1: {mkpts1.shape[0]}'
     fig, axes = plt.subplots(1, 2, figsize=(10, 6), dpi=dpi)
     axes[0].imshow(img0)  # , cmap='gray')
     axes[1].imshow(img1)  # , cmap='gray')
@@ -326,4 +328,28 @@ def draw_matches(mkpts0, mkpts1, img0, img1, conf, dpi = 150, path=None):
     else:
         return fig2im(make_matching_figure(img0, img1, mkpts0, mkpts1, color, text=text))
 
+def draw_image_pairs(
+        img0, img1, text=[], dpi=75, path=None):
+    # draw image pair
+    fig, axes = plt.subplots(1, 2, figsize=(10, 6), dpi=dpi)
+    axes[0].imshow(img0)  # , cmap='gray')
+    axes[1].imshow(img1)  # , cmap='gray')
+    for i in range(2):   # clear all frames
+        axes[i].get_yaxis().set_ticks([])
+        axes[i].get_xaxis().set_ticks([])
+        for spine in axes[i].spines.values():
+            spine.set_visible(False)
+    plt.tight_layout(pad=1)
 
+    # put txts
+    txt_color = 'k' if img0[:100, :200].mean() > 200 else 'w'
+    fig.text(
+        0.01, 0.99, '\n'.join(text), transform=fig.axes[0].transAxes,
+        fontsize=15, va='top', ha='left', color=txt_color)
+
+    # save or return figure
+    if path:
+        plt.savefig(str(path), bbox_inches='tight', pad_inches=0)
+        plt.close()
+    else:
+        return fig2im(fig)

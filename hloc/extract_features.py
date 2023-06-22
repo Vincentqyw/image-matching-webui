@@ -34,7 +34,11 @@ confs = {
         },
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'force_resize': True,
+            'resize_max': 1600,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
         },
     },
     # Resize images to 1600px even if they are originally smaller.
@@ -48,8 +52,11 @@ confs = {
         },
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1600,
             'force_resize': True,
+            'resize_max': 1600,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
         },
     },
     'superpoint_inloc': {
@@ -72,7 +79,11 @@ confs = {
         },
         'preprocessing': {
             'grayscale': False,
-            'resize_max': 1024,
+            'force_resize': True,
+            'resize_max': 1600,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
         },
     },
     'd2net-ss': {
@@ -83,7 +94,11 @@ confs = {
         },
         'preprocessing': {
             'grayscale': False,
+            'force_resize': True,
             'resize_max': 1600,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
         },
     },
     'sift': {
@@ -93,7 +108,11 @@ confs = {
         },
         'preprocessing': {
             'grayscale': True,
+            'force_resize': True,
             'resize_max': 1600,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
         },
     },
     'sosnet': {
@@ -105,6 +124,10 @@ confs = {
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
+            'force_resize': True,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
         },
     },
     'disk': {
@@ -115,7 +138,11 @@ confs = {
         },
         'preprocessing': {
             'grayscale': False,
+            'force_resize': True,
             'resize_max': 1600,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
         },
     },
     # Global descriptors

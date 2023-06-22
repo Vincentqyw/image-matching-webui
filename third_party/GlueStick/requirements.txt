@@ -1,0 +1,12 @@
+numpy
+matplotlib
+scipy
+scikit_learn
+seaborn
+omegaconf==2.2.*
+opencv-python==4.7.0.*
+torch>=1.12
+torchvision>=0.13
+setuptools
+tqdm
+git+https://github.com/iago-suarez/pytlsd.git@37ac583
