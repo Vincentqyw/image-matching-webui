@@ -103,6 +103,22 @@ confs = {
             'dfactor': 8
         },
     },
+    'roma': {
+        'output': 'matches-roma',
+        'model': {
+            'name': 'roma',
+            'weights': 'outdoor',
+            'max_keypoints': 2000,
+        },
+        'preprocessing': {
+            'grayscale': False,
+            'force_resize': True,
+            'resize_max': 1024,
+            'width': 320,
+            'height': 240,
+            'dfactor': 8
+        },
+    },
     'sold2': {
         'output': 'matches-sold2',
         'model': {

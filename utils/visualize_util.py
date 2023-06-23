@@ -255,7 +255,7 @@ def plot_line_segments_from_segments(input_image, line_segments, junc_size=3,
 
 # Additional functions to visualize multiple images at the same time,
 # e.g. for line matching
-def plot_images(imgs, titles=None, cmaps='gray', dpi=100, size=6, pad=.5):
+def plot_images(imgs, titles=None, cmaps='gray', dpi=100, size=5, pad=.5):
     """Plot a set of images horizontally.
     Args:
         imgs: a list of NumPy or PyTorch images, RGB (H, W, 3) or mono (H, W).
@@ -265,8 +265,10 @@ def plot_images(imgs, titles=None, cmaps='gray', dpi=100, size=6, pad=.5):
     n = len(imgs)
     if not isinstance(cmaps, (list, tuple)):
         cmaps = [cmaps] * n
-    figsize = (size*n, size*3/4) if size is not None else None
+    # figsize = (size*n, size*3/4) if size is not None else None
+    figsize = (size*n, size*6/5) if size is not None else None
     fig, ax = plt.subplots(1, n, figsize=figsize, dpi=dpi)
+
     if n == 1:
         ax = [ax]
     for i in range(n):
