@@ -21,7 +21,6 @@ def run_select_model(key):
 
 def run_matching(in0, in1, in2, key, image0, image1):
     model = matcher_zoo[key]
-    # matcher = model['model']
     match_conf = model['config']
     matcher = get_model(match_conf)
     if model['dense']:
