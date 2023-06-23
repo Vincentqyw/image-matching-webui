@@ -19,9 +19,8 @@ def run_select_model(key):
         local_feature_extractor = get_feature_model(extract_conf)
     return matcher, local_feature_extractor
 
-def run_matching(key, image0, image1):
+def run_matching(in0, in1, in2, key, image0, image1):
     model = matcher_zoo[key]
-    # matcher = model['model']
     match_conf = model['config']
     matcher = get_model(match_conf)
     if model['dense']:
@@ -75,25 +74,54 @@ def run_matching(key, image0, image1):
         {'match_conf': match_conf, 'extractor_conf': extract_conf}
 
 def run(config):
-    matcher_list = gr.Dropdown(choices=list(matcher_zoo.keys()), \
-        value='topicfm', label="Select Model", interactive=True)
-    input_image0 = gr.Image(label="Image 0", type="numpy")
-    input_image1 = gr.Image(label="Image 1", type="numpy")
+    with gr.Blocks(theme=gr.themes.Monochrome(),
+        css="footer {visibility: hidden}") as block:
+        gr.Markdown("# Image Matching Toolbox")
+        gr.HTML("<hr> Image matching toolbox webui is a web-based tool for image matching.\
+                You can use it to match two images and visualize the results.")
+        with gr.Row(equal_height=False):
+            with gr.Column():
+                matcher_list = gr.Dropdown(choices=list(matcher_zoo.keys()), \
+                    value='topicfm', label="Select Model", interactive=True)
+                with gr.Row():
+                    match_setting_resize = gr.Slider(minimum=0.1, maximum=1, \
+                            step=0.1, label="Resize ratio")
+                    match_setting_max_num_features = gr.Slider(minimum=100, \
+                            maximum=10000, step=100, label="Max number of features")
+                match_setting_force_resize = gr.Checkbox(label="Force resize")
+                
+                input_image0 = gr.Image(label="Image 0", type="numpy")
+                input_image1 = gr.Image(label="Image 1", type="numpy")
+                with gr.Row():
+                    button_clear = gr.Button(label="Clear",value="Clear")
+                    button_run = gr.Button(label="Run Match", value="Run Match")
+            with gr.Column():
+                output_mkpts = gr.Image(label="Keypoints Matching", type="numpy")
+                output_lines = gr.Image(label="Lines Matching", type="numpy")
+                matches_result_info = gr.JSON(label="Matches Statistics")
+                matcher_info = gr.JSON(label="Match info")
 
-    output_mkpts = gr.Image(label="Keypoints Matching", type="numpy")
-    output_lines = gr.Image(label="Lines Matching", type="numpy")
-    matches_result_info = gr.JSON(label="Matches Statistics")
-    matcher_info = gr.JSON(label="Match info")
-  
-    demo = gr.Interface(
-        fn=run_matching,
-        inputs=[matcher_list, input_image0, input_image1],
-        outputs=[output_mkpts, output_lines, matches_result_info, matcher_info],
-        title="Image Matching Toolbox",
-        description="Select model and upload 2 images to match",
-        theme=gr.themes.Monochrome(),
-        live=False,
-    ).launch(share=False)
+            # collect inputs and outputs
+            inputs = [
+                match_setting_resize,
+                match_setting_max_num_features,
+                match_setting_force_resize,
+                matcher_list,
+                input_image0,
+                input_image1,
+            ]
+            outputs = [output_mkpts,
+                         output_lines, 
+                         matches_result_info, 
+                         matcher_info,
+            ]
+            # button callbacks
+            button_run.click(
+                fn=run_matching,
+                inputs=inputs,
+                outputs=outputs
+            )
+    block.launch(share=False)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
