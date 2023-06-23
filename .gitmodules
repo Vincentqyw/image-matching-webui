@@ -4,3 +4,6 @@
 [submodule "third_party/SuperGluePretrainedNetwork"]
 	path = third_party/SuperGluePretrainedNetwork
 	url = https://github.com/magicleap/SuperGluePretrainedNetwork.git
+[submodule "third_party/SOLD2"]
+	path = third_party/SOLD2
+	url = https://github.com/cvg/SOLD2.git
