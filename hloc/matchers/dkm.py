@@ -1,8 +1,6 @@
 import sys
 from pathlib import Path
 import torch
-import torch.nn.functional as F
-import numpy as np
 from PIL import Image
 import subprocess
 import logging
