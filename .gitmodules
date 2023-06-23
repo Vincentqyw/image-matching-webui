@@ -1,3 +1,6 @@
 [submodule "third_party/Roma"]
 	path = third_party/Roma
 	url = https://github.com/Vincentqyw/RoMa.git
+[submodule "third_party/SuperGluePretrainedNetwork"]
+	path = third_party/SuperGluePretrainedNetwork
+	url = https://github.com/magicleap/SuperGluePretrainedNetwork.git
