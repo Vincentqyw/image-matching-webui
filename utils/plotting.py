@@ -25,7 +25,7 @@ def _compute_conf_thresh(data):
     
 def make_matching_figure(
         img0, img1, mkpts0, mkpts1, color,
-        kpts0=None, kpts1=None, text=[], dpi=75, path=None):
+        kpts0=None, kpts1=None, text=[], dpi=75, path=None,pad=1):
     # draw image pair
     # assert mkpts0.shape[0] == mkpts1.shape[0], f'mkpts0: {mkpts0.shape[0]} v.s. mkpts1: {mkpts1.shape[0]}'
     fig, axes = plt.subplots(1, 2, figsize=(10, 6), dpi=dpi)
@@ -36,7 +36,7 @@ def make_matching_figure(
         axes[i].get_xaxis().set_ticks([])
         for spine in axes[i].spines.values():
             spine.set_visible(False)
-    plt.tight_layout(pad=1)
+    plt.tight_layout(pad=pad)
     
     if kpts0 is not None:
         assert kpts1 is not None
@@ -315,7 +315,7 @@ def fig2im(fig):
     im = buf_ndarray.reshape(h, w, 3)
     return im
 
-def draw_matches(mkpts0, mkpts1, img0, img1, conf, dpi = 150, path=None):
+def draw_matches(mkpts0, mkpts1, img0, img1, conf, dpi = 150, path=None, pad = 0):
     thr = 5e-4
     thr = 0.5
     color = error_colormap(conf, thr, alpha=0.1)
@@ -324,12 +324,14 @@ def draw_matches(mkpts0, mkpts1, img0, img1, conf, dpi = 150, path=None):
         f"#Matches: {len(mkpts0)}",
     ]
     if path:
-        fig2im(make_matching_figure(img0, img1, mkpts0, mkpts1, color, text=text, path=path, dpi=dpi))
+        fig2im(make_matching_figure(img0, img1, mkpts0, mkpts1, 
+                        color, text=text, path=path, dpi=dpi, pad=pad))
     else:
-        return fig2im(make_matching_figure(img0, img1, mkpts0, mkpts1, color, text=text))
+        return fig2im(make_matching_figure(img0, img1, mkpts0, mkpts1,
+                        color, text=text, pad=pad, dpi=dpi))
 
 def draw_image_pairs(
-        img0, img1, text=[], dpi=75, path=None):
+        img0, img1, text=[], dpi=75, path=None, pad=0):
     # draw image pair
     fig, axes = plt.subplots(1, 2, figsize=(10, 6), dpi=dpi)
     axes[0].imshow(img0)  # , cmap='gray')
@@ -339,7 +341,7 @@ def draw_image_pairs(
         axes[i].get_xaxis().set_ticks([])
         for spine in axes[i].spines.values():
             spine.set_visible(False)
-    plt.tight_layout(pad=1)
+    plt.tight_layout(pad=pad)
 
     # put txts
     txt_color = 'k' if img0[:100, :200].mean() > 200 else 'w'
