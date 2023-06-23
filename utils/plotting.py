@@ -25,7 +25,7 @@ def _compute_conf_thresh(data):
     
 def make_matching_figure(
         img0, img1, mkpts0, mkpts1, color,
-        kpts0=None, kpts1=None, text=[], dpi=75, path=None,pad=1):
+        kpts0=None, kpts1=None, text=[], dpi=75, path=None,pad=0):
     # draw image pair
     # assert mkpts0.shape[0] == mkpts1.shape[0], f'mkpts0: {mkpts0.shape[0]} v.s. mkpts1: {mkpts1.shape[0]}'
     fig, axes = plt.subplots(1, 2, figsize=(10, 6), dpi=dpi)
@@ -54,6 +54,10 @@ def make_matching_figure(
                                             transform=fig.transFigure, c=color[i], linewidth=2)
                                         for i in range(len(mkpts0))]
         
+        # freeze the axes to prevent the transform to change
+        axes[0].autoscale(enable=False)
+        axes[1].autoscale(enable=False)
+
         axes[0].scatter(mkpts0[:, 0], mkpts0[:, 1], c=color[..., :3], s=4)
         axes[1].scatter(mkpts1[:, 0], mkpts1[:, 1], c=color[..., :3], s=4)
 
@@ -315,7 +319,7 @@ def fig2im(fig):
     im = buf_ndarray.reshape(h, w, 3)
     return im
 
-def draw_matches(mkpts0, mkpts1, img0, img1, conf, dpi = 150, path=None, pad = 0):
+def draw_matches(mkpts0, mkpts1, img0, img1, conf, dpi = 150, path=None, pad = 0.5):
     thr = 5e-4
     thr = 0.5
     color = error_colormap(conf, thr, alpha=0.1)
@@ -331,7 +335,7 @@ def draw_matches(mkpts0, mkpts1, img0, img1, conf, dpi = 150, path=None, pad = 0
                         color, text=text, pad=pad, dpi=dpi))
 
 def draw_image_pairs(
-        img0, img1, text=[], dpi=75, path=None, pad=0):
+        img0, img1, text=[], dpi=75, path=None, pad=0.5):
     # draw image pair
     fig, axes = plt.subplots(1, 2, figsize=(10, 6), dpi=dpi)
     axes[0].imshow(img0)  # , cmap='gray')

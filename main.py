@@ -57,8 +57,7 @@ def run_matching(in0, in1, in2, key, image0, image1):
         mtlines1 = pred['line1_orig']
         num_inliers = len(mtlines0)
         fig_lines = plot_images([img0.squeeze(), img1.squeeze()], \
-                        ['Image 1 - matched lines', 'Image 2 - matched lines'],
-                        pad=0)
+                        ['Image 1 - matched lines', 'Image 2 - matched lines'])
         fig_lines = plot_color_line_matches([mtlines0, mtlines1], lw=2)
         fig_lines = fig2im(fig_lines)
 
@@ -69,7 +68,7 @@ def run_matching(in0, in1, in2, key, image0, image1):
             mconf = pred['mconf']
         else:
             mconf = np.ones(len(mkpts0))
-        fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi = 300, pad = 0)
+        fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi = 300)
     del pred
     return fig_mkpts, fig_lines, {"matches number": num_inliers}, \
         {'match_conf': match_conf, 'extractor_conf': extract_conf}

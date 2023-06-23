@@ -108,7 +108,7 @@ confs = {
         'model': {
             'name': 'roma',
             'weights': 'outdoor',
-            'max_keypoints': 1000,
+            'max_keypoints': 2000,
         },
         'preprocessing': {
             'grayscale': False,
