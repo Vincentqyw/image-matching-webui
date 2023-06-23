@@ -63,6 +63,10 @@ matcher_zoo = {
         'config_feature': extract_features.confs['sift'],
         'dense': False
     },
+    'roma': {
+        'config': match_dense.confs['roma'],
+        'dense': True
+    },
     'DKMv3': {
         'config': match_dense.confs['dkm'],
         'dense': True
