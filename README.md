@@ -1,3 +1,8 @@
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+
 <p align="center">
   <h1 align="center"><br><ins>Image Matching WebGUI</ins><br>matching images with given images</h1> 
 </p>
@@ -58,3 +63,12 @@ External contributions are very much welcome. Please follow the [PEP8 style guid
 ## Acknowledgement
 
 This code is built based on [Hierarchical-Localization](https://github.com/cvg/Hierarchical-Localization). We express our gratitude to the authors for their valuable source code.
+
+[contributors-shield]: https://img.shields.io/github/contributors/Vincentqyw/image-matching-webui.svg?style=for-the-badge
+[contributors-url]: https://github.com/Vincentqyw/image-matching-webui/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/Vincentqyw/image-matching-webui.svg?style=for-the-badge
+[forks-url]: https://github.com/Vincentqyw/image-matching-webui/network/members
+[stars-shield]: https://img.shields.io/github/stars/Vincentqyw/image-matching-webui.svg?style=for-the-badge
+[stars-url]: https://github.com/Vincentqyw/image-matching-webui/stargazers
+[issues-shield]: https://img.shields.io/github/issues/Vincentqyw/image-matching-webui.svg?style=for-the-badge
+[issues-url]: https://github.com/Vincentqyw/image-matching-webui/issues
