@@ -74,11 +74,17 @@ def run_matching(in0, in1, in2, key, image0, image1):
         {'match_conf': match_conf, 'extractor_conf': extract_conf}
 
 def run(config):
+
     with gr.Blocks(theme=gr.themes.Monochrome(),
         css="footer {visibility: hidden}") as block:
-        gr.Markdown("# Image Matching Toolbox")
-        gr.HTML("<hr> Image matching toolbox webui is a web-based tool for image matching.\
-                You can use it to match two images and visualize the results.")
+        gr.Markdown(
+            """
+            <p align="center">
+            <h1 align="center">Image Matching WebGUI</h1> 
+            </p>
+            """
+        )
+        
         with gr.Row(equal_height=False):
             with gr.Column():
                 matcher_list = gr.Dropdown(choices=list(matcher_zoo.keys()), \
