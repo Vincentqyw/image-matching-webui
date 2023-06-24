@@ -50,7 +50,7 @@ python3 ./main.py
 ```
 then open http://localhost:7860 in your browser.
 
-![](assets/gui.png)
+![](assets/gui.jpg)
 
 ## Contributions welcome!
 
