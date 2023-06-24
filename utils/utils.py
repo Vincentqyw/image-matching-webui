@@ -14,8 +14,6 @@ def get_feature_model(conf):
     Model = dynamic_load(extractors, conf['model']['name'])
     model = Model(conf['model']).eval().to(device)
     return model
-from utils.utils import get_model, get_feature_model, device
-
 
 matcher_zoo = {
     'sold2': {

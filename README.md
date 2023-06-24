@@ -10,6 +10,9 @@
 ## Description
 
 This simple tool efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
+**Note**: the images source can be either local images or webcam images.
+
+Here is a demo of the tool:
 
 ![demo](assets/demo.gif)
 
@@ -42,6 +45,8 @@ The tool currently supports various popular image matching algorithms, namely:
 
 ### requirements
 ``` bash
+git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git
+cd image-matching-webui
 conda env create --name imw --file environment.yaml
 ```
 ### run demo

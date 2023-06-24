@@ -3,24 +3,12 @@ import gradio as gr
 import numpy as np
 import cv2
 from hloc import extract_features
-from utils.plotting import draw_matches, fig2im, draw_image_pairs
+from utils.plotting import draw_matches, fig2im
 from utils.utils import (
     matcher_zoo, device, match_dense, match_features,
     get_model, get_feature_model,
 )
 from utils.visualize_util import plot_images, plot_color_line_matches
-
-
-# TODO: add model selection
-def run_select_model(key):
-    model = matcher_zoo[key]
-    match_conf = model['config']
-    matcher = get_model(match_conf)
-    if not matcher['dense']:
-        extract_conf = model['config_feature']
-        local_feature_extractor = get_feature_model(extract_conf)
-    return matcher, local_feature_extractor
-
 
 def run_matching(match_threshold, extract_max_keypoints, key, image0, image1):
     if image0 is None or image1 is None:
@@ -116,7 +104,7 @@ def run(config):
         gr.Markdown(
             """
             <p align="center">
-            <h1 align="center">Image Matching WebGUI</h1> 
+            <h1 align="center">Image Matching WebUI</h1> 
             </p>
             """
         )
@@ -130,7 +118,7 @@ def run(config):
                         label="Select Model",
                         interactive=True
                     )
-                    match_image_src = gr.Radio(["upload", "webcam", "sketch"],
+                    match_image_src = gr.Radio(["upload", "webcam", "canvas"],
                         label="Image Source",value="upload")
 
                 with gr.Row():
@@ -170,13 +158,11 @@ def run(config):
                     button_run = gr.Button(label="Run Match", value="Run Match")
                     button_clear.click(fn=change_imagebox, inputs=match_image_src, outputs=input_image0)
                     button_clear.click(fn=change_imagebox, inputs=match_image_src, outputs=input_image1)
-                # input_config = gr.JSON(label="Config")
             with gr.Column():
                 output_mkpts = gr.Image(
                     label="Keypoints Matching",
                     type="numpy"
                 )
-                # output_lines = gr.Image(label="Lines Matching", type="numpy")
                 matches_result_info = gr.JSON(label="Matches Statistics")
                 matcher_info = gr.JSON(label="Match info")
             
@@ -203,9 +189,7 @@ def run(config):
                 inputs=inputs,
                 outputs=outputs
             )
-    app.queue()
     app.launch(share=False)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
