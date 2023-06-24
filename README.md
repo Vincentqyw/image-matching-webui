@@ -37,7 +37,7 @@ The tool currently supports various popular image matching algorithms, namely:
 
 ### requirements
 ``` bash
-pip install -r requirements.txt
+conda env create --name imw --file environment.yaml
 ```
 ### run demo
 ``` bash
