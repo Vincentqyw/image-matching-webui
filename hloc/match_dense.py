@@ -13,7 +13,9 @@ confs = {
         'output': 'matches-loftr',
         'model': {
             'name': 'loftr',
-            'weights': 'outdoor'
+            'weights': 'outdoor',
+            'max_keypoints': 2000,
+            'match_threshold': 0.2,
         },
         'preprocessing': {
             'grayscale': True,
@@ -31,7 +33,9 @@ confs = {
         'output': 'matches-loftr_aachen',
         'model': {
             'name': 'loftr',
-            'weights': 'outdoor'
+            'weights': 'outdoor',
+            'max_keypoints': 2000,
+            'match_threshold': 0.2,
         },
         'preprocessing': {
             'grayscale': True,
@@ -46,7 +50,9 @@ confs = {
         'output': 'matches-loftr_aachen',
         'model': {
             'name': 'loftr',
-            'weights': 'outdoor'
+            'weights': 'outdoor',
+            'max_keypoints': 2000,
+            'match_threshold': 0.2,
         },
         'preprocessing': {
             'grayscale': True,
@@ -61,7 +67,9 @@ confs = {
         'output': 'matches-topicfm',
         'model': {
             'name': 'topicfm',
-            'weights': 'outdoor'
+            'weights': 'outdoor',
+            'max_keypoints': 2000,
+            'match_threshold': 0.2,
         },
         'preprocessing': {
             'grayscale': True,
@@ -77,7 +85,9 @@ confs = {
         'output': 'matches-aspanformer',
         'model': {
             'name': 'aspanformer',
-            'weights': 'outdoor'
+            'weights': 'outdoor',
+            'max_keypoints': 2000,
+            'match_threshold': 0.2,
         },
         'preprocessing': {
             'grayscale': True,
@@ -92,7 +102,9 @@ confs = {
         'output': 'matches-dkm',
         'model': {
             'name': 'dkm',
-            'weights': 'outdoor'
+            'weights': 'outdoor',
+            'max_keypoints': 2000,
+            'match_threshold': 0.2,
         },
         'preprocessing': {
             'grayscale': False,
@@ -109,6 +121,7 @@ confs = {
             'name': 'roma',
             'weights': 'outdoor',
             'max_keypoints': 2000,
+            'match_threshold': 0.2,
         },
         'preprocessing': {
             'grayscale': False,
@@ -123,6 +136,8 @@ confs = {
         'output': 'matches-sold2',
         'model': {
             'name': 'sold2',
+            'max_keypoints': 2000,
+            'match_threshold': 0.2,
         },
         'preprocessing': {
             'grayscale': True,
@@ -137,6 +152,10 @@ confs = {
         'output': 'matches-gluestick',
         'model': {
             'name': 'gluestick',
+            'use_lines': True,
+            'max_keypoints': 1000,
+            'max_lines': 300,
+            'force_num_keypoints': False,
         },
         'preprocessing': {
             'grayscale': True,
@@ -320,7 +339,7 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
             kpts0_origin = kpts0_origin.cpu().numpy()
             kpts1_origin = kpts1_origin.cpu().numpy()
         else:
-            kpts0_origin, kpts1_origin = np.zeros([0]), np.zeros([0])
+            kpts0_origin, kpts1_origin = None, None #np.zeros([0]), np.zeros([0])
         lines0, lines1 = pred['lines0'], pred['lines1']
         lines0_raw, lines1_raw = pred['raw_lines0'], pred['raw_lines1']
 

@@ -9,7 +9,7 @@ from ..utils.base_model import BaseModel
 class LoFTR(BaseModel):
     default_conf = {
         'weights': 'outdoor',
-        'match_threshold': 0.2,
+        'match_threshold': 0.2, 
         'max_num_matches': None,
     }
     required_inputs = [

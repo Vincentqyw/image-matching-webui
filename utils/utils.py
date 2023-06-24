@@ -43,9 +43,19 @@ matcher_zoo = {
         'config_feature': extract_features.confs['superpoint_max'],
         'dense': False
     },
+    'superpoint+MNN': {
+        'config': match_features.confs['NN-mutual'],
+        'config_feature': extract_features.confs['superpoint_max'],
+        'dense': False
+    },
     'd2net': {
         'config': match_features.confs['NN-mutual'],
         'config_feature': extract_features.confs['d2net-ss'],
+        'dense': False
+    },
+    'd2net-ms': {
+        'config': match_features.confs['NN-mutual'],
+        'config_feature': extract_features.confs['d2net-ms'],
         'dense': False
     },
     'disk': {
