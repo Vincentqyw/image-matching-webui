@@ -18,6 +18,11 @@ class SOLD2(BaseModel):
         'weights': 'sold2_wireframe.tar',
         'match_threshold': 0.2,
         'checkpoint_dir': sold2_path / 'pretrained',
+        'detect_thresh': 0.25,
+        'multiscale': False,
+        'valid_thresh': 1e-3,
+        'num_blocks': 20,
+        'overlap_ratio': 0.5,
     }
     required_inputs = [
         'image0',

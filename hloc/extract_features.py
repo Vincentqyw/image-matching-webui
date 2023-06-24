@@ -31,6 +31,7 @@ confs = {
             'name': 'superpoint',
             'nms_radius': 3,
             'max_keypoints': 4096,
+            'keypoint_threshold': 0.005,
         },
         'preprocessing': {
             'grayscale': True,
@@ -49,6 +50,7 @@ confs = {
             'name': 'superpoint',
             'nms_radius': 3,
             'max_keypoints': 4096,
+            'keypoint_threshold': 0.005,
         },
         'preprocessing': {
             'grayscale': True,
@@ -65,6 +67,7 @@ confs = {
             'name': 'superpoint',
             'nms_radius': 4,
             'max_keypoints': 4096,
+            'keypoint_threshold': 0.005,
         },
         'preprocessing': {
             'grayscale': True,
@@ -76,6 +79,8 @@ confs = {
         'model': {
             'name': 'r2d2',
             'max_keypoints': 5000,
+            'reliability_threshold': 0.7,
+            'repetability_threshold': 0.7,
         },
         'preprocessing': {
             'grayscale': False,
@@ -91,6 +96,17 @@ confs = {
         'model': {
             'name': 'd2net',
             'multiscale': False,
+        },
+        'preprocessing': {
+            'grayscale': False,
+            'resize_max': 1600,
+        },
+    },
+    'd2net-ms': {
+        'output': 'feats-d2net-ms',
+        'model': {
+            'name': 'd2net',
+            'multiscale': True,
         },
         'preprocessing': {
             'grayscale': False,

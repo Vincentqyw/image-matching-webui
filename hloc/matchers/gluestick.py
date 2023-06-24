@@ -16,32 +16,13 @@ from gluestick.models.two_view_pipeline import TwoViewPipeline
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-MAX_N_POINTS, MAX_N_LINES = 1000, 300
-
 class GlueStick(BaseModel):
     default_conf = {
         'name': 'two_view_pipeline',
         'use_lines': True,
-        'extractor': {
-            'name': 'wireframe',
-            'sp_params': {
-                'force_num_keypoints': False,
-                'max_num_keypoints': MAX_N_POINTS,
-            },
-            'wireframe_params': {
-                'merge_points': True,
-                'merge_line_endpoints': True,
-            },
-            'max_n_lines': MAX_N_LINES,
-        },
-        'matcher': {
-            'name': 'gluestick',
-            'weights': str(gluestick_path / 'resources' / 'weights' / 'checkpoint_GlueStick_MD.tar'),
-            'trainable': False,
-        },
-        'ground_truth': {
-            'from_pose_depth': False,
-        }
+        'max_keypoints': 1000,
+        'max_lines': 300,
+        'force_num_keypoints': False,
     }
     required_inputs = [
         'image0',
@@ -49,7 +30,34 @@ class GlueStick(BaseModel):
     ]
     # Initialize the line matcher
     def _init(self, conf):
-        self.net = TwoViewPipeline(conf)
+        gluestick_conf = {
+            'name': 'two_view_pipeline',
+            'use_lines': True,
+            'extractor': {
+                'name': 'wireframe',
+                'sp_params': {
+                    'force_num_keypoints': False,
+                    'max_num_keypoints': 1000,
+                },
+                'wireframe_params': {
+                    'merge_points': True,
+                    'merge_line_endpoints': True,
+                },
+                'max_n_lines': 300,
+            },
+            'matcher': {
+                'name': 'gluestick',
+                'weights': str(gluestick_path / 'resources' / 'weights' / 'checkpoint_GlueStick_MD.tar'),
+                'trainable': False,
+            },
+            'ground_truth': {
+                'from_pose_depth': False,
+            }
+        }
+        gluestick_conf['extractor']['sp_params']['max_num_keypoints'] = conf['max_keypoints']
+        gluestick_conf['extractor']['sp_params']['force_num_keypoints'] = conf['force_num_keypoints']
+        gluestick_conf['extractor']['max_n_lines'] = conf['max_lines']
+        self.net = TwoViewPipeline(gluestick_conf)
 
     def _forward(self, data):
         pred = self.net(data)
