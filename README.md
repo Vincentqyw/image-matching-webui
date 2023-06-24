@@ -56,8 +56,9 @@ then open http://localhost:7860 in your browser.
 
 External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using a linter like flake8. This is a non-exhaustive list of features that might be valuable additions:
 
+- [x] add webcam support
 - [ ] add more image matching algorithms with submodules
-- [ ] add [line feature matching](https://github.com/Vincentqyw/LineSegmentsDetection) algorithms
+- [x] add [line feature matching](https://github.com/Vincentqyw/LineSegmentsDetection) algorithms
 - [ ] add config file to set default parameters
 
 ## Acknowledgement

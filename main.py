@@ -1,8 +1,7 @@
 import argparse
-
 import gradio as gr
 import numpy as np
-
+import cv2
 from hloc import extract_features
 from utils.plotting import draw_matches, fig2im, draw_image_pairs
 from utils.utils import (
@@ -23,9 +22,17 @@ def run_select_model(key):
     return matcher, local_feature_extractor
 
 
-def run_matching(in0, in1, in2, key, image0, image1):
+def run_matching(match_threshold, extract_max_keypoints, key, image0, image1):
+    if image0 is None or image1 is None:
+        return np.zeros([2,2]), {"matches number": -1}, \
+        {'match_conf': -1, 'extractor_conf': -1}
+    
     model = matcher_zoo[key]
     match_conf = model['config']
+    # update match config
+    match_conf['model']['match_threshold'] = match_threshold
+    match_conf['model']['max_keypoints'] = extract_max_keypoints
+
     matcher = get_model(match_conf)
     if model['dense']:
         pred = match_dense.match_images(
@@ -37,6 +44,8 @@ def run_matching(in0, in1, in2, key, image0, image1):
         extract_conf = None
     else:
         extract_conf = model['config_feature']
+        # update extract config
+        extract_conf['model']['max_keypoints'] = extract_max_keypoints
         extractor = get_feature_model(extract_conf)
         pred0 = extract_features.extract(
             extractor, \
@@ -60,8 +69,11 @@ def run_matching(in0, in1, in2, key, image0, image1):
             mconf = pred['mconf']
         else:
             mconf = np.ones(len(mkpts0))
-        fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
-        fig_lines = draw_image_pairs(img0, img1)
+        fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi=300, 
+              titles=['Image 0 - matched keypoints',
+                     'Image 1 - matched keypoints']
+        )
+        fig = fig_mkpts
     if 'line0_orig' in pred.keys() and 'line1_orig' in pred.keys():
         # lines
         mtlines0 = pred['line0_orig']
@@ -69,8 +81,8 @@ def run_matching(in0, in1, in2, key, image0, image1):
         num_inliers = len(mtlines0)
         fig_lines = plot_images(
             [img0.squeeze(), img1.squeeze()], \
-            ['Image 1 - matched lines',
-             'Image 2 - matched lines']
+            ['Image 0 - matched lines',
+             'Image 1 - matched lines'], dpi=300
             )
         fig_lines = plot_color_line_matches([mtlines0, mtlines1], lw=2)
         fig_lines = fig2im(fig_lines)
@@ -78,21 +90,29 @@ def run_matching(in0, in1, in2, key, image0, image1):
         # keypoints
         mkpts0 = pred['line_keypoints0_orig']
         mkpts1 = pred['line_keypoints1_orig']
-        if 'mconf' in pred.keys():
-            mconf = pred['mconf']
+        if mkpts0 is not None and mkpts1 is not None:
+            num_inliers = len(mkpts0)
+            if 'mconf' in pred.keys():
+                mconf = pred['mconf']
+            else:
+                mconf = np.ones(len(mkpts0))
+            fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
+            fig_lines = cv2.resize(fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0]))
+            fig = np.concatenate([fig_mkpts, fig_lines], axis=0)
         else:
-            mconf = np.ones(len(mkpts0))
-        fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
+            fig = fig_lines
     del pred
-    return fig_mkpts, fig_lines, {"matches number": num_inliers}, \
+    return fig, {"matches number": num_inliers}, \
         {'match_conf': match_conf, 'extractor_conf': extract_conf}
 
+def change_imagebox(choice):
+    return {"value": None, "source": choice, "__type__": "update"}
 
 def run(config):
     with gr.Blocks(
             theme=gr.themes.Monochrome(),
             css="footer {visibility: hidden}"
-            ) as block:
+            ) as app:
         gr.Markdown(
             """
             <p align="center">
@@ -103,52 +123,77 @@ def run(config):
 
         with gr.Row(equal_height=False):
             with gr.Column():
-                matcher_list = gr.Dropdown(
-                    choices=list(matcher_zoo.keys()), \
-                    value='topicfm',
-                    label="Select Model",
-                    interactive=True
-                    )
                 with gr.Row():
-                    match_setting_resize = gr.Slider(
+                    matcher_list = gr.Dropdown(
+                        choices=list(matcher_zoo.keys()), \
+                        value='topicfm',
+                        label="Select Model",
+                        interactive=True
+                    )
+                    match_image_src = gr.Radio(["upload", "webcam", "sketch"],
+                        label="Image Source",value="upload")
+
+                with gr.Row():
+                    match_setting_threshold = gr.Slider(
                         minimum=0.1, maximum=1, \
-                        step=0.1,
-                        label="Resize ratio"
-                        )
+                        step=0.01,
+                        label="Match threshold",
+                        value=0.2,
+                    )
                     match_setting_max_num_features = gr.Slider(
                         minimum=100, \
                         maximum=10000,
                         step=100,
-                        label="Max number of features"
-                        )
-                match_setting_force_resize = gr.Checkbox(label="Force resize")
+                        label="Max number of features",
+                        value=1000,
+                    )
+                # TODO: add line settings
+                with gr.Row():
+                    detect_keypoints_threshold = gr.Slider(
+                        minimum=0.1, maximum=1, \
+                        step=0.01,
+                        label="Keypoint threshold",
+                        value=0.2,
+                    )
+                    detect_line_threshold = gr.Slider(
+                        minimum=0.1, maximum=1, \
+                        step=0.01,
+                        label="Line threshold",
+                        value=0.2,
+                    )
 
-                input_image0 = gr.Image(label="Image 0", type="numpy")
-                input_image1 = gr.Image(label="Image 1", type="numpy")
+                input_image0 = gr.Image(label="Image 0", type="numpy", interactive=True)
+                input_image1 = gr.Image(label="Image 1", type="numpy", interactive=True)
+
                 with gr.Row():
                     button_clear = gr.Button(label="Clear", value="Clear")
                     button_run = gr.Button(label="Run Match", value="Run Match")
+                    button_clear.click(fn=change_imagebox, inputs=match_image_src, outputs=input_image0)
+                    button_clear.click(fn=change_imagebox, inputs=match_image_src, outputs=input_image1)
+                # input_config = gr.JSON(label="Config")
             with gr.Column():
                 output_mkpts = gr.Image(
                     label="Keypoints Matching",
                     type="numpy"
-                    )
-                output_lines = gr.Image(label="Lines Matching", type="numpy")
+                )
+                # output_lines = gr.Image(label="Lines Matching", type="numpy")
                 matches_result_info = gr.JSON(label="Matches Statistics")
                 matcher_info = gr.JSON(label="Match info")
-
+            
+            # callbacks
+            match_image_src.change(fn=change_imagebox, inputs=match_image_src, outputs=input_image0)
+            match_image_src.change(fn=change_imagebox, inputs=match_image_src, outputs=input_image1)
+            
             # collect inputs and outputs
             inputs = [
-                match_setting_resize,
+                match_setting_threshold,
                 match_setting_max_num_features,
-                match_setting_force_resize,
                 matcher_list,
                 input_image0,
                 input_image1,
             ]
             outputs = [
                 output_mkpts,
-                output_lines,
                 matches_result_info,
                 matcher_info,
             ]
@@ -158,7 +203,8 @@ def run(config):
                 inputs=inputs,
                 outputs=outputs
             )
-    block.launch(share=False)
+    app.queue()
+    app.launch(share=False)
 
 
 if __name__ == "__main__":
