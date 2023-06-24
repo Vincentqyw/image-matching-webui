@@ -31,6 +31,7 @@ confs = {
             'name': 'superglue',
             'weights': 'outdoor',
             'sinkhorn_iterations': 50,
+            'match_threshold': 0.2,
         },
         'preprocessing': {
             'grayscale': True,
@@ -45,6 +46,7 @@ confs = {
             'name': 'superglue',
             'weights': 'outdoor',
             'sinkhorn_iterations': 5,
+            'match_threshold': 0.2,
         },
     },
     'NN-superpoint': {
@@ -53,6 +55,7 @@ confs = {
             'name': 'nearest_neighbor',
             'do_mutual_check': True,
             'distance_threshold': 0.7,
+            'match_threshold': 0.2,
         },
     },
     'NN-ratio': {
@@ -61,6 +64,7 @@ confs = {
             'name': 'nearest_neighbor',
             'do_mutual_check': True,
             'ratio_threshold': 0.8,
+            'match_threshold': 0.2,
         }
     },
     'NN-mutual': {
@@ -68,12 +72,14 @@ confs = {
         'model': {
             'name': 'nearest_neighbor',
             'do_mutual_check': True,
+            'match_threshold': 0.2,
         },
     },
     'adalam': {
         'output': 'matches-adalam',
         'model': {
-            'name': 'adalam'
+            'name': 'adalam',
+            'match_threshold': 0.2,
         },
     }
 }
@@ -262,13 +268,13 @@ def match_images(model, feat0, feat1):
     
     pred = {k: v[0].cpu().numpy() for k, v in pred.items()}
     kpts0, kpts1 = feat0['keypoints'][0].cpu().numpy(), feat1['keypoints'][0].cpu().numpy()
-    matches, conf = pred['matches0'], pred['matching_scores0']
+    matches, confid = pred['matches0'], pred['matching_scores0']
 
     # Keep the matching keypoints.
     valid = matches > -1
     mkpts0 = kpts0[valid]
     mkpts1 = kpts1[matches[valid]]
-    mconf = conf[valid]
+    mconfid = confid[valid]
 
     # rescale the keypoints to their original size
     s0 = feat0['original_size'] / feat0['size']
@@ -282,7 +288,7 @@ def match_images(model, feat0, feat1):
         'keypoints1': kpts1,
         'keypoints0_orig': kpts0_origin.numpy(),
         'keypoints1_orig': kpts1_origin.numpy(),
-        'mconf': mconf,
+        'mconf': mconfid,
     }
     return ret
 

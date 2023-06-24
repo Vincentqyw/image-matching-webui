@@ -24,7 +24,7 @@ def _compute_conf_thresh(data):
 
     
 def make_matching_figure(
-        img0, img1, mkpts0, mkpts1, color,
+        img0, img1, mkpts0, mkpts1, color, titles=None,
         kpts0=None, kpts1=None, text=[], dpi=75, path=None,pad=0):
     # draw image pair
     # assert mkpts0.shape[0] == mkpts1.shape[0], f'mkpts0: {mkpts0.shape[0]} v.s. mkpts1: {mkpts1.shape[0]}'
@@ -36,6 +36,9 @@ def make_matching_figure(
         axes[i].get_xaxis().set_ticks([])
         for spine in axes[i].spines.values():
             spine.set_visible(False)
+        if titles is not None:
+            axes[i].set_title(titles[i])
+
     plt.tight_layout(pad=pad)
     
     if kpts0 is not None:
@@ -319,7 +322,7 @@ def fig2im(fig):
     im = buf_ndarray.reshape(h, w, 3)
     return im
 
-def draw_matches(mkpts0, mkpts1, img0, img1, conf, dpi = 150, path=None, pad = 0.5):
+def draw_matches(mkpts0, mkpts1, img0, img1, conf, titles= None, dpi = 150, path=None, pad = 0.5):
     thr = 5e-4
     thr = 0.5
     color = error_colormap(conf, thr, alpha=0.1)
@@ -328,11 +331,11 @@ def draw_matches(mkpts0, mkpts1, img0, img1, conf, dpi = 150, path=None, pad = 0
         f"#Matches: {len(mkpts0)}",
     ]
     if path:
-        fig2im(make_matching_figure(img0, img1, mkpts0, mkpts1, 
-                        color, text=text, path=path, dpi=dpi, pad=pad))
+        fig2im(make_matching_figure(img0, img1, mkpts0, mkpts1, color,
+                  titles=titles, text=text, path=path, dpi=dpi, pad=pad))
     else:
         return fig2im(make_matching_figure(img0, img1, mkpts0, mkpts1,
-                        color, text=text, pad=pad, dpi=dpi))
+                   color, titles=titles, text=text, pad=pad, dpi=dpi))
 
 def draw_image_pairs(
         img0, img1, text=[], dpi=75, path=None, pad=0.5):
