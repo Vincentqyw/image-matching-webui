@@ -1,17 +1,16 @@
 import sys
 from pathlib import Path
-from os.path import join
-
-import cv2
+import subprocess
+import logging
 import torch
 from matplotlib import pyplot as plt
 from ..utils.base_model import BaseModel
+logger = logging.getLogger(__name__)
 
 gluestick_path = Path(__file__).parent / '../../third_party/GlueStick'
 sys.path.append(str(gluestick_path))
 
-from gluestick import batch_to_np, numpy_image_to_torch, GLUESTICK_ROOT
-from gluestick.drawing import plot_images, plot_lines, plot_color_line_matches, plot_keypoints, plot_matches
+from gluestick import batch_to_np
 from gluestick.models.two_view_pipeline import TwoViewPipeline
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -19,6 +18,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 class GlueStick(BaseModel):
     default_conf = {
         'name': 'two_view_pipeline',
+        'model_name': 'checkpoint_GlueStick_MD.tar',
         'use_lines': True,
         'max_keypoints': 1000,
         'max_lines': 300,
@@ -28,8 +28,24 @@ class GlueStick(BaseModel):
         'image0',
         'image1',
     ]
+    
+    gluestick_models = {
+        'checkpoint_GlueStick_MD.tar': \
+            'https://github.com/cvg/GlueStick/releases/download/v0.1_arxiv/checkpoint_GlueStick_MD.tar',
+    }
     # Initialize the line matcher
     def _init(self, conf):
+        model_path = gluestick_path / 'resources' / 'weights' / conf['model_name']
+
+        # Download the model.
+        if not model_path.exists():
+            model_path.parent.mkdir(exist_ok=True)
+            link = self.gluestick_models[conf['model_name']]
+            cmd = ['wget', link, '-O', str(model_path)]
+            logger.info(f'Downloading the Gluestick model with `{cmd}`.')
+            subprocess.run(cmd, check=True)
+        logger.info(f'Loading GlueStick model...')
+
         gluestick_conf = {
             'name': 'two_view_pipeline',
             'use_lines': True,
@@ -47,7 +63,7 @@ class GlueStick(BaseModel):
             },
             'matcher': {
                 'name': 'gluestick',
-                'weights': str(gluestick_path / 'resources' / 'weights' / 'checkpoint_GlueStick_MD.tar'),
+                'weights': str(model_path),
                 'trainable': False,
             },
             'ground_truth': {
