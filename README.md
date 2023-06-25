@@ -50,8 +50,6 @@ cd image-matching-webui
 conda env create --name imw --file environment.yaml
 conda activate imw
 ```
-
- This repository includes external local features / matchers as git submodules – don't forget to pull submodules with git `submodule update --init --recursive`.
  
 ### run demo
 ``` bash
@@ -69,6 +67,14 @@ External contributions are very much welcome. Please follow the [PEP8 style guid
 - [ ] add more image matching algorithms with submodules
 - [x] add [line feature matching](https://github.com/Vincentqyw/LineSegmentsDetection) algorithms
 - [ ] add config file to set default parameters
+
+Adding local features / matchers as submodules is very easy. For example, to add the [GlueStick](https://github.com/cvg/GlueStick): 
+
+``` bash
+git submodule add https://github.com/cvg/GlueStick.git third_party/GlueStick
+```
+
+If remote submodule repositories are updated, don't forget to pull submodules with git `submodule update --init --recursive`.
 
 ## Acknowledgement
 
