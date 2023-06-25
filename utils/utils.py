@@ -61,6 +61,11 @@ matcher_zoo = {
         'config_feature': extract_features.confs['disk'],
         'dense': False
     },
+    'alike': {
+        'config': match_features.confs['NN-mutual'],
+        'config_feature': extract_features.confs['alike'],
+        'dense': False
+    },
     'r2d2': {
         'config': match_features.confs['NN-mutual'],
         'config_feature': extract_features.confs['r2d2'],

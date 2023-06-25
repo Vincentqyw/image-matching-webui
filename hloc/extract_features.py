@@ -153,6 +153,22 @@ confs = {
             'resize_max': 1600,
         },
     },
+    'alike': {
+        'output': 'feats-alike',
+        'model': {
+            'name': 'alike',
+            'max_keypoints': 5000,
+            'use_relu': True,
+            'multiscale': False,
+            'detection_threshold': 0.5,
+            'top_k': -1,
+            'sub_pixel': False,
+        },
+        'preprocessing': {
+            'grayscale': False,
+            'resize_max': 1600,
+        },
+    },
     # Global descriptors
     'dir': {
         'output': 'global-feats-dir',
