@@ -50,6 +50,9 @@ cd image-matching-webui
 conda env create --name imw --file environment.yaml
 conda activate imw
 ```
+
+ This repository includes external local features / matchers as git submodules – don't forget to pull submodules with git `submodule update --init --recursive`.
+ 
 ### run demo
 ``` bash
 python3 ./main.py
