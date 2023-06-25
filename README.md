@@ -17,6 +17,8 @@ Here is a demo of the tool:
 ![demo](assets/demo.gif)
 
 The tool currently supports various popular image matching algorithms, namely:
+- [ ] [ASTR](https://github.com/ASTR2023/ASTR), CVPR 2023
+- [ ] [SEM](https://github.com/SEM2023/SEM), CVPR 2023
 - [ ] [DeepLSD](https://github.com/cvg/DeepLSD), CVPR 2023
 - [x] [GlueStick](https://github.com/cvg/GlueStick), ArXiv 2023
 - [ ] [ConvMatch](https://github.com/SuhZhang/ConvMatch), AAAI 2023
@@ -75,6 +77,10 @@ git submodule add https://github.com/cvg/GlueStick.git third_party/GlueStick
 ```
 
 If remote submodule repositories are updated, don't forget to pull submodules with git `submodule update --init --recursive`.
+
+## Resources
+- [Image Matching: Local Features & Beyond](https://image-matching-workshop.github.io)
+- [Long-term Visual Localization](https://www.visuallocalization.net)
 
 ## Acknowledgement
 
