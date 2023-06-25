@@ -29,7 +29,7 @@ The tool currently supports various popular image matching algorithms, namely:
 - [ ] [NCMNet](https://github.com/xinliu29/NCMNet), CVPR 2023
 - [x] [TopicFM](https://github.com/Vincentqyw/TopicFM), AAAI 2023
 - [x] [AspanFormer](https://github.com/Vincentqyw/ml-aspanformer), ECCV 2022
-- [ ] [LANet](https://github.com/wangch-g/lanet), ACCV 2022
+- [x] [LANet](https://github.com/wangch-g/lanet), ACCV 2022
 - [ ] [LISRD](https://github.com/rpautrat/LISRD), ECCV 2022
 - [ ] [REKD](https://github.com/bluedream1121/REKD), CVPR 2022
 - [x] [ALIKE](https://github.com/Shiaoming/ALIKE), ArXiv 2022

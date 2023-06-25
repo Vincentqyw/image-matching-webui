@@ -3,14 +3,15 @@ import gradio as gr
 import numpy as np
 import cv2
 from hloc import extract_features
-from utils.plotting import draw_matches, fig2im
-from utils.utils import (
+from extra_utils.plotting import draw_matches, fig2im
+from extra_utils.utils import (
     matcher_zoo, device, match_dense, match_features,
     get_model, get_feature_model,
 )
-from utils.visualize_util import plot_images, plot_color_line_matches
+from extra_utils.visualize_util import plot_images, plot_color_line_matches
 
-def run_matching(match_threshold, extract_max_keypoints, key, image0, image1):
+def run_matching(match_threshold, extract_max_keypoints, 
+                 keypoint_threshold, key, image0, image1):
     if image0 is None or image1 is None:
         return np.zeros([2,2]), {"matches number": -1}, \
         {'match_conf': -1, 'extractor_conf': -1}
@@ -34,6 +35,7 @@ def run_matching(match_threshold, extract_max_keypoints, key, image0, image1):
         extract_conf = model['config_feature']
         # update extract config
         extract_conf['model']['max_keypoints'] = extract_max_keypoints
+        extract_conf['model']['keypoint_threshold'] = keypoint_threshold
         extractor = get_feature_model(extract_conf)
         pred0 = extract_features.extract(
             extractor, \
@@ -184,6 +186,7 @@ def run(config):
             inputs = [
                 match_setting_threshold,
                 match_setting_max_num_features,
+                detect_keypoints_threshold,
                 matcher_list,
                 input_image0,
                 input_image1,
