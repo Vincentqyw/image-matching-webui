@@ -7,3 +7,6 @@
 [submodule "third_party/SOLD2"]
 	path = third_party/SOLD2
 	url = https://github.com/cvg/SOLD2.git
+[submodule "third_party/GlueStick"]
+	path = third_party/GlueStick
+	url = https://github.com/cvg/GlueStick.git
