@@ -4,7 +4,7 @@
 [![Issues][issues-shield]][issues-url]
 
 <p align="center">
-  <h1 align="center"><br><ins>Image Matching WebGUI</ins><br>matching images with given images</h1> 
+  <h1 align="center"><br><ins>Image Matching WebUI</ins><br>matching images with given images</h1> 
 </p>
 
 ## Description
@@ -48,6 +48,7 @@ The tool currently supports various popular image matching algorithms, namely:
 git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
 conda env create --name imw --file environment.yaml
+conda activate imw
 ```
 ### run demo
 ``` bash

@@ -23,7 +23,7 @@ class DKMv3(BaseModel):
         'image0',
         'image1',
     ]
-        # Models exported using
+    # Models exported using
     dkm_models = {
         'DKMv3_outdoor.pth': 'https://github.com/Parskatt/storage/releases/download/dkmv3/DKMv3_outdoor.pth',
         'DKMv3_indoor.pth': 'https://github.com/Parskatt/storage/releases/download/dkmv3/DKMv3_indoor.pth'
@@ -39,7 +39,7 @@ class DKMv3(BaseModel):
             cmd = ['wget', link, '-O', str(model_path)]
             logger.info(f'Downloading the DKMv3 model with `{cmd}`.')
             subprocess.run(cmd, check=True)
-        logger.info(f'Loading fire model...')
+        logger.info(f'Loading DKMv3 model...')
         self.net = DKMv3_outdoor(path_to_weights = str(model_path), device=device)
 
     def _forward(self, data):

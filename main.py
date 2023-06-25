@@ -158,6 +158,15 @@ def run(config):
                     button_run = gr.Button(label="Run Match", value="Run Match")
                     button_clear.click(fn=change_imagebox, inputs=match_image_src, outputs=input_image0)
                     button_clear.click(fn=change_imagebox, inputs=match_image_src, outputs=input_image1)
+
+                with gr.Accordion("Open for More!", open = False):
+                    gr.Markdown(
+                        f"""
+                        <h3>Supported Algorithms</h3>
+                        """
+                    )
+                    
+    
             with gr.Column():
                 output_mkpts = gr.Image(
                     label="Keypoints Matching",
@@ -166,6 +175,7 @@ def run(config):
                 matches_result_info = gr.JSON(label="Matches Statistics")
                 matcher_info = gr.JSON(label="Match info")
             
+
             # callbacks
             match_image_src.change(fn=change_imagebox, inputs=match_image_src, outputs=input_image0)
             match_image_src.change(fn=change_imagebox, inputs=match_image_src, outputs=input_image1)
