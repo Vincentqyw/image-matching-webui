@@ -1,4 +1,0 @@
-build/
-dist/
-__pycache__
-torch_localize.egg-info/
