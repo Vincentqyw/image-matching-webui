@@ -28,3 +28,6 @@
 [submodule "third_party/DKM"]
 	path = third_party/DKM
 	url = https://github.com/Vincentqyw/DKM.git
+[submodule "third_party/ALIKE"]
+	path = third_party/ALIKE
+	url = https://github.com/Shiaoming/ALIKE.git
