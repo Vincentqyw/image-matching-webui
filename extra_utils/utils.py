@@ -16,12 +16,12 @@ def get_feature_model(conf):
     return model
 
 matcher_zoo = {
-    'sold2': {
-        'config': match_dense.confs['sold2'],
-        'dense': True
-    },
     'gluestick': {
         'config': match_dense.confs['gluestick'],
+        'dense': True
+    },
+    'sold2': {
+        'config': match_dense.confs['sold2'],
         'dense': True
     },
     'loftr': {
@@ -36,12 +36,12 @@ matcher_zoo = {
         'config': match_dense.confs['aspanformer'],
         'dense': True
     },
-    'superglue': {
+    'superpoint+superglue': {
         'config': match_features.confs['superglue'],
         'config_feature': extract_features.confs['superpoint_max'],
         'dense': False
     },
-    'superpoint+MNN': {
+    'superpoint+mnn': {
         'config': match_features.confs['NN-mutual'],
         'config_feature': extract_features.confs['superpoint_max'],
         'dense': False
