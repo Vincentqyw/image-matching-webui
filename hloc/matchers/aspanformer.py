@@ -28,7 +28,6 @@ class ASpanFormer(BaseModel):
     aspanformer_models = {
         'weights_aspanformer.tar': 'https://drive.google.com/uc?id=1eavM9dTkw9nbc-JqlVVfGPU5UvTTfc6k'
     }
-    # gdown 'https://drive.google.com/uc?id=1eavM9dTkw9nbc-JqlVVfGPU5UvTTfc6k' --proxy http://localhost:1080
 
     def _init(self, conf):
         model_path = aspanformer_path / 'weights' / Path(conf['weights'] + '.ckpt')
