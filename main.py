@@ -13,9 +13,8 @@ from extra_utils.visualize_util import plot_images, plot_color_line_matches
 def run_matching(match_threshold, extract_max_keypoints, 
                  keypoint_threshold, key, image0, image1):
     if image0 is None or image1 is None:
-        return np.zeros([2,2]), {"matches number": -1}, \
-        {'match_conf': -1, 'extractor_conf': -1}
-    
+        raise gr.Error("Error: No images found! Please upload two images.")
+
     model = matcher_zoo[key]
     match_conf = model['config']
     # update match config
@@ -98,6 +97,20 @@ def run_matching(match_threshold, extract_max_keypoints,
 def change_imagebox(choice):
     return {"value": None, "source": choice, "__type__": "update"}
 
+def reset_state(match_threshold, extract_max_keypoints, 
+                 keypoint_threshold, key, image0, image1):
+    match_threshold = 0.2
+    extract_max_keypoints = 1000
+    keypoint_threshold = 0.015
+    key = list(matcher_zoo.keys())[0]
+    image0 = None
+    image1 = None
+    return match_threshold, extract_max_keypoints, \
+        keypoint_threshold, key, image0, image1, \
+        {"value": None, "source": "upload", "__type__": "update"}, \
+        {"value": None, "source": "upload", "__type__": "update"}, \
+        "upload", None, {}, {}
+
 def run(config):
     with gr.Blocks(
             theme=gr.themes.Monochrome(),
@@ -116,7 +129,7 @@ def run(config):
                 with gr.Row():
                     matcher_list = gr.Dropdown(
                         choices=list(matcher_zoo.keys()), \
-                        value='topicfm',
+                        value=list(matcher_zoo.keys())[0],
                         label="Select Model",
                         interactive=True
                     )
@@ -140,10 +153,10 @@ def run(config):
                 # TODO: add line settings
                 with gr.Row():
                     detect_keypoints_threshold = gr.Slider(
-                        minimum=0.1, maximum=1, \
-                        step=0.01,
+                        minimum=0, maximum=1, \
+                        step=0.001,
                         label="Keypoint threshold",
-                        value=0.2,
+                        value=0.015,
                     )
                     detect_line_threshold = gr.Slider(
                         minimum=0.1, maximum=1, \
@@ -151,24 +164,22 @@ def run(config):
                         label="Line threshold",
                         value=0.2,
                     )
-
-                input_image0 = gr.Image(label="Image 0", type="numpy", interactive=True)
-                input_image1 = gr.Image(label="Image 1", type="numpy", interactive=True)
+                with gr.Row():
+                    input_image0 = gr.Image(label="Image 0", type="numpy", interactive=True)
+                    input_image1 = gr.Image(label="Image 1", type="numpy", interactive=True)
 
                 with gr.Row():
-                    button_clear = gr.Button(label="Clear", value="Clear")
-                    button_run = gr.Button(label="Run Match", value="Run Match")
-                    button_clear.click(fn=change_imagebox, inputs=match_image_src, outputs=input_image0)
-                    button_clear.click(fn=change_imagebox, inputs=match_image_src, outputs=input_image1)
+                    button_reset = gr.Button(label="Reset", value="Reset")
+                    button_run = gr.Button(label="Run Match", value="Run Match", variant="primary")
 
                 with gr.Accordion("Open for More!", open = False):
                     gr.Markdown(
                         f"""
                         <h3>Supported Algorithms</h3>
+                        {", ".join(matcher_zoo.keys())}
                         """
                     )
                     
-    
             with gr.Column():
                 output_mkpts = gr.Image(
                     label="Keypoints Matching",
@@ -176,7 +187,6 @@ def run(config):
                 )
                 matches_result_info = gr.JSON(label="Matches Statistics")
                 matcher_info = gr.JSON(label="Match info")
-            
 
             # callbacks
             match_image_src.change(fn=change_imagebox, inputs=match_image_src, outputs=input_image0)
@@ -202,7 +212,25 @@ def run(config):
                 inputs=inputs,
                 outputs=outputs
             )
-    app.launch(share=False)
+
+            # Reset images
+            reset_outputs = [
+                match_setting_threshold,
+                match_setting_max_num_features,
+                detect_keypoints_threshold,
+                matcher_list,
+                input_image0,
+                input_image1,
+                input_image0,
+                input_image1,
+                match_image_src,
+                output_mkpts,
+                matches_result_info,
+                matcher_info,
+            ]
+            button_reset.click(fn=reset_state, inputs=inputs, outputs=reset_outputs)
+
+    app.launch(share=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
