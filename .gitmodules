@@ -10,3 +10,6 @@
 [submodule "third_party/GlueStick"]
 	path = third_party/GlueStick
 	url = https://github.com/cvg/GlueStick.git
+[submodule "third_party/ASpanFormer"]
+	path = third_party/ASpanFormer
+	url = https://github.com/Vincentqyw/ml-aspanformer.git
