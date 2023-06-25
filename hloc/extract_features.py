@@ -169,6 +169,18 @@ confs = {
             'resize_max': 1600,
         },
     },
+    'lanet': {
+        'output': 'feats-lanet',
+        'model': {
+            'name': 'lanet',
+            'keypoint_threshold': 0.1,
+            'max_keypoints': 5000,
+        },
+        'preprocessing': {
+            'grayscale': False,
+            'resize_max': 1600,
+        },
+    },
     # Global descriptors
     'dir': {
         'output': 'global-feats-dir',

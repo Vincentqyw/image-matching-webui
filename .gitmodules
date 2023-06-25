@@ -31,3 +31,6 @@
 [submodule "third_party/ALIKE"]
 	path = third_party/ALIKE
 	url = https://github.com/Shiaoming/ALIKE.git
+[submodule "third_party/lanet"]
+	path = third_party/lanet
+	url = https://github.com/wangch-g/lanet.git
