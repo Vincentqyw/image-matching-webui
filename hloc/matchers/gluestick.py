@@ -3,7 +3,6 @@ from pathlib import Path
 import subprocess
 import logging
 import torch
-from matplotlib import pyplot as plt
 from ..utils.base_model import BaseModel
 logger = logging.getLogger(__name__)
 
