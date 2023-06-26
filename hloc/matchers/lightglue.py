@@ -10,13 +10,14 @@ from lightglue import LightGlue as LG
 
 class LightGlue(BaseModel):
     default_conf = {
-        'weights': 'outdoor',
-        'sinkhorn_iterations': 100,
         'match_threshold': 0.2,
+        'filter_threshold': 0.2,
         'width_confidence': 0.99,  # for point pruning
         'depth_confidence': 0.95,  # for early stopping,
         'pretrained': 'superpoint',
-        'model_name': 'superpoint_lightglue.pth', #disk_lightglue.pth
+        'model_name': 'superpoint_lightglue.pth',
+        # 'input_dim': 256,
+        # 'descriptor_dim': 256,
     }
     required_inputs = [
         'image0', 'keypoints0', 'scores0', 'descriptors0',
@@ -26,6 +27,7 @@ class LightGlue(BaseModel):
     def _init(self, conf):
         weight_path = lightglue_path / 'weights' / conf['model_name']
         conf['weights'] = str(weight_path)
+        conf['filter_threshold'] = conf['match_threshold']
         self.net = LG( **conf)
 
     def _forward(self, data):
