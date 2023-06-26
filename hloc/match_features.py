@@ -49,6 +49,40 @@ confs = {
             'match_threshold': 0.2,
         },
     },
+    'superpoint-lightglue': {
+        'output': 'matches-lightglue',
+        'model': {
+            'name': 'lightglue',
+            'weights': 'outdoor',
+            'sinkhorn_iterations': 50,
+            'match_threshold': 0.2,
+            'pretrained': 'superpoint',
+            'model_name': 'superpoint_lightglue.pth', #disk_lightglue.pth
+        },
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+            'dfactor': 8,
+            'force_resize': False,
+        },
+    },
+    'disk-lightglue': {
+        'output': 'matches-lightglue',
+        'model': {
+            'name': 'lightglue',
+            'weights': 'outdoor',
+            'sinkhorn_iterations': 50,
+            'match_threshold': 0.2,
+            'pretrained': 'disk',
+            'model_name': 'disk_lightglue.pth',
+        },
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+            'dfactor': 8,
+            'force_resize': False,
+        },
+    },
     'NN-superpoint': {
         'output': 'matches-NN-mutual-dist.7',
         'model': {
@@ -265,17 +299,15 @@ def match_images(model, feat0, feat1):
             'scores1': feat1['scores'][0].unsqueeze(0), 
             'descriptors1': desc1
     })
-    
-    pred = {k: v[0].cpu().numpy() for k, v in pred.items()}
+    pred = {k: v.cpu().detach()[0] if
+            isinstance(v, torch.Tensor) else v for k, v in pred.items()}
     kpts0, kpts1 = feat0['keypoints'][0].cpu().numpy(), feat1['keypoints'][0].cpu().numpy()
     matches, confid = pred['matches0'], pred['matching_scores0']
-
     # Keep the matching keypoints.
     valid = matches > -1
     mkpts0 = kpts0[valid]
     mkpts1 = kpts1[matches[valid]]
     mconfid = confid[valid]
-
     # rescale the keypoints to their original size
     s0 = feat0['original_size'] / feat0['size']
     s1 = feat1['original_size'] / feat1['size']
@@ -290,6 +322,9 @@ def match_images(model, feat0, feat1):
         'keypoints1_orig': kpts1_origin.numpy(),
         'mconf': mconfid,
     }
+    del feat0, feat1
+    torch.cuda.empty_cache()
+
     return ret
 
 if __name__ == '__main__':

@@ -41,6 +41,21 @@ matcher_zoo = {
         'config_feature': extract_features.confs['superpoint_max'],
         'dense': False
     },
+    'superpoint+lightglue': {
+        'config': match_features.confs['superpoint-lightglue'],
+        'config_feature': extract_features.confs['superpoint_max'],
+        'dense': False
+    },
+    'disk': {
+        'config': match_features.confs['NN-mutual'],
+        'config_feature': extract_features.confs['disk'],
+        'dense': False
+    },
+    'disk+lightglue': {
+        'config': match_features.confs['disk-lightglue'],
+        'config_feature': extract_features.confs['disk'],
+        'dense': False
+    },
     'superpoint+mnn': {
         'config': match_features.confs['NN-mutual'],
         'config_feature': extract_features.confs['superpoint_max'],
@@ -54,11 +69,6 @@ matcher_zoo = {
     'd2net-ms': {
         'config': match_features.confs['NN-mutual'],
         'config_feature': extract_features.confs['d2net-ms'],
-        'dense': False
-    },
-    'disk': {
-        'config': match_features.confs['NN-mutual'],
-        'config_feature': extract_features.confs['disk'],
         'dense': False
     },
     'alike': {

@@ -362,5 +362,7 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
             'line1_orig': lines1.cpu().numpy(),
             'line_keypoints0_orig': kpts0_origin,
             'line_keypoints1_orig': kpts1_origin,
-        }  
+        }
+    del feat0, feat1
+    torch.cuda.empty_cache()      
     return ret
