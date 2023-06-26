@@ -34,3 +34,6 @@
 [submodule "third_party/lanet"]
 	path = third_party/lanet
 	url = https://github.com/wangch-g/lanet.git
+[submodule "third_party/LightGlue"]
+	path = third_party/LightGlue
+	url = https://github.com/cvg/LightGlue.git
