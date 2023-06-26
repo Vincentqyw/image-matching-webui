@@ -17,7 +17,7 @@ Here is a demo of the tool:
 ![demo](assets/demo.gif)
 
 The tool currently supports various popular image matching algorithms, namely:
-- [ ] [LightGlue](https://github.com/cvg/LightGlue), ArXiv 2023
+- [x] [LightGlue](https://github.com/cvg/LightGlue), ArXiv 2023
 - [ ] [ASTR](https://github.com/ASTR2023/ASTR), CVPR 2023
 - [ ] [SEM](https://github.com/SEM2023/SEM), CVPR 2023
 - [ ] [DeepLSD](https://github.com/cvg/DeepLSD), CVPR 2023
