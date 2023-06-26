@@ -53,11 +53,14 @@ confs = {
         'output': 'matches-lightglue',
         'model': {
             'name': 'lightglue',
-            'weights': 'outdoor',
-            'sinkhorn_iterations': 50,
             'match_threshold': 0.2,
+            'filter_threshold': 0.2,
+            'width_confidence': 0.99,  # for point pruning
+            'depth_confidence': 0.95,  # for early stopping,
             'pretrained': 'superpoint',
-            'model_name': 'superpoint_lightglue.pth', #disk_lightglue.pth
+            'model_name': 'superpoint_lightglue.pth',
+            # 'input_dim': 256,
+            # 'descriptor_dim': 256,
         },
         'preprocessing': {
             'grayscale': True,
@@ -70,11 +73,14 @@ confs = {
         'output': 'matches-lightglue',
         'model': {
             'name': 'lightglue',
-            'weights': 'outdoor',
-            'sinkhorn_iterations': 50,
             'match_threshold': 0.2,
+            'filter_threshold': 0.2,
+            'width_confidence': 0.99,  # for point pruning
+            'depth_confidence': 0.95,  # for early stopping,
             'pretrained': 'disk',
             'model_name': 'disk_lightglue.pth',
+            # 'input_dim': 128,
+            # 'descriptor_dim': 128,
         },
         'preprocessing': {
             'grayscale': True,
