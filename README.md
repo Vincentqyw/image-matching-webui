@@ -77,7 +77,7 @@ Adding local features / matchers as submodules is very easy. For example, to add
 git submodule add https://github.com/cvg/GlueStick.git third_party/GlueStick
 ```
 
-If remote submodule repositories are updated, don't forget to pull submodules with git `submodule update --init --recursive`.
+If remote submodule repositories are updated, don't forget to pull submodules with `git submodule update --remote`, if you only want to update one submodule, use `git submodule update --remote third_party/GlueStick`.
 
 ## Resources
 - [Image Matching: Local Features & Beyond](https://image-matching-workshop.github.io)
