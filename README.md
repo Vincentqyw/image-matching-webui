@@ -50,7 +50,7 @@ The tool currently supports various popular image matching algorithms, namely:
 ``` bash
 git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
-conda env create --name imw --file environment.yaml
+conda env create -f environment.yaml
 conda activate imw
 ```
  

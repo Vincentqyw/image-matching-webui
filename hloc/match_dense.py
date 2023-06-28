@@ -363,6 +363,6 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
             'line_keypoints0_orig': kpts0_origin,
             'line_keypoints1_orig': kpts1_origin,
         }
-    del feat0, feat1
+    del pred
     torch.cuda.empty_cache()      
     return ret
