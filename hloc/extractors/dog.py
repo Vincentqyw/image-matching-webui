@@ -104,11 +104,12 @@ class DoG(BaseModel):
         scales = torch.from_numpy(scales)
         oris = torch.from_numpy(oris)
         scores = torch.from_numpy(scores)
-
         if self.conf['max_keypoints'] != -1:
             # TODO: check that the scores from PyCOLMAP are 100% correct,
             # follow https://github.com/mihaidusmanu/pycolmap/issues/8
-            values, indices = torch.topk(scores, self.conf['max_keypoints'])
+            max_number = scores.shape[0] if scores.shape[0] < \
+                self.conf['max_keypoints'] else self.conf['max_keypoints']
+            values, indices = torch.topk(scores, max_number)
             keypoints = keypoints[indices]
             scales = scales[indices]
             oris = oris[indices]

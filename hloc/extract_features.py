@@ -113,10 +113,27 @@ confs = {
             'resize_max': 1600,
         },
     },
+    'rootsift': {
+        'output': 'feats-sift',
+        'model': {
+            'name': 'dog',
+            'max_keypoints': 5000,
+        },
+        'preprocessing': {
+            'grayscale': True,
+            'force_resize': True,
+            'resize_max': 1600,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
+        },
+    },
     'sift': {
         'output': 'feats-sift',
         'model': {
-            'name': 'dog'
+            'name': 'dog',
+            'descriptor': 'sift',
+            'max_keypoints': 5000,
         },
         'preprocessing': {
             'grayscale': True,
@@ -132,6 +149,21 @@ confs = {
         'model': {
             'name': 'dog',
             'descriptor': 'sosnet'
+        },
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+            'force_resize': True,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
+        },
+    },
+    'hardnet': {
+        'output': 'feats-hardnet',
+        'model': {
+            'name': 'dog',
+            'descriptor': 'hardnet'
         },
         'preprocessing': {
             'grayscale': True,

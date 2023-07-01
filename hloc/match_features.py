@@ -89,6 +89,30 @@ confs = {
             'force_resize': False,
         },
     },
+    'sgmnet': {
+        'output': 'matches-sgmnet',
+        'model': {
+            'name': 'sgmnet',
+            'seed_top_k': [256, 256],
+            'seed_radius_coe': 0.01,
+            'net_channels': 128,
+            'layer_num': 9,
+            'head': 4,
+            'seedlayer': [0,6],
+            'use_mc_seeding': True,
+            'use_score_encoding': False,
+            'conf_bar': [1.11, 0.1],
+            'sink_iter': [10,100],
+            'detach_iter': 1000000,
+            'p_th': 0.2,
+        },
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+            'dfactor': 8,
+            'force_resize': False,
+        },
+    },
     'NN-superpoint': {
         'output': 'matches-NN-mutual-dist.7',
         'model': {

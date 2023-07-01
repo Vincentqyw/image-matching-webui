@@ -37,3 +37,6 @@
 [submodule "third_party/LightGlue"]
 	path = third_party/LightGlue
 	url = https://github.com/cvg/LightGlue.git
+[submodule "third_party/SGMNet"]
+	path = third_party/SGMNet
+	url = https://github.com/vdvchen/SGMNet.git
