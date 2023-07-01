@@ -1,6 +1,7 @@
+import sys
 import torch
 from ..utils.base_model import BaseModel
-import sys
+from ..utils import do_system
 from pathlib import Path
 import subprocess
 import logging
@@ -26,7 +27,7 @@ class ASpanFormer(BaseModel):
     ]
     proxy = 'http://localhost:1080'
     aspanformer_models = {
-        'weights_aspanformer.tar': 'https://drive.google.com/uc?id=1eavM9dTkw9nbc-JqlVVfGPU5UvTTfc6k'
+        'weights_aspanformer.tar': 'https://drive.google.com/uc?id=1eavM9dTkw9nbc-JqlVVfGPU5UvTTfc6k&confirm=t'
     }
 
     def _init(self, conf):
@@ -35,15 +36,14 @@ class ASpanFormer(BaseModel):
         if not model_path.exists():
             # model_path.parent.mkdir(exist_ok=True)
             tar_path = aspanformer_path / conf['model_name']
-            link = self.aspanformer_models[conf['model_name']]
-            cmd = ['gdown', link, '-O', tar_path, '--proxy', self.proxy]
-            logger.info(f'Downloading the Gluestick model with `{cmd}`.')
-            subprocess.run(cmd, check=True)
-            cmd = ['tar xvf', str(tar_path)]
-            subprocess.run(cmd, check=True)
-            logger.info(f'Unzip model file `{cmd}`.')
+            if not tar_path.exists():
+                link = self.aspanformer_models[conf['model_name']]
+                cmd = ['gdown', link, '-O', str(tar_path), '--proxy', self.proxy]
+                logger.info(f'Downloading the Aspanformer model with `{cmd}`.')
+                subprocess.run(cmd, check=True)
+            do_system(f'cd {str(aspanformer_path)} & tar -xvf {str(tar_path)}')
 
-        logger.info(f'Loading GlueStick model...')
+        logger.info(f'Loading Aspanformer model...')
     
         config = get_cfg_defaults()
         config.merge_from_file(conf['config_path'])

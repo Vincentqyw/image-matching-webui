@@ -34,6 +34,7 @@ The tool currently supports various popular image matching algorithms, namely:
 - [ ] [LISRD](https://github.com/rpautrat/LISRD), ECCV 2022
 - [ ] [REKD](https://github.com/bluedream1121/REKD), CVPR 2022
 - [x] [ALIKE](https://github.com/Shiaoming/ALIKE), ArXiv 2022
+- [x] [SGMNet](https://github.com/vdvchen/SGMNet), ICCV 2021
 - [x] [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork), CVPRW 2018
 - [x] [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork), CVPR 2020
 - [x] [D2Net](https://github.com/Vincentqyw/d2-net), CVPR 2019

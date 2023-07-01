@@ -61,6 +61,21 @@ matcher_zoo = {
         'config_feature': extract_features.confs['superpoint_max'],
         'dense': False
     },
+    'sift+sgmnet': {
+        'config': match_features.confs['sgmnet'],
+        'config_feature': extract_features.confs['sift'],
+        'dense': False
+    },
+    'sosnet': {
+        'config': match_features.confs['NN-mutual'],
+        'config_feature': extract_features.confs['sosnet'],
+        'dense': False
+    },
+    'hardnet': {
+        'config': match_features.confs['NN-mutual'],
+        'config_feature': extract_features.confs['hardnet'],
+        'dense': False
+    },
     'd2net': {
         'config': match_features.confs['NN-mutual'],
         'config_feature': extract_features.confs['d2net-ss'],
