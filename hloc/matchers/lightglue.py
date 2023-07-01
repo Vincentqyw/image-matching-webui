@@ -1,11 +1,10 @@
 import sys
 from pathlib import Path
-
+import logging
 from ..utils.base_model import BaseModel
-
+logger = logging.getLogger(__name__)
 lightglue_path = Path(__file__).parent / '../../third_party/LightGlue'
 sys.path.append(str(lightglue_path))
-
 from lightglue import LightGlue as LG
 
 class LightGlue(BaseModel):
@@ -29,6 +28,7 @@ class LightGlue(BaseModel):
         conf['weights'] = str(weight_path)
         conf['filter_threshold'] = conf['match_threshold']
         self.net = LG( **conf)
+        logger.info(f'Load SGMNet model done.')
 
     def _forward(self, data):
         data['keypoints0'] = data['keypoints0'][None]

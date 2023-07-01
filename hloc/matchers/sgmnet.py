@@ -29,9 +29,9 @@ class SGMNet(BaseModel):
         'use_mc_seeding': True,
         'use_score_encoding': False,
         'conf_bar': [1.11, 0.1],
-        'sink_iter': [10,100],
+        'sink_iter': [10, 100],
         'detach_iter': 1000000,
-        'p_th': 0.2,
+        'match_threshold': 0.2,
     }
     required_inputs = [
         'image0',
@@ -70,25 +70,27 @@ class SGMNet(BaseModel):
                 new_stat_dict[key[7:]]=value
             checkpoint['state_dict']=new_stat_dict
         self.net.load_state_dict(checkpoint['state_dict'])
-    
+        logger.info(f'Load SGMNet model done.')
+
     def _forward(self, data):
-        x1 = data['keypoints0']
-        x2 = data['keypoints1']
-        score1 = data['scores0'].reshape(-1, 1)
+        x1 = data['keypoints0'] # N x 2
+        x2 = data['keypoints1'] 
+        score1 = data['scores0'].reshape(-1, 1) # N x 1
         score2 = data['scores1'].reshape(-1, 1)
-        desc1 = data['descriptors0'].permute(0, 2, 1)
+        desc1 = data['descriptors0'].permute(0, 2, 1) # 1 x N x 128
         desc2 = data['descriptors1'].permute(0, 2, 1)
-        size1 = torch.tensor(data['image0'].shape[2:])
-        size2 = torch.tensor(data['image1'].shape[2:])
+        size1 = torch.tensor(data['image0'].shape[2:]).flip(0) # W x H -> x & y
+        size2 = torch.tensor(data['image1'].shape[2:]).flip(0) # W x H
         norm_x1 = self.normalize_size(x1, size1)
         norm_x2 = self.normalize_size(x2, size2)
         
-        x1 = torch.cat((norm_x1, score1), dim=-1)
+        x1 = torch.cat((norm_x1, score1), dim=-1) # N x 3
         x2 = torch.cat((norm_x2, score2), dim=-1)
         input = {'x1':x1[None],'x2':x2[None], 'desc1':desc1,'desc2':desc2}
         input = {k: v.to(device).float() \
                  if isinstance(v, torch.Tensor) else v for k, v in input.items()}
         pred = self.net(input, test_mode = True)
+        
         p = pred['p'] # shape: N * M
         indices0 = self.match_p(p[0,:-1,:-1])
         pred = {
@@ -100,7 +102,7 @@ class SGMNet(BaseModel):
     def match_p(self, p):
         score, index = torch.topk(p,k=1,dim=-1)
         _ , index2 = torch.topk(p,k=1,dim=-2)
-        mask_th, index, index2 = score[:,0]>self.conf['p_th'], index[:,0],index2.squeeze(0)
+        mask_th, index, index2 = score[:,0]>self.conf['match_threshold'], index[:,0],index2.squeeze(0)
         mask_mc = index2[index] == torch.arange(len(p)).cuda()
         mask = mask_th & mask_mc
         indices0 = torch.where(mask, index, index.new_tensor(-1))

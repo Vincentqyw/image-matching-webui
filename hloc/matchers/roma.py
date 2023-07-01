@@ -63,6 +63,7 @@ class Roma(BaseModel):
 
         self.net = roma_model(resolution=(14*8*6,14*8*6), upsample_preds=False,
                weights=weights, dinov2_weights = dinov2_weights, device=device)
+        logger.info(f'Load SGMNet model done.')
 
     def _forward(self, data):
         img0 = data['image0'].cpu().numpy().squeeze() * 255
