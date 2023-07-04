@@ -352,7 +352,7 @@ def match_images(model, feat0, feat1):
         'keypoints1_orig': kpts1_origin.numpy(),
         'mconf': mconfid,
     }
-    del feat0, feat1
+    del feat0, feat1, desc0, desc1, kpts0, kpts1, kpts0_origin, kpts1_origin
     torch.cuda.empty_cache()
 
     return ret
