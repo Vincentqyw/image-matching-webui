@@ -8,15 +8,11 @@ from functools import partial
 from tqdm import tqdm
 import h5py
 import torch
-from types import SimpleNamespace
-import torchvision.transforms.functional as F
 
 from . import matchers, logger
 from .utils.base_model import dynamic_load
 from .utils.parsers import names_to_pair, names_to_pair_old, parse_retrieval
-from .extract_features import read_image, resize_image
 import numpy as np
-import cv2
 
 '''
 A set of standard configurations that can be directly selected from the command
@@ -104,7 +100,7 @@ confs = {
             'conf_bar': [1.11, 0.1],
             'sink_iter': [10,100],
             'detach_iter': 1000000,
-            'p_th': 0.2,
+            'match_threshold': 0.2,
         },
         'preprocessing': {
             'grayscale': True,
