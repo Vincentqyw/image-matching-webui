@@ -79,6 +79,7 @@ def run_matching(match_threshold, extract_max_keypoints,
         # keypoints
         mkpts0 = pred['line_keypoints0_orig']
         mkpts1 = pred['line_keypoints1_orig']
+
         if mkpts0 is not None and mkpts1 is not None:
             num_inliers = len(mkpts0)
             if 'mconf' in pred.keys():
@@ -189,9 +190,13 @@ def run(config):
                 matcher_info = gr.JSON(label="Match info")
 
             # callbacks
-            match_image_src.change(fn=change_imagebox, inputs=match_image_src, outputs=input_image0)
-            match_image_src.change(fn=change_imagebox, inputs=match_image_src, outputs=input_image1)
-            
+            match_image_src.change(fn=change_imagebox, 
+                inputs=match_image_src, 
+                outputs=input_image0)
+            match_image_src.change(fn=change_imagebox, 
+                inputs=match_image_src, 
+                outputs=input_image1)
+
             # collect inputs and outputs
             inputs = [
                 match_setting_threshold,

@@ -308,8 +308,6 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
     # Rescale keypoints and move to cpu
     if 'keypoints0' in pred.keys() and 'keypoints1' in pred.keys():
         kpts0, kpts1 = pred['keypoints0'], pred['keypoints1']
-        # kpts0 = scale_keypoints(kpts0 + 0.5, scale0) - 0.5
-        # kpts1 = scale_keypoints(kpts1 + 0.5, scale1) - 0.5
         kpts0_origin = scale_keypoints(kpts0 + 0.5, s0) - 0.5
         kpts1_origin = scale_keypoints(kpts1 + 0.5, s1) - 0.5
 
