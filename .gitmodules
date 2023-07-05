@@ -40,3 +40,6 @@
 [submodule "third_party/SGMNet"]
 	path = third_party/SGMNet
 	url = https://github.com/vdvchen/SGMNet.git
+[submodule "third_party/DarkFeat"]
+	path = third_party/DarkFeat
+	url = https://github.com/THU-LYJ-Lab/DarkFeat.git
