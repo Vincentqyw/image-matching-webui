@@ -213,6 +213,24 @@ confs = {
             'resize_max': 1600,
         },
     },
+    'darkfeat': {
+        'output': 'feats-darkfeat-n5000-r1024',
+        'model': {
+            'name': 'darkfeat',
+            'max_keypoints': 5000,
+            'reliability_threshold': 0.7,
+            'repetability_threshold': 0.7,
+        },
+        'preprocessing': {
+            'grayscale': False,
+            'force_resize': True,
+            'resize_max': 1600,
+            'width': 640,
+            'height': 480,
+            'dfactor': 8
+        },
+    },
+
     # Global descriptors
     'dir': {
         'output': 'global-feats-dir',

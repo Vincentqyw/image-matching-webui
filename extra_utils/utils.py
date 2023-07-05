@@ -101,6 +101,11 @@ matcher_zoo = {
         'config_feature': extract_features.confs['r2d2'],
         'dense': False
     },
+    'darkfeat': {
+        'config': match_features.confs['NN-mutual'],
+        'config_feature': extract_features.confs['darkfeat'],
+        'dense': False
+    },
     'sift': {
         'config': match_features.confs['NN-mutual'],
         'config_feature': extract_features.confs['sift'],
