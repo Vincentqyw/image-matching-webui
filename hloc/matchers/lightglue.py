@@ -13,10 +13,10 @@ class LightGlue(BaseModel):
         'filter_threshold': 0.2,
         'width_confidence': 0.99,  # for point pruning
         'depth_confidence': 0.95,  # for early stopping,
-        'pretrained': 'superpoint',
+        'features': 'superpoint',
         'model_name': 'superpoint_lightglue.pth',
-        # 'input_dim': 256,
-        # 'descriptor_dim': 256,
+        'flash': True,  # enable FlashAttention if available.
+        'mp': False,  # enable mixed precision
     }
     required_inputs = [
         'image0', 'keypoints0', 'scores0', 'descriptors0',
@@ -27,12 +27,19 @@ class LightGlue(BaseModel):
         weight_path = lightglue_path / 'weights' / conf['model_name']
         conf['weights'] = str(weight_path)
         conf['filter_threshold'] = conf['match_threshold']
-        self.net = LG( **conf)
+        self.net = LG(**conf)
         logger.info(f'Load lightglue model done.')
 
     def _forward(self, data):
-        data['keypoints0'] = data['keypoints0'][None]
-        data['keypoints1'] = data['keypoints1'][None]
-        data['descriptors0'] = data['descriptors0'].permute(0, 2, 1)
-        data['descriptors1'] = data['descriptors1'].permute(0, 2, 1)
-        return self.net(data)
+        input = {}
+        input['image0'] = {
+            'image': data['image0'],
+            'keypoints': data['keypoints0'][None],
+            'descriptors': data['descriptors0'].permute(0, 2, 1),
+        }
+        input['image1'] = {
+            'image': data['image1'],
+            'keypoints': data['keypoints1'][None],
+            'descriptors': data['descriptors1'].permute(0, 2, 1),
+        }
+        return self.net(input)

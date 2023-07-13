@@ -50,13 +50,10 @@ confs = {
         'model': {
             'name': 'lightglue',
             'match_threshold': 0.2,
-            'filter_threshold': 0.2,
             'width_confidence': 0.99,  # for point pruning
             'depth_confidence': 0.95,  # for early stopping,
-            'pretrained': 'superpoint',
+            'features': 'superpoint',
             'model_name': 'superpoint_lightglue.pth',
-            # 'input_dim': 256,
-            # 'descriptor_dim': 256,
         },
         'preprocessing': {
             'grayscale': True,
@@ -70,13 +67,10 @@ confs = {
         'model': {
             'name': 'lightglue',
             'match_threshold': 0.2,
-            'filter_threshold': 0.2,
             'width_confidence': 0.99,  # for point pruning
             'depth_confidence': 0.95,  # for early stopping,
-            'pretrained': 'disk',
+            'features': 'disk',
             'model_name': 'disk_lightglue.pth',
-            # 'input_dim': 128,
-            # 'descriptor_dim': 128,
         },
         'preprocessing': {
             'grayscale': True,
