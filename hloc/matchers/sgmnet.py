@@ -50,11 +50,19 @@ class SGMNet(BaseModel):
         tar_path = sgmnet_path / 'weights.tar.gz'
         # Download the model.
         if not sgmnet_weights.exists(): 
-            # sgmnet_weights.parent.mkdir(exist_ok=True)
             if not tar_path.exists():
                 cmd = ['gdown', link, '-O', str(tar_path), '--proxy', self.proxy]
-                logger.info(f'Downloading the SGMNet model with `{cmd}`.')
-                subprocess.run(cmd, check=True)
+                cmd_wo_proxy = ['gdown', link, '-O', str(tar_path)]
+                logger.info(f'Downloading the SGMNet model with `{cmd_wo_proxy}`.')
+                try: 
+                    subprocess.run(cmd_wo_proxy, check=True)
+                except subprocess.CalledProcessError as e:
+                    logger.info(f'Downloading the SGMNet model with `{cmd}`.')
+                    try: 
+                        subprocess.run(cmd, check=True)
+                    except subprocess.CalledProcessError as e:
+                        logger.error(f'Failed to download the SGMNet model.')
+                        raise e
             cmd = [f'cd {str(sgmnet_path)} & tar -xvf', str(tar_path)]
             logger.info(f'Unzip model file `{cmd}`.')
             do_system(f'cd {str(sgmnet_path)} & tar -xvf {str(tar_path)}')

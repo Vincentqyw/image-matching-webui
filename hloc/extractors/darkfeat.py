@@ -27,9 +27,19 @@ class DarkFeat(BaseModel):
         link = self.weight_urls[conf['model_name']]
         if not model_path.exists(): 
             model_path.parent.mkdir(exist_ok=True)
+            cmd_wo_proxy = ['gdown', link, '-O', str(model_path)]
             cmd = ['gdown', link, '-O', str(model_path), '--proxy', self.proxy]
-            logger.info(f'Downloading the DarkFeat model with `{cmd}`.')
-            subprocess.run(cmd, check=True)
+            logger.info(f'Downloading the DarkFeat model with `{cmd_wo_proxy}`.')
+            try: 
+                subprocess.run(cmd_wo_proxy, check=True)
+            except subprocess.CalledProcessError as e:
+                logger.info(f'Downloading the DarkFeat model with `{cmd}`.')
+                try: 
+                    subprocess.run(cmd, check=True)
+                except subprocess.CalledProcessError as e:
+                    logger.error(f'Failed to download the DarkFeat model.')
+                    raise e
+
         self.net = DarkFeat_(model_path)
 
     def _forward(self, data):
