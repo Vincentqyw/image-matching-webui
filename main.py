@@ -190,11 +190,11 @@ def run(config):
                 matcher_info = gr.JSON(label="Match info")
 
             # callbacks
-            match_image_src.change(fn=change_imagebox, 
-                inputs=match_image_src, 
+            match_image_src.change(fn=change_imagebox,
+                inputs=match_image_src,
                 outputs=input_image0)
-            match_image_src.change(fn=change_imagebox, 
-                inputs=match_image_src, 
+            match_image_src.change(fn=change_imagebox,
+                inputs=match_image_src,
                 outputs=input_image1)
 
             # collect inputs and outputs
