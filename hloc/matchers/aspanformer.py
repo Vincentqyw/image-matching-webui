@@ -39,8 +39,18 @@ class ASpanFormer(BaseModel):
             if not tar_path.exists():
                 link = self.aspanformer_models[conf['model_name']]
                 cmd = ['gdown', link, '-O', str(tar_path), '--proxy', self.proxy]
-                logger.info(f'Downloading the Aspanformer model with `{cmd}`.')
-                subprocess.run(cmd, check=True)
+                cmd_wo_proxy = ['gdown', link, '-O', str(tar_path)]
+                logger.info(f'Downloading the Aspanformer model with `{cmd_wo_proxy}`.')
+                try: 
+                    subprocess.run(cmd_wo_proxy, check=True)
+                except subprocess.CalledProcessError as e:
+                    logger.info(f'Downloading the Aspanformer model with `{cmd}`.')
+                    try: 
+                        subprocess.run(cmd, check=True)
+                    except subprocess.CalledProcessError as e:
+                        logger.error(f'Failed to download the Aspanformer model.')
+                        raise e
+    
             do_system(f'cd {str(aspanformer_path)} & tar -xvf {str(tar_path)}')
 
         logger.info(f'Loading Aspanformer model...')
