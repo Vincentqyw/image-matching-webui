@@ -12,6 +12,7 @@ from extra_utils.visualize_util import plot_images, plot_color_line_matches
 
 def run_matching(match_threshold, extract_max_keypoints, 
                  keypoint_threshold, key, image0, image1):
+    # image0 and image1 is RGB mode
     if image0 is None or image1 is None:
         raise gr.Error("Error: No images found! Please upload two images.")
 
@@ -145,9 +146,9 @@ def run(config):
                         value=0.2,
                     )
                     match_setting_max_num_features = gr.Slider(
-                        minimum=100, \
+                        minimum=10, \
                         maximum=10000,
-                        step=100,
+                        step=10,
                         label="Max number of features",
                         value=1000,
                     )
@@ -166,8 +167,10 @@ def run(config):
                         value=0.2,
                     )
                 with gr.Row():
-                    input_image0 = gr.Image(label="Image 0", type="numpy", interactive=True)
-                    input_image1 = gr.Image(label="Image 1", type="numpy", interactive=True)
+                    input_image0 = gr.Image(label="Image 0", type="numpy", \
+                                            interactive=True, image_mode = "RGB")
+                    input_image1 = gr.Image(label="Image 1", type="numpy", \
+                                            interactive=True, image_mode = "RGB")
 
                 with gr.Row():
                     button_reset = gr.Button(label="Reset", value="Reset")

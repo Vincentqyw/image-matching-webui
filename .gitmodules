@@ -43,3 +43,6 @@
 [submodule "third_party/DarkFeat"]
 	path = third_party/DarkFeat
 	url = https://github.com/THU-LYJ-Lab/DarkFeat.git
+[submodule "third_party/DeDoDe"]
+	path = third_party/DeDoDe
+	url = https://github.com/Parskatt/DeDoDe.git

@@ -24,6 +24,10 @@ matcher_zoo = {
         'config': match_dense.confs['sold2'],
         'dense': True
     },
+    # 'dedode-sparse': {
+    #     'config': match_dense.confs['dedode_sparse'],
+    #     'dense': True  # dense mode, we need 2 images
+    # },
     'loftr': {
         'config': match_dense.confs['loftr'],
         'dense': True
@@ -35,6 +39,11 @@ matcher_zoo = {
     'aspanformer': {
         'config': match_dense.confs['aspanformer'],
         'dense': True
+    },
+    'dedode': {
+        'config': match_features.confs['Dual-Softmax'],
+        'config_feature': extract_features.confs['dedode'],
+        'dense': False 
     },
     'superpoint+superglue': {
         'config': match_features.confs['superglue'],

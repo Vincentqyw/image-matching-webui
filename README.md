@@ -18,6 +18,7 @@ Here is a demo of the tool:
 
 The tool currently supports various popular image matching algorithms, namely:
 - [x] [LightGlue](https://github.com/cvg/LightGlue), ICCV 2023
+- [x] [DeDoDe](https://github.com/Parskatt/DeDoDe), TODO
 - [x] [DarkFeat](https://github.com/THU-LYJ-Lab/DarkFeat), AAAI 2023
 - [ ] [ASTR](https://github.com/ASTR2023/ASTR), CVPR 2023
 - [ ] [SEM](https://github.com/SEM2023/SEM), CVPR 2023
@@ -58,7 +59,7 @@ conda activate imw
  
 ### run demo
 ``` bash
-python3 ./main.py
+python3 ./app.py
 ```
 then open http://localhost:7860 in your browser.
 

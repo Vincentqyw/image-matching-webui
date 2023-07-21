@@ -10,7 +10,7 @@ from tqdm import tqdm
 import pprint
 import collections.abc as collections
 import PIL.Image
-
+import torchvision.transforms.functional as F
 from . import extractors, logger
 from .utils.base_model import dynamic_load
 from .utils.parsers import parse_image_lists
@@ -230,7 +230,21 @@ confs = {
             'dfactor': 8
         },
     },
-
+    'dedode': {
+        'output': 'feats-dedode-n5000-r1024',
+        'model': {
+            'name': 'dedode',
+            'max_keypoints': 5000,
+        },
+        'preprocessing': {
+            'grayscale': False,
+            'force_resize': True,
+            'resize_max': 1024,
+            'width': 768,
+            'height': 768,
+            'dfactor': 8
+        },
+    },
     # Global descriptors
     'dir': {
         'output': 'global-feats-dir',
@@ -345,26 +359,39 @@ def extract(model, image_0, conf):
         'force_resize': False,
         'width': 320,
         'height': 240,
-        'interpolation': 'cv2_area'
+        'interpolation': 'cv2_area',
     }
     conf = SimpleNamespace(**{**default_conf, **conf})
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     def preprocess(image: np.ndarray, conf: SimpleNamespace):
         image = image.astype(np.float32, copy=False)
         size = image.shape[:2][::-1]
-        if conf.resize_max and (conf.force_resize
-                                     or max(size) > conf.resize_max):
+        scale = np.array([1.0, 1.0])
+        if conf.resize_max:
             scale = conf.resize_max / max(size)
-            size_new = tuple(int(round(x*scale)) for x in size)
-            image = resize_image(image, size_new, conf.interpolation)
+            if scale < 1.0:
+                size_new = tuple(int(round(x*scale)) for x in size)
+                image = resize_image(image, size_new, 'cv2_area')
+                scale = np.array(size) / np.array(size_new)
+        if conf.force_resize:
+            image = resize_image(image, (conf.width, conf.height), 'cv2_area')
+            size_new = (conf.width, conf.height)
+            scale = np.array(size) / np.array(size_new)
         if conf.grayscale:
+            assert image.ndim == 2, image.shape
             image = image[None]
         else:
             image = image.transpose((2, 0, 1))  # HxWxC to CxHxW
-        image = image / 255.
-        input = torch.from_numpy(image).to(device, non_blocking=True)[None]
+        image = torch.from_numpy(image / 255.0).float()
+
+        # assure that the size is divisible by dfactor
+        size_new = tuple(map(
+                lambda x: int(x // conf.dfactor * conf.dfactor),
+                image.shape[-2:]))
+        image = F.resize(image, size=size_new)
+        input_ = image.to(device, non_blocking=True)[None]
         data = {
-            'image': input,
+            'image': input_,
             'image_orig': image_0,
             'original_size': np.array(size),
             'size': np.array(image.shape[1:][::-1]),
@@ -372,9 +399,12 @@ def extract(model, image_0, conf):
         return data
     # convert to grayscale if needed
     if len(image_0.shape) == 3 and conf.grayscale:
-        image0 = cv2.cvtColor(image_0, cv2.COLOR_BGR2GRAY)
-    if not conf.grayscale and len(image_0.shape) == 3:
-        image0 = image_0[:, :, ::-1]  # BGR to RGB
+        image0 = cv2.cvtColor(image_0, cv2.COLOR_RGB2GRAY)
+    else:
+        image0 = image_0
+    # comment following lines, image is always RGB mode
+    # if not conf.grayscale and len(image_0.shape) == 3:
+    #     image0 = image_0[:, :, ::-1]  # BGR to RGB
     data = preprocess(image0, conf)
     pred = model({'image': data['image']})
     pred['image_size'] = original_size = data['original_size']
