@@ -13,43 +13,41 @@ from disk import DISK as _DISK  # noqa E402
 
 class DISK(BaseModel):
     default_conf = {
-        'model_name': 'depth-save.pth',
-        'max_keypoints': None,
-        'desc_dim': 128,
-        'mode': 'nms',
-        'nms_window_size': 5,
+        "model_name": "depth-save.pth",
+        "max_keypoints": None,
+        "desc_dim": 128,
+        "mode": "nms",
+        "nms_window_size": 5,
     }
-    required_inputs = ['image']
+    required_inputs = ["image"]
 
     def _init(self, conf):
-        self.model = _DISK(window=8, desc_dim=conf['desc_dim'])
+        self.model = _DISK(window=8, desc_dim=conf["desc_dim"])
 
-        state_dict = torch.load(
-            disk_path / conf['model_name'], map_location='cpu')
-        if 'extractor' in state_dict:
-            weights = state_dict['extractor']
-        elif 'disk' in state_dict:
-            weights = state_dict['disk']
+        state_dict = torch.load(disk_path / conf["model_name"], map_location="cpu")
+        if "extractor" in state_dict:
+            weights = state_dict["extractor"]
+        elif "disk" in state_dict:
+            weights = state_dict["disk"]
         else:
-            raise KeyError('Incompatible weight file!')
+            raise KeyError("Incompatible weight file!")
         self.model.load_state_dict(weights)
 
-        if conf['mode'] == 'nms':
+        if conf["mode"] == "nms":
             self.extract = partial(
                 self.model.features,
-                kind='nms',
-                window_size=conf['nms_window_size'],
-                cutoff=0.,
-                n=conf['max_keypoints']
+                kind="nms",
+                window_size=conf["nms_window_size"],
+                cutoff=0.0,
+                n=conf["max_keypoints"],
             )
-        elif conf['mode'] == 'rng':
-            self.extract = partial(self.model.features, kind='rng')
+        elif conf["mode"] == "rng":
+            self.extract = partial(self.model.features, kind="rng")
         else:
-            raise KeyError(
-                f'mode must be `nms` or `rng`, got `{conf["mode"]}`')
+            raise KeyError(f'mode must be `nms` or `rng`, got `{conf["mode"]}`')
 
     def _forward(self, data):
-        image = data['image']
+        image = data["image"]
         # make sure that the dimensions of the image are multiple of 16
         orig_h, orig_w = image.shape[-2:]
         new_h = round(orig_h / 16) * 16
@@ -58,7 +56,7 @@ class DISK(BaseModel):
 
         batched_features = self.extract(image)
 
-        assert(len(batched_features) == 1)
+        assert len(batched_features) == 1
         features = batched_features[0]
 
         # filter points detected in the padded areas
@@ -75,7 +73,7 @@ class DISK(BaseModel):
         scores = scores[indices]
 
         return {
-            'keypoints': kpts[None],
-            'descriptors': descriptors.t()[None],
-            'scores': scores[None],
+            "keypoints": kpts[None],
+            "descriptors": descriptors.t()[None],
+            "scores": scores[None],
         }
