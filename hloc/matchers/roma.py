@@ -48,7 +48,6 @@ class Roma(BaseModel):
             cmd = ['wget', link, '-O', str(model_path)]
             logger.info(f'Downloading the Roma model with `{cmd}`.')
             subprocess.run(cmd, check=True)
-            logger.info(f'Loading fire model...')
 
         if not dinov2_weights.exists(): 
             dinov2_weights.parent.mkdir(exist_ok=True)
@@ -56,14 +55,15 @@ class Roma(BaseModel):
             cmd = ['wget', link, '-O', str(dinov2_weights)]
             logger.info(f'Downloading the dinov2 model with `{cmd}`.')
             subprocess.run(cmd, check=True)
-            logger.info(f'Loading fire model...')
+        
+        logger.info(f'Loading Roma model...')
         # load the model
         weights = torch.load(model_path, map_location='cpu')
         dinov2_weights = torch.load(dinov2_weights, map_location='cpu')
 
         self.net = roma_model(resolution=(14*8*6,14*8*6), upsample_preds=False,
                weights=weights, dinov2_weights = dinov2_weights, device=device)
-        logger.info(f'Load SGMNet model done.')
+        logger.info(f'Load Roma model done.')
 
     def _forward(self, data):
         img0 = data['image0'].cpu().numpy().squeeze() * 255

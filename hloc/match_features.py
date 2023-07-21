@@ -129,6 +129,14 @@ confs = {
             'match_threshold': 0.2,
         },
     },
+    'Dual-Softmax': {
+        'output': 'matches-Dual-Softmax',
+        'model': {
+            'name': 'dual_softmax',
+            'do_mutual_check': True,
+            'match_threshold': 0.2, #TODO
+        },
+    },
     'adalam': {
         'output': 'matches-adalam',
         'model': {

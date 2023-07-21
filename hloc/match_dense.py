@@ -132,6 +132,23 @@ confs = {
             'dfactor': 8
         },
     },
+    'dedode_sparse': {
+        'output': 'matches-dedode',
+        'model': {
+            'name': 'dedode',
+            'max_keypoints': 2000,
+            'match_threshold': 0.2,
+            'dense': False,
+        },
+        'preprocessing': {
+            'grayscale': False,
+            'force_resize': True,
+            'resize_max': 1024,
+            'width': 768,
+            'height': 768,
+            'dfactor': 8
+        },
+    },
     'sold2': {
         'output': 'matches-sold2',
         'model': {
@@ -199,8 +216,8 @@ def match(model, path_0, path_1, conf):
                 image = resize_image(image, size_new, 'cv2_area')
                 scale = np.array(size) / np.array(size_new)
         if conf.force_resize:
-            image = resize_image(image, (conf.width, conf.height), 'cv2_area')
             size = image.shape[:2][::-1]
+            image = resize_image(image, (conf.width, conf.height), 'cv2_area')
             size_new = (conf.width, conf.height)
             scale = np.array(size) / np.array(size_new)
         if conf.grayscale:
@@ -262,8 +279,8 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
                 image = resize_image(image, size_new, 'cv2_area')
                 scale = np.array(size) / np.array(size_new)
         if conf.force_resize:
-            image = resize_image(image, (conf.width, conf.height), 'cv2_area')
             size = image.shape[:2][::-1]
+            image = resize_image(image, (conf.width, conf.height), 'cv2_area')
             size_new = (conf.width, conf.height)
             scale = np.array(size) / np.array(size_new)
         if conf.grayscale:
@@ -272,29 +289,30 @@ def match_images(model, image_0, image_1, conf, device='cpu'):
         else:
             image = image.transpose((2, 0, 1))  # HxWxC to CxHxW
         image = torch.from_numpy(image / 255.0).float()
+
         # assure that the size is divisible by dfactor
         size_new = tuple(map(
                 lambda x: int(x // conf.dfactor * conf.dfactor),
                 image.shape[-2:]))
-        # print(f"size = {size}")
-        # print(f"size_new = {size_new}")
         image = F.resize(image, size=size_new)
         scale = np.array(size) / np.array(size_new)[::-1]
         return image, scale
     conf = SimpleNamespace(**{**default_conf, **conf})
     
     if len(image_0.shape) == 3 and conf.grayscale:
-        image0 = cv2.cvtColor(image_0, cv2.COLOR_BGR2GRAY)
+        image0 = cv2.cvtColor(image_0, cv2.COLOR_RGB2GRAY)
     else:
         image0 = image_0
     if len(image_0.shape) == 3 and conf.grayscale:
-        image1 = cv2.cvtColor(image_1, cv2.COLOR_BGR2GRAY)
+        image1 = cv2.cvtColor(image_1, cv2.COLOR_RGB2GRAY)
     else:
         image1 = image_1
-    if not conf.grayscale and len(image0.shape) == 3:
-        image0 = image0[:, :, ::-1]  # BGR to RGB
-    if not conf.grayscale and len(image1.shape) == 3:
-        image1 = image1[:, :, ::-1]  # BGR to RGB
+
+    # comment following lines, image is always RGB mode
+    # if not conf.grayscale and len(image0.shape) == 3:
+    #     image0 = image0[:, :, ::-1]  # BGR to RGB
+    # if not conf.grayscale and len(image1.shape) == 3:
+    #     image1 = image1[:, :, ::-1]  # BGR to RGB
 
     image0, scale0 = preprocess(image0)
     image1, scale1 = preprocess(image1)
