@@ -1,7 +1,11 @@
 import torch
+import numpy as np
+import cv2
 from hloc import matchers, extractors
 from hloc.utils.base_model import dynamic_load
 from hloc import match_dense, match_features, extract_features
+from .plotting import draw_matches, fig2im
+from .visualize_util import plot_images, plot_color_line_matches
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -18,6 +22,61 @@ def get_feature_model(conf):
     return model
 
 
+def display_matches(pred: dict):
+    img0 = pred["image0_orig"]
+    img1 = pred["image1_orig"]
+
+    num_inliers = 0
+    if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
+        mkpts0 = pred["keypoints0_orig"]
+        mkpts1 = pred["keypoints1_orig"]
+        num_inliers = len(mkpts0)
+        if "mconf" in pred.keys():
+            mconf = pred["mconf"]
+        else:
+            mconf = np.ones(len(mkpts0))
+        fig_mkpts = draw_matches(
+            mkpts0,
+            mkpts1,
+            img0,
+            img1,
+            mconf,
+            dpi=300,
+            titles=["Image 0 - matched keypoints", "Image 1 - matched keypoints"],
+        )
+        fig = fig_mkpts
+    if "line0_orig" in pred.keys() and "line1_orig" in pred.keys():
+        # lines
+        mtlines0 = pred["line0_orig"]
+        mtlines1 = pred["line1_orig"]
+        num_inliers = len(mtlines0)
+        fig_lines = plot_images(
+            [img0.squeeze(), img1.squeeze()],
+            ["Image 0 - matched lines", "Image 1 - matched lines"],
+            dpi=300,
+        )
+        fig_lines = plot_color_line_matches([mtlines0, mtlines1], lw=2)
+        fig_lines = fig2im(fig_lines)
+
+        # keypoints
+        mkpts0 = pred["line_keypoints0_orig"]
+        mkpts1 = pred["line_keypoints1_orig"]
+
+        if mkpts0 is not None and mkpts1 is not None:
+            num_inliers = len(mkpts0)
+            if "mconf" in pred.keys():
+                mconf = pred["mconf"]
+            else:
+                mconf = np.ones(len(mkpts0))
+            fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
+            fig_lines = cv2.resize(fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0]))
+            fig = np.concatenate([fig_mkpts, fig_lines], axis=0)
+        else:
+            fig = fig_lines
+    return fig, num_inliers
+
+
+# Matchers collections
 matcher_zoo = {
     "gluestick": {"config": match_dense.confs["gluestick"], "dense": True},
     "sold2": {"config": match_dense.confs["sold2"], "dense": True},
