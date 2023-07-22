@@ -239,6 +239,23 @@ confs = {
             "dfactor": 8,
         },
     },
+    "example": {
+        "output": "feats-example-n5000-r1024",
+        "model": {
+            "name": "example",
+            "keypoint_threshold": 0.1,
+            "max_keypoints": 2000,
+            "model_name": "model.pth",
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 768,
+            "height": 768,
+            "dfactor": 8,
+        },
+    },
     # Global descriptors
     "dir": {
         "output": "global-feats-dir",
