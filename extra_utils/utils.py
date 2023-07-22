@@ -48,6 +48,16 @@ matcher_zoo = {
         "config_feature": extract_features.confs["disk"],
         "dense": False,
     },
+    "disk+dualsoftmax": {
+        "config": match_features.confs["Dual-Softmax"],
+        "config_feature": extract_features.confs["disk"],
+        "dense": False,
+    },
+    "superpoint+dualsoftmax": {
+        "config": match_features.confs["Dual-Softmax"],
+        "config_feature": extract_features.confs["superpoint_max"],
+        "dense": False,
+    },
     "disk+lightglue": {
         "config": match_features.confs["disk-lightglue"],
         "config_feature": extract_features.confs["disk"],
