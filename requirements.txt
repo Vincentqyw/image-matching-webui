@@ -8,7 +8,7 @@ scikit_learn
 scikit-image
 h5py
 pycolmap>=0.3.0
-kornia>=0.6.7
+kornia>=0.6.11
 gdown
 seaborn
 omegaconf
@@ -20,6 +20,3 @@ einops
 loguru
 gradio
 e2cnn
-./third_party/disk/submodules/torch-localize
-./third_party/disk/submodules/torch-dimcheck
-./third_party/disk/submodules/unets
