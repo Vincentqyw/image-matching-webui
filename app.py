@@ -165,11 +165,11 @@ def run(config):
 
                 with gr.Row():
                     match_setting_threshold = gr.Slider(
-                        minimum=0.1,
+                        minimum=0.0,
                         maximum=1,
-                        step=0.01,
+                        step=0.001,
                         label="Match threshold",
-                        value=0.2,
+                        value=0.1,
                     )
                     match_setting_max_num_features = gr.Slider(
                         minimum=10,
