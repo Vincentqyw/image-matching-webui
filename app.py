@@ -1,9 +1,7 @@
 import argparse
 import gradio as gr
-import numpy as np
-import cv2
+
 from hloc import extract_features
-from extra_utils.plotting import draw_matches, fig2im
 from extra_utils.utils import (
     matcher_zoo,
     device,
@@ -12,7 +10,14 @@ from extra_utils.utils import (
     get_model,
     get_feature_model,
 )
-from extra_utils.visualize_util import plot_images, plot_color_line_matches
+
+# from extra_utils.plotting import draw_matches, fig2im
+# from extra_utils.visualize_util import plot_images, plot_color_line_matches
+from extra_utils.utils import display_matches
+
+description = "<p style='text-align: center'>\
+    Optical flow and stereo matching demo for <a href='https://haofeixu.github.io/unimatch/' \
+        target='_blank'>Unifying Flow, Stereo and Depth Estimation</a> | <a href='https://arxiv.org/abs/2211.05783' target='_blank'>Paper</a> | <a href='https://github.com/autonomousvision/unimatch' target='_blank'>Code</a> | <a href='https://colab.research.google.com/drive/1r5m-xVy3Kw60U-m5VB-aQ98oqqg_6cab?usp=sharing' target='_blank'>Colab</a><br>Task <strong>flow</strong>: Image1: <strong>video frame t</strong>, Image2: <strong>video frame t+1</strong>; Task <strong>stereo</strong>: Image1: <strong>left</strong> image, Image2: <strong>right</strong> image<br>Simply upload your images or click one of the provided examples.<br><strong>Select the task type according to your input images</strong>.</p>"
 
 
 def run_matching(
@@ -49,56 +54,7 @@ def run_matching(
         )
         pred = match_features.match_images(matcher, pred0, pred1)
         del extractor
-    img0 = pred["image0_orig"]
-    img1 = pred["image1_orig"]
-
-    num_inliers = 0
-    if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
-        mkpts0 = pred["keypoints0_orig"]
-        mkpts1 = pred["keypoints1_orig"]
-        num_inliers = len(mkpts0)
-        if "mconf" in pred.keys():
-            mconf = pred["mconf"]
-        else:
-            mconf = np.ones(len(mkpts0))
-        fig_mkpts = draw_matches(
-            mkpts0,
-            mkpts1,
-            img0,
-            img1,
-            mconf,
-            dpi=300,
-            titles=["Image 0 - matched keypoints", "Image 1 - matched keypoints"],
-        )
-        fig = fig_mkpts
-    if "line0_orig" in pred.keys() and "line1_orig" in pred.keys():
-        # lines
-        mtlines0 = pred["line0_orig"]
-        mtlines1 = pred["line1_orig"]
-        num_inliers = len(mtlines0)
-        fig_lines = plot_images(
-            [img0.squeeze(), img1.squeeze()],
-            ["Image 0 - matched lines", "Image 1 - matched lines"],
-            dpi=300,
-        )
-        fig_lines = plot_color_line_matches([mtlines0, mtlines1], lw=2)
-        fig_lines = fig2im(fig_lines)
-
-        # keypoints
-        mkpts0 = pred["line_keypoints0_orig"]
-        mkpts1 = pred["line_keypoints1_orig"]
-
-        if mkpts0 is not None and mkpts1 is not None:
-            num_inliers = len(mkpts0)
-            if "mconf" in pred.keys():
-                mconf = pred["mconf"]
-            else:
-                mconf = np.ones(len(mkpts0))
-            fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
-            fig_lines = cv2.resize(fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0]))
-            fig = np.concatenate([fig_mkpts, fig_lines], axis=0)
-        else:
-            fig = fig_lines
+    fig, num_inliers = display_matches(pred)
     del pred
     return (
         fig,
@@ -107,11 +63,11 @@ def run_matching(
     )
 
 
-def change_imagebox(choice):
+def ui_change_imagebox(choice):
     return {"value": None, "source": choice, "__type__": "update"}
 
 
-def reset_state(
+def ui_reset_state(
     match_threshold, extract_max_keypoints, keypoint_threshold, key, image0, image1
 ):
     match_threshold = 0.2
@@ -154,7 +110,7 @@ def run(config):
                     matcher_list = gr.Dropdown(
                         choices=list(matcher_zoo.keys()),
                         value=list(matcher_zoo.keys())[0],
-                        label="Select Model",
+                        label="Matching Model",
                         interactive=True,
                     )
                     match_image_src = gr.Radio(
@@ -171,7 +127,7 @@ def run(config):
                         label="Match threshold",
                         value=0.1,
                     )
-                    match_setting_max_num_features = gr.Slider(
+                    match_setting_max_features = gr.Slider(
                         minimum=10,
                         maximum=10000,
                         step=10,
@@ -194,6 +150,11 @@ def run(config):
                         label="Line threshold",
                         value=0.2,
                     )
+                    # matcher_lists = gr.Radio(
+                    #     ["NN-mutual", "Dual-Softmax"],
+                    #     label="Matcher mode",
+                    #     value="NN-mutual",
+                    # )
                 with gr.Row():
                     input_image0 = gr.Image(
                         label="Image 0",
@@ -222,6 +183,70 @@ def run(config):
                         """
                     )
 
+                # collect inputs
+                inputs = [
+                    match_setting_threshold,
+                    match_setting_max_features,
+                    detect_keypoints_threshold,
+                    matcher_list,
+                    input_image0,
+                    input_image1,
+                ]
+
+                # Add some examples
+                with gr.Row():
+                    examples = [
+                        [
+                            0.1,
+                            2000,
+                            0.015,
+                            "disk+lightglue",
+                            "datasets/sacre_coeur/mapping/71295362_4051449754.jpg",
+                            "datasets/sacre_coeur/mapping/93341989_396310999.jpg",
+                        ],
+                        [
+                            0.1,
+                            2000,
+                            0.015,
+                            "loftr",
+                            "datasets/sacre_coeur/mapping/03903474_1471484089.jpg",
+                            "datasets/sacre_coeur/mapping/02928139_3448003521.jpg",
+                        ],
+                        [
+                            0.1,
+                            2000,
+                            0.015,
+                            "disk",
+                            "datasets/sacre_coeur/mapping/10265353_3838484249.jpg",
+                            "datasets/sacre_coeur/mapping/51091044_3486849416.jpg",
+                        ],
+                        [
+                            0.1,
+                            2000,
+                            0.015,
+                            "topicfm",
+                            "datasets/sacre_coeur/mapping/44120379_8371960244.jpg",
+                            "datasets/sacre_coeur/mapping/93341989_396310999.jpg",
+                        ],
+                        [
+                            0.1,
+                            2000,
+                            0.015,
+                            "superpoint+superglue",
+                            "datasets/sacre_coeur/mapping/17295357_9106075285.jpg",
+                            "datasets/sacre_coeur/mapping/44120379_8371960244.jpg",
+                        ],
+                    ]
+                    # Example inputs
+                    gr.Examples(
+                        examples=examples,
+                        inputs=inputs,
+                        outputs=[],
+                        fn=run_matching,
+                        cache_examples=False,
+                        label="Examples (click one of the images below to Run Match)",
+                    )
+
             with gr.Column():
                 output_mkpts = gr.Image(label="Keypoints Matching", type="numpy")
                 matches_result_info = gr.JSON(label="Matches Statistics")
@@ -229,21 +254,13 @@ def run(config):
 
             # callbacks
             match_image_src.change(
-                fn=change_imagebox, inputs=match_image_src, outputs=input_image0
+                fn=ui_change_imagebox, inputs=match_image_src, outputs=input_image0
             )
             match_image_src.change(
-                fn=change_imagebox, inputs=match_image_src, outputs=input_image1
+                fn=ui_change_imagebox, inputs=match_image_src, outputs=input_image1
             )
 
-            # collect inputs and outputs
-            inputs = [
-                match_setting_threshold,
-                match_setting_max_num_features,
-                detect_keypoints_threshold,
-                matcher_list,
-                input_image0,
-                input_image1,
-            ]
+            # collect outputs
             outputs = [
                 output_mkpts,
                 matches_result_info,
@@ -255,7 +272,7 @@ def run(config):
             # Reset images
             reset_outputs = [
                 match_setting_threshold,
-                match_setting_max_num_features,
+                match_setting_max_features,
                 detect_keypoints_threshold,
                 matcher_list,
                 input_image0,
@@ -267,7 +284,7 @@ def run(config):
                 matches_result_info,
                 matcher_info,
             ]
-            button_reset.click(fn=reset_state, inputs=inputs, outputs=reset_outputs)
+            button_reset.click(fn=ui_reset_state, inputs=inputs, outputs=reset_outputs)
 
     app.launch(share=True)
 
