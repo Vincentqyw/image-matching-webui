@@ -65,16 +65,20 @@ then open http://localhost:7860 in your browser.
 
 ![](assets/gui.jpg)
 
+### Add your own feature / matcher
+
+I provide an example to add local feature in [hloc/extractors/example.py](hloc/extractors/example.py). Then add feature settings in `confs` in file [hloc/extract_features.py](hloc/extract_features.py). Last step is adding some settings to `model_zoo` in file [extra_utils/utils.py](extra_utils/utils.py).
+
 ## Contributions welcome!
 
 External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using a linter like flake8. This is a non-exhaustive list of features that might be valuable additions:
 
 - [x] add webcam support
 - [x] add [line feature matching](https://github.com/Vincentqyw/LineSegmentsDetection) algorithms
+- [x] example to add a new feature extractor / matcher
 - [ ] support export matches to colmap ([#issue 6](https://github.com/Vincentqyw/image-matching-webui/issues/6))
 - [ ] add config file to set default parameters
 - [ ] dynamically load models and reduce GPU overload
-- [ ] add templete to add a new feature extractor / matcher
 
 Adding local features / matchers as submodules is very easy. For example, to add the [GlueStick](https://github.com/cvg/GlueStick): 
 
