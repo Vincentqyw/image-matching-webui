@@ -15,11 +15,6 @@ from extra_utils.utils import (
 # from extra_utils.visualize_util import plot_images, plot_color_line_matches
 from extra_utils.utils import display_matches
 
-description = "<p style='text-align: center'>\
-    Optical flow and stereo matching demo for <a href='https://haofeixu.github.io/unimatch/' \
-        target='_blank'>Unifying Flow, Stereo and Depth Estimation</a> | <a href='https://arxiv.org/abs/2211.05783' target='_blank'>Paper</a> | <a href='https://github.com/autonomousvision/unimatch' target='_blank'>Code</a> | <a href='https://colab.research.google.com/drive/1r5m-xVy3Kw60U-m5VB-aQ98oqqg_6cab?usp=sharing' target='_blank'>Colab</a><br>Task <strong>flow</strong>: Image1: <strong>video frame t</strong>, Image2: <strong>video frame t+1</strong>; Task <strong>stereo</strong>: Image1: <strong>left</strong> image, Image2: <strong>right</strong> image<br>Simply upload your images or click one of the provided examples.<br><strong>Select the task type according to your input images</strong>.</p>"
-
-
 def run_matching(
     match_threshold, extract_max_keypoints, keypoint_threshold, key, image0, image1
 ):
@@ -109,7 +104,7 @@ def run(config):
                 with gr.Row():
                     matcher_list = gr.Dropdown(
                         choices=list(matcher_zoo.keys()),
-                        value=list(matcher_zoo.keys())[0],
+                        value="disk+lightglue",
                         label="Matching Model",
                         interactive=True,
                     )
