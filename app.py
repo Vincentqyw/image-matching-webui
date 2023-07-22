@@ -9,11 +9,8 @@ from extra_utils.utils import (
     match_features,
     get_model,
     get_feature_model,
+    display_matches
 )
-
-# from extra_utils.plotting import draw_matches, fig2im
-# from extra_utils.visualize_util import plot_images, plot_color_line_matches
-from extra_utils.utils import display_matches
 
 def run_matching(
     match_threshold, extract_max_keypoints, keypoint_threshold, key, image0, image1
