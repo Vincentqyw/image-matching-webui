@@ -226,7 +226,7 @@ def match(model, path_0, path_1, conf):
         size_new = tuple(
             map(lambda x: int(x // conf.dfactor * conf.dfactor), image.shape[-2:])
         )
-        image = F.resize(image, size=size_new)
+        image = F.resize(image, size=size_new, antialias=True)
         scale = np.array(size) / np.array(size_new)[::-1]
         return image, scale
 

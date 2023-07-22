@@ -399,7 +399,7 @@ def extract(model, image_0, conf):
         size_new = tuple(
             map(lambda x: int(x // conf.dfactor * conf.dfactor), image.shape[-2:])
         )
-        image = F.resize(image, size=size_new)
+        image = F.resize(image, size=size_new, antialias=True)
         input_ = image.to(device, non_blocking=True)[None]
         data = {
             "image": input_,
