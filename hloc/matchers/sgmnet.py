@@ -118,7 +118,7 @@ class SGMNet(BaseModel):
             index[:, 0],
             index2.squeeze(0),
         )
-        mask_mc = index2[index] == torch.arange(len(p)).cuda()
+        mask_mc = index2[index] == torch.arange(len(p)).to(device)
         mask = mask_th & mask_mc
         indices0 = torch.where(mask, index, index.new_tensor(-1))
         return indices0
