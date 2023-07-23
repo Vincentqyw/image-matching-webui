@@ -33,6 +33,7 @@ class GlueStick(BaseModel):
     gluestick_models = {
         "checkpoint_GlueStick_MD.tar": "https://github.com/cvg/GlueStick/releases/download/v0.1_arxiv/checkpoint_GlueStick_MD.tar",
     }
+
     # Initialize the line matcher
     def _init(self, conf):
         model_path = gluestick_path / "resources" / "weights" / conf["model_name"]

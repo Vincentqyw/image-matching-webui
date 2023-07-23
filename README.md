@@ -49,7 +49,13 @@ The tool currently supports various popular image matching algorithms, namely:
 
 ## How to use
 
-### requirements
+### HuggingFace
+
+Just try it on HuggingFace: [Realcat/image-matching-webui](https://huggingface.co/spaces/Realcat/image-matching-webui).
+
+or deploy it locally following the instructions below.
+
+### Requirements
 ``` bash
 git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
@@ -57,7 +63,7 @@ conda env create -f environment.yaml
 conda activate imw
 ```
  
-### run demo
+### Run demo
 ``` bash
 python3 ./app.py
 ```

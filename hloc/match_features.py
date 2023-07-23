@@ -220,7 +220,6 @@ def main(
     features_ref: Optional[Path] = None,
     overwrite: bool = False,
 ) -> Path:
-
     if isinstance(features, Path) or Path(features).exists():
         features_q = features
         if matches is None:

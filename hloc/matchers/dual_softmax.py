@@ -3,6 +3,7 @@ import torch
 from ..utils.base_model import BaseModel
 import numpy as np
 
+
 # borrow from dedode
 def dual_softmax_matcher(
     desc_A: tuple["B", "C", "N"],
