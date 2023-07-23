@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 
 
 def read_nvm_model(nvm_path, database_path, image_ids, camera_ids, skip_points=False):
-
     # Extract the intrinsics from the db file instead of the NVM model
     db = sqlite3.connect(str(database_path))
     ret = db.execute("SELECT camera_id, model, width, height, params FROM cameras;")

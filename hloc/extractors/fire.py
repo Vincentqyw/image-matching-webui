@@ -34,7 +34,6 @@ class FIRe(BaseModel):
     }
 
     def _init(self, conf):
-
         assert conf["model_name"] in self.fire_models.keys()
         # Config paths
         model_path = fire_path / "model" / conf["model_name"]
@@ -64,7 +63,6 @@ class FIRe(BaseModel):
         self.scales = conf["scales"]
 
     def _forward(self, data):
-
         image = self.norm_rgb(data["image"])
 
         # Feature extraction.

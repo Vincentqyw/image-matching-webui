@@ -64,8 +64,8 @@ class DeDoDe(BaseModel):
         # load the model
         weights_detector = torch.load(model_detector_path, map_location="cpu")
         weights_descriptor = torch.load(model_descriptor_path, map_location="cpu")
-        self.detector = dedode_detector_L(weights=weights_detector, device = device)
-        self.descriptor = dedode_descriptor_B(weights=weights_descriptor, device = device)
+        self.detector = dedode_detector_L(weights=weights_detector, device=device)
+        self.descriptor = dedode_descriptor_B(weights=weights_descriptor, device=device)
         logger.info(f"Load DeDoDe model done.")
 
     def _forward(self, data):

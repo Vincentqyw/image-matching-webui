@@ -41,7 +41,6 @@ class FIRe(BaseModel):
     }
 
     def _init(self, conf):
-
         assert conf["model_name"] in self.fire_models.keys()
 
         # Config paths
@@ -75,7 +74,6 @@ class FIRe(BaseModel):
         self.features_num = conf["features_num"]
 
     def _forward(self, data):
-
         image = self.norm_rgb(data["image"])
 
         local_desc = self.net.forward_local(

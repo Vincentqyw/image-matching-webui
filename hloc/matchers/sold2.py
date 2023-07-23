@@ -35,6 +35,7 @@ class SOLD2(BaseModel):
         "image0",
         "image1",
     ]
+
     # Initialize the line matcher
     def _init(self, conf):
         checkpoint_path = conf["checkpoint_dir"] / conf["weights"]
