@@ -22,6 +22,66 @@ def get_feature_model(conf):
     return model
 
 
+def compute_geom(pred) -> dict:
+    mkpts0 = pred["keypoints0_orig"]
+    mkpts1 = pred["keypoints1_orig"]
+    h1, w1, _ = pred["image0_orig"].shape
+
+    geo_info = {}
+    F, _ = cv2.findFundamentalMat(mkpts0, mkpts1, cv2.FM_LMEDS, 1.0, 0.9999)
+    geo_info["Fundamental"] = F.tolist()
+    H, _ = cv2.findHomography(mkpts1, mkpts0, cv2.RANSAC)
+    geo_info["Homography"] = H.tolist()
+    _, H1, H2 = cv2.stereoRectifyUncalibrated(
+        mkpts0.reshape(-1, 2), mkpts1.reshape(-1, 2), F, imgSize=(w1, h1)
+    )
+    geo_info["H1"] = H1.tolist()
+    geo_info["H2"] = H2.tolist()
+    return geo_info
+
+
+def wrap_images(img0, img1, geo_info, geom_type):
+    h1, w1, _ = img0.shape
+    h2, w2, _ = img1.shape
+    result_matrix = None
+    if geo_info is not None:
+        rectified_image0 = img0
+        rectified_image1 = None
+        H = np.array(geo_info["Homography"])
+        F = np.array(geo_info["Fundamental"])
+        if geom_type == "Homography":
+            rectified_image1 = cv2.warpPerspective(
+                img1, H, (img0.shape[1] + img1.shape[1], img0.shape[0])
+            )
+            result_matrix = H
+        elif geom_type == "Fundamental":
+            H1, H2 = np.array(geo_info["H1"]), np.array(geo_info["H2"])
+            rectified_image0 = cv2.warpPerspective(img0, H1, (w1, h1))
+            rectified_image1 = cv2.warpPerspective(img1, H2, (w2, h2))
+            result_matrix = F
+        else:
+            print("Error: Unknown geometry type")
+        fig = plot_images(
+            [rectified_image0.squeeze(), rectified_image1.squeeze()],
+            ["Image 0 - matched lines", "Image 1 - matched lines"],
+            dpi=300,
+        )
+        dictionary = {
+            "row1": result_matrix[0].tolist(),
+            "row2": result_matrix[1].tolist(),
+            "row3": result_matrix[2].tolist(),
+        }
+    return fig2im(fig), dictionary
+
+
+def change_estimate_geom(input_image0, input_image1, matches_info, choice):
+    geom_info = matches_info["geom_info"]
+    wrapped_images = np.array([0])
+    if choice != "No":
+        wrapped_images, _ = wrap_images(input_image0, input_image1, geom_info, choice)
+    return wrapped_images, matches_info
+
+
 def display_matches(pred: dict):
     img0 = pred["image0_orig"]
     img1 = pred["image1_orig"]
