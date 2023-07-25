@@ -28,9 +28,23 @@ def compute_geom(pred) -> dict:
     h1, w1, _ = pred["image0_orig"].shape
 
     geo_info = {}
-    F, _ = cv2.findFundamentalMat(mkpts0, mkpts1, cv2.FM_LMEDS, 1.0, 0.9999)
+    F, inliers = cv2.findFundamentalMat(
+        mkpts0,
+        mkpts1,
+        method=cv2.USAC_MAGSAC,
+        ransacReprojThreshold=1.0,
+        confidence=0.9999,
+        maxIters=10000,
+    )
     geo_info["Fundamental"] = F.tolist()
-    H, _ = cv2.findHomography(mkpts1, mkpts0, cv2.RANSAC)
+    H, _ = cv2.findHomography(
+        mkpts1,
+        mkpts0,
+        method=cv2.USAC_MAGSAC,
+        ransacReprojThreshold=5.0,
+        confidence=0.9999,
+        maxIters=10000,
+    )
     geo_info["Homography"] = H.tolist()
     _, H1, H2 = cv2.stereoRectifyUncalibrated(
         mkpts0.reshape(-1, 2), mkpts1.reshape(-1, 2), F, imgSize=(w1, h1)
