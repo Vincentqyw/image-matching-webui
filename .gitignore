@@ -17,3 +17,4 @@ third_party/REKD
 Dockerfile
 hloc/matchers/dedode.py
 gradio_cached_examples
+*.mp4

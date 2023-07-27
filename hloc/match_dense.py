@@ -347,6 +347,8 @@ def match_images(model, image_0, image_1, conf, device="cpu"):
         }
         if "mconf" in pred.keys():
             ret["mconf"] = pred["mconf"].cpu().numpy()
+        else:
+            ret["mconf"] = np.ones_like(kpts0.cpu().numpy()[:,0])
     if "lines0" in pred.keys() and "lines1" in pred.keys():
         if "keypoints0" in pred.keys() and "keypoints1" in pred.keys():
             kpts0, kpts1 = pred["keypoints0"], pred["keypoints1"]

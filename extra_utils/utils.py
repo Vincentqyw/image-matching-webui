@@ -22,6 +22,33 @@ def get_feature_model(conf):
     return model
 
 
+def filter_matches(pred, reproj_threshold=4.0):
+    mkpts0 = None
+    mkpts1 = None
+    if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
+        mkpts0 = pred["keypoints0_orig"]
+        mkpts1 = pred["keypoints1_orig"]
+
+    if "line_keypoints0_orig" in pred.keys() and "line_keypoints1_orig" in pred.keys():
+        mkpts0 = pred["line_keypoints0_orig"]
+        mkpts1 = pred["line_keypoints1_orig"]
+
+    H, mask = cv2.findHomography(
+        mkpts0,
+        mkpts1,
+        method=cv2.USAC_MAGSAC,
+        ransacReprojThreshold=8.0,
+        confidence=0.9999,
+        maxIters=10000,
+    )
+    mask = np.array(mask.ravel().astype("bool"), dtype="bool")
+    if H is not None:
+        pred["keypoints0_orig"] = pred["keypoints0_orig"][mask]
+        pred["keypoints1_orig"] = pred["keypoints1_orig"][mask]
+        pred["mconf"] = pred["mconf"][mask]
+    return pred
+
+
 def compute_geom(pred) -> dict:
     mkpts0 = None
     mkpts1 = None
@@ -35,6 +62,8 @@ def compute_geom(pred) -> dict:
         mkpts1 = pred["line_keypoints1_orig"]
 
     if mkpts0 is not None and mkpts1 is not None:
+        if len(mkpts0) < 8:
+            return {}
         h1, w1, _ = pred["image0_orig"].shape
         geo_info = {}
         F, inliers = cv2.findFundamentalMat(
@@ -102,6 +131,12 @@ def wrap_images(img0, img1, geo_info, geom_type):
 
 
 def change_estimate_geom(input_image0, input_image1, matches_info, choice):
+    if (
+        matches_info is None
+        or len(matches_info) < 1
+        or "geom_info" not in matches_info.keys()
+    ):
+        return None, None
     geom_info = matches_info["geom_info"]
     wrapped_images = None
     if choice != "No":
