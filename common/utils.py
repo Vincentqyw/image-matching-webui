@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import cv2
+import gradio as gr
 from hloc import matchers, extractors
 from hloc.utils.base_model import dynamic_load
 from hloc import match_dense, match_features, extract_features
@@ -103,21 +104,24 @@ def wrap_images(img0, img1, geo_info, geom_type):
         rectified_image1 = None
         H = np.array(geo_info["Homography"])
         F = np.array(geo_info["Fundamental"])
+        title = []
         if geom_type == "Homography":
             rectified_image1 = cv2.warpPerspective(
                 img1, H, (img0.shape[1] + img1.shape[1], img0.shape[0])
             )
             result_matrix = H
+            title = ["Image 0", "Image 1 - warped"]
         elif geom_type == "Fundamental":
             H1, H2 = np.array(geo_info["H1"]), np.array(geo_info["H2"])
             rectified_image0 = cv2.warpPerspective(img0, H1, (w1, h1))
             rectified_image1 = cv2.warpPerspective(img1, H2, (w2, h2))
             result_matrix = F
+            title = ["Image 0 - warped", "Image 1 - warped"]
         else:
             print("Error: Unknown geometry type")
         fig = plot_images(
             [rectified_image0.squeeze(), rectified_image1.squeeze()],
-            ["Image 0 - matched lines", "Image 1 - matched lines"],
+            title,
             dpi=300,
         )
         dictionary = {
@@ -198,6 +202,71 @@ def display_matches(pred: dict):
         else:
             fig = fig_lines
     return fig, num_inliers
+
+
+def run_matching(
+    image0,
+    image1,
+    match_threshold,
+    extract_max_keypoints,
+    keypoint_threshold,
+    enable_ransac,
+    key,
+):
+    # image0 and image1 is RGB mode
+    if image0 is None or image1 is None:
+        raise gr.Error("Error: No images found! Please upload two images.")
+
+    model = matcher_zoo[key]
+    match_conf = model["config"]
+    # update match config
+    match_conf["model"]["match_threshold"] = match_threshold
+    match_conf["model"]["max_keypoints"] = extract_max_keypoints
+
+    matcher = get_model(match_conf)
+    if model["dense"]:
+        pred = match_dense.match_images(
+            matcher, image0, image1, match_conf["preprocessing"], device=device
+        )
+        del matcher
+        extract_conf = None
+    else:
+        extract_conf = model["config_feature"]
+        # update extract config
+        extract_conf["model"]["max_keypoints"] = extract_max_keypoints
+        extract_conf["model"]["keypoint_threshold"] = keypoint_threshold
+        extractor = get_feature_model(extract_conf)
+        pred0 = extract_features.extract(
+            extractor, image0, extract_conf["preprocessing"]
+        )
+        pred1 = extract_features.extract(
+            extractor, image1, extract_conf["preprocessing"]
+        )
+        pred = match_features.match_images(matcher, pred0, pred1)
+        del extractor
+
+    if enable_ransac:
+        filter_matches(pred, reproj_threshold=4.0)
+
+    fig, num_inliers = display_matches(pred)
+    geom_info = compute_geom(pred)
+    output_wrapped, _ = change_estimate_geom(
+        pred["image0_orig"], pred["image1_orig"], {"geom_info": geom_info}, "Homography"
+    )
+    del pred
+    return (
+        fig,
+        {"matches number": num_inliers},
+        {
+            "match_conf": match_conf,
+            "extractor_conf": extract_conf,
+        },
+        {
+            "geom_info": geom_info,
+        },
+        output_wrapped,
+        # geometry_result,
+    )
 
 
 # Matchers collections
