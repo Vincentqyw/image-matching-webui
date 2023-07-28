@@ -1,17 +1,9 @@
 import argparse
 import gradio as gr
-from hloc import extract_features
-from extra_utils.utils import (
+from common.utils import (
     matcher_zoo,
-    device,
-    match_dense,
-    match_features,
-    get_model,
-    get_feature_model,
-    display_matches,
-    compute_geom,
     change_estimate_geom,
-    filter_matches,
+    run_matching,
 )
 
 DESCRIPTION = """
@@ -23,7 +15,11 @@ This Space demonstrates [Image Matching WebUI](https://github.com/Vincentqyw/ima
 """
 
 
-def run_matching(
+def ui_change_imagebox(choice):
+    return {"value": None, "source": choice, "__type__": "update"}
+
+
+def ui_reset_state(
     image0,
     image1,
     match_threshold,
@@ -32,76 +28,13 @@ def run_matching(
     enable_ransac,
     key,
 ):
-    # image0 and image1 is RGB mode
-    if image0 is None or image1 is None:
-        raise gr.Error("Error: No images found! Please upload two images.")
-
-    model = matcher_zoo[key]
-    match_conf = model["config"]
-    # update match config
-    match_conf["model"]["match_threshold"] = match_threshold
-    match_conf["model"]["max_keypoints"] = extract_max_keypoints
-
-    matcher = get_model(match_conf)
-    if model["dense"]:
-        pred = match_dense.match_images(
-            matcher, image0, image1, match_conf["preprocessing"], device=device
-        )
-        del matcher
-        extract_conf = None
-    else:
-        extract_conf = model["config_feature"]
-        # update extract config
-        extract_conf["model"]["max_keypoints"] = extract_max_keypoints
-        extract_conf["model"]["keypoint_threshold"] = keypoint_threshold
-        extractor = get_feature_model(extract_conf)
-        pred0 = extract_features.extract(
-            extractor, image0, extract_conf["preprocessing"]
-        )
-        pred1 = extract_features.extract(
-            extractor, image1, extract_conf["preprocessing"]
-        )
-        pred = match_features.match_images(matcher, pred0, pred1)
-        del extractor
-
-    if enable_ransac:
-        filter_matches(pred, reproj_threshold=4.0)
-
-    fig, num_inliers = display_matches(pred)
-    geom_info = compute_geom(pred)
-    output_wrapped, _ = change_estimate_geom(
-        pred["image0_orig"], pred["image1_orig"], {"geom_info": geom_info}, "Homography"
-    )
-    del pred
-    return (
-        fig,
-        {"matches number": num_inliers},
-        {
-            "match_conf": match_conf,
-            "extractor_conf": extract_conf,
-        },
-        {
-            "geom_info": geom_info,
-        },
-        output_wrapped,
-        # geometry_result,
-    )
-
-
-def ui_change_imagebox(choice):
-    return {"value": None, "source": choice, "__type__": "update"}
-
-
-def ui_reset_state(
-    image0, image1, match_threshold, extract_max_keypoints, keypoint_threshold, key
-):
     match_threshold = 0.2
     extract_max_keypoints = 1000
     keypoint_threshold = 0.015
     key = list(matcher_zoo.keys())[0]
     image0 = None
     image1 = None
-
+    enable_ransac = False
     return (
         image0,
         image1,
@@ -109,14 +42,15 @@ def ui_reset_state(
         extract_max_keypoints,
         keypoint_threshold,
         key,
-        {"value": None, "source": "upload", "__type__": "update"},
-        {"value": None, "source": "upload", "__type__": "update"},
+        ui_change_imagebox("upload"),
+        ui_change_imagebox("upload"),
         "upload",
         None,
         {},
         {},
         None,
         {},
+        False,
     )
 
 
@@ -345,12 +279,12 @@ def run(config):
 
             # Reset images
             reset_outputs = [
+                input_image0,
+                input_image1,
                 match_setting_threshold,
                 match_setting_max_features,
                 detect_keypoints_threshold,
                 matcher_list,
-                input_image0,
-                input_image1,
                 input_image0,
                 input_image1,
                 match_image_src,
@@ -359,6 +293,7 @@ def run(config):
                 matcher_info,
                 output_wrapped,
                 geometry_result,
+                enable_ransac,
             ]
             button_reset.click(fn=ui_reset_state, inputs=inputs, outputs=reset_outputs)
 
