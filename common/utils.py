@@ -5,8 +5,7 @@ import gradio as gr
 from hloc import matchers, extractors
 from hloc.utils.base_model import dynamic_load
 from hloc import match_dense, match_features, extract_features
-from .plotting import draw_matches, fig2im
-from .visualize_util import plot_images, plot_color_line_matches
+from .viz import draw_matches, fig2im, plot_images, plot_color_line_matches
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -30,7 +29,10 @@ def filter_matches(pred, reproj_threshold=4.0):
         mkpts0 = pred["keypoints0_orig"]
         mkpts1 = pred["keypoints1_orig"]
 
-    if "line_keypoints0_orig" in pred.keys() and "line_keypoints1_orig" in pred.keys():
+    if (
+        "line_keypoints0_orig" in pred.keys()
+        and "line_keypoints1_orig" in pred.keys()
+    ):
         mkpts0 = pred["line_keypoints0_orig"]
         mkpts1 = pred["line_keypoints1_orig"]
 
@@ -58,7 +60,10 @@ def compute_geom(pred) -> dict:
         mkpts0 = pred["keypoints0_orig"]
         mkpts1 = pred["keypoints1_orig"]
 
-    if "line_keypoints0_orig" in pred.keys() and "line_keypoints1_orig" in pred.keys():
+    if (
+        "line_keypoints0_orig" in pred.keys()
+        and "line_keypoints1_orig" in pred.keys()
+    ):
         mkpts0 = pred["line_keypoints0_orig"]
         mkpts1 = pred["line_keypoints1_orig"]
 
@@ -144,7 +149,9 @@ def change_estimate_geom(input_image0, input_image1, matches_info, choice):
     geom_info = matches_info["geom_info"]
     wrapped_images = None
     if choice != "No":
-        wrapped_images, _ = wrap_images(input_image0, input_image1, geom_info, choice)
+        wrapped_images, _ = wrap_images(
+            input_image0, input_image1, geom_info, choice
+        )
         return wrapped_images, matches_info
     else:
         return None, None
@@ -170,7 +177,10 @@ def display_matches(pred: dict):
             img1,
             mconf,
             dpi=300,
-            titles=["Image 0 - matched keypoints", "Image 1 - matched keypoints"],
+            titles=[
+                "Image 0 - matched keypoints",
+                "Image 1 - matched keypoints",
+            ],
         )
         fig = fig_mkpts
     if "line0_orig" in pred.keys() and "line1_orig" in pred.keys():
@@ -197,7 +207,9 @@ def display_matches(pred: dict):
             else:
                 mconf = np.ones(len(mkpts0))
             fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
-            fig_lines = cv2.resize(fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0]))
+            fig_lines = cv2.resize(
+                fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0])
+            )
             fig = np.concatenate([fig_mkpts, fig_lines], axis=0)
         else:
             fig = fig_lines
@@ -251,7 +263,10 @@ def run_matching(
     fig, num_inliers = display_matches(pred)
     geom_info = compute_geom(pred)
     output_wrapped, _ = change_estimate_geom(
-        pred["image0_orig"], pred["image1_orig"], {"geom_info": geom_info}, "Homography"
+        pred["image0_orig"],
+        pred["image1_orig"],
+        {"geom_info": geom_info},
+        "Homography",
     )
     del pred
     return (
