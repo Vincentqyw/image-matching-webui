@@ -1,5 +1,8 @@
-import torch
+import os
+import random
 import numpy as np
+import torch
+from itertools import combinations
 import cv2
 import gradio as gr
 from hloc import matchers, extractors
@@ -22,37 +25,113 @@ def get_feature_model(conf):
     return model
 
 
-def filter_matches(pred, reproj_threshold=4.0):
+def gen_examples():
+    random.seed(1)
+    example_matchers = [
+        "disk+lightglue",
+        "loftr",
+        "disk",
+        "d2net",
+        "topicfm",
+        "superpoint+superglue",
+        "disk+dualsoftmax",
+        "lanet",
+    ]
+
+    def gen_images_pairs(path: str, count: int = 5):
+        imgs_list = [
+            os.path.join(path, file)
+            for file in os.listdir(path)
+            if file.lower().endswith((".jpg", ".jpeg", ".png"))
+        ]
+        pairs = list(combinations(imgs_list, 2))
+        selected = random.sample(range(len(pairs)), count)
+        return [pairs[i] for i in selected]
+    # image pair path
+    path = "datasets/sacre_coeur/mapping"
+    pairs = gen_images_pairs(path, len(example_matchers))
+    match_setting_threshold = 0.1
+    match_setting_max_features = 2000
+    detect_keypoints_threshold = 0.01
+    enable_ransac = False
+    ransac_method = "RANSAC"
+    ransac_reproj_threshold = 8
+    ransac_confidence = 0.999
+    ransac_max_iter = 10000
+    input_lists = []
+    for pair, mt in zip(pairs, example_matchers):
+        input_lists.append(
+            [
+                pair[0],
+                pair[1],
+                match_setting_threshold,
+                match_setting_max_features,
+                detect_keypoints_threshold,
+                mt,
+                enable_ransac,
+                ransac_method,
+                ransac_reproj_threshold,
+                ransac_confidence,
+                ransac_max_iter,
+            ]
+        )
+    return input_lists
+
+
+def filter_matches(
+    pred,
+    ransac_method="RANSAC",
+    ransac_reproj_threshold=8,
+    ransac_confidence=0.999,
+    ransac_max_iter=10000,
+):
     mkpts0 = None
     mkpts1 = None
+    feature_type = None
     if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
         mkpts0 = pred["keypoints0_orig"]
         mkpts1 = pred["keypoints1_orig"]
-
-    if (
+        feature_type = "KEYPOINT"
+    elif (
         "line_keypoints0_orig" in pred.keys()
         and "line_keypoints1_orig" in pred.keys()
     ):
         mkpts0 = pred["line_keypoints0_orig"]
         mkpts1 = pred["line_keypoints1_orig"]
-
+        feature_type = "LINE"
+    else:
+        return pred
+    if mkpts0 is None or mkpts0 is None:
+        return pred
+    if ransac_method not in ransac_zoo.keys():
+        ransac_method = "RANSAC"
     H, mask = cv2.findHomography(
         mkpts0,
         mkpts1,
-        method=cv2.USAC_MAGSAC,
-        ransacReprojThreshold=8.0,
-        confidence=0.9999,
-        maxIters=10000,
+        method=ransac_zoo[ransac_method],
+        ransacReprojThreshold=ransac_reproj_threshold,
+        confidence=ransac_confidence,
+        maxIters=ransac_max_iter,
     )
     mask = np.array(mask.ravel().astype("bool"), dtype="bool")
     if H is not None:
-        pred["keypoints0_orig"] = pred["keypoints0_orig"][mask]
-        pred["keypoints1_orig"] = pred["keypoints1_orig"][mask]
-        pred["mconf"] = pred["mconf"][mask]
+        if feature_type == "KEYPOINT":
+            pred["keypoints0_orig"] = mkpts0[mask]
+            pred["keypoints1_orig"] = mkpts1[mask]
+            pred["mconf"] = pred["mconf"][mask]
+        elif feature_type == "LINE":
+            pred["line_keypoints0_orig"] = mkpts0[mask]
+            pred["line_keypoints1_orig"] = mkpts1[mask]
     return pred
 
 
-def compute_geom(pred) -> dict:
+def compute_geom(
+    pred,
+    ransac_method="RANSAC",
+    ransac_reproj_threshold=8,
+    ransac_confidence=0.999,
+    ransac_max_iter=10000,
+) -> dict:
     mkpts0 = None
     mkpts1 = None
 
@@ -75,19 +154,19 @@ def compute_geom(pred) -> dict:
         F, inliers = cv2.findFundamentalMat(
             mkpts0,
             mkpts1,
-            method=cv2.USAC_MAGSAC,
-            ransacReprojThreshold=1.0,
-            confidence=0.9999,
-            maxIters=10000,
+            method=ransac_zoo[ransac_method],
+            ransacReprojThreshold=ransac_reproj_threshold,
+            confidence=ransac_confidence,
+            maxIters=ransac_max_iter,
         )
         geo_info["Fundamental"] = F.tolist()
         H, _ = cv2.findHomography(
             mkpts1,
             mkpts0,
-            method=cv2.USAC_MAGSAC,
-            ransacReprojThreshold=5.0,
-            confidence=0.9999,
-            maxIters=10000,
+            method=ransac_zoo[ransac_method],
+            ransacReprojThreshold=ransac_reproj_threshold,
+            confidence=ransac_confidence,
+            maxIters=ransac_max_iter,
         )
         geo_info["Homography"] = H.tolist()
         _, H1, H2 = cv2.stereoRectifyUncalibrated(
@@ -222,8 +301,13 @@ def run_matching(
     match_threshold,
     extract_max_keypoints,
     keypoint_threshold,
-    enable_ransac,
     key,
+    enable_ransac=False,
+    ransac_method="RANSAC",
+    ransac_reproj_threshold=8,
+    ransac_confidence=0.999,
+    ransac_max_iter=10000,
+    choice_estimate_geom="Homography",
 ):
     # image0 and image1 is RGB mode
     if image0 is None or image1 is None:
@@ -258,7 +342,13 @@ def run_matching(
         del extractor
 
     if enable_ransac:
-        filter_matches(pred, reproj_threshold=4.0)
+        filter_matches(
+            pred,
+            ransac_method=ransac_method,
+            ransac_reproj_threshold=ransac_reproj_threshold,
+            ransac_confidence=ransac_confidence,
+            ransac_max_iter=ransac_max_iter,
+        )
 
     fig, num_inliers = display_matches(pred)
     geom_info = compute_geom(pred)
@@ -266,7 +356,7 @@ def run_matching(
         pred["image0_orig"],
         pred["image1_orig"],
         {"geom_info": geom_info},
-        "Homography",
+        choice_estimate_geom,
     )
     del pred
     return (
@@ -283,6 +373,19 @@ def run_matching(
         # geometry_result,
     )
 
+
+# @ref: https://docs.opencv.org/4.x/d0/d74/md__build_4_x-contrib_docs-lin64_opencv_doc_tutorials_calib3d_usac.html
+# AND: https://opencv.org/blog/2021/06/09/evaluating-opencvs-new-ransacs
+ransac_zoo = {
+    "RANSAC": cv2.RANSAC,
+    "USAC_MAGSAC": cv2.USAC_MAGSAC,
+    "USAC_DEFAULT": cv2.USAC_DEFAULT,
+    "USAC_FM_8PTS": cv2.USAC_FM_8PTS,
+    "USAC_PROSAC": cv2.USAC_PROSAC,
+    "USAC_FAST": cv2.USAC_FAST,
+    "USAC_ACCURATE": cv2.USAC_ACCURATE,
+    "USAC_PARALLEL": cv2.USAC_PARALLEL,
+}
 
 # Matchers collections
 matcher_zoo = {
