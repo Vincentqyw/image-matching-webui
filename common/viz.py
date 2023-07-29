@@ -6,6 +6,7 @@ import matplotlib.cm as cm
 from PIL import Image
 import torch.nn.functional as F
 import torch
+import seaborn as sns
 
 
 def _compute_conf_thresh(data):
@@ -19,7 +20,77 @@ def _compute_conf_thresh(data):
     return thr
 
 
-# --- VISUALIZATION --- #
+def plot_images(imgs, titles=None, cmaps="gray", dpi=100, size=5, pad=0.5):
+    """Plot a set of images horizontally.
+    Args:
+        imgs: a list of NumPy or PyTorch images, RGB (H, W, 3) or mono (H, W).
+        titles: a list of strings, as titles for each image.
+        cmaps: colormaps for monochrome images.
+    """
+    n = len(imgs)
+    if not isinstance(cmaps, (list, tuple)):
+        cmaps = [cmaps] * n
+    # figsize = (size*n, size*3/4) if size is not None else None
+    figsize = (size * n, size * 6 / 5) if size is not None else None
+    fig, ax = plt.subplots(1, n, figsize=figsize, dpi=dpi)
+
+    if n == 1:
+        ax = [ax]
+    for i in range(n):
+        ax[i].imshow(imgs[i], cmap=plt.get_cmap(cmaps[i]))
+        ax[i].get_yaxis().set_ticks([])
+        ax[i].get_xaxis().set_ticks([])
+        ax[i].set_axis_off()
+        for spine in ax[i].spines.values():  # remove frame
+            spine.set_visible(False)
+        if titles:
+            ax[i].set_title(titles[i])
+    fig.tight_layout(pad=pad)
+    return fig
+
+
+def plot_color_line_matches(lines, correct_matches=None, lw=2, indices=(0, 1)):
+    """Plot line matches for existing images with multiple colors.
+    Args:
+        lines: list of ndarrays of size (N, 2, 2).
+        correct_matches: bool array of size (N,) indicating correct matches.
+        lw: line width as float pixels.
+        indices: indices of the images to draw the matches on.
+    """
+    n_lines = len(lines[0])
+    colors = sns.color_palette("husl", n_colors=n_lines)
+    np.random.shuffle(colors)
+    alphas = np.ones(n_lines)
+    # If correct_matches is not None, display wrong matches with a low alpha
+    if correct_matches is not None:
+        alphas[~np.array(correct_matches)] = 0.2
+
+    fig = plt.gcf()
+    ax = fig.axes
+    assert len(ax) > max(indices)
+    axes = [ax[i] for i in indices]
+    fig.canvas.draw()
+
+    # Plot the lines
+    for a, l in zip(axes, lines):
+        # Transform the points into the figure coordinate system
+        transFigure = fig.transFigure.inverted()
+        endpoint0 = transFigure.transform(a.transData.transform(l[:, 0]))
+        endpoint1 = transFigure.transform(a.transData.transform(l[:, 1]))
+        fig.lines += [
+            matplotlib.lines.Line2D(
+                (endpoint0[i, 0], endpoint1[i, 0]),
+                (endpoint0[i, 1], endpoint1[i, 1]),
+                zorder=1,
+                transform=fig.transFigure,
+                c=colors[i],
+                alpha=alphas[i],
+                linewidth=lw,
+            )
+            for i in range(n_lines)
+        ]
+
+    return fig
 
 
 def make_matching_figure(
@@ -105,8 +176,12 @@ def _make_evaluation_figure(data, b_id, alpha="dynamic"):
     b_mask = data["m_bids"] == b_id
     conf_thr = _compute_conf_thresh(data)
 
-    img0 = (data["image0"][b_id][0].cpu().numpy() * 255).round().astype(np.int32)
-    img1 = (data["image1"][b_id][0].cpu().numpy() * 255).round().astype(np.int32)
+    img0 = (
+        (data["image0"][b_id][0].cpu().numpy() * 255).round().astype(np.int32)
+    )
+    img1 = (
+        (data["image1"][b_id][0].cpu().numpy() * 255).round().astype(np.int32)
+    )
     kpts0 = data["mkpts0_f"][b_mask].cpu().numpy()
     kpts1 = data["mkpts1_f"][b_mask].cpu().numpy()
 
@@ -131,8 +206,10 @@ def _make_evaluation_figure(data, b_id, alpha="dynamic"):
 
     text = [
         f"#Matches {len(kpts0)}",
-        f"Precision({conf_thr:.2e}) ({100 * precision:.1f}%): {n_correct}/{len(kpts0)}",
-        f"Recall({conf_thr:.2e}) ({100 * recall:.1f}%): {n_correct}/{n_gt_matches}",
+        f"Precision({conf_thr:.2e}) ({100 * precision:.1f}%):"
+        f" {n_correct}/{len(kpts0)}",
+        f"Recall({conf_thr:.2e}) ({100 * recall:.1f}%):"
+        f" {n_correct}/{n_gt_matches}",
     ]
 
     # make the figure
@@ -188,7 +265,9 @@ def error_colormap(err, thr, alpha=1.0):
     assert alpha <= 1.0 and alpha > 0, f"Invaid alpha value: {alpha}"
     x = 1 - np.clip(err / (thr * 2), 0, 1)
     return np.clip(
-        np.stack([2 - x * 2, x * 2, np.zeros_like(x), np.ones_like(x) * alpha], -1),
+        np.stack(
+            [2 - x * 2, x * 2, np.zeros_like(x), np.ones_like(x) * alpha], -1
+        ),
         0,
         1,
     )
@@ -200,9 +279,13 @@ np.random.shuffle(color_map)
 
 
 def draw_topics(
-    data, img0, img1, saved_folder="viz_topics", show_n_topics=8, saved_name=None
+    data,
+    img0,
+    img1,
+    saved_folder="viz_topics",
+    show_n_topics=8,
+    saved_name=None,
 ):
-
     topic0, topic1 = data["topic_matrix"]["img0"], data["topic_matrix"]["img1"]
     hw0_c, hw1_c = data["hw0_c"], data["hw1_c"]
     hw0_i, hw1_i = data["hw0_i"], data["hw1_i"]
@@ -237,7 +320,10 @@ def draw_topics(
         dim=-1, keepdim=True
     )  # .float() / (n_topics - 1) #* 255 + 1
     # topic1[~mask1_nonzero] = -1
-    label_img0, label_img1 = torch.zeros_like(topic0) - 1, torch.zeros_like(topic1) - 1
+    label_img0, label_img1 = (
+        torch.zeros_like(topic0) - 1,
+        torch.zeros_like(topic1) - 1,
+    )
     for i, k in enumerate(top_topics):
         label_img0[topic0 == k] = color_map[k]
         label_img1[topic1 == k] = color_map[k]
@@ -312,24 +398,30 @@ def draw_topicfm_demo(
     opencv_display=False,
     opencv_title="",
 ):
-    topic_map0, topic_map1 = draw_topics(data, img0, img1, show_n_topics=show_n_topics)
-
-    mask_tm0, mask_tm1 = np.expand_dims(topic_map0 >= 0, axis=-1), np.expand_dims(
-        topic_map1 >= 0, axis=-1
+    topic_map0, topic_map1 = draw_topics(
+        data, img0, img1, show_n_topics=show_n_topics
     )
 
+    mask_tm0, mask_tm1 = np.expand_dims(
+        topic_map0 >= 0, axis=-1
+    ), np.expand_dims(topic_map1 >= 0, axis=-1)
+
     topic_cm0, topic_cm1 = cm.jet(topic_map0 / 99.0), cm.jet(topic_map1 / 99.0)
-    topic_cm0 = cv2.cvtColor(topic_cm0[..., :3].astype(np.float32), cv2.COLOR_RGB2BGR)
-    topic_cm1 = cv2.cvtColor(topic_cm1[..., :3].astype(np.float32), cv2.COLOR_RGB2BGR)
+    topic_cm0 = cv2.cvtColor(
+        topic_cm0[..., :3].astype(np.float32), cv2.COLOR_RGB2BGR
+    )
+    topic_cm1 = cv2.cvtColor(
+        topic_cm1[..., :3].astype(np.float32), cv2.COLOR_RGB2BGR
+    )
     overlay0 = (mask_tm0 * topic_cm0 + (1 - mask_tm0) * img0).astype(np.float32)
     overlay1 = (mask_tm1 * topic_cm1 + (1 - mask_tm1) * img1).astype(np.float32)
 
     cv2.addWeighted(overlay0, topic_alpha, img0, 1 - topic_alpha, 0, overlay0)
     cv2.addWeighted(overlay1, topic_alpha, img1, 1 - topic_alpha, 0, overlay1)
 
-    overlay0, overlay1 = (overlay0 * 255).astype(np.uint8), (overlay1 * 255).astype(
-        np.uint8
-    )
+    overlay0, overlay1 = (overlay0 * 255).astype(np.uint8), (
+        overlay1 * 255
+    ).astype(np.uint8)
 
     h0, w0 = img0.shape[:2]
     h1, w1 = img1.shape[:2]
@@ -338,7 +430,9 @@ def draw_topicfm_demo(
     out_fig[:h0, :w0] = overlay0
     if h0 >= h1:
         start = (h0 - h1) // 2
-        out_fig[start : (start + h1), (w0 + margin) : (w0 + margin + w1)] = overlay1
+        out_fig[
+            start : (start + h1), (w0 + margin) : (w0 + margin + w1)
+        ] = overlay1
     else:
         start = (h1 - h0) // 2
         out_fig[:h0, (w0 + margin) : (w0 + margin + w1)] = overlay1[
@@ -358,7 +452,8 @@ def draw_topicfm_demo(
             img1[start : start + h0] * 255
         ).astype(np.uint8)
 
-    # draw matching lines, this is inspried from https://raw.githubusercontent.com/magicleap/SuperGluePretrainedNetwork/master/models/utils.py
+    # draw matching lines, this is inspried from
+    # https://raw.githubusercontent.com/magicleap/SuperGluePretrainedNetwork/master/models/utils.py
     mkpts0, mkpts1 = np.round(mkpts0).astype(int), np.round(mkpts1).astype(int)
     mcolor = (np.array(mcolor[:, [2, 1, 0]]) * 255).astype(int)
 

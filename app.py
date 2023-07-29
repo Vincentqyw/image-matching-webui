@@ -95,20 +95,19 @@ def run(config):
                     )
 
                 with gr.Accordion("Advanced Setting", open=False):
-
                     with gr.Row():
                         match_setting_threshold = gr.Slider(
                             minimum=0.0,
                             maximum=1,
                             step=0.001,
-                            label="Match threshold",
+                            label="Match thres.",
                             value=0.1,
                         )
                         match_setting_max_features = gr.Slider(
                             minimum=10,
                             maximum=10000,
                             step=10,
-                            label="Max number of features",
+                            label="Max features",
                             value=1000,
                         )
                     # TODO: add line settings
@@ -117,14 +116,14 @@ def run(config):
                             minimum=0,
                             maximum=1,
                             step=0.001,
-                            label="Keypoint threshold",
+                            label="Keypoint thres.",
                             value=0.015,
                         )
                         detect_line_threshold = gr.Slider(
                             minimum=0.1,
                             maximum=1,
                             step=0.01,
-                            label="Line threshold",
+                            label="Line thres.",
                             value=0.2,
                         )
                         # matcher_lists = gr.Radio(
@@ -139,11 +138,19 @@ def run(config):
                             value="Homography",
                         )
 
-                    with gr.Accordion("RANSAC Setting (In Development)", open=False):
-                        with gr.Row():
-                            enable_ransac = gr.Checkbox(label="Use RANSAC")
+                    with gr.Accordion(
+                        "RANSAC Setting (In Development)", open=False
+                    ):
+                        with gr.Row(equal_height=False):
+                            enable_ransac = gr.Checkbox(label="Enable RANSAC")
                             ransac_method = gr.Dropdown(
-                                choices=["RANSAC", "USAC_MAGSAC"],
+                                choices=[
+                                    "RANSAC",
+                                    "USAC_MAGSAC",
+                                    "USAC_FM_8PTS",
+                                    "USAC_PROSAC",
+                                    "USAC_ACCURATE",
+                                ],
                                 value="USAC_MAGSAC",
                                 label="RANSAC Method",
                                 interactive=True,
@@ -239,7 +246,10 @@ def run(config):
                         outputs=[],
                         fn=run_matching,
                         cache_examples=False,
-                        label="Examples (click one of the images below to Run Match)",
+                        label=(
+                            "Examples (click one of the images below to Run"
+                            " Match)"
+                        ),
                     )
                 with gr.Accordion("Open for More!", open=False):
                     gr.Markdown(
@@ -250,8 +260,12 @@ def run(config):
                     )
 
             with gr.Column():
-                output_mkpts = gr.Image(label="Keypoints Matching", type="numpy")
-                with gr.Accordion("Open for More: Matches Statistics", open=False):
+                output_mkpts = gr.Image(
+                    label="Keypoints Matching", type="numpy"
+                )
+                with gr.Accordion(
+                    "Open for More: Matches Statistics", open=False
+                ):
                     matches_result_info = gr.JSON(label="Matches Statistics")
                     matcher_info = gr.JSON(label="Match info")
                 output_wrapped = gr.Image(label="Wrapped Pair", type="numpy")
@@ -260,10 +274,14 @@ def run(config):
 
             # callbacks
             match_image_src.change(
-                fn=ui_change_imagebox, inputs=match_image_src, outputs=input_image0
+                fn=ui_change_imagebox,
+                inputs=match_image_src,
+                outputs=input_image0,
             )
             match_image_src.change(
-                fn=ui_change_imagebox, inputs=match_image_src, outputs=input_image1
+                fn=ui_change_imagebox,
+                inputs=match_image_src,
+                outputs=input_image1,
             )
 
             # collect outputs
@@ -295,7 +313,9 @@ def run(config):
                 geometry_result,
                 enable_ransac,
             ]
-            button_reset.click(fn=ui_reset_state, inputs=inputs, outputs=reset_outputs)
+            button_reset.click(
+                fn=ui_reset_state, inputs=inputs, outputs=reset_outputs
+            )
 
             # estimate geo
             choice_estimate_geom.change(
@@ -315,7 +335,10 @@ def run(config):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--config_path", type=str, default="config.yaml", help="configuration file path"
+        "--config_path",
+        type=str,
+        default="config.yaml",
+        help="configuration file path",
     )
     args = parser.parse_args()
     config = None
