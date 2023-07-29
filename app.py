@@ -4,6 +4,8 @@ from common.utils import (
     matcher_zoo,
     change_estimate_geom,
     run_matching,
+    ransac_zoo,
+    gen_examples,
 )
 
 DESCRIPTION = """
@@ -25,8 +27,13 @@ def ui_reset_state(
     match_threshold,
     extract_max_keypoints,
     keypoint_threshold,
-    enable_ransac,
     key,
+    enable_ransac=False,
+    ransac_method="RANSAC",
+    ransac_reproj_threshold=8,
+    ransac_confidence=0.999,
+    ransac_max_iter=10000,
+    choice_estimate_geom="Homography",
 ):
     match_threshold = 0.2
     extract_max_keypoints = 1000
@@ -51,6 +58,11 @@ def ui_reset_state(
         None,
         {},
         False,
+        "RANSAC",
+        8,
+        0.999,
+        10000,
+        "Homography",
     )
 
 
@@ -67,7 +79,6 @@ def run(config):
                         value="disk+lightglue",
                         label="Matching Model",
                         interactive=True,
-                        variant="compact",
                     )
                     match_image_src = gr.Radio(
                         ["upload", "webcam", "canvas"],
@@ -144,32 +155,25 @@ def run(config):
                         with gr.Row(equal_height=False):
                             enable_ransac = gr.Checkbox(label="Enable RANSAC")
                             ransac_method = gr.Dropdown(
-                                choices=[
-                                    "RANSAC",
-                                    "USAC_MAGSAC",
-                                    "USAC_FM_8PTS",
-                                    "USAC_PROSAC",
-                                    "USAC_ACCURATE",
-                                ],
-                                value="USAC_MAGSAC",
+                                choices=ransac_zoo.keys(),
+                                value="RANSAC",
                                 label="RANSAC Method",
                                 interactive=True,
                             )
-                        with gr.Row():
-                            ransac_reproj_threshold = gr.Slider(
-                                minimum=0.0,
-                                maximum=12,
-                                step=0.01,
-                                label="Ransac Reproj threshold",
-                                value=1.0,
-                            )
-                            ransac_confidence = gr.Slider(
-                                minimum=0.0,
-                                maximum=1,
-                                step=0.01,
-                                label="Ransac Confidence",
-                                value=0.99,
-                            )
+                        ransac_reproj_threshold = gr.Slider(
+                            minimum=0.0,
+                            maximum=12,
+                            step=0.01,
+                            label="Ransac Reproj threshold",
+                            value=8.0,
+                        )
+                        ransac_confidence = gr.Slider(
+                            minimum=0.0,
+                            maximum=1,
+                            step=0.00001,
+                            label="Ransac Confidence",
+                            value=0.99999,
+                        )
                         ransac_max_iter = gr.Slider(
                             minimum=0.0,
                             maximum=100000,
@@ -186,62 +190,20 @@ def run(config):
                     match_setting_threshold,
                     match_setting_max_features,
                     detect_keypoints_threshold,
-                    enable_ransac,
                     matcher_list,
+                    enable_ransac,
+                    ransac_method,
+                    ransac_reproj_threshold,
+                    ransac_confidence,
+                    ransac_max_iter,
+                    choice_estimate_geom,
                 ]
 
                 # Add some examples
                 with gr.Row():
-                    examples = [
-                        [
-                            "datasets/sacre_coeur/mapping/71295362_4051449754.jpg",
-                            "datasets/sacre_coeur/mapping/93341989_396310999.jpg",
-                            0.1,
-                            2000,
-                            0.015,
-                            False,
-                            "disk+lightglue",
-                        ],
-                        [
-                            "datasets/sacre_coeur/mapping/03903474_1471484089.jpg",
-                            "datasets/sacre_coeur/mapping/02928139_3448003521.jpg",
-                            0.1,
-                            2000,
-                            0.015,
-                            False,
-                            "loftr",
-                        ],
-                        [
-                            "datasets/sacre_coeur/mapping/10265353_3838484249.jpg",
-                            "datasets/sacre_coeur/mapping/51091044_3486849416.jpg",
-                            0.1,
-                            2000,
-                            0.015,
-                            False,
-                            "disk",
-                        ],
-                        [
-                            "datasets/sacre_coeur/mapping/44120379_8371960244.jpg",
-                            "datasets/sacre_coeur/mapping/93341989_396310999.jpg",
-                            0.1,
-                            2000,
-                            0.015,
-                            False,
-                            "topicfm",
-                        ],
-                        [
-                            "datasets/sacre_coeur/mapping/17295357_9106075285.jpg",
-                            "datasets/sacre_coeur/mapping/44120379_8371960244.jpg",
-                            0.1,
-                            2000,
-                            0.015,
-                            False,
-                            "superpoint+superglue",
-                        ],
-                    ]
                     # Example inputs
                     gr.Examples(
-                        examples=examples,
+                        examples=gen_examples(),
                         inputs=inputs,
                         outputs=[],
                         fn=run_matching,
@@ -312,6 +274,11 @@ def run(config):
                 output_wrapped,
                 geometry_result,
                 enable_ransac,
+                ransac_method,
+                ransac_reproj_threshold,
+                ransac_confidence,
+                ransac_max_iter,
+                choice_estimate_geom,
             ]
             button_reset.click(
                 fn=ui_reset_state, inputs=inputs, outputs=reset_outputs
