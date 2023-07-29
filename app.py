@@ -106,52 +106,44 @@ def run(config):
                     )
 
                 with gr.Accordion("Advanced Setting", open=False):
-                    with gr.Row():
-                        match_setting_threshold = gr.Slider(
-                            minimum=0.0,
-                            maximum=1,
-                            step=0.001,
-                            label="Match thres.",
-                            value=0.1,
-                        )
-                        match_setting_max_features = gr.Slider(
-                            minimum=10,
-                            maximum=10000,
-                            step=10,
-                            label="Max features",
-                            value=1000,
-                        )
-                    # TODO: add line settings
-                    with gr.Row():
-                        detect_keypoints_threshold = gr.Slider(
-                            minimum=0,
-                            maximum=1,
-                            step=0.001,
-                            label="Keypoint thres.",
-                            value=0.015,
-                        )
-                        detect_line_threshold = gr.Slider(
-                            minimum=0.1,
-                            maximum=1,
-                            step=0.01,
-                            label="Line thres.",
-                            value=0.2,
-                        )
+                    with gr.Accordion("Matching Setting", open=True):
+                        with gr.Row():
+                            match_setting_threshold = gr.Slider(
+                                minimum=0.0,
+                                maximum=1,
+                                step=0.001,
+                                label="Match thres.",
+                                value=0.1,
+                            )
+                            match_setting_max_features = gr.Slider(
+                                minimum=10,
+                                maximum=10000,
+                                step=10,
+                                label="Max features",
+                                value=1000,
+                            )
+                        # TODO: add line settings
+                        with gr.Row():
+                            detect_keypoints_threshold = gr.Slider(
+                                minimum=0,
+                                maximum=1,
+                                step=0.001,
+                                label="Keypoint thres.",
+                                value=0.015,
+                            )
+                            detect_line_threshold = gr.Slider(
+                                minimum=0.1,
+                                maximum=1,
+                                step=0.01,
+                                label="Line thres.",
+                                value=0.2,
+                            )
                         # matcher_lists = gr.Radio(
                         #     ["NN-mutual", "Dual-Softmax"],
                         #     label="Matcher mode",
                         #     value="NN-mutual",
                         # )
-                    with gr.Row():
-                        choice_estimate_geom = gr.Radio(
-                            ["Fundamental", "Homography"],
-                            label="Reconstruct Geometry",
-                            value="Homography",
-                        )
-
-                    with gr.Accordion(
-                        "RANSAC Setting (In Development)", open=False
-                    ):
+                    with gr.Accordion("RANSAC Setting", open=False):
                         with gr.Row(equal_height=False):
                             enable_ransac = gr.Checkbox(label="Enable RANSAC")
                             ransac_method = gr.Dropdown(
@@ -181,6 +173,15 @@ def run(config):
                             label="Ransac Iterations",
                             value=10000,
                         )
+
+                    with gr.Accordion("Geometry Setting", open=True):
+                        with gr.Row(equal_height=False):
+                            # show_geom = gr.Checkbox(label="Show Geometry")
+                            choice_estimate_geom = gr.Radio(
+                                ["Fundamental", "Homography"],
+                                label="Reconstruct Geometry",
+                                value="Homography",
+                            )
 
                 # with gr.Column():
                 # collect inputs
@@ -230,6 +231,7 @@ def run(config):
                 ):
                     matches_result_info = gr.JSON(label="Matches Statistics")
                     matcher_info = gr.JSON(label="Match info")
+
                 output_wrapped = gr.Image(label="Wrapped Pair", type="numpy")
                 with gr.Accordion("Open for More: Geometry info", open=False):
                     geometry_result = gr.JSON(label="Reconstructed Geometry")
