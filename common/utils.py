@@ -396,6 +396,7 @@ matcher_zoo = {
     #     'dense': True  # dense mode, we need 2 images
     # },
     "loftr": {"config": match_dense.confs["loftr"], "dense": True},
+    # "loftr-quadtree": {"config": match_dense.confs["loftr-quadtree"], "dense": True},
     "topicfm": {"config": match_dense.confs["topicfm"], "dense": True},
     "aspanformer": {"config": match_dense.confs["aspanformer"], "dense": True},
     "dedode": {
