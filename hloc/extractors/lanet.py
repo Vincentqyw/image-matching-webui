@@ -16,6 +16,7 @@ class LANet(BaseModel):
     default_conf = {
         "model_name": "v0",
         "keypoint_threshold": 0.1,
+        "max_keypoints": 1024,
     }
     required_inputs = ["image"]
 
@@ -34,10 +35,10 @@ class LANet(BaseModel):
 
         # Scores & Descriptors
         kpts_score = (
-            torch.cat([keypoints, scores], dim=1).view(3, -1).t().cpu().detach().numpy()
+            torch.cat([keypoints, scores], dim=1).view(3, -1).t()
         )
         descriptors = (
-            descriptors.view(256, Hc, Wc).view(256, -1).t().cpu().detach().numpy()
+            descriptors.view(256, Hc, Wc).view(256, -1).t()
         )
 
         # Filter based on confidence threshold
@@ -46,8 +47,13 @@ class LANet(BaseModel):
         keypoints = kpts_score[:, 1:]
         scores = kpts_score[:, 0]
 
+        idxs = scores.argsort()[-self.conf["max_keypoints"] or None :]
+        keypoints = keypoints[idxs, :2]
+        descriptors = descriptors[idxs]
+        scores = scores[idxs]
+
         return {
-            "keypoints": torch.from_numpy(keypoints)[None],
-            "scores": torch.from_numpy(scores)[None],
-            "descriptors": torch.from_numpy(descriptors.T)[None],
+            "keypoints": keypoints[None],
+            "scores": scores[None],
+            "descriptors": descriptors.T[None],
         }
