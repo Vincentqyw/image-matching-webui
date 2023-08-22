@@ -82,7 +82,8 @@ External contributions are very much welcome. Please follow the [PEP8 style guid
 - [x] add webcam support
 - [x] add [line feature matching](https://github.com/Vincentqyw/LineSegmentsDetection) algorithms
 - [x] example to add a new feature extractor / matcher
-- [ ] ransac to filter outliers
+- [x] ransac to filter outliers
+- [ ] add [rotation images](https://github.com/pidahbus/deep-image-orientation-angle-detection) options before matching 
 - [ ] support export matches to colmap ([#issue 6](https://github.com/Vincentqyw/image-matching-webui/issues/6))
 - [ ] add config file to set default parameters
 - [ ] dynamically load models and reduce GPU overload
