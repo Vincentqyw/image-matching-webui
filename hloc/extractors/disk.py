@@ -26,7 +26,7 @@ class DISK(BaseModel):
             pad_if_not_divisible=self.conf["pad_if_not_divisible"],
         )
         return {
-            "keypoints": [f.keypoints for f in features],
-            "scores": [f.detection_scores for f in features],
-            "descriptors": [f.descriptors.t() for f in features],
+            "keypoints": [f.keypoints for f in features][0][None],
+            "scores": [f.detection_scores for f in features][0][None],
+            "descriptors": [f.descriptors.t() for f in features][0][None],
         }

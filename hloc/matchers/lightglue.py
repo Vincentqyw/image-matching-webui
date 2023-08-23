@@ -42,12 +42,12 @@ class LightGlue(BaseModel):
         input = {}
         input["image0"] = {
             "image": data["image0"],
-            "keypoints": data["keypoints0"][None],
+            "keypoints": data["keypoints0"],
             "descriptors": data["descriptors0"].permute(0, 2, 1),
         }
         input["image1"] = {
             "image": data["image1"],
-            "keypoints": data["keypoints1"][None],
+            "keypoints": data["keypoints1"],
             "descriptors": data["descriptors1"].permute(0, 2, 1),
         }
         return self.net(input)

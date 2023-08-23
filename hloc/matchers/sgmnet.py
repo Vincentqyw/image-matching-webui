@@ -82,8 +82,8 @@ class SGMNet(BaseModel):
         logger.info(f"Load SGMNet model done.")
 
     def _forward(self, data):
-        x1 = data["keypoints0"]  # N x 2
-        x2 = data["keypoints1"]
+        x1 = data["keypoints0"].squeeze()  # N x 2
+        x2 = data["keypoints1"].squeeze()
         score1 = data["scores0"].reshape(-1, 1)  # N x 1
         score2 = data["scores1"].reshape(-1, 1)
         desc1 = data["descriptors0"].permute(0, 2, 1)  # 1 x N x 128
