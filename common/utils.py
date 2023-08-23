@@ -459,11 +459,11 @@ matcher_zoo = {
         "config_feature": extract_features.confs["d2net-ss"],
         "dense": False,
     },
-    "d2net-ms": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["d2net-ms"],
-        "dense": False,
-    },
+    # "d2net-ms": {
+    #     "config": match_features.confs["NN-mutual"],
+    #     "config_feature": extract_features.confs["d2net-ms"],
+    #     "dense": False,
+    # },
     "alike": {
         "config": match_features.confs["NN-mutual"],
         "config_feature": extract_features.confs["alike"],

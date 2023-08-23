@@ -329,14 +329,19 @@ def match_images(model, feat0, feat1):
         desc0 = desc0.unsqueeze(0)
     if len(desc1.shape) == 2:
         desc1 = desc1.unsqueeze(0)
+    if isinstance(feat0["keypoints"], list):
+        feat0["keypoints"] = feat0["keypoints"][0][None]
+    if isinstance(feat1["keypoints"], list):
+        feat1["keypoints"] = feat1["keypoints"][0][None]
+
     pred = model(
         {
             "image0": feat0["image"],
-            "keypoints0": feat0["keypoints"][0],
+            "keypoints0": feat0["keypoints"],
             "scores0": feat0["scores"][0].unsqueeze(0),
             "descriptors0": desc0,
             "image1": feat1["image"],
-            "keypoints1": feat1["keypoints"][0],
+            "keypoints1": feat1["keypoints"],
             "scores1": feat1["scores"][0].unsqueeze(0),
             "descriptors1": desc1,
         }
