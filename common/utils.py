@@ -47,13 +47,14 @@ def gen_examples():
         pairs = list(combinations(imgs_list, 2))
         selected = random.sample(range(len(pairs)), count)
         return [pairs[i] for i in selected]
+
     # image pair path
     path = "datasets/sacre_coeur/mapping"
     pairs = gen_images_pairs(path, len(example_matchers))
     match_setting_threshold = 0.1
     match_setting_max_features = 2000
     detect_keypoints_threshold = 0.01
-    enable_ransac = False
+    enable_ransac = True
     ransac_method = "RANSAC"
     ransac_reproj_threshold = 8
     ransac_confidence = 0.999

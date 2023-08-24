@@ -31,24 +31,39 @@ class ASpanFormer(BaseModel):
     }
 
     def _init(self, conf):
-        model_path = aspanformer_path / "weights" / Path(conf["weights"] + ".ckpt")
+        model_path = (
+            aspanformer_path / "weights" / Path(conf["weights"] + ".ckpt")
+        )
         # Download the model.
         if not model_path.exists():
             # model_path.parent.mkdir(exist_ok=True)
             tar_path = aspanformer_path / conf["model_name"]
             if not tar_path.exists():
                 link = self.aspanformer_models[conf["model_name"]]
-                cmd = ["gdown", link, "-O", str(tar_path), "--proxy", self.proxy]
+                cmd = [
+                    "gdown",
+                    link,
+                    "-O",
+                    str(tar_path),
+                    "--proxy",
+                    self.proxy,
+                ]
                 cmd_wo_proxy = ["gdown", link, "-O", str(tar_path)]
-                logger.info(f"Downloading the Aspanformer model with `{cmd_wo_proxy}`.")
+                logger.info(
+                    f"Downloading the Aspanformer model with `{cmd_wo_proxy}`."
+                )
                 try:
                     subprocess.run(cmd_wo_proxy, check=True)
                 except subprocess.CalledProcessError as e:
-                    logger.info(f"Downloading the Aspanformer model with `{cmd}`.")
+                    logger.info(
+                        f"Downloading the Aspanformer model with `{cmd}`."
+                    )
                     try:
                         subprocess.run(cmd, check=True)
                     except subprocess.CalledProcessError as e:
-                        logger.error(f"Failed to download the Aspanformer model.")
+                        logger.error(
+                            f"Failed to download the Aspanformer model."
+                        )
                         raise e
 
             do_system(f"cd {str(aspanformer_path)} & tar -xvf {str(tar_path)}")
@@ -60,7 +75,9 @@ class ASpanFormer(BaseModel):
         _config = lower_config(config)
         self.net = _ASpanFormer(config=_config["aspan"])
         weight_path = model_path
-        state_dict = torch.load(str(weight_path), map_location="cpu")["state_dict"]
+        state_dict = torch.load(str(weight_path), map_location="cpu")[
+            "state_dict"
+        ]
         self.net.load_state_dict(state_dict, strict=False)
 
     def _forward(self, data):

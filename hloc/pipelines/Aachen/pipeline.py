@@ -40,14 +40,18 @@ images = dataset / "images/images_upright/"
 
 outputs = args.outputs  # where everything will be saved
 sift_sfm = outputs / "sfm_sift"  # from which we extract the reference poses
-reference_sfm = outputs / "sfm_superpoint+superglue"  # the SfM model we will build
+reference_sfm = (
+    outputs / "sfm_superpoint+superglue"
+)  # the SfM model we will build
 sfm_pairs = (
     outputs / f"pairs-db-covis{args.num_covis}.txt"
 )  # top-k most covisible in SIFT model
 loc_pairs = (
     outputs / f"pairs-query-netvlad{args.num_loc}.txt"
 )  # top-k retrieved by NetVLAD
-results = outputs / f"Aachen_hloc_superpoint+superglue_netvlad{args.num_loc}.txt"
+results = (
+    outputs / f"Aachen_hloc_superpoint+superglue_netvlad{args.num_loc}.txt"
+)
 
 # list the standard configurations available
 print(f"Configs for feature extractors:\n{pformat(extract_features.confs)}")
@@ -71,7 +75,9 @@ sfm_matches = match_features.main(
     matcher_conf, sfm_pairs, feature_conf["output"], outputs
 )
 
-triangulation.main(reference_sfm, sift_sfm, images, sfm_pairs, features, sfm_matches)
+triangulation.main(
+    reference_sfm, sift_sfm, images, sfm_pairs, features, sfm_matches
+)
 
 global_descriptors = extract_features.main(retrieval_conf, images, outputs)
 pairs_from_retrieval.main(

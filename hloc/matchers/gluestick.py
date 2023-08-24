@@ -36,7 +36,9 @@ class GlueStick(BaseModel):
 
     # Initialize the line matcher
     def _init(self, conf):
-        model_path = gluestick_path / "resources" / "weights" / conf["model_name"]
+        model_path = (
+            gluestick_path / "resources" / "weights" / conf["model_name"]
+        )
 
         # Download the model.
         if not model_path.exists():

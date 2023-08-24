@@ -17,6 +17,7 @@ class D2Net(BaseModel):
         "checkpoint_dir": d2net_path / "models",
         "use_relu": True,
         "multiscale": False,
+        "max_keypoints": 1024,
     }
     required_inputs = ["image"]
 
@@ -49,6 +50,11 @@ class D2Net(BaseModel):
                 image, self.net, scales=[1]
             )
         keypoints = keypoints[:, [1, 0]]  # (x, y) and remove the scale
+
+        idxs = scores.argsort()[-self.conf["max_keypoints"] or None :]
+        keypoints = keypoints[idxs, :2]
+        descriptors = descriptors[idxs]
+        scores = scores[idxs]
 
         return {
             "keypoints": torch.from_numpy(keypoints)[None],

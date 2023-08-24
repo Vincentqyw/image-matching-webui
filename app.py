@@ -143,7 +143,7 @@ def run(config):
                         #     label="Matcher mode",
                         #     value="NN-mutual",
                         # )
-                    with gr.Accordion("RANSAC Setting", open=False):
+                    with gr.Accordion("RANSAC Setting", open=True):
                         with gr.Row(equal_height=False):
                             enable_ransac = gr.Checkbox(label="Enable RANSAC")
                             ransac_method = gr.Dropdown(
@@ -174,7 +174,7 @@ def run(config):
                             value=10000,
                         )
 
-                    with gr.Accordion("Geometry Setting", open=True):
+                    with gr.Accordion("Geometry Setting", open=False):
                         with gr.Row(equal_height=False):
                             # show_geom = gr.Checkbox(label="Show Geometry")
                             choice_estimate_geom = gr.Radio(
@@ -232,8 +232,8 @@ def run(config):
                     matches_result_info = gr.JSON(label="Matches Statistics")
                     matcher_info = gr.JSON(label="Match info")
 
-                output_wrapped = gr.Image(label="Wrapped Pair", type="numpy")
                 with gr.Accordion("Open for More: Geometry info", open=False):
+                    output_wrapped = gr.Image(label="Wrapped Pair", type="numpy")
                     geometry_result = gr.JSON(label="Reconstructed Geometry")
 
             # callbacks

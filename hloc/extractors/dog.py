@@ -1,5 +1,8 @@
 import kornia
-from kornia.feature.laf import laf_from_center_scale_ori, extract_patches_from_pyramid
+from kornia.feature.laf import (
+    laf_from_center_scale_ori,
+    extract_patches_from_pyramid,
+)
 import numpy as np
 import torch
 import pycolmap

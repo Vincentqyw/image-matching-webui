@@ -16,10 +16,14 @@ from ...utils.read_write_model import write_model
 logger = logging.getLogger(__name__)
 
 
-def read_nvm_model(nvm_path, database_path, image_ids, camera_ids, skip_points=False):
+def read_nvm_model(
+    nvm_path, database_path, image_ids, camera_ids, skip_points=False
+):
     # Extract the intrinsics from the db file instead of the NVM model
     db = sqlite3.connect(str(database_path))
-    ret = db.execute("SELECT camera_id, model, width, height, params FROM cameras;")
+    ret = db.execute(
+        "SELECT camera_id, model, width, height, params FROM cameras;"
+    )
     cameras = {}
     for camera_id, camera_model, width, height, params in ret:
         params = np.fromstring(params, dtype=np.double).reshape(-1)

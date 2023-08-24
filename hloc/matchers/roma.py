@@ -84,7 +84,9 @@ class Roma(BaseModel):
         matches, certainty = self.net.sample(
             warp, certainty, num=self.conf["max_keypoints"]
         )
-        kpts1, kpts2 = self.net.to_pixel_coordinates(matches, H_A, W_A, H_B, W_B)
+        kpts1, kpts2 = self.net.to_pixel_coordinates(
+            matches, H_A, W_A, H_B, W_B
+        )
         pred = {}
         pred["keypoints0"], pred["keypoints1"] = kpts1, kpts2
         pred["mconf"] = certainty

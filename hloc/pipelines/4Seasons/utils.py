@@ -48,7 +48,11 @@ def camera_from_calibration_file(id_, path):
     model_name = "PINHOLE"
     params = [float(i) for i in [fx, fy, cx, cy]]
     camera = Camera(
-        id=id_, model=model_name, width=int(width), height=int(height), params=params
+        id=id_,
+        model=model_name,
+        width=int(width),
+        height=int(height),
+        params=params,
     )
     return camera
 
@@ -149,7 +153,9 @@ def generate_localization_pairs(sequence, reloc, num, ref_pairs, out_path):
     """
     if "test" in sequence:
         # hard pairs will be overwritten by easy ones if available
-        relocs = [str(reloc).replace("*", d) for d in ["hard", "moderate", "easy"]]
+        relocs = [
+            str(reloc).replace("*", d) for d in ["hard", "moderate", "easy"]
+        ]
     else:
         relocs = [reloc]
     query_to_ref_ts = {}
@@ -207,8 +213,12 @@ def evaluate_submission(submission_dir, relocs, ths=[0.1, 0.2, 0.5]):
     """Compute the relocalization recall from predicted and ground truth poses."""
     for reloc in relocs.parent.glob(relocs.name):
         poses_gt = parse_relocalization(reloc, has_poses=True)
-        poses_pred = parse_relocalization(submission_dir / reloc.name, has_poses=True)
-        poses_pred = {(ref_ts, q_ts): (R, t) for ref_ts, q_ts, R, t in poses_pred}
+        poses_pred = parse_relocalization(
+            submission_dir / reloc.name, has_poses=True
+        )
+        poses_pred = {
+            (ref_ts, q_ts): (R, t) for ref_ts, q_ts, R, t in poses_pred
+        }
 
         error = []
         for ref_ts, q_ts, R_gt, t_gt in poses_gt:

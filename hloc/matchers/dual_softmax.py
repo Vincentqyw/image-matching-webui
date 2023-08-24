@@ -18,7 +18,9 @@ def dual_softmax_matcher(
     if normalize:
         desc_A = desc_A / desc_A.norm(dim=1, keepdim=True)
         desc_B = desc_B / desc_B.norm(dim=1, keepdim=True)
-    sim = torch.einsum("b c n, b c m -> b n m", desc_A, desc_B) * inv_temperature
+    sim = (
+        torch.einsum("b c n, b c m -> b n m", desc_A, desc_B) * inv_temperature
+    )
     P = sim.softmax(dim=-2) * sim.softmax(dim=-1)
     mask = torch.nonzero(
         (P == P.max(dim=-1, keepdim=True).values)
@@ -48,9 +50,14 @@ class DualSoftMax(BaseModel):
         pass
 
     def _forward(self, data):
-        if data["descriptors0"].size(-1) == 0 or data["descriptors1"].size(-1) == 0:
+        if (
+            data["descriptors0"].size(-1) == 0
+            or data["descriptors1"].size(-1) == 0
+        ):
             matches0 = torch.full(
-                data["descriptors0"].shape[:2], -1, device=data["descriptors0"].device
+                data["descriptors0"].shape[:2],
+                -1,
+                device=data["descriptors0"].device,
             )
             return {
                 "matches0": matches0,

@@ -52,9 +52,18 @@ class SGMNet(BaseModel):
         # Download the model.
         if not sgmnet_weights.exists():
             if not tar_path.exists():
-                cmd = ["gdown", link, "-O", str(tar_path), "--proxy", self.proxy]
+                cmd = [
+                    "gdown",
+                    link,
+                    "-O",
+                    str(tar_path),
+                    "--proxy",
+                    self.proxy,
+                ]
                 cmd_wo_proxy = ["gdown", link, "-O", str(tar_path)]
-                logger.info(f"Downloading the SGMNet model with `{cmd_wo_proxy}`.")
+                logger.info(
+                    f"Downloading the SGMNet model with `{cmd_wo_proxy}`."
+                )
                 try:
                     subprocess.run(cmd_wo_proxy, check=True)
                 except subprocess.CalledProcessError as e:
@@ -73,7 +82,10 @@ class SGMNet(BaseModel):
         self.net = SGM_Model(config)
         checkpoint = torch.load(sgmnet_weights, map_location="cpu")
         # for ddp model
-        if list(checkpoint["state_dict"].items())[0][0].split(".")[0] == "module":
+        if (
+            list(checkpoint["state_dict"].items())[0][0].split(".")[0]
+            == "module"
+        ):
             new_stat_dict = OrderedDict()
             for key, value in checkpoint["state_dict"].items():
                 new_stat_dict[key[7:]] = value

@@ -243,7 +243,10 @@ def match(model, path_0, path_1, conf):
         image = torch.from_numpy(image / 255.0).float()
         # assure that the size is divisible by dfactor
         size_new = tuple(
-            map(lambda x: int(x // conf.dfactor * conf.dfactor), image.shape[-2:])
+            map(
+                lambda x: int(x // conf.dfactor * conf.dfactor),
+                image.shape[-2:],
+            )
         )
         image = F.resize(image, size=size_new, antialias=True)
         scale = np.array(size) / np.array(size_new)[::-1]
@@ -310,7 +313,10 @@ def match_images(model, image_0, image_1, conf, device="cpu"):
 
         # assure that the size is divisible by dfactor
         size_new = tuple(
-            map(lambda x: int(x // conf.dfactor * conf.dfactor), image.shape[-2:])
+            map(
+                lambda x: int(x // conf.dfactor * conf.dfactor),
+                image.shape[-2:],
+            )
         )
         image = F.resize(image, size=size_new)
         scale = np.array(size) / np.array(size_new)[::-1]
@@ -367,7 +373,7 @@ def match_images(model, image_0, image_1, conf, device="cpu"):
         if "mconf" in pred.keys():
             ret["mconf"] = pred["mconf"].cpu().numpy()
         else:
-            ret["mconf"] = np.ones_like(kpts0.cpu().numpy()[:,0])
+            ret["mconf"] = np.ones_like(kpts0.cpu().numpy()[:, 0])
     if "lines0" in pred.keys() and "lines1" in pred.keys():
         if "keypoints0" in pred.keys() and "keypoints1" in pred.keys():
             kpts0, kpts1 = pred["keypoints0"], pred["keypoints1"]
@@ -376,7 +382,10 @@ def match_images(model, image_0, image_1, conf, device="cpu"):
             kpts0_origin = kpts0_origin.cpu().numpy()
             kpts1_origin = kpts1_origin.cpu().numpy()
         else:
-            kpts0_origin, kpts1_origin = None, None  # np.zeros([0]), np.zeros([0])
+            kpts0_origin, kpts1_origin = (
+                None,
+                None,
+            )  # np.zeros([0]), np.zeros([0])
         lines0, lines1 = pred["lines0"], pred["lines1"]
         lines0_raw, lines1_raw = pred["raw_lines0"], pred["raw_lines1"]
 

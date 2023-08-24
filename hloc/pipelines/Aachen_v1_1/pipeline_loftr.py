@@ -61,7 +61,9 @@ features, sfm_matches = match_dense.main(
     matcher_conf, sfm_pairs, images, outputs, max_kps=8192, overwrite=False
 )
 
-triangulation.main(reference_sfm, sift_sfm, images, sfm_pairs, features, sfm_matches)
+triangulation.main(
+    reference_sfm, sift_sfm, images, sfm_pairs, features, sfm_matches
+)
 
 global_descriptors = extract_features.main(retrieval_conf, images, outputs)
 pairs_from_retrieval.main(

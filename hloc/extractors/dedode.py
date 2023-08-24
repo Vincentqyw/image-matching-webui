@@ -36,7 +36,9 @@ class DeDoDe(BaseModel):
 
     # Initialize the line matcher
     def _init(self, conf):
-        model_detector_path = dedode_path / "pretrained" / conf["model_detector_name"]
+        model_detector_path = (
+            dedode_path / "pretrained" / conf["model_detector_name"]
+        )
         model_descriptor_path = (
             dedode_path / "pretrained" / conf["model_descriptor_name"]
         )
@@ -56,16 +58,24 @@ class DeDoDe(BaseModel):
             model_descriptor_path.parent.mkdir(exist_ok=True)
             link = self.weight_urls[conf["model_descriptor_name"]]
             cmd = ["wget", link, "-O", str(model_descriptor_path)]
-            logger.info(f"Downloading the DeDoDe descriptor model with `{cmd}`.")
+            logger.info(
+                f"Downloading the DeDoDe descriptor model with `{cmd}`."
+            )
             subprocess.run(cmd, check=True)
 
         logger.info(f"Loading DeDoDe model...")
 
         # load the model
         weights_detector = torch.load(model_detector_path, map_location="cpu")
-        weights_descriptor = torch.load(model_descriptor_path, map_location="cpu")
-        self.detector = dedode_detector_L(weights=weights_detector, device=device)
-        self.descriptor = dedode_descriptor_B(weights=weights_descriptor, device=device)
+        weights_descriptor = torch.load(
+            model_descriptor_path, map_location="cpu"
+        )
+        self.detector = dedode_detector_L(
+            weights=weights_detector, device=device
+        )
+        self.descriptor = dedode_descriptor_B(
+            weights=weights_descriptor, device=device
+        )
         logger.info(f"Load DeDoDe model done.")
 
     def _forward(self, data):
@@ -90,9 +100,9 @@ class DeDoDe(BaseModel):
 
         # step 2: describe keypoints
         # dim: 1 x N x 256
-        description_A = self.descriptor.describe_keypoints(batch_A, keypoints_A)[
-            "descriptions"
-        ]
+        description_A = self.descriptor.describe_keypoints(
+            batch_A, keypoints_A
+        )["descriptions"]
         keypoints_A = to_pixel_coords(keypoints_A, H_A, W_A)
 
         return {

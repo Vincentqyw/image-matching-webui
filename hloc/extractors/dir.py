@@ -8,7 +8,9 @@ import gdown
 
 from ..utils.base_model import BaseModel
 
-sys.path.append(str(Path(__file__).parent / "../../third_party/deep-image-retrieval"))
+sys.path.append(
+    str(Path(__file__).parent / "../../third_party/deep-image-retrieval")
+)
 os.environ["DB_ROOT"] = ""  # required by dirtorch
 
 from dirtorch.utils import common  # noqa: E402
@@ -40,7 +42,9 @@ class DIR(BaseModel):
     }
 
     def _init(self, conf):
-        checkpoint = Path(torch.hub.get_dir(), "dirtorch", conf["model_name"] + ".pt")
+        checkpoint = Path(
+            torch.hub.get_dir(), "dirtorch", conf["model_name"] + ".pt"
+        )
         if not checkpoint.exists():
             checkpoint.parent.mkdir(exist_ok=True, parents=True)
             link = self.dir_models[conf["model_name"]]

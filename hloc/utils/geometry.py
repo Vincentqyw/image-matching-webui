@@ -16,12 +16,12 @@ def compute_epipolar_errors(qvec_r2t, tvec_r2t, p2d_r, p2d_t):
     E = vector_to_cross_product_matrix(T_r2t[:3, -1]) @ T_r2t[:3, :3]
     l2d_r2t = (E @ to_homogeneous(p2d_r).T).T
     l2d_t2r = (E.T @ to_homogeneous(p2d_t).T).T
-    errors_r = np.abs(np.sum(to_homogeneous(p2d_r) * l2d_t2r, axis=1)) / np.linalg.norm(
-        l2d_t2r[:, :2], axis=1
-    )
-    errors_t = np.abs(np.sum(to_homogeneous(p2d_t) * l2d_r2t, axis=1)) / np.linalg.norm(
-        l2d_r2t[:, :2], axis=1
-    )
+    errors_r = np.abs(
+        np.sum(to_homogeneous(p2d_r) * l2d_t2r, axis=1)
+    ) / np.linalg.norm(l2d_t2r[:, :2], axis=1)
+    errors_t = np.abs(
+        np.sum(to_homogeneous(p2d_t) * l2d_r2t, axis=1)
+    ) / np.linalg.norm(l2d_r2t[:, :2], axis=1)
     return E, errors_r, errors_t
 
 
