@@ -21,6 +21,7 @@ class ASpanFormer(BaseModel):
     default_conf = {
         "weights": "outdoor",
         "match_threshold": 0.2,
+        "sinkhorn_iterations": 20,
         "config_path": aspanformer_path / "configs/aspan/outdoor/aspan_test.py",
         "model_name": "weights_aspanformer.tar",
     }
@@ -73,6 +74,10 @@ class ASpanFormer(BaseModel):
         config = get_cfg_defaults()
         config.merge_from_file(conf["config_path"])
         _config = lower_config(config)
+
+        _config["aspan"]["match_coarse"]["thr"] = conf["match_threshold"]
+        _config["aspan"]["match_coarse"]["skh_iters"] = conf["sinkhorn_iterations"]
+
         self.net = _ASpanFormer(config=_config["aspan"])
         weight_path = model_path
         state_dict = torch.load(str(weight_path), map_location="cpu")[
