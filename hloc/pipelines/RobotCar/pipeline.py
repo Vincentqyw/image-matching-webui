@@ -79,7 +79,9 @@ sift_sfm = outputs / "sfm_sift"
 reference_sfm = outputs / "sfm_superpoint+superglue"
 sfm_pairs = outputs / f"pairs-db-covis{args.num_covis}.txt"
 loc_pairs = outputs / f"pairs-query-netvlad{args.num_loc}.txt"
-results = outputs / f"RobotCar_hloc_superpoint+superglue_netvlad{args.num_loc}.txt"
+results = (
+    outputs / f"RobotCar_hloc_superpoint+superglue_netvlad{args.num_loc}.txt"
+)
 
 # pick one of the configurations for extraction and matching
 retrieval_conf = extract_features.confs["netvlad"]
@@ -103,7 +105,9 @@ sfm_matches = match_features.main(
     matcher_conf, sfm_pairs, feature_conf["output"], outputs
 )
 
-triangulation.main(reference_sfm, sift_sfm, images, sfm_pairs, features, sfm_matches)
+triangulation.main(
+    reference_sfm, sift_sfm, images, sfm_pairs, features, sfm_matches
+)
 
 global_descriptors = extract_features.main(retrieval_conf, images, outputs)
 # TODO: do per location and per camera

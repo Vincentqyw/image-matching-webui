@@ -46,20 +46,34 @@ def run_slice(slice_, root, outputs, num_covis, num_loc):
     matcher_conf = match_features.confs["superglue"]
 
     pairs_from_covisibility.main(sift_sfm, sfm_pairs, num_matched=num_covis)
-    features = extract_features.main(feature_conf, ref_images, outputs, as_half=True)
+    features = extract_features.main(
+        feature_conf, ref_images, outputs, as_half=True
+    )
     sfm_matches = match_features.main(
         matcher_conf, sfm_pairs, feature_conf["output"], outputs
     )
-    triangulation.main(ref_sfm, sift_sfm, ref_images, sfm_pairs, features, sfm_matches)
-
-    generate_query_list(root, query_list, slice_)
-    global_descriptors = extract_features.main(retrieval_conf, ref_images, outputs)
-    global_descriptors = extract_features.main(retrieval_conf, query_images, outputs)
-    pairs_from_retrieval.main(
-        global_descriptors, loc_pairs, num_loc, query_list=query_list, db_model=ref_sfm
+    triangulation.main(
+        ref_sfm, sift_sfm, ref_images, sfm_pairs, features, sfm_matches
     )
 
-    features = extract_features.main(feature_conf, query_images, outputs, as_half=True)
+    generate_query_list(root, query_list, slice_)
+    global_descriptors = extract_features.main(
+        retrieval_conf, ref_images, outputs
+    )
+    global_descriptors = extract_features.main(
+        retrieval_conf, query_images, outputs
+    )
+    pairs_from_retrieval.main(
+        global_descriptors,
+        loc_pairs,
+        num_loc,
+        query_list=query_list,
+        db_model=ref_sfm,
+    )
+
+    features = extract_features.main(
+        feature_conf, query_images, outputs, as_half=True
+    )
     loc_matches = match_features.main(
         matcher_conf, loc_pairs, feature_conf["output"], outputs
     )
@@ -122,5 +136,9 @@ if __name__ == "__main__":
     for slice_ in slices:
         logger.info("Working on slice %s.", slice_)
         run_slice(
-            f"slice{slice_}", args.dataset, args.outputs, args.num_covis, args.num_loc
+            f"slice{slice_}",
+            args.dataset,
+            args.outputs,
+            args.num_covis,
+            args.num_loc,
         )

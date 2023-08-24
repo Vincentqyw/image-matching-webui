@@ -85,17 +85,18 @@ confs = {
         "preprocessing": {
             "grayscale": False,
             "force_resize": True,
-            "resize_max": 1600,
+            "resize_max": 1024,
             "width": 640,
             "height": 480,
             "dfactor": 8,
         },
     },
     "d2net-ss": {
-        "output": "feats-d2net-ss",
+        "output": "feats-d2net-ss-n5000-r1600",
         "model": {
             "name": "d2net",
             "multiscale": False,
+            "max_keypoints": 5000,
         },
         "preprocessing": {
             "grayscale": False,
@@ -103,10 +104,11 @@ confs = {
         },
     },
     "d2net-ms": {
-        "output": "feats-d2net-ms",
+        "output": "feats-d2net-ms-n5000-r1600",
         "model": {
             "name": "d2net",
             "multiscale": True,
+            "max_keypoints": 5000,
         },
         "preprocessing": {
             "grayscale": False,
@@ -114,7 +116,7 @@ confs = {
         },
     },
     "rootsift": {
-        "output": "feats-sift",
+        "output": "feats-rootsift-n5000-r1600",
         "model": {
             "name": "dog",
             "max_keypoints": 5000,
@@ -129,7 +131,7 @@ confs = {
         },
     },
     "sift": {
-        "output": "feats-sift",
+        "output": "feats-sift-n5000-r1600",
         "model": {
             "name": "dog",
             "descriptor": "sift",
@@ -145,8 +147,12 @@ confs = {
         },
     },
     "sosnet": {
-        "output": "feats-sosnet",
-        "model": {"name": "dog", "descriptor": "sosnet"},
+        "output": "feats-sosnet-n5000-r1600",
+        "model": {
+            "name": "dog",
+            "descriptor": "sosnet",
+            "max_keypoints": 5000,
+        },
         "preprocessing": {
             "grayscale": True,
             "resize_max": 1600,
@@ -157,8 +163,12 @@ confs = {
         },
     },
     "hardnet": {
-        "output": "feats-hardnet",
-        "model": {"name": "dog", "descriptor": "hardnet"},
+        "output": "feats-hardnet-n5000-r1600",
+        "model": {
+            "name": "dog",
+            "descriptor": "hardnet",
+            "max_keypoints": 5000,
+        },
         "preprocessing": {
             "grayscale": True,
             "resize_max": 1600,
@@ -169,7 +179,7 @@ confs = {
         },
     },
     "disk": {
-        "output": "feats-disk",
+        "output": "feats-disk-n5000-r1600",
         "model": {
             "name": "disk",
             "max_keypoints": 5000,
@@ -180,7 +190,7 @@ confs = {
         },
     },
     "alike": {
-        "output": "feats-alike",
+        "output": "feats-alike-n5000-r1600",
         "model": {
             "name": "alike",
             "max_keypoints": 5000,
@@ -196,7 +206,7 @@ confs = {
         },
     },
     "lanet": {
-        "output": "feats-lanet",
+        "output": "feats-lanet-n5000-r1600",
         "model": {
             "name": "lanet",
             "keypoint_threshold": 0.1,
@@ -208,7 +218,7 @@ confs = {
         },
     },
     "darkfeat": {
-        "output": "feats-darkfeat-n5000-r1024",
+        "output": "feats-darkfeat-n5000-r1600",
         "model": {
             "name": "darkfeat",
             "max_keypoints": 5000,
@@ -225,7 +235,7 @@ confs = {
         },
     },
     "dedode": {
-        "output": "feats-dedode-n5000-r1024",
+        "output": "feats-dedode-n5000-r1600",
         "model": {
             "name": "dedode",
             "max_keypoints": 5000,
@@ -233,14 +243,14 @@ confs = {
         "preprocessing": {
             "grayscale": False,
             "force_resize": True,
-            "resize_max": 1024,
+            "resize_max": 1600,
             "width": 768,
             "height": 768,
             "dfactor": 8,
         },
     },
     "example": {
-        "output": "feats-example-n5000-r1024",
+        "output": "feats-example-n2000-r1024",
         "model": {
             "name": "example",
             "keypoint_threshold": 0.1,
@@ -323,13 +333,17 @@ class ImageDataset(torch.utils.data.Dataset):
             if isinstance(paths, (Path, str)):
                 self.names = parse_image_lists(paths)
             elif isinstance(paths, collections.Iterable):
-                self.names = [p.as_posix() if isinstance(p, Path) else p for p in paths]
+                self.names = [
+                    p.as_posix() if isinstance(p, Path) else p for p in paths
+                ]
             else:
                 raise ValueError(f"Unknown format for path argument {paths}.")
 
             for name in self.names:
                 if not (root / name).exists():
-                    raise ValueError(f"Image {name} does not exists in root: {root}.")
+                    raise ValueError(
+                        f"Image {name} does not exists in root: {root}."
+                    )
 
     def __getitem__(self, idx):
         name = self.names[idx]
@@ -397,7 +411,10 @@ def extract(model, image_0, conf):
 
         # assure that the size is divisible by dfactor
         size_new = tuple(
-            map(lambda x: int(x // conf.dfactor * conf.dfactor), image.shape[-2:])
+            map(
+                lambda x: int(x // conf.dfactor * conf.dfactor),
+                image.shape[-2:],
+            )
         )
         image = F.resize(image, size=size_new, antialias=True)
         input_ = image.to(device, non_blocking=True)[None]
@@ -435,7 +452,8 @@ def main(
     overwrite: bool = False,
 ) -> Path:
     logger.info(
-        "Extracting local features with configuration:" f"\n{pprint.pformat(conf)}"
+        "Extracting local features with configuration:"
+        f"\n{pprint.pformat(conf)}"
     )
 
     dataset = ImageDataset(image_dir, conf["preprocessing"], image_list)
@@ -443,7 +461,9 @@ def main(
         feature_path = Path(export_dir, conf["output"] + ".h5")
     feature_path.parent.mkdir(exist_ok=True, parents=True)
     skip_names = set(
-        list_h5_names(feature_path) if feature_path.exists() and not overwrite else ()
+        list_h5_names(feature_path)
+        if feature_path.exists() and not overwrite
+        else ()
     )
     dataset.names = [n for n in dataset.names if n not in skip_names]
     if len(dataset.names) == 0:
@@ -507,7 +527,10 @@ if __name__ == "__main__":
     parser.add_argument("--image_dir", type=Path, required=True)
     parser.add_argument("--export_dir", type=Path, required=True)
     parser.add_argument(
-        "--conf", type=str, default="superpoint_aachen", choices=list(confs.keys())
+        "--conf",
+        type=str,
+        default="superpoint_aachen",
+        choices=list(confs.keys()),
     )
     parser.add_argument("--as_half", action="store_true")
     parser.add_argument("--image_list", type=Path)

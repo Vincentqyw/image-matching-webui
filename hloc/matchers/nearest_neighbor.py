@@ -36,24 +36,36 @@ class NearestNeighbor(BaseModel):
         pass
 
     def _forward(self, data):
-        if data["descriptors0"].size(-1) == 0 or data["descriptors1"].size(-1) == 0:
+        if (
+            data["descriptors0"].size(-1) == 0
+            or data["descriptors1"].size(-1) == 0
+        ):
             matches0 = torch.full(
-                data["descriptors0"].shape[:2], -1, device=data["descriptors0"].device
+                data["descriptors0"].shape[:2],
+                -1,
+                device=data["descriptors0"].device,
             )
             return {
                 "matches0": matches0,
                 "matching_scores0": torch.zeros_like(matches0),
             }
         ratio_threshold = self.conf["ratio_threshold"]
-        if data["descriptors0"].size(-1) == 1 or data["descriptors1"].size(-1) == 1:
+        if (
+            data["descriptors0"].size(-1) == 1
+            or data["descriptors1"].size(-1) == 1
+        ):
             ratio_threshold = None
-        sim = torch.einsum("bdn,bdm->bnm", data["descriptors0"], data["descriptors1"])
+        sim = torch.einsum(
+            "bdn,bdm->bnm", data["descriptors0"], data["descriptors1"]
+        )
         matches0, scores0 = find_nn(
             sim, ratio_threshold, self.conf["distance_threshold"]
         )
         if self.conf["do_mutual_check"]:
             matches1, scores1 = find_nn(
-                sim.transpose(1, 2), ratio_threshold, self.conf["distance_threshold"]
+                sim.transpose(1, 2),
+                ratio_threshold,
+                self.conf["distance_threshold"],
             )
             matches0 = mutual_check(matches0, matches1)
         return {

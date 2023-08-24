@@ -21,7 +21,9 @@ class LANet(BaseModel):
     required_inputs = ["image"]
 
     def _init(self, conf):
-        model_path = lanet_path / "checkpoints" / f'PointModel_{conf["model_name"]}.pth'
+        model_path = (
+            lanet_path / "checkpoints" / f'PointModel_{conf["model_name"]}.pth'
+        )
         if not model_path.exists():
             print(f"No model found at {model_path}")
         self.net = PointModel(is_test=True)
@@ -34,16 +36,16 @@ class LANet(BaseModel):
         _, _, Hc, Wc = descriptors.shape
 
         # Scores & Descriptors
-        kpts_score = (
-            torch.cat([keypoints, scores], dim=1).view(3, -1).t()
-        )
-        descriptors = (
-            descriptors.view(256, Hc, Wc).view(256, -1).t()
-        )
+        kpts_score = torch.cat([keypoints, scores], dim=1).view(3, -1).t()
+        descriptors = descriptors.view(256, Hc, Wc).view(256, -1).t()
 
         # Filter based on confidence threshold
-        descriptors = descriptors[kpts_score[:, 0] > self.conf["keypoint_threshold"], :]
-        kpts_score = kpts_score[kpts_score[:, 0] > self.conf["keypoint_threshold"], :]
+        descriptors = descriptors[
+            kpts_score[:, 0] > self.conf["keypoint_threshold"], :
+        ]
+        kpts_score = kpts_score[
+            kpts_score[:, 0] > self.conf["keypoint_threshold"], :
+        ]
         keypoints = kpts_score[:, 1:]
         scores = kpts_score[:, 0]
 

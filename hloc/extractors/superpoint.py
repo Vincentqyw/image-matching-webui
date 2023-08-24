@@ -16,7 +16,10 @@ def sample_descriptors_fix_sampling(keypoints, descriptors, s: int = 8):
     keypoints = (keypoints + 0.5) / (keypoints.new_tensor([w, h]) * s)
     keypoints = keypoints * 2 - 1  # normalize to (-1, 1)
     descriptors = torch.nn.functional.grid_sample(
-        descriptors, keypoints.view(b, 1, -1, 2), mode="bilinear", align_corners=False
+        descriptors,
+        keypoints.view(b, 1, -1, 2),
+        mode="bilinear",
+        align_corners=False,
     )
     descriptors = torch.nn.functional.normalize(
         descriptors.reshape(b, c, -1), p=2, dim=1

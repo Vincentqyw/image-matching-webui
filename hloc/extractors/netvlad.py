@@ -18,7 +18,9 @@ EPS = 1e-6
 class NetVLADLayer(nn.Module):
     def __init__(self, input_dim=512, K=64, score_bias=False, intranorm=True):
         super().__init__()
-        self.score_proj = nn.Conv1d(input_dim, K, kernel_size=1, bias=score_bias)
+        self.score_proj = nn.Conv1d(
+            input_dim, K, kernel_size=1, bias=score_bias
+        )
         centers = nn.parameter.Parameter(torch.empty([input_dim, K]))
         nn.init.xavier_uniform_(centers)
         self.register_parameter("centers", centers)
@@ -54,7 +56,9 @@ class NetVLAD(BaseModel):
         assert conf["model_name"] in self.dir_models.keys()
 
         # Download the checkpoint.
-        checkpoint = Path(torch.hub.get_dir(), "netvlad", conf["model_name"] + ".mat")
+        checkpoint = Path(
+            torch.hub.get_dir(), "netvlad", conf["model_name"] + ".mat"
+        )
         if not checkpoint.exists():
             checkpoint.parent.mkdir(exist_ok=True, parents=True)
             link = self.dir_models[conf["model_name"]]
@@ -77,7 +81,9 @@ class NetVLAD(BaseModel):
         mat = loadmat(checkpoint, struct_as_record=False, squeeze_me=True)
 
         # CNN weights.
-        for layer, mat_layer in zip(self.backbone.children(), mat["net"].layers):
+        for layer, mat_layer in zip(
+            self.backbone.children(), mat["net"].layers
+        ):
             if isinstance(layer, nn.Conv2d):
                 w = mat_layer.weights[0]  # Shape: S x S x IN x OUT
                 b = mat_layer.weights[1]  # Shape: OUT

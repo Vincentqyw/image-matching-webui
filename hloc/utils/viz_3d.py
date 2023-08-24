@@ -46,7 +46,9 @@ def init_figure(height: int = 800) -> go.Figure:
             dragmode="orbit",
         ),
         margin=dict(l=0, r=0, b=0, t=0, pad=0),
-        legend=dict(orientation="h", yanchor="top", y=0.99, xanchor="left", x=0.1),
+        legend=dict(
+            orientation="h", yanchor="top", y=0.99, xanchor="left", x=0.1
+        ),
     )
     return fig
 
@@ -68,7 +70,9 @@ def plot_points(
         mode="markers",
         name=name,
         legendgroup=name,
-        marker=dict(size=ps, color=color, line_width=0.0, colorscale=colorscale),
+        marker=dict(
+            size=ps, color=color, line_width=0.0, colorscale=colorscale
+        ),
     )
     fig.add_trace(tr)
 
@@ -162,7 +166,9 @@ def plot_camera_colmap(
     )
 
 
-def plot_cameras(fig: go.Figure, reconstruction: pycolmap.Reconstruction, **kwargs):
+def plot_cameras(
+    fig: go.Figure, reconstruction: pycolmap.Reconstruction, **kwargs
+):
     """Plot a camera as a cone with camera frustum."""
     for image_id, image in reconstruction.images.items():
         plot_camera_colmap(

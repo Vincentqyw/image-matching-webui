@@ -32,7 +32,9 @@ class DarkFeat(BaseModel):
             model_path.parent.mkdir(exist_ok=True)
             cmd_wo_proxy = ["gdown", link, "-O", str(model_path)]
             cmd = ["gdown", link, "-O", str(model_path), "--proxy", self.proxy]
-            logger.info(f"Downloading the DarkFeat model with `{cmd_wo_proxy}`.")
+            logger.info(
+                f"Downloading the DarkFeat model with `{cmd_wo_proxy}`."
+            )
             try:
                 subprocess.run(cmd_wo_proxy, check=True)
             except subprocess.CalledProcessError as e:
@@ -50,6 +52,10 @@ class DarkFeat(BaseModel):
         keypoints = pred["keypoints"]
         descriptors = pred["descriptors"]
         scores = pred["scores"]
+        idxs = scores.argsort()[-self.conf["max_keypoints"] or None :]
+        keypoints = keypoints[idxs, :2]
+        descriptors = descriptors[:, idxs]
+        scores = scores[idxs]
         return {
             "keypoints": keypoints[None],  # 1 x N x 2
             "scores": scores[None],  # 1 x N

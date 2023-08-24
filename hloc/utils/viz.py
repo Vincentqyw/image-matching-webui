@@ -19,7 +19,9 @@ def cm_RdGn(x):
     return np.clip(c, 0, 1)
 
 
-def plot_images(imgs, titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True):
+def plot_images(
+    imgs, titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True
+):
     """Plot a set of images horizontally.
     Args:
         imgs: a list of NumPy or PyTorch images, RGB (H, W, 3) or mono (H, W).
@@ -129,7 +131,13 @@ def add_text(
 ):
     ax = plt.gcf().axes[idx]
     t = ax.text(
-        *pos, text, fontsize=fs, ha=ha, va=va, color=color, transform=ax.transAxes
+        *pos,
+        text,
+        fontsize=fs,
+        ha=ha,
+        va=va,
+        color=color,
+        transform=ax.transAxes
     )
     if lcolor is not None:
         t.set_path_effects(

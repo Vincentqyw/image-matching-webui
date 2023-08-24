@@ -28,7 +28,9 @@ def interpolate_depth(depth, kp):
 
     # To maximize the number of points that have depth:
     # do bilinear interpolation first and then nearest for the remaining points
-    interp_lin = grid_sample(depth, kp, align_corners=True, mode="bilinear")[0, :, 0]
+    interp_lin = grid_sample(depth, kp, align_corners=True, mode="bilinear")[
+        0, :, 0
+    ]
     interp_nn = torch.nn.functional.grid_sample(
         depth, kp, align_corners=True, mode="nearest"
     )[0, :, 0]
@@ -127,7 +129,15 @@ if __name__ == "__main__":
     dataset = Path("datasets/7scenes")
     outputs = Path("outputs/7Scenes")
 
-    SCENES = ["chess", "fire", "heads", "office", "pumpkin", "redkitchen", "stairs"]
+    SCENES = [
+        "chess",
+        "fire",
+        "heads",
+        "office",
+        "pumpkin",
+        "redkitchen",
+        "stairs",
+    ]
     for scene in SCENES:
         sfm_path = outputs / scene / "sfm_superpoint+superglue"
         depth_path = dataset / f"depth/7scenes_{scene}/train/depth"

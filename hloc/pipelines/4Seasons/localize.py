@@ -67,7 +67,9 @@ delete_unused_images(seq_images, timestamps)
 generate_query_lists(timestamps, seq_dir, query_list)
 
 # Generate the localization pairs from the given reference frames.
-generate_localization_pairs(sequence, reloc, num_loc_pairs, ref_pairs, loc_pairs)
+generate_localization_pairs(
+    sequence, reloc, num_loc_pairs, ref_pairs, loc_pairs
+)
 
 # Extract, match, amd localize.
 ffile = extract_features.main(fconf, seq_images, output_dir)

@@ -55,7 +55,9 @@ class DKMv3(BaseModel):
 
         warp, certainty = self.net.match(img0, img1, device=device)
         matches, certainty = self.net.sample(warp, certainty)
-        kpts1, kpts2 = self.net.to_pixel_coordinates(matches, H_A, W_A, H_B, W_B)
+        kpts1, kpts2 = self.net.to_pixel_coordinates(
+            matches, H_A, W_A, H_B, W_B
+        )
         pred = {}
         pred["keypoints0"], pred["keypoints1"] = kpts1, kpts2
         return pred
