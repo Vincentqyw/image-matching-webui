@@ -28,7 +28,7 @@ def ui_reset_state(
     extract_max_keypoints,
     keypoint_threshold,
     key,
-    enable_ransac=False,
+    # enable_ransac=False,
     ransac_method="RANSAC",
     ransac_reproj_threshold=8,
     ransac_confidence=0.999,
@@ -41,7 +41,7 @@ def ui_reset_state(
     key = list(matcher_zoo.keys())[0]
     image0 = None
     image1 = None
-    enable_ransac = False
+    # enable_ransac = False
     return (
         image0,
         image1,
@@ -52,12 +52,14 @@ def ui_reset_state(
         ui_change_imagebox("upload"),
         ui_change_imagebox("upload"),
         "upload",
-        None,
+        None,  # keypoints
+        None,  # raw matches
+        None,  # ransac matches
         {},
         {},
         None,
         {},
-        False,
+        # False,
         "RANSAC",
         8,
         0.999,
@@ -145,7 +147,7 @@ def run(config):
                         # )
                     with gr.Accordion("RANSAC Setting", open=True):
                         with gr.Row(equal_height=False):
-                            enable_ransac = gr.Checkbox(label="Enable RANSAC")
+                            # enable_ransac = gr.Checkbox(label="Enable RANSAC")
                             ransac_method = gr.Dropdown(
                                 choices=ransac_zoo.keys(),
                                 value="RANSAC",
@@ -192,7 +194,7 @@ def run(config):
                     match_setting_max_features,
                     detect_keypoints_threshold,
                     matcher_list,
-                    enable_ransac,
+                    # enable_ransac,
                     ransac_method,
                     ransac_reproj_threshold,
                     ransac_confidence,
@@ -223,8 +225,10 @@ def run(config):
                     )
 
             with gr.Column():
-                output_mkpts = gr.Image(
-                    label="Keypoints Matching", type="numpy"
+                output_keypoints = gr.Image(label="Keypoints", type="numpy")
+                output_matches_raw = gr.Image(label="Raw Matches", type="numpy")
+                output_matches_ransac = gr.Image(
+                    label="Ransac Matches", type="numpy"
                 )
                 with gr.Accordion(
                     "Open for More: Matches Statistics", open=False
@@ -232,9 +236,12 @@ def run(config):
                     matches_result_info = gr.JSON(label="Matches Statistics")
                     matcher_info = gr.JSON(label="Match info")
 
-                with gr.Accordion("Open for More: Geometry info", open=False):
-                    output_wrapped = gr.Image(label="Wrapped Pair", type="numpy")
-                    geometry_result = gr.JSON(label="Reconstructed Geometry")
+                with gr.Accordion("Open for More: Warped Image", open=False):
+                    output_wrapped = gr.Image(
+                        label="Wrapped Pair", type="numpy"
+                    )
+                    with gr.Accordion("Open for More: Geometry info", open=False):
+                        geometry_result = gr.JSON(label="Reconstructed Geometry")
 
             # callbacks
             match_image_src.change(
@@ -250,7 +257,9 @@ def run(config):
 
             # collect outputs
             outputs = [
-                output_mkpts,
+                output_keypoints,
+                output_matches_raw,
+                output_matches_ransac,
                 matches_result_info,
                 matcher_info,
                 geometry_result,
@@ -270,12 +279,14 @@ def run(config):
                 input_image0,
                 input_image1,
                 match_image_src,
-                output_mkpts,
+                output_keypoints,
+                output_matches_raw,
+                output_matches_ransac,
                 matches_result_info,
                 matcher_info,
                 output_wrapped,
                 geometry_result,
-                enable_ransac,
+                # enable_ransac,
                 ransac_method,
                 ransac_reproj_threshold,
                 ransac_confidence,

@@ -51,7 +51,7 @@ The tool currently supports various popular image matching algorithms, namely:
 
 ### HuggingFace 
 
-Just try it on HF <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'>
+Just try it on HF <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'>  [![Open in OpenXLab](https://cdn-static.openxlab.org.cn/app-center/openxlab_app.svg)](https://openxlab.org.cn/apps/detail/Realcat/image-matching-webui)
 
 or deploy it locally following the instructions below.
 
