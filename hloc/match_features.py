@@ -369,15 +369,19 @@ def match_images(model, feat0, feat1):
     # rescale the keypoints to their original size
     s0 = feat0["original_size"] / feat0["size"]
     s1 = feat1["original_size"] / feat1["size"]
-    kpts0_origin = scale_keypoints(torch.from_numpy(mkpts0 + 0.5), s0) - 0.5
-    kpts1_origin = scale_keypoints(torch.from_numpy(mkpts1 + 0.5), s1) - 0.5
+    kpts0_origin = scale_keypoints(torch.from_numpy(kpts0 + 0.5), s0) - 0.5
+    kpts1_origin = scale_keypoints(torch.from_numpy(kpts1 + 0.5), s1) - 0.5
+
+    mkpts0_origin = scale_keypoints(torch.from_numpy(mkpts0 + 0.5), s0) - 0.5
+    mkpts1_origin = scale_keypoints(torch.from_numpy(mkpts1 + 0.5), s1) - 0.5
+
     ret = {
         "image0_orig": feat0["image_orig"],
         "image1_orig": feat1["image_orig"],
-        "keypoints0": kpts0,
-        "keypoints1": kpts1,
-        "keypoints0_orig": kpts0_origin.numpy(),
-        "keypoints1_orig": kpts1_origin.numpy(),
+        "keypoints0": kpts0_origin.numpy(),
+        "keypoints1": kpts1_origin.numpy(),
+        "keypoints0_orig": mkpts0_origin.numpy(),
+        "keypoints1_orig": mkpts1_origin.numpy(),
         "mconf": mconfid,
     }
     del feat0, feat1, desc0, desc1, kpts0, kpts1, kpts0_origin, kpts1_origin

@@ -8,6 +8,7 @@ import gradio as gr
 from hloc import matchers, extractors
 from hloc.utils.base_model import dynamic_load
 from hloc import match_dense, match_features, extract_features
+from hloc.utils.viz import add_text, plot_keypoints
 from .viz import draw_matches, fig2im, plot_images, plot_color_line_matches
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -69,7 +70,7 @@ def gen_examples():
                 match_setting_max_features,
                 detect_keypoints_threshold,
                 mt,
-                enable_ransac,
+                # enable_ransac,
                 ransac_method,
                 ransac_reproj_threshold,
                 ransac_confidence,
@@ -106,6 +107,9 @@ def filter_matches(
         return pred
     if ransac_method not in ransac_zoo.keys():
         ransac_method = "RANSAC"
+
+    if len(mkpts0) < 4:
+        return pred
     H, mask = cv2.findHomography(
         mkpts0,
         mkpts1,
@@ -237,7 +241,7 @@ def change_estimate_geom(input_image0, input_image1, matches_info, choice):
         return None, None
 
 
-def display_matches(pred: dict):
+def display_matches(pred: dict, titles=[], dpi=300):
     img0 = pred["image0_orig"]
     img1 = pred["image1_orig"]
 
@@ -256,11 +260,8 @@ def display_matches(pred: dict):
             img0,
             img1,
             mconf,
-            dpi=300,
-            titles=[
-                "Image 0 - matched keypoints",
-                "Image 1 - matched keypoints",
-            ],
+            dpi=dpi,
+            titles=titles,
         )
         fig = fig_mkpts
     if "line0_orig" in pred.keys() and "line1_orig" in pred.keys():
@@ -303,7 +304,7 @@ def run_matching(
     extract_max_keypoints,
     keypoint_threshold,
     key,
-    enable_ransac=False,
+    # enable_ransac=False,
     ransac_method="RANSAC",
     ransac_reproj_threshold=8,
     ransac_confidence=0.999,
@@ -313,6 +314,10 @@ def run_matching(
     # image0 and image1 is RGB mode
     if image0 is None or image1 is None:
         raise gr.Error("Error: No images found! Please upload two images.")
+    # init output
+    output_keypoints = None
+    output_matches_raw = None
+    output_matches_ransac = None
 
     model = matcher_zoo[key]
     match_conf = model["config"]
@@ -342,16 +347,48 @@ def run_matching(
         pred = match_features.match_images(matcher, pred0, pred1)
         del extractor
 
-    if enable_ransac:
-        filter_matches(
-            pred,
-            ransac_method=ransac_method,
-            ransac_reproj_threshold=ransac_reproj_threshold,
-            ransac_confidence=ransac_confidence,
-            ransac_max_iter=ransac_max_iter,
-        )
+    # plot images with keypoints
+    titles = [
+        "Image 0 - Keypoints",
+        "Image 1 - Keypoints",
+    ]
+    output_keypoints = plot_images([image0, image1], titles=titles, dpi=300)
+    plot_keypoints([pred["keypoints0"], pred["keypoints1"]])
+    text = (
+        f"# keypoints0: {len(pred['keypoints0'])} \n"
+        + f"# keypoints1: {len(pred['keypoints1'])}"
+    )
 
-    fig, num_inliers = display_matches(pred)
+    add_text(0, text, fs=15)
+    output_keypoints = fig2im(output_keypoints)
+
+    # plot images with raw matches
+    titles = [
+        "Image 0 - Raw matched keypoints",
+        "Image 1 - Raw matched keypoints",
+    ]
+
+    output_matches_raw, num_matches_raw = display_matches(pred, titles=titles)
+
+    # if enable_ransac:
+    filter_matches(
+        pred,
+        ransac_method=ransac_method,
+        ransac_reproj_threshold=ransac_reproj_threshold,
+        ransac_confidence=ransac_confidence,
+        ransac_max_iter=ransac_max_iter,
+    )
+
+    # plot images with ransac matches
+    titles = [
+        "Image 0 - Ransac matched keypoints",
+        "Image 1 - Ransac matched keypoints",
+    ]
+    output_matches_ransac, num_matches_ransac = display_matches(
+        pred, titles=titles
+    )
+
+    # plot wrapped images
     geom_info = compute_geom(pred)
     output_wrapped, _ = change_estimate_geom(
         pred["image0_orig"],
@@ -359,10 +396,17 @@ def run_matching(
         {"geom_info": geom_info},
         choice_estimate_geom,
     )
+
     del pred
+
     return (
-        fig,
-        {"matches number": num_inliers},
+        output_keypoints,
+        output_matches_raw,
+        output_matches_ransac,
+        {
+            "number raw matches": num_matches_raw,
+            "number ransac matches": num_matches_ransac,
+        },
         {
             "match_conf": match_conf,
             "extractor_conf": extract_conf,
@@ -371,7 +415,6 @@ def run_matching(
             "geom_info": geom_info,
         },
         output_wrapped,
-        # geometry_result,
     )
 
 
