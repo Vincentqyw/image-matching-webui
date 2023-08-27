@@ -164,7 +164,8 @@ def compute_geom(
             confidence=ransac_confidence,
             maxIters=ransac_max_iter,
         )
-        geo_info["Fundamental"] = F.tolist()
+        if F is not None:
+            geo_info["Fundamental"] = F.tolist()
         H, _ = cv2.findHomography(
             mkpts1,
             mkpts0,
@@ -173,12 +174,13 @@ def compute_geom(
             confidence=ransac_confidence,
             maxIters=ransac_max_iter,
         )
-        geo_info["Homography"] = H.tolist()
-        _, H1, H2 = cv2.stereoRectifyUncalibrated(
-            mkpts0.reshape(-1, 2), mkpts1.reshape(-1, 2), F, imgSize=(w1, h1)
-        )
-        geo_info["H1"] = H1.tolist()
-        geo_info["H2"] = H2.tolist()
+        if H is not None:
+            geo_info["Homography"] = H.tolist()
+            _, H1, H2 = cv2.stereoRectifyUncalibrated(
+                mkpts0.reshape(-1, 2), mkpts1.reshape(-1, 2), F, imgSize=(w1, h1)
+            )
+            geo_info["H1"] = H1.tolist()
+            geo_info["H2"] = H2.tolist()
         return geo_info
     else:
         return {}
