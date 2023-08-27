@@ -353,13 +353,13 @@ def run_matching(
         "Image 1 - Keypoints",
     ]
     output_keypoints = plot_images([image0, image1], titles=titles, dpi=300)
-    plot_keypoints([pred["keypoints0"], pred["keypoints1"]])
-    text = (
-        f"# keypoints0: {len(pred['keypoints0'])} \n"
-        + f"# keypoints1: {len(pred['keypoints1'])}"
-    )
-
-    add_text(0, text, fs=15)
+    if "keypoints0" in pred.keys() and "keypoints1" in pred.keys():
+        plot_keypoints([pred["keypoints0"], pred["keypoints1"]])
+        text = (
+            f"# keypoints0: {len(pred['keypoints0'])} \n"
+            + f"# keypoints1: {len(pred['keypoints1'])}"
+        )
+        add_text(0, text, fs=15)
     output_keypoints = fig2im(output_keypoints)
 
     # plot images with raw matches
