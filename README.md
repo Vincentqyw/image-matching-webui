@@ -14,7 +14,7 @@ This simple tool efficiently matches image pairs using multiple famous image mat
 
 Here is a demo of the tool:
 
-![demo](assets/demo.gif)
+https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c3484d1b-cc00-4fdc-9b31-e5b7af07ecd9
 
 The tool currently supports various popular image matching algorithms, namely:
 - [x] [LightGlue](https://github.com/cvg/LightGlue), ICCV 2023
