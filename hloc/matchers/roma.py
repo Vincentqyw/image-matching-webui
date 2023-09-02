@@ -1,10 +1,10 @@
 import sys
 from pathlib import Path
 import subprocess
-import logging
 import torch
 from PIL import Image
 from ..utils.base_model import BaseModel
+from .. import logger
 
 roma_path = Path(__file__).parent / "../../third_party/Roma"
 sys.path.append(str(roma_path))
@@ -12,8 +12,6 @@ sys.path.append(str(roma_path))
 from roma.models.model_zoo.roma_models import roma_model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-logger = logging.getLogger(__name__)
-
 
 class Roma(BaseModel):
     default_conf = {

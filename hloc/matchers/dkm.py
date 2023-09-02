@@ -3,15 +3,14 @@ from pathlib import Path
 import torch
 from PIL import Image
 import subprocess
-import logging
 from ..utils.base_model import BaseModel
+from .. import logger
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
 from DKM.dkm import DKMv3_outdoor
 
 dkm_path = Path(__file__).parent / "../../third_party/DKM"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-logger = logging.getLogger(__name__)
 
 
 class DKMv3(BaseModel):

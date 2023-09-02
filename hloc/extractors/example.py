@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 import subprocess
 import torch
-import logging
+from .. import logger
 
 from ..utils.base_model import BaseModel
 
@@ -10,10 +10,7 @@ example_path = Path(__file__).parent / "../../third_party/example"
 sys.path.append(str(example_path))
 
 # import some modules here
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-logger = logging.getLogger(__name__)
-
 
 class Example(BaseModel):
     # change to your default configs

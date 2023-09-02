@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-import subprocess
 import torch
 
 from ..utils.base_model import BaseModel

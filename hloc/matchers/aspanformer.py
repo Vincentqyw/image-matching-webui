@@ -4,9 +4,7 @@ from ..utils.base_model import BaseModel
 from ..utils import do_system
 from pathlib import Path
 import subprocess
-import logging
-
-logger = logging.getLogger(__name__)
+from .. import logger
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
 from ASpanFormer.src.ASpanFormer.aspanformer import ASpanFormer as _ASpanFormer
@@ -76,7 +74,9 @@ class ASpanFormer(BaseModel):
         _config = lower_config(config)
 
         _config["aspan"]["match_coarse"]["thr"] = conf["match_threshold"]
-        _config["aspan"]["match_coarse"]["skh_iters"] = conf["sinkhorn_iterations"]
+        _config["aspan"]["match_coarse"]["skh_iters"] = conf[
+            "sinkhorn_iterations"
+        ]
 
         self.net = _ASpanFormer(config=_config["aspan"])
         weight_path = model_path

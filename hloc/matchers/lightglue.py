@@ -1,9 +1,8 @@
 import sys
 from pathlib import Path
-import logging
 from ..utils.base_model import BaseModel
+from .. import logger
 
-logger = logging.getLogger(__name__)
 lightglue_path = Path(__file__).parent / "../../third_party/LightGlue"
 sys.path.append(str(lightglue_path))
 from lightglue import LightGlue as LG
