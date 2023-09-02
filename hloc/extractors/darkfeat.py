@@ -4,7 +4,6 @@ import subprocess
 import logging
 
 from ..utils.base_model import BaseModel
-
 logger = logging.getLogger(__name__)
 
 darkfeat_path = Path(__file__).parent / "../../third_party/DarkFeat"

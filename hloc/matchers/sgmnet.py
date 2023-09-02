@@ -1,12 +1,12 @@
 import sys
 from pathlib import Path
 import subprocess
-import logging
 import torch
 from PIL import Image
 from collections import OrderedDict, namedtuple
 from ..utils.base_model import BaseModel
 from ..utils import do_system
+from .. import logger
 
 sgmnet_path = Path(__file__).parent / "../../third_party/SGMNet"
 sys.path.append(str(sgmnet_path))
@@ -14,7 +14,6 @@ sys.path.append(str(sgmnet_path))
 from sgmnet import matcher as SGM_Model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-logger = logging.getLogger(__name__)
 
 
 class SGMNet(BaseModel):

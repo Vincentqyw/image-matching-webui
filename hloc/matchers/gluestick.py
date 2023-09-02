@@ -1,11 +1,9 @@
 import sys
 from pathlib import Path
 import subprocess
-import logging
 import torch
 from ..utils.base_model import BaseModel
-
-logger = logging.getLogger(__name__)
+from .. import logger
 
 gluestick_path = Path(__file__).parent / "../../third_party/GlueStick"
 sys.path.append(str(gluestick_path))

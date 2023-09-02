@@ -1,15 +1,13 @@
 from pathlib import Path
 import subprocess
-import logging
 import sys
 import torch
 import torchvision.transforms as tvf
 
 from ..utils.base_model import BaseModel
+from .. import logger
 
-logger = logging.getLogger(__name__)
 fire_path = Path(__file__).parent / "../../third_party/fire"
-
 sys.path.append(str(fire_path))
 
 

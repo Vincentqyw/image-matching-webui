@@ -1,6 +1,5 @@
 from pathlib import Path
 import subprocess
-import logging
 import numpy as np
 import torch
 import torch.nn as nn
@@ -9,8 +8,7 @@ import torchvision.models as models
 from scipy.io import loadmat
 
 from ..utils.base_model import BaseModel
-
-logger = logging.getLogger(__name__)
+from .. import logger
 
 EPS = 1e-6
 

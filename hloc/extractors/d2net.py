@@ -10,7 +10,6 @@ sys.path.append(str(d2net_path))
 from lib.model_test import D2Net as _D2Net
 from lib.pyramid import process_multiscale
 
-
 class D2Net(BaseModel):
     default_conf = {
         "model_name": "d2_tf.pth",
