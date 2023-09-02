@@ -242,7 +242,7 @@ def run(config):
                     )
                     with gr.Accordion("Open for More: Geometry info", open=False):
                         geometry_result = gr.JSON(label="Reconstructed Geometry")
-
+            
             # callbacks
             match_image_src.change(
                 fn=ui_change_imagebox,
