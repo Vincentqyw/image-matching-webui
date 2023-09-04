@@ -177,7 +177,10 @@ def compute_geom(
         if H is not None:
             geo_info["Homography"] = H.tolist()
             _, H1, H2 = cv2.stereoRectifyUncalibrated(
-                mkpts0.reshape(-1, 2), mkpts1.reshape(-1, 2), F, imgSize=(w1, h1)
+                mkpts0.reshape(-1, 2),
+                mkpts1.reshape(-1, 2),
+                F,
+                imgSize=(w1, h1),
             )
             geo_info["H1"] = H1.tolist()
             geo_info["H2"] = H2.tolist()
