@@ -43,3 +43,6 @@
 [submodule "third_party/DeDoDe"]
 	path = third_party/DeDoDe
 	url = https://github.com/Parskatt/DeDoDe.git
+[submodule "third_party/RoRD"]
+	path = third_party/RoRD
+	url = https://github.com/Vincentqyw/RoRD.git
