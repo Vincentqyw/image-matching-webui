@@ -508,6 +508,11 @@ matcher_zoo = {
         "config_feature": extract_features.confs["d2net-ss"],
         "dense": False,
     },
+    "rord": {
+        "config": match_features.confs["NN-mutual"],
+        "config_feature": extract_features.confs["rord"],
+        "dense": False,
+    },
     # "d2net-ms": {
     #     "config": match_features.confs["NN-mutual"],
     #     "config_feature": extract_features.confs["d2net-ms"],

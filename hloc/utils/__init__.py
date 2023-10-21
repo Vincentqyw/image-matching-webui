@@ -1,8 +1,7 @@
 import os
 import logging
-
-logger = logging.getLogger(__name__)
-
+import sys
+from .. import logger
 
 def do_system(cmd, verbose=False):
     if verbose:
