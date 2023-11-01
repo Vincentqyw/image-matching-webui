@@ -102,9 +102,9 @@ def run(config):
                     )
 
                 with gr.Row():
-                    button_reset = gr.Button(label="Reset", value="Reset")
+                    button_reset = gr.Button( value="Reset")
                     button_run = gr.Button(
-                        label="Run Match", value="Run Match", variant="primary"
+                         value="Run Match", variant="primary"
                     )
 
                 with gr.Accordion("Advanced Setting", open=False):
