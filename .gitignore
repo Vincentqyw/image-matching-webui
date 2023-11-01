@@ -20,3 +20,4 @@ gradio_cached_examples
 *.mp4
 hloc/matchers/quadtree.py
 third_party/QuadTreeAttention
+desktop.ini

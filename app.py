@@ -14,6 +14,9 @@ This Space demonstrates [Image Matching WebUI](https://github.com/Vincentqyw/ima
 
 🔎 For more details about supported local features and matchers, please refer to https://github.com/Vincentqyw/image-matching-webui
 
+🚀 All algorithms run on CPU for inference on HF, causing slow speeds and high latency. For faster inference, please download the [source code](https://github.com/Vincentqyw/image-matching-webui) for local deployment or check [openxlab space](https://github.com/Vincentqyw/image-matching-webui) and [direct URL](https://g-app-center-083997-7409-n9elr1.openxlab.space) 
+
+🐛 Your feedback is valuable to me. Please do not hesitate to report any bugs [here](https://github.com/Vincentqyw/image-matching-webui/issues).
 """
 
 
@@ -102,7 +105,7 @@ def run(config):
                     )
 
                 with gr.Row():
-                    button_reset = gr.Button( value="Reset")
+                    button_reset = gr.Button(value="Reset")
                     button_run = gr.Button(
                          value="Run Match", variant="primary"
                     )
