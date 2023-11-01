@@ -115,6 +115,18 @@ confs = {
             "resize_max": 1600,
         },
     },
+    "rord": {
+        "output": "feats-rord-ss-n5000-r1600",
+        "model": {
+            "name": "rord",
+            "multiscale": False,
+            "max_keypoints": 5000,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "resize_max": 1600,
+        },
+    },
     "rootsift": {
         "output": "feats-rootsift-n5000-r1600",
         "model": {
