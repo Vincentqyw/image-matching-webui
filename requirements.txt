@@ -18,5 +18,6 @@ shapely
 yacs
 einops
 loguru
-gradio==3.33.1
+gradio
+gradio_client==0.2.7
 e2cnn
