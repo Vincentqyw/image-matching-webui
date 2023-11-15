@@ -201,7 +201,7 @@ def wrap_images(img0, img1, geo_info, geom_type):
         title = []
         if geom_type == "Homography":
             rectified_image1 = cv2.warpPerspective(
-                img1, H, (img0.shape[1] + img1.shape[1], img0.shape[0])
+                 img1, H, (img0.shape[1], img0.shape[0])
             )
             result_matrix = H
             title = ["Image 0", "Image 1 - warped"]
