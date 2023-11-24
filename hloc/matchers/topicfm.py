@@ -34,12 +34,9 @@ class TopicFM(BaseModel):
             "image1": data["image1"],
         }
         self.net(data_)
-        mkpts0 = data_["mkpts0_f"]
-        mkpts1 = data_["mkpts1_f"]
-        mconf = data_["mconf"]
-        total_n_matches = len(data_["mkpts0_f"])
-
-        pred = {}
-        pred["keypoints0"], pred["keypoints1"] = mkpts0, mkpts1
-        pred["mconf"] = mconf
+        pred = {
+            "keypoints0": data_["mkpts0_f"],
+            "keypoints1": data_["mkpts1_f"],
+            "mconf": data_["mconf"],
+        }
         return pred

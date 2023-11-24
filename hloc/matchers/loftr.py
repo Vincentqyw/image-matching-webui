@@ -2,7 +2,7 @@ import torch
 import warnings
 from kornia.feature.loftr.loftr import default_cfg
 from kornia.feature import LoFTR as LoFTR_
-
+from hloc import logger
 from ..utils.base_model import BaseModel
 
 
@@ -18,7 +18,7 @@ class LoFTR(BaseModel):
         cfg = default_cfg
         cfg["match_coarse"]["thr"] = conf["match_threshold"]
         self.net = LoFTR_(pretrained=conf["weights"], config=cfg)
-
+        logger.info(f"Loaded LoFTR with weights {conf['weights']}")
     def _forward(self, data):
         # For consistency with hloc pairs, we refine kpts in image0!
         rename = {

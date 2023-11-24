@@ -91,8 +91,9 @@ class ASpanFormer(BaseModel):
             "image1": data["image1"],
         }
         self.net(data_, online_resize=True)
-        corr0 = data_["mkpts0_f"]
-        corr1 = data_["mkpts1_f"]
-        pred = {}
-        pred["keypoints0"], pred["keypoints1"] = corr0, corr1
+        pred = {
+            "keypoints0": data_["mkpts0_f"],
+            "keypoints1": data_["mkpts1_f"],
+            "mconf": data_["mconf"],
+        }
         return pred

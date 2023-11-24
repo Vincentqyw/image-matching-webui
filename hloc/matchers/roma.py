@@ -13,6 +13,7 @@ from roma.models.model_zoo.roma_models import roma_model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 class Roma(BaseModel):
     default_conf = {
         "name": "two_view_pipeline",
@@ -85,7 +86,10 @@ class Roma(BaseModel):
         kpts1, kpts2 = self.net.to_pixel_coordinates(
             matches, H_A, W_A, H_B, W_B
         )
-        pred = {}
-        pred["keypoints0"], pred["keypoints1"] = kpts1, kpts2
-        pred["mconf"] = certainty
+        pred = {
+            "keypoints0": kpts1,
+            "keypoints1": kpts2,
+            "mconf": certainty,
+        }
+
         return pred

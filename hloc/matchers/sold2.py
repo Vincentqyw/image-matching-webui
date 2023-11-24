@@ -34,7 +34,7 @@ class SOLD2(BaseModel):
     # Initialize the line matcher
     def _init(self, conf):
         checkpoint_path = conf["checkpoint_dir"] / conf["weights"]
-        
+
         # Download the model.
         if not checkpoint_path.exists():
             checkpoint_path.parent.mkdir(exist_ok=True)
