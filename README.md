@@ -4,7 +4,8 @@
 [![Issues][issues-shield]][issues-url]
 
 <p align="center">
-  <h1 align="center"><br><ins>Image Matching WebUI</ins><br>find matches between 2 images</h1> 
+  <h1 align="center"><br><ins>$\color{red}{\textnormal{Image\ Matching\ WebUI}}$
+</ins><br>find matches between 2 images</h1> 
 </p>
 
 ## Description
