@@ -12,6 +12,7 @@ from hloc.utils.viz import add_text, plot_keypoints
 from .viz import draw_matches, fig2im, plot_images, plot_color_line_matches
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+DEFAULT_RANSAC = "USAC_MAGSAC"
 
 
 def get_model(match_conf):
@@ -56,7 +57,7 @@ def gen_examples():
     match_setting_max_features = 2000
     detect_keypoints_threshold = 0.01
     enable_ransac = True
-    ransac_method = "RANSAC"
+    ransac_method = DEFAULT_RANSAC
     ransac_reproj_threshold = 8
     ransac_confidence = 0.999
     ransac_max_iter = 10000
@@ -82,7 +83,7 @@ def gen_examples():
 
 def filter_matches(
     pred,
-    ransac_method="RANSAC",
+    ransac_method=DEFAULT_RANSAC,
     ransac_reproj_threshold=8,
     ransac_confidence=0.999,
     ransac_max_iter=10000,
@@ -106,7 +107,7 @@ def filter_matches(
     if mkpts0 is None or mkpts0 is None:
         return pred
     if ransac_method not in ransac_zoo.keys():
-        ransac_method = "RANSAC"
+        ransac_method = DEFAULT_RANSAC
 
     if len(mkpts0) < 4:
         return pred
@@ -132,7 +133,7 @@ def filter_matches(
 
 def compute_geom(
     pred,
-    ransac_method="RANSAC",
+    ransac_method=DEFAULT_RANSAC,
     ransac_reproj_threshold=8,
     ransac_confidence=0.999,
     ransac_max_iter=10000,
@@ -201,7 +202,7 @@ def wrap_images(img0, img1, geo_info, geom_type):
         title = []
         if geom_type == "Homography":
             rectified_image1 = cv2.warpPerspective(
-                 img1, H, (img0.shape[1], img0.shape[0])
+                img1, H, (img0.shape[1], img0.shape[0])
             )
             result_matrix = H
             title = ["Image 0", "Image 1 - warped"]
@@ -310,7 +311,7 @@ def run_matching(
     keypoint_threshold,
     key,
     # enable_ransac=False,
-    ransac_method="RANSAC",
+    ransac_method=DEFAULT_RANSAC,
     ransac_reproj_threshold=8,
     ransac_confidence=0.999,
     ransac_max_iter=10000,
