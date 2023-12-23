@@ -2,11 +2,18 @@ import argparse
 import gradio as gr
 from common.utils import (
     matcher_zoo,
+    ransac_zoo,
     change_estimate_geom,
     run_matching,
-    ransac_zoo,
     gen_examples,
-    DEFAULT_RANSAC,
+    DEFAULT_RANSAC_METHOD,
+    DEFAULT_SETTING_GEOMETRY,
+    DEFAULT_RANSAC_REPROJ_THRESHOLD,
+    DEFAULT_RANSAC_CONFIDENCE,
+    DEFAULT_RANSAC_MAX_ITER,
+    DEFAULT_MATCHING_THRESHOLD,
+    DEFAULT_SETTING_MAX_FEATURES,
+    DEFAULT_DEFAULT_KEYPOINT_THRESHOLD,
 )
 
 DESCRIPTION = """
@@ -22,57 +29,66 @@ This Space demonstrates [Image Matching WebUI](https://github.com/Vincentqyw/ima
 
 
 def ui_change_imagebox(choice):
-    return {"value": None, "sources": choice, "__type__": "update"}
+    """
+    Updates the image box with the given choice.
+
+    Args:
+        choice (list): The list of image sources to be displayed in the image box.
+
+    Returns:
+        dict: A dictionary containing the updated value, sources, and type for the image box.
+    """
+    return {
+        "value": None,  # The updated value of the image box
+        "sources": choice,  # The list of image sources to be displayed
+        "__type__": "update",  # The type of update for the image box
+    }
 
 
-def ui_reset_state(
-    image0,
-    image1,
-    match_threshold,
-    extract_max_keypoints,
-    keypoint_threshold,
-    key,
-    # enable_ransac=False,
-    ransac_method=DEFAULT_RANSAC,
-    ransac_reproj_threshold=8,
-    ransac_confidence=0.999,
-    ransac_max_iter=10000,
-    choice_estimate_geom="Homography",
-):
-    match_threshold = 0.2
-    extract_max_keypoints = 1000
-    keypoint_threshold = 0.015
-    key = list(matcher_zoo.keys())[0]
-    image0 = None
-    image1 = None
-    # enable_ransac = False
+def ui_reset_state(*args):
+    """
+    Reset the state of the UI.
+
+    Returns:
+        tuple: A tuple containing the initial values for the UI state.
+    """
+    key = list(matcher_zoo.keys())[0]  # Get the first key from matcher_zoo
     return (
-        image0,
-        image1,
-        match_threshold,
-        extract_max_keypoints,
-        keypoint_threshold,
-        key,
-        ui_change_imagebox("upload"),
-        ui_change_imagebox("upload"),
-        "upload",
+        None,  # image0
+        None,  # image1
+        DEFAULT_MATCHING_THRESHOLD,  # matching_threshold
+        DEFAULT_SETTING_MAX_FEATURES,  # max_features
+        DEFAULT_DEFAULT_KEYPOINT_THRESHOLD,  # keypoint_threshold
+        key,  # matcher
+        ui_change_imagebox("upload"),  # input image0
+        ui_change_imagebox("upload"),  # input image1
+        "upload",  # match_image_src
         None,  # keypoints
         None,  # raw matches
         None,  # ransac matches
-        {},
-        {},
-        None,
-        {},
-        DEFAULT_RANSAC,
-        8,
-        0.999,
-        10000,
-        "Homography",
+        {},  # matches result info
+        {},  # matcher config
+        None,  # warped image
+        {},  # geometry result
+        DEFAULT_RANSAC_METHOD,  # ransac_method
+        DEFAULT_RANSAC_REPROJ_THRESHOLD,  # ransac_reproj_threshold
+        DEFAULT_RANSAC_CONFIDENCE,  # ransac_confidence
+        DEFAULT_RANSAC_MAX_ITER,  # ransac_max_iter
+        DEFAULT_SETTING_GEOMETRY,  # geometry
     )
 
 
 # "footer {visibility: hidden}"
 def run(config):
+    """
+    Runs the application.
+
+    Args:
+        config (dict): A dictionary containing configuration parameters for the application.
+
+    Returns:
+        None
+    """
     with gr.Blocks(css="style.css") as app:
         gr.Markdown(DESCRIPTION)
 
@@ -153,7 +169,7 @@ def run(config):
                             # enable_ransac = gr.Checkbox(label="Enable RANSAC")
                             ransac_method = gr.Dropdown(
                                 choices=ransac_zoo.keys(),
-                                value=DEFAULT_RANSAC,
+                                value=DEFAULT_RANSAC_METHOD,
                                 label="RANSAC Method",
                                 interactive=True,
                             )
@@ -185,7 +201,7 @@ def run(config):
                             choice_estimate_geom = gr.Radio(
                                 ["Fundamental", "Homography"],
                                 label="Reconstruct Geometry",
-                                value="Homography",
+                                value=DEFAULT_SETTING_GEOMETRY,
                             )
 
                 # with gr.Column():

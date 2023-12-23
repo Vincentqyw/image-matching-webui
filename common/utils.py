@@ -12,7 +12,18 @@ from hloc.utils.viz import add_text, plot_keypoints
 from .viz import draw_matches, fig2im, plot_images, plot_color_line_matches
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-DEFAULT_RANSAC = "USAC_MAGSAC"
+
+DEFAULT_SETTING_THRESHOLD = 0.1
+DEFAULT_SETTING_MAX_FEATURES = 2000
+DEFAULT_DEFAULT_KEYPOINT_THRESHOLD = 0.01
+DEFAULT_ENABLE_RANSAC = True
+DEFAULT_RANSAC_METHOD = "USAC_MAGSAC"
+DEFAULT_RANSAC_REPROJ_THRESHOLD = 8
+DEFAULT_RANSAC_CONFIDENCE = 0.999
+DEFAULT_RANSAC_MAX_ITER = 10000
+DEFAULT_MIN_NUM_MATCHES = 4
+DEFAULT_MATCHING_THRESHOLD = 0.2
+DEFAULT_SETTING_GEOMETRY = "Homography"
 
 
 def get_model(match_conf):
@@ -53,14 +64,13 @@ def gen_examples():
     # image pair path
     path = "datasets/sacre_coeur/mapping"
     pairs = gen_images_pairs(path, len(example_matchers))
-    match_setting_threshold = 0.1
-    match_setting_max_features = 2000
-    detect_keypoints_threshold = 0.01
-    enable_ransac = True
-    ransac_method = DEFAULT_RANSAC
-    ransac_reproj_threshold = 8
-    ransac_confidence = 0.999
-    ransac_max_iter = 10000
+    match_setting_threshold = DEFAULT_SETTING_THRESHOLD
+    match_setting_max_features = DEFAULT_SETTING_MAX_FEATURES
+    detect_keypoints_threshold = DEFAULT_DEFAULT_KEYPOINT_THRESHOLD
+    ransac_method = DEFAULT_RANSAC_METHOD
+    ransac_reproj_threshold = DEFAULT_RANSAC_REPROJ_THRESHOLD
+    ransac_confidence = DEFAULT_RANSAC_CONFIDENCE
+    ransac_max_iter = DEFAULT_RANSAC_MAX_ITER
     input_lists = []
     for pair, mt in zip(pairs, example_matchers):
         input_lists.append(
@@ -83,10 +93,10 @@ def gen_examples():
 
 def filter_matches(
     pred,
-    ransac_method=DEFAULT_RANSAC,
-    ransac_reproj_threshold=8,
-    ransac_confidence=0.999,
-    ransac_max_iter=10000,
+    ransac_method=DEFAULT_RANSAC_METHOD,
+    ransac_reproj_threshold=DEFAULT_RANSAC_REPROJ_THRESHOLD,
+    ransac_confidence=DEFAULT_RANSAC_CONFIDENCE,
+    ransac_max_iter=DEFAULT_RANSAC_MAX_ITER,
 ):
     mkpts0 = None
     mkpts1 = None
@@ -107,9 +117,9 @@ def filter_matches(
     if mkpts0 is None or mkpts0 is None:
         return pred
     if ransac_method not in ransac_zoo.keys():
-        ransac_method = DEFAULT_RANSAC
+        ransac_method = DEFAULT_RANSAC_METHOD
 
-    if len(mkpts0) < 4:
+    if len(mkpts0) < DEFAULT_MIN_NUM_MATCHES:
         return pred
     H, mask = cv2.findHomography(
         mkpts0,
@@ -133,10 +143,10 @@ def filter_matches(
 
 def compute_geom(
     pred,
-    ransac_method=DEFAULT_RANSAC,
-    ransac_reproj_threshold=8,
-    ransac_confidence=0.999,
-    ransac_max_iter=10000,
+    ransac_method=DEFAULT_RANSAC_METHOD,
+    ransac_reproj_threshold=DEFAULT_RANSAC_REPROJ_THRESHOLD,
+    ransac_confidence=DEFAULT_RANSAC_CONFIDENCE,
+    ransac_max_iter=DEFAULT_RANSAC_MAX_ITER,
 ) -> dict:
     mkpts0 = None
     mkpts1 = None
@@ -153,7 +163,7 @@ def compute_geom(
         mkpts1 = pred["line_keypoints1_orig"]
 
     if mkpts0 is not None and mkpts1 is not None:
-        if len(mkpts0) < 8:
+        if len(mkpts0) < 2 * DEFAULT_MIN_NUM_MATCHES:
             return {}
         h1, w1, _ = pred["image0_orig"].shape
         geo_info = {}
@@ -310,12 +320,11 @@ def run_matching(
     extract_max_keypoints,
     keypoint_threshold,
     key,
-    # enable_ransac=False,
-    ransac_method=DEFAULT_RANSAC,
-    ransac_reproj_threshold=8,
-    ransac_confidence=0.999,
-    ransac_max_iter=10000,
-    choice_estimate_geom="Homography",
+    ransac_method=DEFAULT_RANSAC_METHOD,
+    ransac_reproj_threshold=DEFAULT_RANSAC_REPROJ_THRESHOLD,
+    ransac_confidence=DEFAULT_RANSAC_CONFIDENCE,
+    ransac_max_iter=DEFAULT_RANSAC_MAX_ITER,
+    choice_estimate_geom=DEFAULT_SETTING_GEOMETRY,
 ):
     # image0 and image1 is RGB mode
     if image0 is None or image1 is None:
