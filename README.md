@@ -18,8 +18,8 @@ Here is a demo of the tool:
 https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c3484d1b-cc00-4fdc-9b31-e5b7af07ecd9
 
 The tool currently supports various popular image matching algorithms, namely:
+- [x] [DeDoDe](https://github.com/Parskatt/DeDoDe), 3DV 2024
 - [x] [LightGlue](https://github.com/cvg/LightGlue), ICCV 2023
-- [x] [DeDoDe](https://github.com/Parskatt/DeDoDe), ArXiv 2023
 - [x] [DarkFeat](https://github.com/THU-LYJ-Lab/DarkFeat), AAAI 2023
 - [ ] [ASTR](https://github.com/ASTR2023/ASTR), CVPR 2023
 - [ ] [SEM](https://github.com/SEM2023/SEM), CVPR 2023
