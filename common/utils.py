@@ -329,6 +329,11 @@ def run_matching(
     # image0 and image1 is RGB mode
     if image0 is None or image1 is None:
         raise gr.Error("Error: No images found! Please upload two images.")
+    if isinstance(image0, dict) and "composite" in image0.keys():
+        image0 = image0['composite']
+    if isinstance(image1, dict) and "composite" in image1.keys():
+        image1 = image1['composite']
+
     # init output
     output_keypoints = None
     output_matches_raw = None

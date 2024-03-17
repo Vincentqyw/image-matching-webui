@@ -40,7 +40,7 @@ def ui_change_imagebox(choice):
     """
     return {
         "value": None,  # The updated value of the image box
-        "sources": choice,  # The list of image sources to be displayed
+        "sources": [choice],  # The list of image sources to be displayed
         "__type__": "update",  # The type of update for the image box
     }
 
@@ -68,7 +68,7 @@ def ui_reset_state(*args):
         None,  # ransac matches
         {},  # matches result info
         {},  # matcher config
-        None,  # warped image
+        None,  # warped imageInstance of 'Radio' has no 'change' member
         {},  # geometry result
         DEFAULT_RANSAC_METHOD,  # ransac_method
         DEFAULT_RANSAC_REPROJ_THRESHOLD,  # ransac_reproj_threshold
@@ -102,7 +102,7 @@ def run(config):
                         interactive=True,
                     )
                     match_image_src = gr.Radio(
-                        ["upload", "webcam", "canvas"],
+                        ["upload", "webcam", "clipboard"],
                         label="Image Source",
                         value="upload",
                     )
@@ -111,14 +111,12 @@ def run(config):
                         label="Image 0",
                         type="numpy",
                         image_mode="RGB",
-                        height=300,
                         interactive=True,
                     )
                     input_image1 = gr.Image(
                         label="Image 1",
                         type="numpy",
                         image_mode="RGB",
-                        height=300,
                         interactive=True,
                     )
 
@@ -166,7 +164,6 @@ def run(config):
                         # )
                     with gr.Accordion("RANSAC Setting", open=True):
                         with gr.Row(equal_height=False):
-                            # enable_ransac = gr.Checkbox(label="Enable RANSAC")
                             ransac_method = gr.Dropdown(
                                 choices=ransac_zoo.keys(),
                                 value=DEFAULT_RANSAC_METHOD,
@@ -185,27 +182,24 @@ def run(config):
                             maximum=1,
                             step=0.00001,
                             label="Ransac Confidence",
-                            value=0.99999,
+                            value=DEFAULT_RANSAC_CONFIDENCE,
                         )
                         ransac_max_iter = gr.Slider(
                             minimum=0.0,
                             maximum=100000,
                             step=100,
                             label="Ransac Iterations",
-                            value=10000,
+                            value=DEFAULT_RANSAC_MAX_ITER,
                         )
 
                     with gr.Accordion("Geometry Setting", open=False):
                         with gr.Row(equal_height=False):
-                            # show_geom = gr.Checkbox(label="Show Geometry")
                             choice_estimate_geom = gr.Radio(
                                 ["Fundamental", "Homography"],
                                 label="Reconstruct Geometry",
                                 value=DEFAULT_SETTING_GEOMETRY,
                             )
-
-                # with gr.Column():
-                # collect inputs
+                # collect the inputs
                 inputs = [
                     input_image0,
                     input_image1,
@@ -213,7 +207,6 @@ def run(config):
                     match_setting_max_features,
                     detect_keypoints_threshold,
                     matcher_list,
-                    # enable_ransac,
                     ransac_method,
                     ransac_reproj_threshold,
                     ransac_confidence,
@@ -309,7 +302,6 @@ def run(config):
                 matcher_info,
                 output_wrapped,
                 geometry_result,
-                # enable_ransac,
                 ransac_method,
                 ransac_reproj_threshold,
                 ransac_confidence,
@@ -344,5 +336,6 @@ if __name__ == "__main__":
         help="configuration file path",
     )
     args = parser.parse_args()
+    # future: add config path
     config = None
     run(config)
