@@ -30,3 +30,4 @@ else:
             minimal_version,
             found_version,
         )
+checkpoints_hub = "https://huggingface.co/spaces/Realcat/image-matching-webui/resolve/main/third_party"
