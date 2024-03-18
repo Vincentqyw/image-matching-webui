@@ -28,9 +28,6 @@
 [submodule "third_party/ALIKE"]
 	path = third_party/ALIKE
 	url = https://github.com/Shiaoming/ALIKE.git
-[submodule "third_party/lanet"]
-	path = third_party/lanet
-	url = https://github.com/wangch-g/lanet.git
 [submodule "third_party/LightGlue"]
 	path = third_party/LightGlue
 	url = https://github.com/cvg/LightGlue.git
@@ -46,3 +43,6 @@
 [submodule "third_party/RoRD"]
 	path = third_party/RoRD
 	url = https://github.com/Vincentqyw/RoRD.git
+[submodule "third_party/lanet"]
+	path = third_party/lanet
+	url = https://github.com/agipro/lanet.git
