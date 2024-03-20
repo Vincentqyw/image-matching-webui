@@ -44,6 +44,7 @@ class DoG(BaseModel):
             raise ValueError(f'Unknown descriptor: {conf["descriptor"]}')
 
         self.sift = None  # lazily instantiated on the first image
+        self.dummy_param = torch.nn.Parameter(torch.empty(0))
         self.device = torch.device("cpu")
 
     def to(self, *args, **kwargs):
@@ -63,7 +64,8 @@ class DoG(BaseModel):
         assert image_np.min() >= -EPS and image_np.max() <= 1 + EPS
 
         if self.sift is None:
-            use_gpu = pycolmap.has_cuda and self.device.type == "cuda"
+            device = self.dummy_param.device
+            use_gpu = pycolmap.has_cuda and device.type == "cuda"
             options = {**self.conf["options"]}
             if self.conf["descriptor"] == "rootsift":
                 options["normalization"] = pycolmap.Normalization.L1_ROOT
@@ -73,8 +75,11 @@ class DoG(BaseModel):
                 options=pycolmap.SiftExtractionOptions(options),
                 device=getattr(pycolmap.Device, "cuda" if use_gpu else "cpu"),
             )
-
-        keypoints, scores, descriptors = self.sift.extract(image_np)
+        pred = self.sift.extract(image_np)
+        if len(pred) == 2:
+            keypoints, descriptors = pred
+        elif len(pred) == 3:
+            keypoints, scores, descriptors = pred
         scales = keypoints[:, 2]
         oris = np.rad2deg(keypoints[:, 3])
 
@@ -109,7 +114,8 @@ class DoG(BaseModel):
         keypoints = torch.from_numpy(keypoints[:, :2])  # keep only x, y
         scales = torch.from_numpy(scales)
         oris = torch.from_numpy(oris)
-        scores = torch.from_numpy(scores)
+        scores = keypoints.new_zeros(len(keypoints))  # no scores for SIFT yet
+
         if self.conf["max_keypoints"] != -1:
             # TODO: check that the scores from PyCOLMAP are 100% correct,
             # follow https://github.com/mihaidusmanu/pycolmap/issues/8
