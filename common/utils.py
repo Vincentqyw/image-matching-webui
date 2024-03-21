@@ -453,8 +453,6 @@ ransac_zoo = {
 
 # Matchers collections
 matcher_zoo = {
-    "gluestick": {"config": match_dense.confs["gluestick"], "dense": True},
-    "sold2": {"config": match_dense.confs["sold2"], "dense": True},
     # 'dedode-sparse': {
     #     'config': match_dense.confs['dedode_sparse'],
     #     'dense': True  # dense mode, we need 2 images
@@ -560,4 +558,6 @@ matcher_zoo = {
     },
     "roma": {"config": match_dense.confs["roma"], "dense": True},
     "DKMv3": {"config": match_dense.confs["dkm"], "dense": True},
+    "gluestick": {"config": match_dense.confs["gluestick"], "dense": True},
+    "sold2": {"config": match_dense.confs["sold2"], "dense": True},
 }

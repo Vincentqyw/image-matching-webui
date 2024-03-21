@@ -40,7 +40,7 @@ def ui_change_imagebox(choice):
     """
     return {
         "value": None,  # The updated value of the image box
-        "sources": [choice],  # The list of image sources to be displayed
+        "source": choice,  # The list of image sources to be displayed
         "__type__": "update",  # The type of update for the image box
     }
 
