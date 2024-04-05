@@ -21,5 +21,3 @@ loguru
 gradio==3.50.2
 gradio_client==0.6.1
 e2cnn
-pytorch-lightning
-torchmetrics
