@@ -324,7 +324,7 @@ def run(config):
                 outputs=[output_wrapped, geometry_result],
             )
 
-    app.queue().launch(share=False)
+    app.queue().launch(server_name='0.0.0.0', share=False)
 
 
 if __name__ == "__main__":
