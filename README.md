@@ -18,7 +18,9 @@ Here is a demo of the tool:
 https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c3484d1b-cc00-4fdc-9b31-e5b7af07ecd9
 
 The tool currently supports various popular image matching algorithms, namely:
+- [x] [RoMa](https://github.com/Vincentqyw/RoMa), CVPR 2024
 - [x] [DeDoDe](https://github.com/Parskatt/DeDoDe), 3DV 2024
+- [ ] [GIM](https://github.com/xuelunshen/gim), ICLR 2024
 - [x] [LightGlue](https://github.com/cvg/LightGlue), ICCV 2023
 - [x] [DarkFeat](https://github.com/THU-LYJ-Lab/DarkFeat), AAAI 2023
 - [ ] [ASTR](https://github.com/ASTR2023/ASTR), CVPR 2023
@@ -29,7 +31,6 @@ The tool currently supports various popular image matching algorithms, namely:
 - [x] [SOLD2](https://github.com/cvg/SOLD2), CVPR 2021
 - [ ] [LineTR](https://github.com/yosungho/LineTR), RA-L 2021
 - [x] [DKM](https://github.com/Parskatt/DKM), CVPR 2023
-- [x] [RoMa](https://github.com/Vincentqyw/RoMa), Arxiv 2023
 - [ ] [NCMNet](https://github.com/xinliu29/NCMNet), CVPR 2023
 - [x] [TopicFM](https://github.com/Vincentqyw/TopicFM), AAAI 2023
 - [x] [AspanFormer](https://github.com/Vincentqyw/ml-aspanformer), ECCV 2022
@@ -63,6 +64,13 @@ git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
 conda env create -f environment.yaml
 conda activate imw
+```
+
+or using docker:
+
+``` bash
+docker pull vincentqin/image-matching-webui:latest
+docker run -it -p 7860:7860 vincentqin/image-matching-webui:latest python app.py --server_name "0.0.0.0" --server_port=7860
 ```
  
 ### Run demo
