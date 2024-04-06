@@ -79,7 +79,7 @@ def ui_reset_state(*args):
 
 
 # "footer {visibility: hidden}"
-def run(config):
+def run(server_name="127.0.0.1", server_port=7860):
     """
     Runs the application.
 
@@ -265,6 +265,7 @@ def run(config):
                 inputs=match_image_src,
                 outputs=input_image0,
             )
+
             match_image_src.change(
                 fn=ui_change_imagebox,
                 inputs=match_image_src,
@@ -324,18 +325,25 @@ def run(config):
                 outputs=[output_wrapped, geometry_result],
             )
 
-    app.queue().launch(server_name='0.0.0.0', share=False)
+    app.queue().launch(
+        server_name=server_name, server_port=server_port, share=False
+    )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--config_path",
+        "--server_name",
         type=str,
-        default="config.yaml",
-        help="configuration file path",
+        default="127.0.0.1",
+        help="server name",
     )
+    parser.add_argument(
+        "--server_port",
+        type=int,
+        default=7860,
+        help="server port",
+    )
+
     args = parser.parse_args()
-    # future: add config path
-    config = None
-    run(config)
+    run(args.server_name, args.server_port)
