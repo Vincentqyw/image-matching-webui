@@ -20,6 +20,7 @@ https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c34
 The tool currently supports various popular image matching algorithms, namely:
 - [x] [RoMa](https://github.com/Vincentqyw/RoMa), CVPR 2024
 - [x] [DeDoDe](https://github.com/Parskatt/DeDoDe), 3DV 2024
+- [ ] [Mickey](https://github.com/nianticlabs/mickey), CVPR 2024
 - [ ] [GIM](https://github.com/xuelunshen/gim), ICLR 2024
 - [x] [LightGlue](https://github.com/cvg/LightGlue), ICCV 2023
 - [x] [DarkFeat](https://github.com/THU-LYJ-Lab/DarkFeat), AAAI 2023
