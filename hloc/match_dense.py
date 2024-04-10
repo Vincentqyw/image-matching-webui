@@ -126,6 +126,23 @@ confs = {
             "dfactor": 8,
         },
     },
+    "mickey": {
+        "output": "matches-mickey",
+        "model": {
+            "name": "mickey",
+            "weights": "mickey.ckpt",
+            "max_keypoints": 2000,
+            "match_threshold": 0.2,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": False,
+            "resize_max": 1024,
+            "width": 320,
+            "height": 240,
+            "dfactor": 8,
+        },
+    },
     "roma": {
         "output": "matches-roma",
         "model": {
