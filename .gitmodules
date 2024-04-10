@@ -46,3 +46,6 @@
 [submodule "third_party/lanet"]
 	path = third_party/lanet
 	url = https://github.com/agipro/lanet.git
+[submodule "third_party/mickey"]
+	path = third_party/mickey
+	url = https://github.com/agipro/mickey.git

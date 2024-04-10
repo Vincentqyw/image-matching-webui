@@ -10,7 +10,7 @@ class LoFTR(BaseModel):
     default_conf = {
         "weights": "outdoor",
         "match_threshold": 0.2,
-        "max_num_matches": None,
+        "max_keypoints": 2000,
     }
     required_inputs = ["image0", "image1"]
 
@@ -36,7 +36,7 @@ class LoFTR(BaseModel):
 
         scores = pred["confidence"]
 
-        top_k = self.conf["max_num_matches"]
+        top_k = self.conf["max_keypoints"]
         if top_k is not None and len(scores) > top_k:
             keep = torch.argsort(scores, descending=True)[:top_k]
             pred["keypoints0"], pred["keypoints1"] = (
