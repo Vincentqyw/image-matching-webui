@@ -31,9 +31,7 @@ class Mickey(BaseModel):
         "image0",
         "image1",
     ]
-    weight_urls = (
-        "https://storage.googleapis.com/niantic-lon-static/research/mickey/assets/mickey_weights.zip",
-    )
+    weight_urls = "https://storage.googleapis.com/niantic-lon-static/research/mickey/assets/mickey_weights.zip"
 
     # Initialize the line matcher
     def _init(self, conf):
@@ -42,19 +40,20 @@ class Mickey(BaseModel):
         config_path = model_path.parent / self.conf["config_path"]
         # Download the model.
         if not model_path.exists():
-            model_path.parent.mkdir(exist_ok=True, parent=True)
+            model_path.parent.mkdir(exist_ok=True, parents=True)
             link = self.weight_urls
-            cmd = ["wget", link, "-O", str(model_path)]
-            logger.info(f"Downloading the Mickey model with {cmd}.")
-            subprocess.run(cmd, check=True)
-            cmd = ["unzip", "-d", str(model_path.parent), str(zip_path)]
+            if not zip_path.exists():
+                cmd = ["wget", link, "-O", str(zip_path)]
+                logger.info(f"Downloading the Mickey model with {cmd}.")
+                subprocess.run(cmd, check=True)
+            cmd = ["unzip", "-d", str(model_path.parent.parent), str(zip_path)]
             logger.info(f"Running {cmd}.")
             subprocess.run(cmd, check=True)
 
         logger.info(f"Loading mickey model...")
         cfg.merge_from_file(config_path)
-        self.net = build_model(cfg, checkpoint=args.checkpoint)
-        logger.info(f"Load Roma model done.")
+        self.net = build_model(cfg, checkpoint=model_path)
+        logger.info(f"Load Mickey model done.")
 
     def _forward(self, data):
         # data['K_color0'] = torch.from_numpy(K['im0.jpg']).unsqueeze(0).to(device)
