@@ -2,9 +2,10 @@ import os
 import random
 import numpy as np
 import torch
-from itertools import combinations
 import cv2
 import gradio as gr
+from pathlib import Path
+from itertools import combinations
 from hloc import matchers, extractors
 from hloc.utils.base_model import dynamic_load
 from hloc import match_dense, match_features, extract_features
@@ -62,8 +63,8 @@ def gen_examples():
         return [pairs[i] for i in selected]
 
     # image pair path
-    path = "datasets/sacre_coeur/mapping"
-    pairs = gen_images_pairs(path, len(example_matchers))
+    path = Path(__file__).parent.parent / "datasets/sacre_coeur/mapping"
+    pairs = gen_images_pairs(str(path), len(example_matchers))
     match_setting_threshold = DEFAULT_SETTING_THRESHOLD
     match_setting_max_features = DEFAULT_SETTING_MAX_FEATURES
     detect_keypoints_threshold = DEFAULT_DEFAULT_KEYPOINT_THRESHOLD
