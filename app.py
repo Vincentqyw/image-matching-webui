@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 import gradio as gr
 from common.utils import (
     matcher_zoo,
@@ -90,8 +91,18 @@ def run(server_name="127.0.0.1", server_port=7860):
         None
     """
     with gr.Blocks(css="style.css") as app:
-        gr.Markdown(DESCRIPTION)
-
+        # gr.Markdown(DESCRIPTION)
+        with gr.Row():
+            with gr.Column(scale=1):
+                gr.Image(
+                    str(Path(__file__).parent / "assets/logo.webp"),
+                    elem_id="logo-img",
+                    show_label=False,
+                    show_share_button=False,
+                    show_download_button=False,
+                )
+            with gr.Column(scale=3):
+                gr.Markdown(DESCRIPTION)
         with gr.Row(equal_height=False):
             with gr.Column():
                 with gr.Row():
