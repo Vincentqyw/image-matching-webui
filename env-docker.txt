@@ -1,8 +1,8 @@
 e2cnn==0.2.3
 einops==0.6.1
 gdown==4.7.1
-gradio==4.25.0
-gradio_client==0.15.0
+gradio==3.41.2
+gradio_client==0.5.0
 h5py==3.9.0
 imageio==2.31.1
 Jinja2==3.1.2

@@ -6,7 +6,7 @@ import cv2
 import gradio as gr
 from pathlib import Path
 from itertools import combinations
-from hloc import matchers, extractors
+from hloc import matchers, extractors, logger
 from hloc.utils.base_model import dynamic_load
 from hloc import match_dense, match_features, extract_features
 from hloc.utils.viz import add_text, plot_keypoints
@@ -25,7 +25,7 @@ DEFAULT_RANSAC_MAX_ITER = 10000
 DEFAULT_MIN_NUM_MATCHES = 4
 DEFAULT_MATCHING_THRESHOLD = 0.2
 DEFAULT_SETTING_GEOMETRY = "Homography"
-
+GRADIO_VERSION = gr.__version__.split('.')[0]
 
 def get_model(match_conf):
     Model = dynamic_load(matchers, match_conf["model"]["name"])
@@ -37,7 +37,6 @@ def get_feature_model(conf):
     Model = dynamic_load(extractors, conf["model"]["name"])
     model = Model(conf["model"]).eval().to(device)
     return model
-
 
 def gen_examples():
     random.seed(1)
@@ -188,14 +187,17 @@ def compute_geom(
         )
         if H is not None:
             geo_info["Homography"] = H.tolist()
-            _, H1, H2 = cv2.stereoRectifyUncalibrated(
-                mkpts0.reshape(-1, 2),
-                mkpts1.reshape(-1, 2),
-                F,
-                imgSize=(w1, h1),
-            )
-            geo_info["H1"] = H1.tolist()
-            geo_info["H2"] = H2.tolist()
+            try:
+                _, H1, H2 = cv2.stereoRectifyUncalibrated(
+                    mkpts0.reshape(-1, 2),
+                    mkpts1.reshape(-1, 2),
+                    F,
+                    imgSize=(w1, h1),
+                )
+                geo_info["H1"] = H1.tolist()
+                geo_info["H2"] = H2.tolist()
+            except cv2.error as e:
+                logger.error(f"e, skip")
         return geo_info
     else:
         return {}
@@ -458,6 +460,7 @@ matcher_zoo = {
     #     'config': match_dense.confs['dedode_sparse'],
     #     'dense': True  # dense mode, we need 2 images
     # },
+    "roma": {"config": match_dense.confs["roma"], "dense": True},
     "loftr": {"config": match_dense.confs["loftr"], "dense": True},
     # "loftr-quadtree": {"config": match_dense.confs["loftr-quadtree"], "dense": True},
     "topicfm": {"config": match_dense.confs["topicfm"], "dense": True},
@@ -557,8 +560,7 @@ matcher_zoo = {
         "config_feature": extract_features.confs["sift"],
         "dense": False,
     },
-    "roma": {"config": match_dense.confs["roma"], "dense": True},
-    "DKMv3": {"config": match_dense.confs["dkm"], "dense": True},
     "gluestick": {"config": match_dense.confs["gluestick"], "dense": True},
     "sold2": {"config": match_dense.confs["sold2"], "dense": True},
+    # "DKMv3": {"config": match_dense.confs["dkm"], "dense": True},
 }
