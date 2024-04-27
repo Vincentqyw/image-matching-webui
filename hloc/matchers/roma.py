@@ -6,13 +6,12 @@ from PIL import Image
 from ..utils.base_model import BaseModel
 from .. import logger
 
-roma_path = Path(__file__).parent / "../../third_party/Roma"
+roma_path = Path(__file__).parent / "../../third_party/RoMa"
 sys.path.append(str(roma_path))
 
 from roma.models.model_zoo.roma_models import roma_model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 class Roma(BaseModel):
     default_conf = {
@@ -64,6 +63,8 @@ class Roma(BaseModel):
             weights=weights,
             dinov2_weights=dinov2_weights,
             device=device,
+            #temp fix issue: https://github.com/Parskatt/RoMa/issues/26
+            amp_dtype=torch.float32,
         )
         logger.info(f"Load Roma model done.")
 

@@ -46,3 +46,6 @@
 [submodule "third_party/mickey"]
 	path = third_party/mickey
 	url = https://github.com/agipro/mickey.git
+[submodule "third_party/RoMa"]
+	path = third_party/RoMa
+	url = https://github.com/Parskatt/RoMa.git
