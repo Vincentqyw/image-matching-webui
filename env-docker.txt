@@ -27,5 +27,6 @@ seaborn==0.12.2
 shapely==2.0.1
 tensorboardX==2.6.1
 torchmetrics==0.6.0
+torchvision==0.17.1
 tqdm==4.65.0
 yacs==0.1.8
