@@ -1,5 +1,7 @@
 import argparse
 from pathlib import Path
+import numpy as np
+from typing import Dict, Any, Optional, Tuple, List, Union
 import gradio as gr
 from common.utils import (
     matcher_zoo,
@@ -56,36 +58,59 @@ def ui_change_imagebox(choice):
         }
 
 
-def ui_reset_state(*args):
+def ui_reset_state(
+    *args: Any,
+) -> Tuple[
+    Optional[np.ndarray],
+    Optional[np.ndarray],
+    float,
+    int,
+    float,
+    str,
+    Dict[str, Any],
+    Dict[str, Any],
+    str,
+    Optional[np.ndarray],
+    Optional[np.ndarray],
+    Optional[np.ndarray],
+    Dict[str, Any],
+    Dict[str, Any],
+    Optional[np.ndarray],
+    Dict[str, Any],
+    str,
+    int,
+    float,
+    int,
+]:
     """
     Reset the state of the UI.
 
     Returns:
         tuple: A tuple containing the initial values for the UI state.
     """
-    key = list(matcher_zoo.keys())[0]  # Get the first key from matcher_zoo
+    key: str = list(matcher_zoo.keys())[0]  # Get the first key from matcher_zoo
     return (
-        None,  # image0
-        None,  # image1
-        DEFAULT_MATCHING_THRESHOLD,  # matching_threshold
-        DEFAULT_SETTING_MAX_FEATURES,  # max_features
-        DEFAULT_DEFAULT_KEYPOINT_THRESHOLD,  # keypoint_threshold
-        key,  # matcher
-        ui_change_imagebox("upload"),  # input image0
-        ui_change_imagebox("upload"),  # input image1
-        "upload",  # match_image_src
-        None,  # keypoints
-        None,  # raw matches
-        None,  # ransac matches
-        {},  # matches result info
-        {},  # matcher config
-        None,  # warped imageInstance of 'Radio' has no 'change' member
-        {},  # geometry result
-        DEFAULT_RANSAC_METHOD,  # ransac_method
-        DEFAULT_RANSAC_REPROJ_THRESHOLD,  # ransac_reproj_threshold
-        DEFAULT_RANSAC_CONFIDENCE,  # ransac_confidence
-        DEFAULT_RANSAC_MAX_ITER,  # ransac_max_iter
-        DEFAULT_SETTING_GEOMETRY,  # geometry
+        None,  # image0: Optional[np.ndarray]
+        None,  # image1: Optional[np.ndarray]
+        DEFAULT_MATCHING_THRESHOLD,  # matching_threshold: float
+        DEFAULT_SETTING_MAX_FEATURES,  # max_features: int
+        DEFAULT_DEFAULT_KEYPOINT_THRESHOLD,  # keypoint_threshold: float
+        key,  # matcher: str
+        ui_change_imagebox("upload"),  # input image0: Dict[str, Any]
+        ui_change_imagebox("upload"),  # input image1: Dict[str, Any]
+        "upload",  # match_image_src: str
+        None,  # keypoints: Optional[np.ndarray]
+        None,  # raw matches: Optional[np.ndarray]
+        None,  # ransac matches: Optional[np.ndarray]
+        {},  # matches result info: Dict[str, Any]
+        {},  # matcher config: Dict[str, Any]
+        None,  # warped image: Optional[np.ndarray]
+        {},  # geometry result: Dict[str, Any]
+        DEFAULT_RANSAC_METHOD,  # ransac_method: str
+        DEFAULT_RANSAC_REPROJ_THRESHOLD,  # ransac_reproj_threshold: float
+        DEFAULT_RANSAC_CONFIDENCE,  # ransac_confidence: float
+        DEFAULT_RANSAC_MAX_ITER,  # ransac_max_iter: int
+        DEFAULT_SETTING_GEOMETRY,  # geometry: str
     )
 
 
@@ -226,7 +251,8 @@ def run(server_name="0.0.0.0", server_port=7860):
                                 label="Reconstruct Geometry",
                                 value=DEFAULT_SETTING_GEOMETRY,
                             )
-                # collect the inputs
+
+                # collect inputs
                 inputs = [
                     input_image0,
                     input_image1,
@@ -360,7 +386,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--server_name",
         type=str,
-        default="127.0.0.1",
+        default="0.0.0.0",
         help="server name",
     )
     parser.add_argument(

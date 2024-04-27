@@ -5,6 +5,7 @@ import torch
 import cv2
 import gradio as gr
 from pathlib import Path
+from typing import Dict, Any, Optional, Tuple, List, Union
 from itertools import combinations
 from hloc import matchers, extractors, logger
 from hloc.utils.base_model import dynamic_load
@@ -25,18 +26,38 @@ DEFAULT_RANSAC_MAX_ITER = 10000
 DEFAULT_MIN_NUM_MATCHES = 4
 DEFAULT_MATCHING_THRESHOLD = 0.2
 DEFAULT_SETTING_GEOMETRY = "Homography"
-GRADIO_VERSION = gr.__version__.split('.')[0]
+GRADIO_VERSION = gr.__version__.split(".")[0]
 
-def get_model(match_conf):
+
+def get_model(match_conf: Dict[str, Any]):
+    """
+    Load a matcher model from the provided configuration.
+
+    Args:
+        match_conf: A dictionary containing the model configuration.
+
+    Returns:
+        A matcher model instance.
+    """
     Model = dynamic_load(matchers, match_conf["model"]["name"])
     model = Model(match_conf["model"]).eval().to(device)
     return model
 
 
-def get_feature_model(conf):
+def get_feature_model(conf: Dict[str, Dict[str, Any]]):
+    """
+    Load a feature extraction model from the provided configuration.
+
+    Args:
+        conf: A dictionary containing the model configuration.
+
+    Returns:
+        A feature extraction model instance.
+    """
     Model = dynamic_load(extractors, conf["model"]["name"])
     model = Model(conf["model"]).eval().to(device)
     return model
+
 
 def gen_examples():
     random.seed(1)
@@ -48,7 +69,7 @@ def gen_examples():
         "topicfm",
         "superpoint+superglue",
         "disk+dualsoftmax",
-        "lanet",
+        "roma",
     ]
 
     def gen_images_pairs(path: str, count: int = 5):
@@ -92,15 +113,30 @@ def gen_examples():
 
 
 def filter_matches(
-    pred,
-    ransac_method=DEFAULT_RANSAC_METHOD,
-    ransac_reproj_threshold=DEFAULT_RANSAC_REPROJ_THRESHOLD,
-    ransac_confidence=DEFAULT_RANSAC_CONFIDENCE,
-    ransac_max_iter=DEFAULT_RANSAC_MAX_ITER,
-):
-    mkpts0 = None
-    mkpts1 = None
-    feature_type = None
+    pred: Dict[str, Any],
+    ransac_method: str = DEFAULT_RANSAC_METHOD,
+    ransac_reproj_threshold: float = DEFAULT_RANSAC_REPROJ_THRESHOLD,
+    ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
+    ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
+) -> Dict[str, Any]:
+    """
+    Filter matches using RANSAC. If keypoints are available, filter by keypoints.
+    If lines are available, filter by lines. If both keypoints and lines are
+    available, filter by keypoints.
+
+    Args:
+        pred (Dict[str, Any]): dict of matches, including original keypoints.
+        ransac_method (str, optional): RANSAC method. Defaults to DEFAULT_RANSAC_METHOD.
+        ransac_reproj_threshold (float, optional): RANSAC reprojection threshold. Defaults to DEFAULT_RANSAC_REPROJ_THRESHOLD.
+        ransac_confidence (float, optional): RANSAC confidence. Defaults to DEFAULT_RANSAC_CONFIDENCE.
+        ransac_max_iter (int, optional): RANSAC maximum iterations. Defaults to DEFAULT_RANSAC_MAX_ITER.
+
+    Returns:
+        Dict[str, Any]: filtered matches.
+    """
+    mkpts0: Optional[np.ndarray] = None
+    mkpts1: Optional[np.ndarray] = None
+    feature_type: Optional[str] = None
     if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
         mkpts0 = pred["keypoints0_orig"]
         mkpts1 = pred["keypoints1_orig"]
@@ -142,20 +178,33 @@ def filter_matches(
 
 
 def compute_geom(
-    pred,
-    ransac_method=DEFAULT_RANSAC_METHOD,
-    ransac_reproj_threshold=DEFAULT_RANSAC_REPROJ_THRESHOLD,
-    ransac_confidence=DEFAULT_RANSAC_CONFIDENCE,
-    ransac_max_iter=DEFAULT_RANSAC_MAX_ITER,
-) -> dict:
-    mkpts0 = None
-    mkpts1 = None
+    pred: Dict[str, Any],
+    ransac_method: str = DEFAULT_RANSAC_METHOD,
+    ransac_reproj_threshold: float = DEFAULT_RANSAC_REPROJ_THRESHOLD,
+    ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
+    ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
+) -> Dict[str, List[float]]:
+    """
+    Compute geometric information of matches, including Fundamental matrix,
+    Homography matrix, and rectification matrices (if available).
+
+    Args:
+        pred (Dict[str, Any]): dict of matches, including original keypoints.
+        ransac_method (str, optional): RANSAC method. Defaults to DEFAULT_RANSAC_METHOD.
+        ransac_reproj_threshold (float, optional): RANSAC reprojection threshold. Defaults to DEFAULT_RANSAC_REPROJ_THRESHOLD.
+        ransac_confidence (float, optional): RANSAC confidence. Defaults to DEFAULT_RANSAC_CONFIDENCE.
+        ransac_max_iter (int, optional): RANSAC maximum iterations. Defaults to DEFAULT_RANSAC_MAX_ITER.
+
+    Returns:
+        Dict[str, List[float]]: geometric information in form of a dict.
+    """
+    mkpts0: Optional[np.ndarray] = None
+    mkpts1: Optional[np.ndarray] = None
 
     if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
         mkpts0 = pred["keypoints0_orig"]
         mkpts1 = pred["keypoints1_orig"]
-
-    if (
+    elif (
         "line_keypoints0_orig" in pred.keys()
         and "line_keypoints1_orig" in pred.keys()
     ):
@@ -166,7 +215,7 @@ def compute_geom(
         if len(mkpts0) < 2 * DEFAULT_MIN_NUM_MATCHES:
             return {}
         h1, w1, _ = pred["image0_orig"].shape
-        geo_info = {}
+        geo_info: Dict[str, List[float]] = {}
         F, inliers = cv2.findFundamentalMat(
             mkpts0,
             mkpts1,
@@ -197,22 +246,39 @@ def compute_geom(
                 geo_info["H1"] = H1.tolist()
                 geo_info["H2"] = H2.tolist()
             except cv2.error as e:
-                logger.error(f"e, skip")
+                logger.error(f"{e}, skip")
         return geo_info
     else:
         return {}
 
 
-def wrap_images(img0, img1, geo_info, geom_type):
+def wrap_images(
+    img0: np.ndarray,
+    img1: np.ndarray,
+    geo_info: Optional[Dict[str, List[float]]],
+    geom_type: str,
+) -> Tuple[Optional[str], Optional[Dict[str, List[float]]]]:
+    """
+    Wraps the images based on the geometric transformation used to align them.
+
+    Args:
+        img0: numpy array representing the first image.
+        img1: numpy array representing the second image.
+        geo_info: dictionary containing the geometric transformation information.
+        geom_type: type of geometric transformation used to align the images.
+
+    Returns:
+        A tuple containing a base64 encoded image string and a dictionary with the transformation matrix.
+    """
     h1, w1, _ = img0.shape
     h2, w2, _ = img1.shape
-    result_matrix = None
+    result_matrix: Optional[np.ndarray] = None
     if geo_info is not None and len(geo_info) != 0:
         rectified_image0 = img0
         rectified_image1 = None
         H = np.array(geo_info["Homography"])
         F = np.array(geo_info["Fundamental"])
-        title = []
+        title: List[str] = []
         if geom_type == "Homography":
             rectified_image1 = cv2.warpPerspective(
                 img1, H, (img0.shape[1], img0.shape[0])
@@ -242,15 +308,32 @@ def wrap_images(img0, img1, geo_info, geom_type):
         return None, None
 
 
-def change_estimate_geom(input_image0, input_image1, matches_info, choice):
+def change_estimate_geom(
+    input_image0: np.ndarray,
+    input_image1: np.ndarray,
+    matches_info: Dict[str, Any],
+    choice: str,
+) -> Tuple[Optional[np.ndarray], Optional[Dict[str, Any]]]:
+    """
+    Changes the estimate of the geometric transformation used to align the images.
+
+    Args:
+        input_image0: First input image.
+        input_image1: Second input image.
+        matches_info: Dictionary containing information about the matches.
+        choice: Type of geometric transformation to use ('Homography' or 'Fundamental') or 'No' to disable.
+
+    Returns:
+        A tuple containing the updated images and the updated matches info.
+    """
     if (
         matches_info is None
         or len(matches_info) < 1
         or "geom_info" not in matches_info.keys()
     ):
         return None, None
-    geom_info = matches_info["geom_info"]
-    wrapped_images = None
+    geom_info: Dict[str, Any] = matches_info["geom_info"]
+    wrapped_images: Optional[np.ndarray] = None
     if choice != "No":
         wrapped_images, _ = wrap_images(
             input_image0, input_image1, geom_info, choice
@@ -260,16 +343,34 @@ def change_estimate_geom(input_image0, input_image1, matches_info, choice):
         return None, None
 
 
-def display_matches(pred: dict, titles=[], dpi=300):
+def display_matches(
+    pred: Dict[str, np.ndarray], titles: List[str] = [], dpi: int = 300
+) -> Tuple[np.ndarray, int]:
+    """
+    Displays the matches between two images.
+
+    Args:
+        pred: Dictionary containing the original images and the matches.
+        titles: Optional titles for the plot.
+        dpi: Resolution of the plot.
+
+    Returns:
+        The resulting concatenated plot and the number of inliers.
+    """
     img0 = pred["image0_orig"]
     img1 = pred["image1_orig"]
 
     num_inliers = 0
-    if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
+    if (
+        "keypoints0_orig" in pred
+        and "keypoints1_orig" in pred
+        and pred["keypoints0_orig"] is not None
+        and pred["keypoints1_orig"] is not None
+    ):
         mkpts0 = pred["keypoints0_orig"]
         mkpts1 = pred["keypoints1_orig"]
         num_inliers = len(mkpts0)
-        if "mconf" in pred.keys():
+        if "mconf" in pred:
             mconf = pred["mconf"]
         else:
             mconf = np.ones(len(mkpts0))
@@ -283,7 +384,12 @@ def display_matches(pred: dict, titles=[], dpi=300):
             titles=titles,
         )
         fig = fig_mkpts
-    if "line0_orig" in pred.keys() and "line1_orig" in pred.keys():
+    if (
+        "line0_orig" in pred
+        and "line1_orig" in pred
+        and pred["line0_orig"] is not None
+        and pred["line1_orig"] is not None
+    ):
         # lines
         mtlines0 = pred["line0_orig"]
         mtlines1 = pred["line1_orig"]
@@ -297,12 +403,12 @@ def display_matches(pred: dict, titles=[], dpi=300):
         fig_lines = fig2im(fig_lines)
 
         # keypoints
-        mkpts0 = pred["line_keypoints0_orig"]
-        mkpts1 = pred["line_keypoints1_orig"]
+        mkpts0 = pred.get("line_keypoints0_orig")
+        mkpts1 = pred.get("line_keypoints1_orig")
 
         if mkpts0 is not None and mkpts1 is not None:
             num_inliers = len(mkpts0)
-            if "mconf" in pred.keys():
+            if "mconf" in pred:
                 mconf = pred["mconf"]
             else:
                 mconf = np.ones(len(mkpts0))
@@ -317,26 +423,54 @@ def display_matches(pred: dict, titles=[], dpi=300):
 
 
 def run_matching(
-    image0,
-    image1,
-    match_threshold,
-    extract_max_keypoints,
-    keypoint_threshold,
-    key,
-    ransac_method=DEFAULT_RANSAC_METHOD,
-    ransac_reproj_threshold=DEFAULT_RANSAC_REPROJ_THRESHOLD,
-    ransac_confidence=DEFAULT_RANSAC_CONFIDENCE,
-    ransac_max_iter=DEFAULT_RANSAC_MAX_ITER,
-    choice_estimate_geom=DEFAULT_SETTING_GEOMETRY,
-):
+    image0: np.ndarray,
+    image1: np.ndarray,
+    match_threshold: float,
+    extract_max_keypoints: int,
+    keypoint_threshold: float,
+    key: str,
+    ransac_method: str = DEFAULT_RANSAC_METHOD,
+    ransac_reproj_threshold: int = DEFAULT_RANSAC_REPROJ_THRESHOLD,
+    ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
+    ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
+    choice_estimate_geom: str = DEFAULT_SETTING_GEOMETRY,
+) -> Tuple[
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    Dict[str, int],
+    Dict[str, Dict[str, Any]],
+    Dict[str, Dict[str, float]],
+    np.ndarray,
+]:
+    """Match two images using the given parameters.
+
+    Args:
+        image0 (np.ndarray): RGB image 0.
+        image1 (np.ndarray): RGB image 1.
+        match_threshold (float): match threshold.
+        extract_max_keypoints (int): number of keypoints to extract.
+        keypoint_threshold (float): keypoint threshold.
+        key (str): key of the model to use.
+        ransac_method (str, optional): RANSAC method to use.
+        ransac_reproj_threshold (int, optional): RANSAC reprojection threshold.
+        ransac_confidence (float, optional): RANSAC confidence level.
+        ransac_max_iter (int, optional): RANSAC maximum number of iterations.
+        choice_estimate_geom (str, optional): setting of geometry estimation.
+
+    Returns:
+        tuple:
+            - output_keypoints (np.ndarray): image with keypoints.
+            - output_matches_raw (np.ndarray): image with raw matches.
+            - output_matches_ransac (np.ndarray): image with RANSAC matches.
+            - num_matches (Dict[str, int]): number of raw and RANSAC matches.
+            - configs (Dict[str, Dict[str, Any]]): match and feature extraction configs.
+            - geom_info (Dict[str, Dict[str, float]]): geometry information.
+            - output_wrapped (np.ndarray): wrapped images.
+    """
     # image0 and image1 is RGB mode
     if image0 is None or image1 is None:
         raise gr.Error("Error: No images found! Please upload two images.")
-    if isinstance(image0, dict) and "composite" in image0.keys():
-        image0 = image0['composite']
-    if isinstance(image1, dict) and "composite" in image1.keys():
-        image1 = image1['composite']
-
     # init output
     output_keypoints = None
     output_matches_raw = None
@@ -462,7 +596,6 @@ matcher_zoo = {
     # },
     "roma": {"config": match_dense.confs["roma"], "dense": True},
     "loftr": {"config": match_dense.confs["loftr"], "dense": True},
-    # "loftr-quadtree": {"config": match_dense.confs["loftr-quadtree"], "dense": True},
     "topicfm": {"config": match_dense.confs["topicfm"], "dense": True},
     "aspanformer": {"config": match_dense.confs["aspanformer"], "dense": True},
     "dedode": {
