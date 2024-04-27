@@ -7,6 +7,7 @@ from common.utils import (
     change_estimate_geom,
     run_matching,
     gen_examples,
+    GRADIO_VERSION,
     DEFAULT_RANSAC_METHOD,
     DEFAULT_SETTING_GEOMETRY,
     DEFAULT_RANSAC_REPROJ_THRESHOLD,
@@ -20,10 +21,10 @@ from common.utils import (
 DESCRIPTION = """
 # Image Matching WebUI
 This Space demonstrates [Image Matching WebUI](https://github.com/Vincentqyw/image-matching-webui) by vincent qin. Feel free to play with it, or duplicate to run image matching without a queue!
-
+<br/>
 🔎 For more details about supported local features and matchers, please refer to https://github.com/Vincentqyw/image-matching-webui
 
-🚀 All algorithms run on CPU for inference on HF, causing slow speeds and high latency. For faster inference, please download the [source code](https://github.com/Vincentqyw/image-matching-webui) for local deployment or check [openxlab space](https://openxlab.org.cn/apps/detail/Realcat/image-matching-webui) and [direct URL](https://g-app-center-083997-7409-n9elr1.openxlab.space) 
+🚀 All algorithms run on CPU for inference, causing slow speeds and high latency. For faster inference, please download the [source code](https://github.com/Vincentqyw/image-matching-webui) for local deployment.
 
 🐛 Your feedback is valuable to me. Please do not hesitate to report any bugs [here](https://github.com/Vincentqyw/image-matching-webui/issues).
 """
@@ -39,11 +40,20 @@ def ui_change_imagebox(choice):
     Returns:
         dict: A dictionary containing the updated value, sources, and type for the image box.
     """
-    return {
+    ret_dict = {
         "value": None,  # The updated value of the image box
-        "source": choice,  # The list of image sources to be displayed
         "__type__": "update",  # The type of update for the image box
     }
+    if GRADIO_VERSION > "3":
+        return {
+            **ret_dict,
+            "sources": choice,  # The list of image sources to be displayed
+        }
+    else:
+        return {
+            **ret_dict,
+            "source": choice,  # The list of image sources to be displayed
+        }
 
 
 def ui_reset_state(*args):
@@ -80,7 +90,7 @@ def ui_reset_state(*args):
 
 
 # "footer {visibility: hidden}"
-def run(server_name="127.0.0.1", server_port=7860):
+def run(server_name="0.0.0.0", server_port=7860):
     """
     Runs the application.
 
@@ -90,7 +100,7 @@ def run(server_name="127.0.0.1", server_port=7860):
     Returns:
         None
     """
-    with gr.Blocks(css="style.css") as app:
+    with gr.Blocks() as app:
         # gr.Markdown(DESCRIPTION)
         with gr.Row():
             with gr.Column(scale=1):
@@ -113,7 +123,11 @@ def run(server_name="127.0.0.1", server_port=7860):
                         interactive=True,
                     )
                     match_image_src = gr.Radio(
-                        ["upload", "webcam", "clipboard"],
+                        (
+                            ["upload", "webcam", "clipboard"]
+                            if GRADIO_VERSION > "3"
+                            else ["upload", "webcam", "canvas"]
+                        ),
                         label="Image Source",
                         value="upload",
                     )
@@ -122,12 +136,14 @@ def run(server_name="127.0.0.1", server_port=7860):
                         label="Image 0",
                         type="numpy",
                         image_mode="RGB",
+                        height=300 if GRADIO_VERSION > "3" else None,
                         interactive=True,
                     )
                     input_image1 = gr.Image(
                         label="Image 1",
                         type="numpy",
                         image_mode="RGB",
+                        height=300 if GRADIO_VERSION > "3" else None,
                         interactive=True,
                     )
 
@@ -276,7 +292,6 @@ def run(server_name="127.0.0.1", server_port=7860):
                 inputs=match_image_src,
                 outputs=input_image0,
             )
-
             match_image_src.change(
                 fn=ui_change_imagebox,
                 inputs=match_image_src,
@@ -335,7 +350,6 @@ def run(server_name="127.0.0.1", server_port=7860):
                 ],
                 outputs=[output_wrapped, geometry_result],
             )
-
     app.queue().launch(
         server_name=server_name, server_port=server_port, share=False
     )
