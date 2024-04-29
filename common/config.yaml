@@ -1,0 +1,108 @@
+server:
+  name: "0.0.0.0"
+  port: 7860
+
+defaults:
+  setting_threshold: 0.1
+  max_keypoints: 2000
+  keypoint_threshold: 0.05
+  enable_ransac: true
+  ransac_method: USAC_MAGSAC
+  ransac_reproj_threshold: 8
+  ransac_confidence: 0.999
+  ransac_max_iter: 10000
+  ransac_num_samples: 4
+  match_threshold: 0.2
+  setting_geometry: Homography
+
+matcher_zoo:
+  roma:
+    matcher: roma
+    dense: true
+  loftr:
+    matcher: loftr
+    dense: true
+  topicfm:
+    matcher: topicfm
+    dense: true
+  aspanformer:
+    matcher: aspanformer
+    dense: true
+  dedode:
+    matcher: Dual-Softmax
+    feature: dedode
+    dense: false
+  superpoint+superglue:
+    matcher: superglue
+    feature: superpoint_max
+    dense: false
+  superpoint+lightglue:
+    matcher: superpoint-lightglue
+    feature: superpoint_max
+    dense: false
+  disk:
+    matcher: NN-mutual
+    feature: disk
+    dense: false
+  disk+dualsoftmax:
+    matcher: Dual-Softmax
+    feature: disk
+    dense: false
+  superpoint+dualsoftmax:
+    matcher: Dual-Softmax
+    feature: superpoint_max
+    dense: false
+  disk+lightglue:
+    matcher: disk-lightglue
+    feature: disk
+    dense: false
+  superpoint+mnn:
+    matcher: NN-mutual
+    feature: superpoint_max
+    dense: false
+  sift+sgmnet:
+    matcher: sgmnet
+    feature: sift
+    dense: false
+  sosnet:
+    matcher: NN-mutual
+    feature: sosnet
+    dense: false
+  hardnet:
+    matcher: NN-mutual
+    feature: hardnet
+    dense: false
+  d2net:
+    matcher: NN-mutual
+    feature: d2net-ss
+    dense: false
+  rord:
+    matcher: NN-mutual
+    feature: rord
+    dense: false
+  alike:
+    matcher: NN-mutual
+    feature: alike
+    dense: false
+  lanet:
+    matcher: NN-mutual
+    feature: lanet
+    dense: false
+  r2d2:
+    matcher: NN-mutual
+    feature: r2d2
+    dense: false
+  darkfeat:
+    matcher: NN-mutual
+    feature: darkfeat
+    dense: false
+  sift:
+    matcher: NN-mutual
+    feature: sift
+    dense: false
+  gluestick:
+    matcher: gluestick
+    dense: true
+  sold2:
+    matcher: sold2
+    dense: true
