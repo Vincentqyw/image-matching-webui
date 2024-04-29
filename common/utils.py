@@ -1,20 +1,27 @@
 import os
+import cv2
+import torch
 import random
 import numpy as np
-import torch
-import cv2
 import gradio as gr
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple, List, Union
 from itertools import combinations
+from typing import Callable, Dict, Any, Optional, Tuple, List, Union
 from hloc import matchers, extractors, logger
 from hloc.utils.base_model import dynamic_load
 from hloc import match_dense, match_features, extract_features
 from hloc.utils.viz import add_text, plot_keypoints
-from .viz import draw_matches, fig2im, plot_images, plot_color_line_matches
+from .viz import (
+    draw_matches,
+    fig2im,
+    plot_images,
+    display_matches,
+    plot_color_line_matches,
+)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
+ROOT = Path(__file__).parent.parent
 DEFAULT_SETTING_THRESHOLD = 0.1
 DEFAULT_SETTING_MAX_FEATURES = 2000
 DEFAULT_DEFAULT_KEYPOINT_THRESHOLD = 0.01
@@ -27,6 +34,58 @@ DEFAULT_MIN_NUM_MATCHES = 4
 DEFAULT_MATCHING_THRESHOLD = 0.2
 DEFAULT_SETTING_GEOMETRY = "Homography"
 GRADIO_VERSION = gr.__version__.split(".")[0]
+MATCHER_ZOO = None
+
+
+def load_config(config_name: str) -> Dict[str, Any]:
+    """
+    Load a YAML configuration file.
+
+    Args:
+        config_name: The path to the YAML configuration file.
+
+    Returns:
+        The configuration dictionary, with string keys and arbitrary values.
+    """
+    import yaml
+
+    with open(config_name, "r") as stream:
+        try:
+            config: Dict[str, Any] = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            logger.error(exc)
+    return config
+
+
+def get_matcher_zoo(
+    matcher_zoo: Dict[str, Dict[str, Union[str, bool]]]
+) -> Dict[str, Dict[str, Union[Callable, bool]]]:
+    """
+    Restore matcher configurations from a dictionary.
+
+    Args:
+        matcher_zoo: A dictionary with the matcher configurations,
+            where the configuration is a dictionary as loaded from a YAML file.
+
+    Returns:
+        A dictionary with the matcher configurations, where the configuration is
+            a function or a function instead of a string.
+    """
+    matcher_zoo_restored = {}
+    for k, v in matcher_zoo.items():
+        dense = v["dense"]
+        if dense:
+            matcher_zoo_restored[k] = {
+                "matcher": match_dense.confs.get(v["matcher"]),
+                "dense": dense,
+            }
+        else:
+            matcher_zoo_restored[k] = {
+                "feature": extract_features.confs.get(v["feature"]),
+                "matcher": match_features.confs.get(v["matcher"]),
+                "dense": dense,
+            }
+    return matcher_zoo_restored
 
 
 def get_model(match_conf: Dict[str, Any]):
@@ -83,7 +142,7 @@ def gen_examples():
         return [pairs[i] for i in selected]
 
     # image pair path
-    path = Path(__file__).parent.parent / "datasets/sacre_coeur/mapping"
+    path = ROOT / "datasets/sacre_coeur/mapping"
     pairs = gen_images_pairs(str(path), len(example_matchers))
     match_setting_threshold = DEFAULT_SETTING_THRESHOLD
     match_setting_max_features = DEFAULT_SETTING_MAX_FEATURES
@@ -343,85 +402,6 @@ def change_estimate_geom(
         return None, None
 
 
-def display_matches(
-    pred: Dict[str, np.ndarray], titles: List[str] = [], dpi: int = 300
-) -> Tuple[np.ndarray, int]:
-    """
-    Displays the matches between two images.
-
-    Args:
-        pred: Dictionary containing the original images and the matches.
-        titles: Optional titles for the plot.
-        dpi: Resolution of the plot.
-
-    Returns:
-        The resulting concatenated plot and the number of inliers.
-    """
-    img0 = pred["image0_orig"]
-    img1 = pred["image1_orig"]
-
-    num_inliers = 0
-    if (
-        "keypoints0_orig" in pred
-        and "keypoints1_orig" in pred
-        and pred["keypoints0_orig"] is not None
-        and pred["keypoints1_orig"] is not None
-    ):
-        mkpts0 = pred["keypoints0_orig"]
-        mkpts1 = pred["keypoints1_orig"]
-        num_inliers = len(mkpts0)
-        if "mconf" in pred:
-            mconf = pred["mconf"]
-        else:
-            mconf = np.ones(len(mkpts0))
-        fig_mkpts = draw_matches(
-            mkpts0,
-            mkpts1,
-            img0,
-            img1,
-            mconf,
-            dpi=dpi,
-            titles=titles,
-        )
-        fig = fig_mkpts
-    if (
-        "line0_orig" in pred
-        and "line1_orig" in pred
-        and pred["line0_orig"] is not None
-        and pred["line1_orig"] is not None
-    ):
-        # lines
-        mtlines0 = pred["line0_orig"]
-        mtlines1 = pred["line1_orig"]
-        num_inliers = len(mtlines0)
-        fig_lines = plot_images(
-            [img0.squeeze(), img1.squeeze()],
-            ["Image 0 - matched lines", "Image 1 - matched lines"],
-            dpi=300,
-        )
-        fig_lines = plot_color_line_matches([mtlines0, mtlines1], lw=2)
-        fig_lines = fig2im(fig_lines)
-
-        # keypoints
-        mkpts0 = pred.get("line_keypoints0_orig")
-        mkpts1 = pred.get("line_keypoints1_orig")
-
-        if mkpts0 is not None and mkpts1 is not None:
-            num_inliers = len(mkpts0)
-            if "mconf" in pred:
-                mconf = pred["mconf"]
-            else:
-                mconf = np.ones(len(mkpts0))
-            fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
-            fig_lines = cv2.resize(
-                fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0])
-            )
-            fig = np.concatenate([fig_mkpts, fig_lines], axis=0)
-        else:
-            fig = fig_lines
-    return fig, num_inliers
-
-
 def run_matching(
     image0: np.ndarray,
     image1: np.ndarray,
@@ -434,6 +414,7 @@ def run_matching(
     ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
     ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
     choice_estimate_geom: str = DEFAULT_SETTING_GEOMETRY,
+    matcher_zoo: Dict[str, Any] = None,
 ) -> Tuple[
     np.ndarray,
     np.ndarray,
@@ -477,7 +458,7 @@ def run_matching(
     output_matches_ransac = None
 
     model = matcher_zoo[key]
-    match_conf = model["config"]
+    match_conf = model["matcher"]
     # update match config
     match_conf["model"]["match_threshold"] = match_threshold
     match_conf["model"]["max_keypoints"] = extract_max_keypoints
@@ -490,7 +471,7 @@ def run_matching(
         del matcher
         extract_conf = None
     else:
-        extract_conf = model["config_feature"]
+        extract_conf = model["feature"]
         # update extract config
         extract_conf["model"]["max_keypoints"] = extract_max_keypoints
         extract_conf["model"]["keypoint_threshold"] = keypoint_threshold
@@ -586,114 +567,4 @@ ransac_zoo = {
     "USAC_FAST": cv2.USAC_FAST,
     "USAC_ACCURATE": cv2.USAC_ACCURATE,
     "USAC_PARALLEL": cv2.USAC_PARALLEL,
-}
-
-# Matchers collections
-matcher_zoo = {
-    # 'dedode-sparse': {
-    #     'config': match_dense.confs['dedode_sparse'],
-    #     'dense': True  # dense mode, we need 2 images
-    # },
-    "roma": {"config": match_dense.confs["roma"], "dense": True},
-    "loftr": {"config": match_dense.confs["loftr"], "dense": True},
-    "topicfm": {"config": match_dense.confs["topicfm"], "dense": True},
-    "aspanformer": {"config": match_dense.confs["aspanformer"], "dense": True},
-    "dedode": {
-        "config": match_features.confs["Dual-Softmax"],
-        "config_feature": extract_features.confs["dedode"],
-        "dense": False,
-    },
-    "superpoint+superglue": {
-        "config": match_features.confs["superglue"],
-        "config_feature": extract_features.confs["superpoint_max"],
-        "dense": False,
-    },
-    "superpoint+lightglue": {
-        "config": match_features.confs["superpoint-lightglue"],
-        "config_feature": extract_features.confs["superpoint_max"],
-        "dense": False,
-    },
-    "disk": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["disk"],
-        "dense": False,
-    },
-    "disk+dualsoftmax": {
-        "config": match_features.confs["Dual-Softmax"],
-        "config_feature": extract_features.confs["disk"],
-        "dense": False,
-    },
-    "superpoint+dualsoftmax": {
-        "config": match_features.confs["Dual-Softmax"],
-        "config_feature": extract_features.confs["superpoint_max"],
-        "dense": False,
-    },
-    "disk+lightglue": {
-        "config": match_features.confs["disk-lightglue"],
-        "config_feature": extract_features.confs["disk"],
-        "dense": False,
-    },
-    "superpoint+mnn": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["superpoint_max"],
-        "dense": False,
-    },
-    "sift+sgmnet": {
-        "config": match_features.confs["sgmnet"],
-        "config_feature": extract_features.confs["sift"],
-        "dense": False,
-    },
-    "sosnet": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["sosnet"],
-        "dense": False,
-    },
-    "hardnet": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["hardnet"],
-        "dense": False,
-    },
-    "d2net": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["d2net-ss"],
-        "dense": False,
-    },
-    "rord": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["rord"],
-        "dense": False,
-    },
-    # "d2net-ms": {
-    #     "config": match_features.confs["NN-mutual"],
-    #     "config_feature": extract_features.confs["d2net-ms"],
-    #     "dense": False,
-    # },
-    "alike": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["alike"],
-        "dense": False,
-    },
-    "lanet": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["lanet"],
-        "dense": False,
-    },
-    "r2d2": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["r2d2"],
-        "dense": False,
-    },
-    "darkfeat": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["darkfeat"],
-        "dense": False,
-    },
-    "sift": {
-        "config": match_features.confs["NN-mutual"],
-        "config_feature": extract_features.confs["sift"],
-        "dense": False,
-    },
-    "gluestick": {"config": match_dense.confs["gluestick"], "dense": True},
-    "sold2": {"config": match_dense.confs["sold2"], "dense": True},
-    # "DKMv3": {"config": match_dense.confs["dkm"], "dense": True},
 }

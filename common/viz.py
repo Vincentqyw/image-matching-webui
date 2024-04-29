@@ -367,3 +367,82 @@ def draw_image_pairs(
         plt.close()
     else:
         return fig2im(fig)
+
+
+def display_matches(
+    pred: Dict[str, np.ndarray], titles: List[str] = [], dpi: int = 300
+) -> Tuple[np.ndarray, int]:
+    """
+    Displays the matches between two images.
+
+    Args:
+        pred: Dictionary containing the original images and the matches.
+        titles: Optional titles for the plot.
+        dpi: Resolution of the plot.
+
+    Returns:
+        The resulting concatenated plot and the number of inliers.
+    """
+    img0 = pred["image0_orig"]
+    img1 = pred["image1_orig"]
+
+    num_inliers = 0
+    if (
+        "keypoints0_orig" in pred
+        and "keypoints1_orig" in pred
+        and pred["keypoints0_orig"] is not None
+        and pred["keypoints1_orig"] is not None
+    ):
+        mkpts0 = pred["keypoints0_orig"]
+        mkpts1 = pred["keypoints1_orig"]
+        num_inliers = len(mkpts0)
+        if "mconf" in pred:
+            mconf = pred["mconf"]
+        else:
+            mconf = np.ones(len(mkpts0))
+        fig_mkpts = draw_matches(
+            mkpts0,
+            mkpts1,
+            img0,
+            img1,
+            mconf,
+            dpi=dpi,
+            titles=titles,
+        )
+        fig = fig_mkpts
+    if (
+        "line0_orig" in pred
+        and "line1_orig" in pred
+        and pred["line0_orig"] is not None
+        and pred["line1_orig"] is not None
+    ):
+        # lines
+        mtlines0 = pred["line0_orig"]
+        mtlines1 = pred["line1_orig"]
+        num_inliers = len(mtlines0)
+        fig_lines = plot_images(
+            [img0.squeeze(), img1.squeeze()],
+            ["Image 0 - matched lines", "Image 1 - matched lines"],
+            dpi=300,
+        )
+        fig_lines = plot_color_line_matches([mtlines0, mtlines1], lw=2)
+        fig_lines = fig2im(fig_lines)
+
+        # keypoints
+        mkpts0 = pred.get("line_keypoints0_orig")
+        mkpts1 = pred.get("line_keypoints1_orig")
+
+        if mkpts0 is not None and mkpts1 is not None:
+            num_inliers = len(mkpts0)
+            if "mconf" in pred:
+                mconf = pred["mconf"]
+            else:
+                mconf = np.ones(len(mkpts0))
+            fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
+            fig_lines = cv2.resize(
+                fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0])
+            )
+            fig = np.concatenate([fig_mkpts, fig_lines], axis=0)
+        else:
+            fig = fig_lines
+    return fig, num_inliers
