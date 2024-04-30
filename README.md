@@ -5,7 +5,7 @@
 
 <p align="center">
   <h1 align="center"><br><ins>$\color{red}{\textnormal{Image\ Matching\ WebUI}}$
-</ins><br>find matches between 2 images</h1> 
+</ins><br>Identify matching points between two images</h1> 
 </p>
 
 ## Description
@@ -13,7 +13,8 @@
 This simple tool efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
 **Note**: the images source can be either local images or webcam images.
 
-Try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'> <a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui">
+Try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a> 
+<a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui">
   <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/>
 </a>
 
@@ -59,7 +60,8 @@ The tool currently supports various popular image matching algorithms, namely:
 
 ### HuggingFace / Lightning AI
 
-Just try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'><a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui">
+Just try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a> 
+<a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui">
   <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/>
 </a>
 
@@ -73,7 +75,7 @@ conda env create -f environment.yaml
 conda activate imw
 ```
 
-or using docker:
+or using [docker](https://hub.docker.com/r/vincentqin/image-matching-webui):
 
 ``` bash
 docker pull vincentqin/image-matching-webui:latest
