@@ -28,6 +28,10 @@ matcher_zoo:
   aspanformer:
     matcher: aspanformer
     dense: true
+  xfeat:
+    matcher: NN-mutual
+    feature: xfeat
+    dense: false
   dedode:
     matcher: Dual-Softmax
     feature: dedode

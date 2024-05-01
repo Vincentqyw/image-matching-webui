@@ -23,6 +23,7 @@ Here is a demo of the tool:
 https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c3484d1b-cc00-4fdc-9b31-e5b7af07ecd9
 
 The tool currently supports various popular image matching algorithms, namely:
+- [x] [XFeat](https://github.com/verlab/accelerated_features), CVPR 2024
 - [x] [RoMa](https://github.com/Vincentqyw/RoMa), CVPR 2024
 - [x] [DeDoDe](https://github.com/Parskatt/DeDoDe), 3DV 2024
 - [ ] [Mickey](https://github.com/nianticlabs/mickey), CVPR 2024
@@ -92,7 +93,7 @@ then open http://localhost:7860 in your browser.
 
 ### Add your own feature / matcher
 
-I provide an example to add local feature in [hloc/extractors/example.py](hloc/extractors/example.py). Then add feature settings in `confs` in file [hloc/extract_features.py](hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in file [common/utils.py](common/utils.py).
+I provide an example to add local feature in [hloc/extractors/example.py](hloc/extractors/example.py). Then add feature settings in `confs` in file [hloc/extract_features.py](hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in file [common/config.yaml](common/config.yaml).
 
 ## Contributions welcome!
 
