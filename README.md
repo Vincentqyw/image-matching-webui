@@ -33,8 +33,9 @@ The tool currently supports various popular image matching algorithms, namely:
 - [ ] [ASTR](https://github.com/ASTR2023/ASTR), CVPR 2023
 - [ ] [SEM](https://github.com/SEM2023/SEM), CVPR 2023
 - [ ] [DeepLSD](https://github.com/cvg/DeepLSD), CVPR 2023
-- [x] [GlueStick](https://github.com/cvg/GlueStick), ArXiv 2023
+- [x] [GlueStick](https://github.com/cvg/GlueStick), ICCV 2023
 - [ ] [ConvMatch](https://github.com/SuhZhang/ConvMatch), AAAI 2023
+- [x] [LoFTR](https://github.com/zju3dv/LoFTR), CVPR 2021
 - [x] [SOLD2](https://github.com/cvg/SOLD2), CVPR 2021
 - [ ] [LineTR](https://github.com/yosungho/LineTR), RA-L 2021
 - [x] [DKM](https://github.com/Parskatt/DKM), CVPR 2023
@@ -44,7 +45,7 @@ The tool currently supports various popular image matching algorithms, namely:
 - [x] [LANet](https://github.com/wangch-g/lanet), ACCV 2022
 - [ ] [LISRD](https://github.com/rpautrat/LISRD), ECCV 2022
 - [ ] [REKD](https://github.com/bluedream1121/REKD), CVPR 2022
-- [x] [ALIKE](https://github.com/Shiaoming/ALIKE), ArXiv 2022
+- [x] [ALIKE](https://github.com/Shiaoming/ALIKE), TMM 2022
 - [x] [RoRD](https://github.com/UditSinghParihar/RoRD), IROS 2021
 - [x] [SGMNet](https://github.com/vdvchen/SGMNet), ICCV 2021
 - [x] [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork), CVPRW 2018
@@ -54,7 +55,8 @@ The tool currently supports various popular image matching algorithms, namely:
 - [x] [DISK](https://github.com/cvlab-epfl/disk), NeurIPS 2020
 - [ ] [Key.Net](https://github.com/axelBarroso/Key.Net), ICCV 2019
 - [ ] [OANet](https://github.com/zjhthu/OANet), ICCV 2019
-- [ ] [SOSNet](https://github.com/scape-research/SOSNet), CVPR 2019
+- [x] [SOSNet](https://github.com/scape-research/SOSNet), CVPR 2019
+- [x] [HardNet](https://github.com/DagnyT/hardnet), NeurIPS 2017
 - [x] [SIFT](https://docs.opencv.org/4.x/da/df5/tutorial_py_sift_intro.html), IJCV 2004
 
 ## How to use

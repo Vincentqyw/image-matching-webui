@@ -20,10 +20,17 @@ from .viz import (
 )
 import time
 import matplotlib.pyplot as plt
+import warnings
+
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings(
+    "ignore", category=gr.deprecation.GradioDeprecationWarning
+)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 ROOT = Path(__file__).parent.parent
+# some default values
 DEFAULT_SETTING_THRESHOLD = 0.1
 DEFAULT_SETTING_MAX_FEATURES = 2000
 DEFAULT_DEFAULT_KEYPOINT_THRESHOLD = 0.01
@@ -458,6 +465,13 @@ def run_matching(
     output_keypoints = None
     output_matches_raw = None
     output_matches_ransac = None
+
+    # super slow!
+    if "roma" in key.lower():
+        gr.Info(
+            f"Success! Please be patient and allow for about 2-3 minutes."
+            f" Due to CPU inference, {key} is quiet slow."
+        )
 
     model = matcher_zoo[key]
     match_conf = model["matcher"]
