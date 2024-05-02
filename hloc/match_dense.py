@@ -91,7 +91,7 @@ confs = {
             "height": 480,
         },
     },
-    # Use topicfm for matching feats
+    # Use aspanformer for matching feats
     "aspanformer": {
         "output": "matches-aspanformer",
         "model": {
@@ -103,6 +103,21 @@ confs = {
         "preprocessing": {
             "grayscale": True,
             "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
+    "xfeat_dense": {
+        "output": "matches-xfeat_dense",
+        "model": {
+            "name": "xfeat_dense",
+            "max_keypoints": 8000,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": False,
             "resize_max": 1024,
             "width": 640,
             "height": 480,

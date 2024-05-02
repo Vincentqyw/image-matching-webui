@@ -18,6 +18,8 @@ from .viz import (
     display_matches,
     plot_color_line_matches,
 )
+import time
+import matplotlib.pyplot as plt
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -462,7 +464,7 @@ def run_matching(
     # update match config
     match_conf["model"]["match_threshold"] = match_threshold
     match_conf["model"]["max_keypoints"] = extract_max_keypoints
-
+    t1 = time.time()
     matcher = get_model(match_conf)
     if model["dense"]:
         pred = match_dense.match_images(
@@ -534,9 +536,9 @@ def run_matching(
         {"geom_info": geom_info},
         choice_estimate_geom,
     )
-
+    plt.close("all")
     del pred
-
+    logger.info(f"TOTAL time: {time.time()-t1:.3f}s")
     return (
         output_keypoints,
         output_matches_raw,

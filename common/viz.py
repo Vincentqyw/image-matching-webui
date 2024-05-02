@@ -252,6 +252,7 @@ def draw_matches(
     img1: np.ndarray,
     conf: np.ndarray,
     titles: Optional[List[str]] = None,
+    texts: Optional[List[str]] = None,
     dpi: int = 150,
     path: Optional[str] = None,
     pad: float = 0.5,
@@ -370,7 +371,10 @@ def draw_image_pairs(
 
 
 def display_matches(
-    pred: Dict[str, np.ndarray], titles: List[str] = [], dpi: int = 300
+    pred: Dict[str, np.ndarray],
+    titles: List[str] = [],
+    texts: List[str] = [],
+    dpi: int = 300,
 ) -> Tuple[np.ndarray, int]:
     """
     Displays the matches between two images.
@@ -408,6 +412,7 @@ def display_matches(
             mconf,
             dpi=dpi,
             titles=titles,
+            texts=texts,
         )
         fig = fig_mkpts
     if (

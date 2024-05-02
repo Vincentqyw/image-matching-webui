@@ -18,7 +18,7 @@ class XFeat(BaseModel):
             pretrained=True,
             top_k=self.conf["max_keypoints"],
         )
-        logger.info(f"Load XFeat model done.")
+        logger.info(f"Load XFeat(sparse) model done.")
 
     def _forward(self, data):
         pred = self.net.detectAndCompute(
