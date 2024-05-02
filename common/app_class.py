@@ -200,13 +200,9 @@ class ImageMatchingApp:
                                 " Match)"
                             ),
                         )
-                    with gr.Accordion("Open for More!", open=False):
-                        gr.Markdown(
-                            f"""
-                            <h3>Supported Algorithms</h3>
-                            {", ".join(self.matcher_zoo.keys())}
-                            """
-                        )
+                    with gr.Accordion("Supported Algorithms", open=False):
+                        # add a table of supported algorithms
+                        self.display_supported_algorithms()
 
                 with gr.Column():
                     output_keypoints = gr.Image(label="Keypoints", type="numpy")
@@ -401,3 +397,58 @@ class ImageMatchingApp:
             self.cfg["defaults"]["ransac_max_iter"],  # ransac_max_iter: int
             self.cfg["defaults"]["setting_geometry"],  # geometry: str
         )
+
+    def display_supported_algorithms(self, style="tab"):
+        def get_link(link, tag="Link"):
+            return "[{}]({})".format(tag, link) if link is not None else "None"
+
+        data = []
+        cfg = self.cfg["matcher_zoo"]
+        if style == "md":
+            markdown_table = "| Algo. | Conference | Code | Project | Paper |\n"
+            markdown_table += (
+                "| ----- | ---------- | ---- | ------- | ----- |\n"
+            )
+
+            for k, v in cfg.items():
+                if not v["info"]["display"]:
+                    continue
+                github_link = get_link(v["info"]["github"])
+                project_link = get_link(v["info"]["project"])
+                paper_link = get_link(
+                    v["info"]["paper"],
+                    (
+                        Path(v["info"]["paper"]).name[-10:]
+                        if v["info"]["paper"] is not None
+                        else "Link"
+                    ),
+                )
+
+                markdown_table += "{}|{}|{}|{}|{}\n".format(
+                    v["info"]["name"],  # display name
+                    v["info"]["source"],
+                    github_link,
+                    project_link,
+                    paper_link,
+                )
+            return gr.Markdown(markdown_table)
+        elif style == "tab":
+            for k, v in cfg.items():
+                if not v["info"]["display"]:
+                    continue
+                data.append(
+                    [
+                        v["info"]["name"],
+                        v["info"]["source"],
+                        v["info"]["github"],
+                        v["info"]["project"],
+                        v["info"]["paper"],
+                    ]
+                )
+            tab = gr.Dataframe(
+                headers=["Algo.", "Conference", "Code", "Project", "Paper"],
+                datatype=["str", "str", "str", "str", "str"],
+                col_count=(5, "fixed"),
+            )
+            tab.value = data
+            return tab
