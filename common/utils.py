@@ -21,12 +21,7 @@ from .viz import (
 import time
 import matplotlib.pyplot as plt
 import warnings
-
-warnings.filterwarnings("ignore", category=UserWarning)
-warnings.filterwarnings(
-    "ignore", category=gr.deprecation.GradioDeprecationWarning
-)
-
+warnings.simplefilter("ignore")
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 ROOT = Path(__file__).parent.parent
@@ -478,8 +473,11 @@ def run_matching(
     # update match config
     match_conf["model"]["match_threshold"] = match_threshold
     match_conf["model"]["max_keypoints"] = extract_max_keypoints
-    t1 = time.time()
+    t0 = time.time()
     matcher = get_model(match_conf)
+    gr.Info(f"Loading model using: {time.time()-t0:.3f}s")
+    t1 = time.time()
+    
     if model["dense"]:
         pred = match_dense.match_images(
             matcher, image0, image1, match_conf["preprocessing"], device=device
@@ -500,7 +498,8 @@ def run_matching(
         )
         pred = match_features.match_images(matcher, pred0, pred1)
         del extractor
-
+    gr.Info(f"Matching images done using: {time.time()-t1:.3f}s")
+    t1 = time.time()
     # plot images with keypoints
     titles = [
         "Image 0 - Keypoints",
@@ -532,6 +531,7 @@ def run_matching(
         ransac_confidence=ransac_confidence,
         ransac_max_iter=ransac_max_iter,
     )
+    gr.Info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
 
     # plot images with ransac matches
     titles = [
@@ -542,6 +542,7 @@ def run_matching(
         pred, titles=titles
     )
 
+    t1 = time.time()
     # plot wrapped images
     geom_info = compute_geom(pred)
     output_wrapped, _ = change_estimate_geom(
@@ -550,9 +551,12 @@ def run_matching(
         {"geom_info": geom_info},
         choice_estimate_geom,
     )
+    gr.Info(f"Compute geometry done using: {time.time()-t1:.3f}s")
     plt.close("all")
     del pred
-    logger.info(f"TOTAL time: {time.time()-t1:.3f}s")
+    logger.info(f"TOTAL time: {time.time()-t0:.3f}s")
+    gr.Info(f"In summary, total time: {time.time()-t0:.3f}s")
+
     return (
         output_keypoints,
         output_matches_raw,
