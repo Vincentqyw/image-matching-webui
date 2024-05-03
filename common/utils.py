@@ -518,7 +518,7 @@ def run_matching(
     gr.Info(f"Matching images done using: {time.time()-t1:.3f}s")
     logger.info(f"Matching images done using: {time.time()-t1:.3f}s")
     t1 = time.time()
-    # plot images with keypoints
+    # plot images with keypoints\
     titles = [
         "Image 0 - Keypoints",
         "Image 1 - Keypoints",

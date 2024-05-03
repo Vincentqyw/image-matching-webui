@@ -293,7 +293,7 @@ def draw_matches_core(
                 mkpts1,
                 color,
                 titles=titles,
-                # text=texts,
+                text=text,
                 path=path,
                 dpi=dpi,
                 pad=pad,
@@ -308,7 +308,7 @@ def draw_matches_core(
                 mkpts1,
                 color,
                 titles=titles,
-                # text=texts,
+                text=text,
                 pad=pad,
                 dpi=dpi,
             )
