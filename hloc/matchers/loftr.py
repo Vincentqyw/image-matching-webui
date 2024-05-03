@@ -10,15 +10,18 @@ class LoFTR(BaseModel):
     default_conf = {
         "weights": "outdoor",
         "match_threshold": 0.2,
-        "max_keypoints": 2000,
+        "sinkhorn_iterations": 20,
+        "max_keypoints": -1,
     }
     required_inputs = ["image0", "image1"]
 
     def _init(self, conf):
         cfg = default_cfg
         cfg["match_coarse"]["thr"] = conf["match_threshold"]
+        cfg["match_coarse"]["skh_iters"] = conf["sinkhorn_iterations"]
         self.net = LoFTR_(pretrained=conf["weights"], config=cfg)
         logger.info(f"Loaded LoFTR with weights {conf['weights']}")
+
     def _forward(self, data):
         # For consistency with hloc pairs, we refine kpts in image0!
         rename = {

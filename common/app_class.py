@@ -13,6 +13,7 @@ from common.utils import (
     GRADIO_VERSION,
 )
 
+
 DESCRIPTION = """
 # Image Matching WebUI
 This Space demonstrates [Image Matching WebUI](https://github.com/Vincentqyw/image-matching-webui) by vincent qin. Feel free to play with it, or duplicate to run image matching without a queue!
@@ -34,7 +35,6 @@ class ImageMatchingApp:
         )
         self.cfg = load_config(self.config_path)
         self.matcher_zoo = get_matcher_zoo(self.cfg["matcher_zoo"])
-        # self.ransac_zoo = get_ransac_zoo(self.cfg["ransac_zoo"])
         self.app = None
         self.init_interface()
         # print all the keys
@@ -162,7 +162,7 @@ class ImageMatchingApp:
 
                         with gr.Accordion("Geometry Setting", open=False):
                             with gr.Row(equal_height=False):
-                                choice_estimate_geom = gr.Radio(
+                                choice_geometry_type = gr.Radio(
                                     ["Fundamental", "Homography"],
                                     label="Reconstruct Geometry",
                                     value=self.cfg["defaults"][
@@ -182,7 +182,7 @@ class ImageMatchingApp:
                         ransac_reproj_threshold,
                         ransac_confidence,
                         ransac_max_iter,
-                        choice_estimate_geom,
+                        choice_geometry_type,
                         gr.State(self.matcher_zoo),
                     ]
 
@@ -282,20 +282,20 @@ class ImageMatchingApp:
                     ransac_reproj_threshold,
                     ransac_confidence,
                     ransac_max_iter,
-                    choice_estimate_geom,
+                    choice_geometry_type,
                 ]
                 button_reset.click(
-                    fn=self.ui_reset_state, inputs=inputs, outputs=reset_outputs
+                    fn=self.ui_reset_state, inputs=None, outputs=reset_outputs
                 )
 
                 # estimate geo
-                choice_estimate_geom.change(
+                choice_geometry_type.change(
                     fn=change_estimate_geom,
                     inputs=[
                         input_image0,
                         input_image1,
                         geometry_result,
-                        choice_estimate_geom,
+                        choice_geometry_type,
                     ],
                     outputs=[output_wrapped, geometry_result],
                 )
@@ -441,14 +441,17 @@ class ImageMatchingApp:
                         v["info"]["name"],
                         v["info"]["source"],
                         v["info"]["github"],
-                        v["info"]["project"],
                         v["info"]["paper"],
+                        v["info"]["project"],
                     ]
                 )
             tab = gr.Dataframe(
-                headers=["Algo.", "Conference", "Code", "Project", "Paper"],
+                headers=["Algo.", "Conference", "Code", "Paper", "Project"],
                 datatype=["str", "str", "str", "str", "str"],
                 col_count=(5, "fixed"),
+                value=data,
+                # wrap=True,
+                # min_width = 1000,
+                # height=1000,
             )
-            tab.value = data
             return tab

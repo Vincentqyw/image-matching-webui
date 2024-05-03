@@ -1,6 +1,6 @@
 server:
   name: "0.0.0.0"
-  port: 7860
+  port: 7861
 
 defaults:
   setting_threshold: 0.1
@@ -25,6 +25,16 @@ matcher_zoo:
       github: https://github.com/Parskatt/RoMa
       paper: https://arxiv.org/abs/2305.15404
       project: https://parskatt.github.io/RoMa
+      display: true
+  dkm:
+    matcher: dkm
+    dense: true
+    info: 
+      name: DKM #dispaly name
+      source: "CVPR 2023"
+      github: https://github.com/Parskatt/DKM
+      paper: https://arxiv.org/abs/2202.00667
+      project: https://parskatt.github.io/DKM
       display: true
   loftr:
     matcher: loftr
@@ -218,7 +228,7 @@ matcher_zoo:
       source: "IROS 2021"
       github: https://github.com/UditSinghParihar/RoRD
       paper: https://arxiv.org/abs/2103.08573
-      project: https://uditsinghparihar.github.io/RoRD/
+      project: https://uditsinghparihar.github.io/RoRD
       display: true
   alike:
     matcher: NN-mutual

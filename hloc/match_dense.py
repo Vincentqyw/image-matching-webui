@@ -28,25 +28,6 @@ confs = {
         "max_error": 1,  # max error for assigned keypoints (in px)
         "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
     },
-    "loftr-quadtree": {
-        "output": "matches-loftr-quadtree",
-        "model": {
-            "name": "quadtree",
-            "weights": "outdoor",
-            "max_keypoints": 2000,
-            "match_threshold": 0.2,
-        },
-        "preprocessing": {
-            "grayscale": True,
-            "resize_max": 1024,
-            "dfactor": 8,
-            "width": 640,
-            "height": 480,
-            "force_resize": True,
-        },
-        "max_error": 1,  # max error for assigned keypoints (in px)
-        "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
-    },
     # Semi-scalable loftr which limits detected keypoints
     "loftr_aachen": {
         "output": "matches-loftr_aachen",
@@ -138,23 +119,6 @@ confs = {
             "resize_max": 1024,
             "width": 80,
             "height": 60,
-            "dfactor": 8,
-        },
-    },
-    "mickey": {
-        "output": "matches-mickey",
-        "model": {
-            "name": "mickey",
-            "weights": "mickey.ckpt",
-            "max_keypoints": 2000,
-            "match_threshold": 0.2,
-        },
-        "preprocessing": {
-            "grayscale": False,
-            "force_resize": False,
-            "resize_max": 1024,
-            "width": 320,
-            "height": 240,
             "dfactor": 8,
         },
     },
@@ -404,7 +368,7 @@ def match_images(model, image_0, image_1, conf, device="cpu"):
         }
         if "mconf" in pred.keys():
             ret["mconf"] = pred["mconf"].cpu().numpy()
-        elif "scores" in pred.keys(): #adapting loftr
+        elif "scores" in pred.keys():  # adapting loftr
             ret["mconf"] = pred["scores"].cpu().numpy()
         else:
             ret["mconf"] = np.ones_like(kpts0.cpu().numpy()[:, 0])

@@ -21,6 +21,7 @@ from .viz import (
 import time
 import matplotlib.pyplot as plt
 import warnings
+
 warnings.simplefilter("ignore")
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -39,6 +40,7 @@ DEFAULT_MATCHING_THRESHOLD = 0.2
 DEFAULT_SETTING_GEOMETRY = "Homography"
 GRADIO_VERSION = gr.__version__.split(".")[0]
 MATCHER_ZOO = None
+models_already_loaded = {}
 
 
 def load_config(config_name: str) -> Dict[str, Any]:
@@ -417,7 +419,7 @@ def run_matching(
     ransac_reproj_threshold: int = DEFAULT_RANSAC_REPROJ_THRESHOLD,
     ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
     ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
-    choice_estimate_geom: str = DEFAULT_SETTING_GEOMETRY,
+    choice_geometry_type: str = DEFAULT_SETTING_GEOMETRY,
     matcher_zoo: Dict[str, Any] = None,
 ) -> Tuple[
     np.ndarray,
@@ -441,7 +443,7 @@ def run_matching(
         ransac_reproj_threshold (int, optional): RANSAC reprojection threshold.
         ransac_confidence (float, optional): RANSAC confidence level.
         ransac_max_iter (int, optional): RANSAC maximum number of iterations.
-        choice_estimate_geom (str, optional): setting of geometry estimation.
+        choice_geometry_type (str, optional): setting of geometry estimation.
 
     Returns:
         tuple:
@@ -467,17 +469,25 @@ def run_matching(
             f"Success! Please be patient and allow for about 2-3 minutes."
             f" Due to CPU inference, {key} is quiet slow."
         )
-
     model = matcher_zoo[key]
     match_conf = model["matcher"]
     # update match config
     match_conf["model"]["match_threshold"] = match_threshold
     match_conf["model"]["max_keypoints"] = extract_max_keypoints
     t0 = time.time()
-    matcher = get_model(match_conf)
+    cache_key = match_conf["model"]["name"]
+    if cache_key in models_already_loaded:
+        matcher = models_already_loaded[cache_key]
+        matcher.conf["max_keypoints"] = extract_max_keypoints
+        matcher.conf["match_threshold"] = match_threshold
+        logger.info(f"Loaded cached model {cache_key}")
+    else:
+        matcher = get_model(match_conf)
+        models_already_loaded[cache_key] = matcher
     gr.Info(f"Loading model using: {time.time()-t0:.3f}s")
+    logger.info(f"Loading model using: {time.time()-t0:.3f}s")
     t1 = time.time()
-    
+
     if model["dense"]:
         pred = match_dense.match_images(
             matcher, image0, image1, match_conf["preprocessing"], device=device
@@ -489,7 +499,15 @@ def run_matching(
         # update extract config
         extract_conf["model"]["max_keypoints"] = extract_max_keypoints
         extract_conf["model"]["keypoint_threshold"] = keypoint_threshold
-        extractor = get_feature_model(extract_conf)
+        cache_key = extract_conf["model"]["name"]
+        if cache_key in models_already_loaded:
+            extractor = models_already_loaded[cache_key]
+            extractor.conf["max_keypoints"] = extract_max_keypoints
+            extractor.conf["keypoint_threshold"] = keypoint_threshold
+            logger.info(f"Loaded cached model {cache_key}")
+        else:
+            extractor = get_feature_model(extract_conf)
+            models_already_loaded[cache_key] = extractor
         pred0 = extract_features.extract(
             extractor, image0, extract_conf["preprocessing"]
         )
@@ -499,6 +517,7 @@ def run_matching(
         pred = match_features.match_images(matcher, pred0, pred1)
         del extractor
     gr.Info(f"Matching images done using: {time.time()-t1:.3f}s")
+    logger.info(f"Matching images done using: {time.time()-t1:.3f}s")
     t1 = time.time()
     # plot images with keypoints
     titles = [
@@ -532,6 +551,8 @@ def run_matching(
         ransac_max_iter=ransac_max_iter,
     )
     gr.Info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
+    t1 = time.time()
 
     # plot images with ransac matches
     titles = [
@@ -541,6 +562,8 @@ def run_matching(
     output_matches_ransac, num_matches_ransac = display_matches(
         pred, titles=titles
     )
+    gr.Info(f"Display matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
 
     t1 = time.time()
     # plot wrapped images
@@ -549,9 +572,8 @@ def run_matching(
         pred["image0_orig"],
         pred["image1_orig"],
         {"geom_info": geom_info},
-        choice_estimate_geom,
+        choice_geometry_type,
     )
-    gr.Info(f"Compute geometry done using: {time.time()-t1:.3f}s")
     plt.close("all")
     del pred
     logger.info(f"TOTAL time: {time.time()-t0:.3f}s")

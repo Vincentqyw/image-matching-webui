@@ -4,6 +4,7 @@ from ..utils.base_model import BaseModel
 from ..utils import do_system
 from pathlib import Path
 import subprocess
+
 from .. import logger
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
@@ -20,6 +21,7 @@ class ASpanFormer(BaseModel):
         "weights": "outdoor",
         "match_threshold": 0.2,
         "sinkhorn_iterations": 20,
+        "max_keypoints": 2048,
         "config_path": aspanformer_path / "configs/aspan/outdoor/aspan_test.py",
         "model_name": "weights_aspanformer.tar",
     }
@@ -67,12 +69,11 @@ class ASpanFormer(BaseModel):
 
             do_system(f"cd {str(aspanformer_path)} & tar -xvf {str(tar_path)}")
 
-        logger.info(f"Loading Aspanformer model...")
-
         config = get_cfg_defaults()
         config.merge_from_file(conf["config_path"])
         _config = lower_config(config)
 
+        # update: match threshold
         _config["aspan"]["match_coarse"]["thr"] = conf["match_threshold"]
         _config["aspan"]["match_coarse"]["skh_iters"] = conf[
             "sinkhorn_iterations"
@@ -84,6 +85,7 @@ class ASpanFormer(BaseModel):
             "state_dict"
         ]
         self.net.load_state_dict(state_dict, strict=False)
+        logger.info(f"Loaded Aspanformer model")
 
     def _forward(self, data):
         data_ = {
@@ -96,4 +98,14 @@ class ASpanFormer(BaseModel):
             "keypoints1": data_["mkpts1_f"],
             "mconf": data_["mconf"],
         }
+        scores = data_["mconf"]
+        top_k = self.conf["max_keypoints"]
+        if top_k is not None and len(scores) > top_k:
+            keep = torch.argsort(scores, descending=True)[:top_k]
+            scores = scores[keep]
+            pred["keypoints0"], pred["keypoints1"], pred["mconf"] = (
+                pred["keypoints0"][keep],
+                pred["keypoints1"][keep],
+                scores,
+            )
         return pred
