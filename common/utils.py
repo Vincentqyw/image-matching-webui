@@ -127,16 +127,29 @@ def gen_examples():
     random.seed(1)
     example_matchers = [
         "disk+lightglue",
+        "xfeat(sparse)",
+        "dedode",
         "loftr",
         "disk",
+        "roma",
         "d2net",
+        "aspanformer",
         "topicfm",
         "superpoint+superglue",
-        "disk+dualsoftmax",
-        "roma",
+        "superpoint+lightglue",
+        "superpoint+mnn",
+        "disk",
     ]
 
-    def gen_images_pairs(path: str, count: int = 5):
+    def distribute_elements(A, B):
+        new_B = np.array(B, copy=True).flatten()
+        np.random.shuffle(new_B)
+        new_B = np.resize(new_B, len(A))
+        np.random.shuffle(new_B)
+        return new_B.tolist()
+
+    def gen_images_pairs(count: int = 5):
+        path = str(ROOT / "datasets/sacre_coeur/mapping")
         imgs_list = [
             os.path.join(path, file)
             for file in os.listdir(path)
@@ -146,9 +159,28 @@ def gen_examples():
         selected = random.sample(range(len(pairs)), count)
         return [pairs[i] for i in selected]
 
+    def gen_image_pairs_wxbs(count: int = None):
+        prefix = "datasets/wxbs_benchmark/.WxBS/v1.1"
+        wxbs_path = ROOT / prefix
+        pairs = []
+        for catg in os.listdir(wxbs_path):
+            catg_path = wxbs_path / catg
+            if not catg_path.is_dir():
+                continue
+            for scene in os.listdir(catg_path):
+                scene_path = catg_path / scene
+                if not scene_path.is_dir():
+                    continue
+                img1_path = scene_path / "01.png"
+                img2_path = scene_path / "02.png"
+                if img1_path.exists() and img2_path.exists():
+                    pairs.append([str(img1_path), str(img2_path)])
+        return pairs
+
     # image pair path
-    path = ROOT / "datasets/sacre_coeur/mapping"
-    pairs = gen_images_pairs(str(path), len(example_matchers))
+    pairs = gen_images_pairs()
+    pairs += gen_image_pairs_wxbs()
+
     match_setting_threshold = DEFAULT_SETTING_THRESHOLD
     match_setting_max_features = DEFAULT_SETTING_MAX_FEATURES
     detect_keypoints_threshold = DEFAULT_DEFAULT_KEYPOINT_THRESHOLD
@@ -157,7 +189,8 @@ def gen_examples():
     ransac_confidence = DEFAULT_RANSAC_CONFIDENCE
     ransac_max_iter = DEFAULT_RANSAC_MAX_ITER
     input_lists = []
-    for pair, mt in zip(pairs, example_matchers):
+    dist_examples = distribute_elements(pairs, example_matchers)
+    for pair, mt in zip(pairs, dist_examples):
         input_lists.append(
             [
                 pair[0],

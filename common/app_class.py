@@ -197,7 +197,7 @@ class ImageMatchingApp:
                             cache_examples=False,
                             label=(
                                 "Examples (click one of the images below to Run"
-                                " Match)"
+                                " Match). Thx: WxBS"
                             ),
                         )
                     with gr.Accordion("Supported Algorithms", open=False):
