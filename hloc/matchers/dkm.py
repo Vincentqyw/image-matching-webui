@@ -65,5 +65,4 @@ class DKMv3(BaseModel):
             "keypoints1": kpts2,
             "mconf": certainty,
         }
-        breakpoint()
         return pred
