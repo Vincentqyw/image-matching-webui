@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional, Tuple, List, Union
 from common.utils import (
     ransac_zoo,
-    change_estimate_geom,
+    generate_warp_images,
     load_config,
     get_matcher_zoo,
     run_matching,
@@ -290,7 +290,7 @@ class ImageMatchingApp:
 
                 # estimate geo
                 choice_geometry_type.change(
-                    fn=change_estimate_geom,
+                    fn=generate_warp_images,
                     inputs=[
                         input_image0,
                         input_image1,

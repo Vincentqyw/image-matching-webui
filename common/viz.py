@@ -247,7 +247,7 @@ def fig2im(fig: matplotlib.figure.Figure) -> np.ndarray:
     return buf_ndarray.reshape(height, width, 3)
 
 
-def draw_matches(
+def draw_matches_core(
     mkpts0: List[np.ndarray],
     mkpts1: List[np.ndarray],
     img0: np.ndarray,
@@ -293,7 +293,7 @@ def draw_matches(
                 mkpts1,
                 color,
                 titles=titles,
-                text=text,
+                # text=texts,
                 path=path,
                 dpi=dpi,
                 pad=pad,
@@ -308,7 +308,7 @@ def draw_matches(
                 mkpts1,
                 color,
                 titles=titles,
-                text=text,
+                # text=texts,
                 pad=pad,
                 dpi=dpi,
             )
@@ -406,7 +406,7 @@ def display_matches(
             mconf = pred["mconf"]
         else:
             mconf = np.ones(len(mkpts0))
-        fig_mkpts = draw_matches(
+        fig_mkpts = draw_matches_core(
             mkpts0,
             mkpts1,
             img0,
@@ -445,7 +445,9 @@ def display_matches(
                 mconf = pred["mconf"]
             else:
                 mconf = np.ones(len(mkpts0))
-            fig_mkpts = draw_matches(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
+            fig_mkpts = draw_matches_core(
+                mkpts0, mkpts1, img0, img1, mconf, dpi=300
+            )
             fig_lines = cv2.resize(
                 fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0])
             )

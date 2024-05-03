@@ -16,26 +16,26 @@ defaults:
   setting_geometry: Homography
 
 matcher_zoo:
-  roma:
-    matcher: roma
-    dense: true
-    info: 
-      name: RoMa #dispaly name
-      source: "CVPR 2024"
-      github: https://github.com/Parskatt/RoMa
-      paper: https://arxiv.org/abs/2305.15404
-      project: https://parskatt.github.io/RoMa
-      display: true
-  dkm:
-    matcher: dkm
-    dense: true
-    info: 
-      name: DKM #dispaly name
-      source: "CVPR 2023"
-      github: https://github.com/Parskatt/DKM
-      paper: https://arxiv.org/abs/2202.00667
-      project: https://parskatt.github.io/DKM
-      display: true
+  # roma:
+  #   matcher: roma
+  #   dense: true
+  #   info: 
+  #     name: RoMa #dispaly name
+  #     source: "CVPR 2024"
+  #     github: https://github.com/Parskatt/RoMa
+  #     paper: https://arxiv.org/abs/2305.15404
+  #     project: https://parskatt.github.io/RoMa
+  #     display: true
+  # dkm:
+  #   matcher: dkm
+  #   dense: true
+  #   info: 
+  #     name: DKM #dispaly name
+  #     source: "CVPR 2023"
+  #     github: https://github.com/Parskatt/DKM
+  #     paper: https://arxiv.org/abs/2202.00667
+  #     project: https://parskatt.github.io/DKM
+  #     display: true
   loftr:
     matcher: loftr
     dense: true

@@ -12,7 +12,6 @@ from hloc.utils.base_model import dynamic_load
 from hloc import match_dense, match_features, extract_features
 from hloc.utils.viz import add_text, plot_keypoints
 from .viz import (
-    draw_matches,
     fig2im,
     plot_images,
     display_matches,
@@ -242,7 +241,7 @@ def filter_matches(
     return pred
 
 
-def compute_geom(
+def compute_geometry(
     pred: Dict[str, Any],
     ransac_method: str = DEFAULT_RANSAC_METHOD,
     ransac_reproj_threshold: float = DEFAULT_RANSAC_REPROJ_THRESHOLD,
@@ -373,7 +372,7 @@ def wrap_images(
         return None, None
 
 
-def change_estimate_geom(
+def generate_warp_images(
     input_image0: np.ndarray,
     input_image1: np.ndarray,
     matches_info: Dict[str, Any],
@@ -475,7 +474,7 @@ def run_matching(
     match_conf["model"]["match_threshold"] = match_threshold
     match_conf["model"]["max_keypoints"] = extract_max_keypoints
     t0 = time.time()
-    cache_key = match_conf["model"]["name"]
+    cache_key = "{}_{}".format(key, match_conf["model"]["name"])
     if cache_key in models_already_loaded:
         matcher = models_already_loaded[cache_key]
         matcher.conf["max_keypoints"] = extract_max_keypoints
@@ -499,7 +498,7 @@ def run_matching(
         # update extract config
         extract_conf["model"]["max_keypoints"] = extract_max_keypoints
         extract_conf["model"]["keypoint_threshold"] = keypoint_threshold
-        cache_key = extract_conf["model"]["name"]
+        cache_key = "{}_{}".format(key, extract_conf["model"]["name"])
         if cache_key in models_already_loaded:
             extractor = models_already_loaded[cache_key]
             extractor.conf["max_keypoints"] = extract_max_keypoints
@@ -567,8 +566,8 @@ def run_matching(
 
     t1 = time.time()
     # plot wrapped images
-    geom_info = compute_geom(pred)
-    output_wrapped, _ = change_estimate_geom(
+    geom_info = compute_geometry(pred)
+    output_wrapped, _ = generate_warp_images(
         pred["image0_orig"],
         pred["image1_orig"],
         {"geom_info": geom_info},
