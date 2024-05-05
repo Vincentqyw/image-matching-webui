@@ -9,6 +9,7 @@ from common.utils import (
     load_config,
     get_matcher_zoo,
     run_matching,
+    run_ransac,
     gen_examples,
     GRADIO_VERSION,
 )
@@ -159,7 +160,9 @@ class ImageMatchingApp:
                                 label="Ransac Iterations",
                                 value=self.cfg["defaults"]["ransac_max_iter"],
                             )
-
+                            button_ransac = gr.Button(
+                                value="Rerun RANSAC", variant="primary"
+                            )
                         with gr.Accordion("Geometry Setting", open=False):
                             with gr.Row(equal_height=False):
                                 choice_geometry_type = gr.Radio(
@@ -171,6 +174,7 @@ class ImageMatchingApp:
                                 )
 
                     # collect inputs
+                    state_cache = gr.State({})
                     inputs = [
                         input_image0,
                         input_image1,
@@ -184,6 +188,7 @@ class ImageMatchingApp:
                         ransac_max_iter,
                         choice_geometry_type,
                         gr.State(self.matcher_zoo),
+                        # state_cache,
                     ]
 
                     # Add some examples
@@ -207,7 +212,8 @@ class ImageMatchingApp:
                 with gr.Column():
                     output_keypoints = gr.Image(label="Keypoints", type="numpy")
                     output_matches_raw = gr.Image(
-                        label="Raw Matches", type="numpy"
+                        label="Raw Matches",
+                        type="numpy",
                     )
                     output_matches_ransac = gr.Image(
                         label="Ransac Matches", type="numpy"
@@ -254,6 +260,7 @@ class ImageMatchingApp:
                     matcher_info,
                     geometry_result,
                     output_wrapped,
+                    state_cache,
                 ]
                 # button callbacks
                 button_run.click(
@@ -286,6 +293,22 @@ class ImageMatchingApp:
                 ]
                 button_reset.click(
                     fn=self.ui_reset_state, inputs=None, outputs=reset_outputs
+                )
+
+                # run ransac button action
+                button_ransac.click(
+                    fn=run_ransac,
+                    inputs=[
+                        ransac_method,
+                        ransac_reproj_threshold,
+                        ransac_confidence,
+                        ransac_max_iter,
+                        state_cache,
+                    ],
+                    outputs=[
+                        output_matches_ransac,
+                        matches_result_info,
+                    ],
                 )
 
                 # estimate geo

@@ -156,7 +156,11 @@ def make_matching_figure(
         axes[1].scatter(kpts1[:, 0], kpts1[:, 1], c="w", s=5)
 
     # draw matches
-    if mkpts0.shape[0] != 0 and mkpts1.shape[0] != 0:
+    if (
+        mkpts0.shape[0] != 0
+        and mkpts1.shape[0] != 0
+        and mkpts0.shape == mkpts1.shape
+    ):
         fig.canvas.draw()
         transFigure = fig.transFigure.inverted()
         fkpts0 = transFigure.transform(axes[0].transData.transform(mkpts0))
@@ -377,6 +381,7 @@ def display_matches(
     titles: List[str] = [],
     texts: List[str] = [],
     dpi: int = 300,
+    tag: str = "KPTS_RAW",  # KPTS_RAW, KPTS_RANSAC, LINES_RAW, LINES_RANSAC,
 ) -> Tuple[np.ndarray, int]:
     """
     Displays the matches between two images.
@@ -393,11 +398,13 @@ def display_matches(
     img1 = pred["image1_orig"]
 
     num_inliers = 0
+    # draw raw matches
     if (
         "keypoints0_orig" in pred
         and "keypoints1_orig" in pred
         and pred["keypoints0_orig"] is not None
         and pred["keypoints1_orig"] is not None
+        and tag == "KPTS_RAW"
     ):
         mkpts0 = pred["keypoints0_orig"]
         mkpts1 = pred["keypoints1_orig"]
@@ -417,11 +424,38 @@ def display_matches(
             texts=texts,
         )
         fig = fig_mkpts
+    elif (
+        "mkeypoints0_orig" in pred
+        and "mkeypoints1_orig" in pred
+        and pred["mkeypoints0_orig"] is not None
+        and pred["mkeypoints1_orig"] is not None
+        and tag == "KPTS_RANSAC"
+    ):  # draw ransac matches
+        mkpts0 = pred["mkeypoints0_orig"]
+        mkpts1 = pred["mkeypoints1_orig"]
+        num_inliers = len(mkpts0)
+        if "mmconf" in pred:
+            mmconf = pred["mmconf"]
+        else:
+            mmconf = np.ones(len(mkpts0))
+        fig_mkpts = draw_matches_core(
+            mkpts0,
+            mkpts1,
+            img0,
+            img1,
+            mmconf,
+            dpi=dpi,
+            titles=titles,
+            texts=texts,
+        )
+        fig = fig_mkpts
+    # TODO: draw lines
     if (
         "line0_orig" in pred
         and "line1_orig" in pred
         and pred["line0_orig"] is not None
         and pred["line1_orig"] is not None
+        # and (tag == "LINES_RAW" or tag == "LINES_RANSAC")
     ):
         # lines
         mtlines0 = pred["line0_orig"]
