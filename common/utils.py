@@ -127,16 +127,29 @@ def gen_examples():
     random.seed(1)
     example_matchers = [
         "disk+lightglue",
+        "xfeat(sparse)",
+        "dedode",
         "loftr",
         "disk",
+        "roma",
         "d2net",
+        "aspanformer",
         "topicfm",
         "superpoint+superglue",
-        "disk+dualsoftmax",
-        "roma",
+        "superpoint+lightglue",
+        "superpoint+mnn",
+        "disk",
     ]
 
-    def gen_images_pairs(path: str, count: int = 5):
+    def distribute_elements(A, B):
+        new_B = np.array(B, copy=True).flatten()
+        np.random.shuffle(new_B)
+        new_B = np.resize(new_B, len(A))
+        np.random.shuffle(new_B)
+        return new_B.tolist()
+
+    def gen_images_pairs(count: int = 5):
+        path = str(ROOT / "datasets/sacre_coeur/mapping")
         imgs_list = [
             os.path.join(path, file)
             for file in os.listdir(path)
@@ -146,9 +159,28 @@ def gen_examples():
         selected = random.sample(range(len(pairs)), count)
         return [pairs[i] for i in selected]
 
+    def gen_image_pairs_wxbs(count: int = None):
+        prefix = "datasets/wxbs_benchmark/.WxBS/v1.1"
+        wxbs_path = ROOT / prefix
+        pairs = []
+        for catg in os.listdir(wxbs_path):
+            catg_path = wxbs_path / catg
+            if not catg_path.is_dir():
+                continue
+            for scene in os.listdir(catg_path):
+                scene_path = catg_path / scene
+                if not scene_path.is_dir():
+                    continue
+                img1_path = scene_path / "01.png"
+                img2_path = scene_path / "02.png"
+                if img1_path.exists() and img2_path.exists():
+                    pairs.append([str(img1_path), str(img2_path)])
+        return pairs
+
     # image pair path
-    path = ROOT / "datasets/sacre_coeur/mapping"
-    pairs = gen_images_pairs(str(path), len(example_matchers))
+    pairs = gen_images_pairs()
+    pairs += gen_image_pairs_wxbs()
+
     match_setting_threshold = DEFAULT_SETTING_THRESHOLD
     match_setting_max_features = DEFAULT_SETTING_MAX_FEATURES
     detect_keypoints_threshold = DEFAULT_DEFAULT_KEYPOINT_THRESHOLD
@@ -157,7 +189,8 @@ def gen_examples():
     ransac_confidence = DEFAULT_RANSAC_CONFIDENCE
     ransac_max_iter = DEFAULT_RANSAC_MAX_ITER
     input_lists = []
-    for pair, mt in zip(pairs, example_matchers):
+    dist_examples = distribute_elements(pairs, example_matchers)
+    for pair, mt in zip(pairs, dist_examples):
         input_lists.append(
             [
                 pair[0],
@@ -232,12 +265,13 @@ def filter_matches(
     mask = np.array(mask.ravel().astype("bool"), dtype="bool")
     if H is not None:
         if feature_type == "KEYPOINT":
-            pred["keypoints0_orig"] = mkpts0[mask]
-            pred["keypoints1_orig"] = mkpts1[mask]
-            pred["mconf"] = pred["mconf"][mask]
+            pred["mkeypoints0_orig"] = mkpts0[mask]
+            pred["mkeypoints1_orig"] = mkpts1[mask]
+            pred["mmconf"] = pred["mconf"][mask]
         elif feature_type == "LINE":
-            pred["line_keypoints0_orig"] = mkpts0[mask]
-            pred["line_keypoints1_orig"] = mkpts1[mask]
+            pred["mline_keypoints0_orig"] = mkpts0[mask]
+            pred["mline_keypoints1_orig"] = mkpts1[mask]
+        pred["H"] = H
     return pred
 
 
@@ -341,7 +375,7 @@ def wrap_images(
         rectified_image0 = img0
         rectified_image1 = None
         H = np.array(geo_info["Homography"])
-        F = np.array(geo_info["Fundamental"])
+
         title: List[str] = []
         if geom_type == "Homography":
             rectified_image1 = cv2.warpPerspective(
@@ -350,11 +384,15 @@ def wrap_images(
             result_matrix = H
             title = ["Image 0", "Image 1 - warped"]
         elif geom_type == "Fundamental":
-            H1, H2 = np.array(geo_info["H1"]), np.array(geo_info["H2"])
-            rectified_image0 = cv2.warpPerspective(img0, H1, (w1, h1))
-            rectified_image1 = cv2.warpPerspective(img1, H2, (w2, h2))
-            result_matrix = F
-            title = ["Image 0 - warped", "Image 1 - warped"]
+            if geom_type not in geo_info:
+                logger.warning(f"{geom_type} not exist, maybe too less matches")
+                return None, None
+            else:
+                H1, H2 = np.array(geo_info["H1"]), np.array(geo_info["H2"])
+                rectified_image0 = cv2.warpPerspective(img0, H1, (w1, h1))
+                rectified_image1 = cv2.warpPerspective(img1, H2, (w2, h2))
+                result_matrix = np.array(geo_info["Fundamental"])
+                title = ["Image 0 - warped", "Image 1 - warped"]
         else:
             print("Error: Unknown geometry type")
         fig = plot_images(
@@ -362,11 +400,7 @@ def wrap_images(
             title,
             dpi=300,
         )
-        dictionary = {
-            "row1": result_matrix[0].tolist(),
-            "row2": result_matrix[1].tolist(),
-            "row3": result_matrix[2].tolist(),
-        }
+        dictionary = {}
         return fig2im(fig), dictionary
     else:
         return None, None
@@ -405,6 +439,65 @@ def generate_warp_images(
         return wrapped_images, matches_info
     else:
         return None, None
+
+
+def run_ransac(
+    state_cache: Dict[str, Any],
+    ransac_method: str = DEFAULT_RANSAC_METHOD,
+    ransac_reproj_threshold: int = DEFAULT_RANSAC_REPROJ_THRESHOLD,
+    ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
+    ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
+) -> Tuple[Optional[np.ndarray], Optional[Dict[str, int]]]:
+    """
+    Run RANSAC matches and return the output images and the number of matches.
+
+    Args:
+        state_cache (Dict[str, Any]): Current state of the app, including the matches.
+        ransac_method (str, optional): RANSAC method. Defaults to DEFAULT_RANSAC_METHOD.
+        ransac_reproj_threshold (int, optional): RANSAC reprojection threshold. Defaults to DEFAULT_RANSAC_REPROJ_THRESHOLD.
+        ransac_confidence (float, optional): RANSAC confidence. Defaults to DEFAULT_RANSAC_CONFIDENCE.
+        ransac_max_iter (int, optional): RANSAC maximum iterations. Defaults to DEFAULT_RANSAC_MAX_ITER.
+
+    Returns:
+        Tuple[Optional[np.ndarray], Optional[Dict[str, int]]]: Tuple containing the output images and the number of matches.
+    """
+    if not state_cache:
+        logger.info("Run Match first before Rerun RANSAC")
+        gr.Warning("Run Match first before Rerun RANSAC")
+        return None, None
+    t1 = time.time()
+    logger.info(
+        f"Run RANSAC matches using: {ransac_method} with threshold: {ransac_reproj_threshold}"
+    )
+    logger.info(
+        f"Run RANSAC matches using: {ransac_confidence} with iter: {ransac_max_iter}"
+    )
+    # if enable_ransac:
+    filter_matches(
+        state_cache,
+        ransac_method=ransac_method,
+        ransac_reproj_threshold=ransac_reproj_threshold,
+        ransac_confidence=ransac_confidence,
+        ransac_max_iter=ransac_max_iter,
+    )
+    logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
+    t1 = time.time()
+
+    # plot images with ransac matches
+    titles = [
+        "Image 0 - Ransac matched keypoints",
+        "Image 1 - Ransac matched keypoints",
+    ]
+    output_matches_ransac, num_matches_ransac = display_matches(
+        state_cache, titles=titles, tag="KPTS_RANSAC"
+    )
+    logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
+    t1 = time.time()
+    num_matches_raw = state_cache["num_matches_raw"]
+    return output_matches_ransac, {
+        "num_matches_raw": num_matches_raw,
+        "num_matches_ransac": num_matches_ransac,
+    }
 
 
 def run_matching(
@@ -456,14 +549,19 @@ def run_matching(
     """
     # image0 and image1 is RGB mode
     if image0 is None or image1 is None:
-        raise gr.Error("Error: No images found! Please upload two images.")
+        logger.error(
+            "Error: No images found! Please upload two images or select an example."
+        )
+        raise gr.Error(
+            "Error: No images found! Please upload two images or select an example."
+        )
     # init output
     output_keypoints = None
     output_matches_raw = None
     output_matches_ransac = None
 
     # super slow!
-    if "roma" in key.lower():
+    if "roma" in key.lower() and device == "cpu":
         gr.Info(
             f"Success! Please be patient and allow for about 2-3 minutes."
             f" Due to CPU inference, {key} is quiet slow."
@@ -483,7 +581,7 @@ def run_matching(
     else:
         matcher = get_model(match_conf)
         models_already_loaded[cache_key] = matcher
-    gr.Info(f"Loading model using: {time.time()-t0:.3f}s")
+    # gr.Info(f"Loading model using: {time.time()-t0:.3f}s")
     logger.info(f"Loading model using: {time.time()-t0:.3f}s")
     t1 = time.time()
 
@@ -515,7 +613,9 @@ def run_matching(
         )
         pred = match_features.match_images(matcher, pred0, pred1)
         del extractor
-    gr.Info(f"Matching images done using: {time.time()-t1:.3f}s")
+    gr.Info(
+        f"Matching images done using: {time.time()-t1:.3f}s",
+    )
     logger.info(f"Matching images done using: {time.time()-t1:.3f}s")
     t1 = time.time()
     # plot images with keypoints\
@@ -549,7 +649,7 @@ def run_matching(
         ransac_confidence=ransac_confidence,
         ransac_max_iter=ransac_max_iter,
     )
-    gr.Info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
+    # gr.Info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
     logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
     t1 = time.time()
 
@@ -559,9 +659,9 @@ def run_matching(
         "Image 1 - Ransac matched keypoints",
     ]
     output_matches_ransac, num_matches_ransac = display_matches(
-        pred, titles=titles
+        pred, titles=titles, tag="KPTS_RANSAC"
     )
-    gr.Info(f"Display matches done using: {time.time()-t1:.3f}s")
+    # gr.Info(f"Display matches done using: {time.time()-t1:.3f}s")
     logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
 
     t1 = time.time()
@@ -574,17 +674,20 @@ def run_matching(
         choice_geometry_type,
     )
     plt.close("all")
-    del pred
+    # del pred
+    # gr.Info(f"In summary, total time: {time.time()-t0:.3f}s")
     logger.info(f"TOTAL time: {time.time()-t0:.3f}s")
-    gr.Info(f"In summary, total time: {time.time()-t0:.3f}s")
 
+    state_cache = pred
+    state_cache["num_matches_raw"] = num_matches_raw
+    state_cache["num_matches_ransac"] = num_matches_ransac
     return (
         output_keypoints,
         output_matches_raw,
         output_matches_ransac,
         {
-            "number raw matches": num_matches_raw,
-            "number ransac matches": num_matches_ransac,
+            "num_raw_matches": num_matches_raw,
+            "num_ransac_matches": num_matches_ransac,
         },
         {
             "match_conf": match_conf,
@@ -594,6 +697,7 @@ def run_matching(
             "geom_info": geom_info,
         },
         output_wrapped,
+        state_cache,
     )
 
 
