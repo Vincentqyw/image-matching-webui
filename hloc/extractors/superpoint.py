@@ -44,4 +44,4 @@ class SuperPoint(BaseModel):
         self.net = superpoint.SuperPoint(conf)
 
     def _forward(self, data):
-        return self.net(data)
+        return self.net(data, self.conf)
