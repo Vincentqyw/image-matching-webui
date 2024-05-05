@@ -443,6 +443,7 @@ def generate_warp_images(
 
 def run_ransac(
     state_cache: Dict[str, Any],
+    choice_geometry_type: str,
     ransac_method: str = DEFAULT_RANSAC_METHOD,
     ransac_reproj_threshold: int = DEFAULT_RANSAC_REPROJ_THRESHOLD,
     ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
@@ -493,11 +494,32 @@ def run_ransac(
     )
     logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
     t1 = time.time()
+
+    # compute warp images
+    geom_info = compute_geometry(
+        state_cache,
+        ransac_method=ransac_method,
+        ransac_reproj_threshold=ransac_reproj_threshold,
+        ransac_confidence=ransac_confidence,
+        ransac_max_iter=ransac_max_iter,
+    )
+    output_wrapped, _ = generate_warp_images(
+        state_cache["image0_orig"],
+        state_cache["image1_orig"],
+        {"geom_info": geom_info},
+        choice_geometry_type,
+    )
+    plt.close("all")
+
     num_matches_raw = state_cache["num_matches_raw"]
-    return output_matches_ransac, {
-        "num_matches_raw": num_matches_raw,
-        "num_matches_ransac": num_matches_ransac,
-    }
+    return (
+        output_matches_ransac,
+        {
+            "num_matches_raw": num_matches_raw,
+            "num_matches_ransac": num_matches_ransac,
+        },
+        output_wrapped,
+    )
 
 
 def run_matching(
@@ -666,7 +688,13 @@ def run_matching(
 
     t1 = time.time()
     # plot wrapped images
-    geom_info = compute_geometry(pred)
+    geom_info = compute_geometry(
+        pred,
+        ransac_method=ransac_method,
+        ransac_reproj_threshold=ransac_reproj_threshold,
+        ransac_confidence=ransac_confidence,
+        ransac_max_iter=ransac_max_iter,
+    )
     output_wrapped, _ = generate_warp_images(
         pred["image0_orig"],
         pred["image1_orig"],

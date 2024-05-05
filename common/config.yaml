@@ -46,6 +46,16 @@ matcher_zoo:
       paper: https://arxiv.org/pdf/2104.00680
       project: https://zju3dv.github.io/loftr
       display: true
+  cotr:
+    matcher: cotr
+    dense: true
+    info:
+      name: CoTR #dispaly name
+      source: "ICCV 2021"
+      github: https://github.com/ubc-vision/COTR
+      paper: https://arxiv.org/abs/2103.14167
+      project: null
+      display: true
   topicfm:
     matcher: topicfm
     dense: true

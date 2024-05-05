@@ -300,6 +300,7 @@ class ImageMatchingApp:
                     fn=run_ransac,
                     inputs=[
                         state_cache,
+                        choice_geometry_type,
                         ransac_method,
                         ransac_reproj_threshold,
                         ransac_confidence,
@@ -308,6 +309,7 @@ class ImageMatchingApp:
                     outputs=[
                         output_matches_ransac,
                         matches_result_info,
+                        output_wrapped,
                     ],
                 )
 
@@ -457,7 +459,7 @@ class ImageMatchingApp:
             return gr.Markdown(markdown_table)
         elif style == "tab":
             for k, v in cfg.items():
-                if not v["info"]["display"]:
+                if not v["info"].get("display", True):
                     continue
                 data.append(
                     [

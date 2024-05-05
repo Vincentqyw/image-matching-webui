@@ -49,3 +49,6 @@
 [submodule "third_party/SuperGluePretrainedNetwork"]
 	path = third_party/SuperGluePretrainedNetwork
 	url = https://github.com/Vincentqyw/SuperGluePretrainedNetwork.git
+[submodule "third_party/COTR"]
+	path = third_party/COTR
+	url = https://github.com/Vincentqyw/COTR.git
