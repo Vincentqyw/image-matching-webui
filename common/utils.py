@@ -442,12 +442,29 @@ def generate_warp_images(
 
 
 def run_ransac(
+    state_cache: Dict[str, Any],
     ransac_method: str = DEFAULT_RANSAC_METHOD,
     ransac_reproj_threshold: int = DEFAULT_RANSAC_REPROJ_THRESHOLD,
     ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
     ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
-    state_cache: Dict[str, Any] = None,
-):
+) -> Tuple[Optional[np.ndarray], Optional[Dict[str, int]]]:
+    """
+    Run RANSAC matches and return the output images and the number of matches.
+
+    Args:
+        state_cache (Dict[str, Any]): Current state of the app, including the matches.
+        ransac_method (str, optional): RANSAC method. Defaults to DEFAULT_RANSAC_METHOD.
+        ransac_reproj_threshold (int, optional): RANSAC reprojection threshold. Defaults to DEFAULT_RANSAC_REPROJ_THRESHOLD.
+        ransac_confidence (float, optional): RANSAC confidence. Defaults to DEFAULT_RANSAC_CONFIDENCE.
+        ransac_max_iter (int, optional): RANSAC maximum iterations. Defaults to DEFAULT_RANSAC_MAX_ITER.
+
+    Returns:
+        Tuple[Optional[np.ndarray], Optional[Dict[str, int]]]: Tuple containing the output images and the number of matches.
+    """
+    if not state_cache:
+        logger.info("Run Match first before Rerun RANSAC")
+        gr.Warning("Run Match first before Rerun RANSAC")
+        return None, None
     t1 = time.time()
     logger.info(
         f"Run RANSAC matches using: {ransac_method} with threshold: {ransac_reproj_threshold}"
@@ -532,7 +549,12 @@ def run_matching(
     """
     # image0 and image1 is RGB mode
     if image0 is None or image1 is None:
-        raise gr.Error("Error: No images found! Please upload two images.")
+        logger.error(
+            "Error: No images found! Please upload two images or select an example."
+        )
+        raise gr.Error(
+            "Error: No images found! Please upload two images or select an example."
+        )
     # init output
     output_keypoints = None
     output_matches_raw = None

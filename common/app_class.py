@@ -299,11 +299,11 @@ class ImageMatchingApp:
                 button_ransac.click(
                     fn=run_ransac,
                     inputs=[
+                        state_cache,
                         ransac_method,
                         ransac_reproj_threshold,
                         ransac_confidence,
                         ransac_max_iter,
-                        state_cache,
                     ],
                     outputs=[
                         output_matches_ransac,
