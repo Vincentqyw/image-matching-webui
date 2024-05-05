@@ -396,7 +396,6 @@ def display_matches(
     """
     img0 = pred["image0_orig"]
     img1 = pred["image1_orig"]
-
     num_inliers = 0
     # draw raw matches
     if (

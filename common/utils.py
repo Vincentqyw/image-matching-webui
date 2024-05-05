@@ -209,6 +209,18 @@ def gen_examples():
     return input_lists
 
 
+def set_null_pred(feature_type: str, pred: dict):
+    if feature_type == "KEYPOINT":
+        pred["mkeypoints0_orig"] = np.array([])
+        pred["mkeypoints1_orig"] = np.array([])
+        pred["mmconf"] = np.array([])
+    elif feature_type == "LINE":
+        pred["mline_keypoints0_orig"] = np.array([])
+        pred["mline_keypoints1_orig"] = np.array([])
+    pred["H"] = None
+    return pred
+
+
 def filter_matches(
     pred: Dict[str, Any],
     ransac_method: str = DEFAULT_RANSAC_METHOD,
@@ -246,14 +258,14 @@ def filter_matches(
         mkpts1 = pred["line_keypoints1_orig"]
         feature_type = "LINE"
     else:
-        return pred
+        return set_null_pred(feature_type, pred)
     if mkpts0 is None or mkpts0 is None:
-        return pred
+        return set_null_pred(feature_type, pred)
     if ransac_method not in ransac_zoo.keys():
         ransac_method = DEFAULT_RANSAC_METHOD
 
     if len(mkpts0) < DEFAULT_MIN_NUM_MATCHES:
-        return pred
+        return set_null_pred(feature_type, pred)
     H, mask = cv2.findHomography(
         mkpts0,
         mkpts1,
@@ -272,6 +284,8 @@ def filter_matches(
             pred["mline_keypoints0_orig"] = mkpts0[mask]
             pred["mline_keypoints1_orig"] = mkpts1[mask]
         pred["H"] = H
+    else:
+        set_null_pred(feature_type, pred)
     return pred
 
 
@@ -344,7 +358,7 @@ def compute_geometry(
                 geo_info["H1"] = H1.tolist()
                 geo_info["H2"] = H2.tolist()
             except cv2.error as e:
-                logger.error(f"{e}, skip")
+                logger.error(f"StereoRectifyUncalibrated failed, skip!")
         return geo_info
     else:
         return {}
