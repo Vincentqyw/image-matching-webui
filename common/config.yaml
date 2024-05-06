@@ -47,6 +47,7 @@ matcher_zoo:
       project: https://zju3dv.github.io/loftr
       display: true
   cotr:
+    enable: false
     matcher: cotr
     dense: true
     info:

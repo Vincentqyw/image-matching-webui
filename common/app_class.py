@@ -40,6 +40,13 @@ class ImageMatchingApp:
         self.init_interface()
         # print all the keys
 
+    def init_matcher_dropdown(self):
+        algos = []
+        for k, v in self.cfg["matcher_zoo"].items():
+            if v.get("enable", True):
+                algos.append(k)
+        return algos
+
     def init_interface(self):
         with gr.Blocks() as self.app:
             with gr.Row():
@@ -57,7 +64,7 @@ class ImageMatchingApp:
                 with gr.Column():
                     with gr.Row():
                         matcher_list = gr.Dropdown(
-                            choices=list(self.matcher_zoo.keys()),
+                            choices=self.init_matcher_dropdown(),
                             value="disk+lightglue",
                             label="Matching Model",
                             interactive=True,
