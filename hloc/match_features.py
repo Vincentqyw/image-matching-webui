@@ -133,8 +133,8 @@ confs = {
         "output": "matches-Dual-Softmax",
         "model": {
             "name": "dual_softmax",
-            "do_mutual_check": True,
-            "match_threshold": 0.2,  # TODO
+            "match_threshold": 0.01,
+            "inv_temperature": 20,
         },
     },
     "adalam": {
@@ -378,10 +378,14 @@ def match_images(model, feat0, feat1):
     ret = {
         "image0_orig": feat0["image_orig"],
         "image1_orig": feat1["image_orig"],
-        "keypoints0": kpts0_origin.numpy(),
-        "keypoints1": kpts1_origin.numpy(),
-        "keypoints0_orig": mkpts0_origin.numpy(),
-        "keypoints1_orig": mkpts1_origin.numpy(),
+        "keypoints0": kpts0,
+        "keypoints1": kpts1,
+        "keypoints0_orig": kpts0_origin.numpy(),
+        "keypoints1_orig": kpts1_origin.numpy(),
+        "mkeypoints0": mkpts0,
+        "mkeypoints1": mkpts1,
+        "mkeypoints0_orig": mkpts0_origin.numpy(),
+        "mkeypoints1_orig": mkpts1_origin.numpy(),
         "mconf": mconfid,
     }
     del feat0, feat1, desc0, desc1, kpts0, kpts1, kpts0_origin, kpts1_origin

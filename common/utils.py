@@ -10,11 +10,11 @@ from typing import Callable, Dict, Any, Optional, Tuple, List, Union
 from hloc import matchers, extractors, logger
 from hloc.utils.base_model import dynamic_load
 from hloc import match_dense, match_features, extract_features
-from hloc.utils.viz import add_text, plot_keypoints
 from .viz import (
     fig2im,
     plot_images,
     display_matches,
+    display_keypoints,
     plot_color_line_matches,
 )
 import time
@@ -131,7 +131,7 @@ def gen_examples():
         "dedode",
         "loftr",
         "disk",
-        "roma",
+        "RoMa",
         "d2net",
         "aspanformer",
         "topicfm",
@@ -148,6 +148,7 @@ def gen_examples():
         np.random.shuffle(new_B)
         return new_B.tolist()
 
+    # normal examples
     def gen_images_pairs(count: int = 5):
         path = str(ROOT / "datasets/sacre_coeur/mapping")
         imgs_list = [
@@ -156,9 +157,34 @@ def gen_examples():
             if file.lower().endswith((".jpg", ".jpeg", ".png"))
         ]
         pairs = list(combinations(imgs_list, 2))
+        if len(pairs) < count:
+            count = len(pairs)
         selected = random.sample(range(len(pairs)), count)
         return [pairs[i] for i in selected]
 
+    # rotated examples
+    def gen_rot_image_pairs(count: int = 5):
+        path = ROOT / "datasets/sacre_coeur/mapping"
+        path_rot = ROOT / "datasets/sacre_coeur/mapping_rot"
+        rot_list = [45, 90, 135, 180, 225, 270]
+        pairs = []
+        for file in os.listdir(path):
+            if file.lower().endswith((".jpg", ".jpeg", ".png")):
+                for rot in rot_list:
+                    file_rot = "{}_rot{}.jpg".format(Path(file).stem, rot)
+                    if (path_rot / file_rot).exists():
+                        pairs.append(
+                            [
+                                path / file,
+                                path_rot / file_rot,
+                            ]
+                        )
+        if len(pairs) < count:
+            count = len(pairs)
+        selected = random.sample(range(len(pairs)), count)
+        return [pairs[i] for i in selected]
+
+    # extramely hard examples
     def gen_image_pairs_wxbs(count: int = None):
         prefix = "datasets/wxbs_benchmark/.WxBS/v1.1"
         wxbs_path = ROOT / prefix
@@ -179,6 +205,7 @@ def gen_examples():
 
     # image pair path
     pairs = gen_images_pairs()
+    pairs += gen_rot_image_pairs()
     pairs += gen_image_pairs_wxbs()
 
     match_setting_threshold = DEFAULT_SETTING_THRESHOLD
@@ -211,8 +238,8 @@ def gen_examples():
 
 def set_null_pred(feature_type: str, pred: dict):
     if feature_type == "KEYPOINT":
-        pred["mkeypoints0_orig"] = np.array([])
-        pred["mkeypoints1_orig"] = np.array([])
+        pred["mmkeypoints0_orig"] = np.array([])
+        pred["mmkeypoints1_orig"] = np.array([])
         pred["mmconf"] = np.array([])
     elif feature_type == "LINE":
         pred["mline_keypoints0_orig"] = np.array([])
@@ -246,9 +273,9 @@ def filter_matches(
     mkpts0: Optional[np.ndarray] = None
     mkpts1: Optional[np.ndarray] = None
     feature_type: Optional[str] = None
-    if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
-        mkpts0 = pred["keypoints0_orig"]
-        mkpts1 = pred["keypoints1_orig"]
+    if "mkeypoints0_orig" in pred.keys() and "mkeypoints1_orig" in pred.keys():
+        mkpts0 = pred["mkeypoints0_orig"]
+        mkpts1 = pred["mkeypoints1_orig"]
         feature_type = "KEYPOINT"
     elif (
         "line_keypoints0_orig" in pred.keys()
@@ -277,8 +304,8 @@ def filter_matches(
     mask = np.array(mask.ravel().astype("bool"), dtype="bool")
     if H is not None:
         if feature_type == "KEYPOINT":
-            pred["mkeypoints0_orig"] = mkpts0[mask]
-            pred["mkeypoints1_orig"] = mkpts1[mask]
+            pred["mmkeypoints0_orig"] = mkpts0[mask]
+            pred["mmkeypoints1_orig"] = mkpts1[mask]
             pred["mmconf"] = pred["mconf"][mask]
         elif feature_type == "LINE":
             pred["mline_keypoints0_orig"] = mkpts0[mask]
@@ -313,9 +340,9 @@ def compute_geometry(
     mkpts0: Optional[np.ndarray] = None
     mkpts1: Optional[np.ndarray] = None
 
-    if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
-        mkpts0 = pred["keypoints0_orig"]
-        mkpts1 = pred["keypoints1_orig"]
+    if "mkeypoints0_orig" in pred.keys() and "mkeypoints1_orig" in pred.keys():
+        mkpts0 = pred["mkeypoints0_orig"]
+        mkpts1 = pred["mkeypoints1_orig"]
     elif (
         "line_keypoints0_orig" in pred.keys()
         and "line_keypoints1_orig" in pred.keys()
@@ -654,27 +681,19 @@ def run_matching(
     )
     logger.info(f"Matching images done using: {time.time()-t1:.3f}s")
     t1 = time.time()
-    # plot images with keypoints\
+
+    # plot images with keypoints
     titles = [
         "Image 0 - Keypoints",
         "Image 1 - Keypoints",
     ]
-    output_keypoints = plot_images([image0, image1], titles=titles, dpi=300)
-    if "keypoints0" in pred.keys() and "keypoints1" in pred.keys():
-        plot_keypoints([pred["keypoints0"], pred["keypoints1"]])
-        text = (
-            f"# keypoints0: {len(pred['keypoints0'])} \n"
-            + f"# keypoints1: {len(pred['keypoints1'])}"
-        )
-        add_text(0, text, fs=15)
-    output_keypoints = fig2im(output_keypoints)
+    output_keypoints = display_keypoints(pred, titles=titles)
 
     # plot images with raw matches
     titles = [
         "Image 0 - Raw matched keypoints",
         "Image 1 - Raw matched keypoints",
     ]
-
     output_matches_raw, num_matches_raw = display_matches(pred, titles=titles)
 
     # if enable_ransac:
@@ -755,3 +774,11 @@ ransac_zoo = {
     "USAC_ACCURATE": cv2.USAC_ACCURATE,
     "USAC_PARALLEL": cv2.USAC_PARALLEL,
 }
+
+
+def rotate_image(input_path, degrees, output_path):
+    from PIL import Image
+
+    img = Image.open(input_path)
+    img_rotated = img.rotate(-degrees)
+    img_rotated.save(output_path)

@@ -8,10 +8,10 @@ from .. import logger
 
 roma_path = Path(__file__).parent / "../../third_party/RoMa"
 sys.path.append(str(roma_path))
-
-from roma.models.model_zoo.roma_models import roma_model
+from roma.models.model_zoo import roma_model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class Roma(BaseModel):
     default_conf = {
@@ -52,7 +52,7 @@ class Roma(BaseModel):
             logger.info(f"Downloading the dinov2 model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 
-        logger.info(f"Loading Roma model...")
+        logger.info(f"Loading Roma model")
         # load the model
         weights = torch.load(model_path, map_location="cpu")
         dinov2_weights = torch.load(dinov2_weights, map_location="cpu")
@@ -63,7 +63,7 @@ class Roma(BaseModel):
             weights=weights,
             dinov2_weights=dinov2_weights,
             device=device,
-            #temp fix issue: https://github.com/Parskatt/RoMa/issues/26
+            # temp fix issue: https://github.com/Parskatt/RoMa/issues/26
             amp_dtype=torch.float32,
         )
         logger.info(f"Load Roma model done.")

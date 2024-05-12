@@ -16,7 +16,29 @@ defaults:
   setting_geometry: Homography
 
 matcher_zoo:
-  roma:
+  DUSt3R:
+    # TODO: duster is under development  
+    enable: false
+    matcher: duster
+    dense: true
+    info: 
+      name: DUSt3R #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/naver/dust3r
+      paper: https://arxiv.org/abs/2312.14132
+      project: https://dust3r.europe.naverlabs.com
+      display: true  
+  GIM(dkm):
+    matcher: gim(dkm)
+    dense: true
+    info: 
+      name: GIM(DKM) #dispaly name
+      source: "ICLR 2024"
+      github: https://github.com/xuelunshen/gim
+      paper: https://arxiv.org/abs/2402.11095
+      project: https://xuelunshen.com/gim
+      display: true
+  RoMa:
     matcher: roma
     dense: true
     info: 

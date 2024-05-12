@@ -52,3 +52,9 @@
 [submodule "third_party/COTR"]
 	path = third_party/COTR
 	url = https://github.com/Vincentqyw/COTR.git
+[submodule "third_party/gim"]
+	path = third_party/gim
+	url = https://github.com/xuelunshen/gim.git
+[submodule "third_party/dust3r"]
+	path = third_party/dust3r
+	url = https://github.com/naver/dust3r.git

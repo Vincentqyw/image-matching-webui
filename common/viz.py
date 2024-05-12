@@ -1,11 +1,12 @@
 import cv2
+import typing
 import matplotlib
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pathlib import Path
-import typing
 from typing import Dict, Any, Optional, Tuple, List, Union
+from hloc.utils.viz import add_text, plot_keypoints
 
 
 def plot_images(
@@ -376,6 +377,21 @@ def draw_image_pairs(
         return fig2im(fig)
 
 
+def display_keypoints(pred: dict, titles: List[str] = []):
+    img0 = pred["image0_orig"]
+    img1 = pred["image1_orig"]
+    output_keypoints = plot_images([img0, img1], titles=titles, dpi=300)
+    if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
+        plot_keypoints([pred["keypoints0_orig"], pred["keypoints1_orig"]])
+        text = (
+            f"# keypoints0: {len(pred['keypoints0_orig'])} \n"
+            + f"# keypoints1: {len(pred['keypoints1_orig'])}"
+        )
+        add_text(0, text, fs=15)
+    output_keypoints = fig2im(output_keypoints)
+    return output_keypoints
+
+
 def display_matches(
     pred: Dict[str, np.ndarray],
     titles: List[str] = [],
@@ -397,41 +413,26 @@ def display_matches(
     img0 = pred["image0_orig"]
     img1 = pred["image1_orig"]
     num_inliers = 0
+    KPTS0_KEY = None
+    KPTS1_KEY = None
+    if tag == "KPTS_RAW":
+        KPTS0_KEY = "mkeypoints0_orig"
+        KPTS1_KEY = "mkeypoints1_orig"
+    elif tag == "KPTS_RANSAC":
+        KPTS0_KEY = "mmkeypoints0_orig"
+        KPTS1_KEY = "mmkeypoints1_orig"
+    else:
+        # TODO: LINES_RAW, LINES_RANSAC
+        raise ValueError(f"Unknown tag: {tag}")
     # draw raw matches
     if (
-        "keypoints0_orig" in pred
-        and "keypoints1_orig" in pred
-        and pred["keypoints0_orig"] is not None
-        and pred["keypoints1_orig"] is not None
-        and tag == "KPTS_RAW"
-    ):
-        mkpts0 = pred["keypoints0_orig"]
-        mkpts1 = pred["keypoints1_orig"]
-        num_inliers = len(mkpts0)
-        if "mconf" in pred:
-            mconf = pred["mconf"]
-        else:
-            mconf = np.ones(len(mkpts0))
-        fig_mkpts = draw_matches_core(
-            mkpts0,
-            mkpts1,
-            img0,
-            img1,
-            mconf,
-            dpi=dpi,
-            titles=titles,
-            texts=texts,
-        )
-        fig = fig_mkpts
-    elif (
-        "mkeypoints0_orig" in pred
-        and "mkeypoints1_orig" in pred
-        and pred["mkeypoints0_orig"] is not None
-        and pred["mkeypoints1_orig"] is not None
-        and tag == "KPTS_RANSAC"
+        KPTS0_KEY in pred
+        and KPTS1_KEY in pred
+        and pred[KPTS0_KEY] is not None
+        and pred[KPTS1_KEY] is not None
     ):  # draw ransac matches
-        mkpts0 = pred["mkeypoints0_orig"]
-        mkpts1 = pred["mkeypoints1_orig"]
+        mkpts0 = pred[KPTS0_KEY]
+        mkpts1 = pred[KPTS1_KEY]
         num_inliers = len(mkpts0)
         if "mmconf" in pred:
             mmconf = pred["mmconf"]
@@ -454,7 +455,7 @@ def display_matches(
         and "line1_orig" in pred
         and pred["line0_orig"] is not None
         and pred["line1_orig"] is not None
-        # and (tag == "LINES_RAW" or tag == "LINES_RANSAC")
+        and (tag == "LINES_RAW" or tag == "LINES_RANSAC")
     ):
         # lines
         mtlines0 = pred["line0_orig"]
