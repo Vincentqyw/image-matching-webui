@@ -78,19 +78,22 @@ def get_matcher_zoo(
     """
     matcher_zoo_restored = {}
     for k, v in matcher_zoo.items():
-        dense = v["dense"]
-        if dense:
-            matcher_zoo_restored[k] = {
-                "matcher": match_dense.confs.get(v["matcher"]),
-                "dense": dense,
-            }
-        else:
-            matcher_zoo_restored[k] = {
-                "feature": extract_features.confs.get(v["feature"]),
-                "matcher": match_features.confs.get(v["matcher"]),
-                "dense": dense,
-            }
+        matcher_zoo_restored[k] = parse_match_config(v)
     return matcher_zoo_restored
+
+
+def parse_match_config(conf):
+    if conf["dense"]:
+        return {
+            "matcher": match_dense.confs.get(conf["matcher"]),
+            "dense": True,
+        }
+    else:
+        return {
+            "feature": extract_features.confs.get(conf["feature"]),
+            "matcher": match_features.confs.get(conf["matcher"]),
+            "dense": False,
+        }
 
 
 def get_model(match_conf: Dict[str, Any]):

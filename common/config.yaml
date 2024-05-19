@@ -319,6 +319,7 @@ matcher_zoo:
       project: null
       display: true
   gluestick:
+    enable: false
     matcher: gluestick
     dense: true
     info:
@@ -329,6 +330,7 @@ matcher_zoo:
       project: https://iago-suarez.com/gluestick
       display: true
   sold2:
+    enable: false
     matcher: sold2
     dense: true
     info:

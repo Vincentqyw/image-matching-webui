@@ -415,12 +415,17 @@ def display_matches(
     num_inliers = 0
     KPTS0_KEY = None
     KPTS1_KEY = None
+    confid = None
     if tag == "KPTS_RAW":
         KPTS0_KEY = "mkeypoints0_orig"
         KPTS1_KEY = "mkeypoints1_orig"
+        if "mconf" in pred:
+            confid = pred["mconf"]
     elif tag == "KPTS_RANSAC":
         KPTS0_KEY = "mmkeypoints0_orig"
         KPTS1_KEY = "mmkeypoints1_orig"
+        if "mmconf" in pred:
+            confid = pred["mmconf"]
     else:
         # TODO: LINES_RAW, LINES_RANSAC
         raise ValueError(f"Unknown tag: {tag}")
@@ -434,16 +439,14 @@ def display_matches(
         mkpts0 = pred[KPTS0_KEY]
         mkpts1 = pred[KPTS1_KEY]
         num_inliers = len(mkpts0)
-        if "mmconf" in pred:
-            mmconf = pred["mmconf"]
-        else:
-            mmconf = np.ones(len(mkpts0))
+        if confid is None:
+            confid = np.ones(len(mkpts0))
         fig_mkpts = draw_matches_core(
             mkpts0,
             mkpts1,
             img0,
             img1,
-            mmconf,
+            confid,
             dpi=dpi,
             titles=titles,
             texts=texts,
@@ -472,7 +475,8 @@ def display_matches(
         # keypoints
         mkpts0 = pred.get("line_keypoints0_orig")
         mkpts1 = pred.get("line_keypoints1_orig")
-
+        fig = None
+        breakpoint()
         if mkpts0 is not None and mkpts1 is not None:
             num_inliers = len(mkpts0)
             if "mconf" in pred:
