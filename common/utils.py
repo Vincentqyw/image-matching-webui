@@ -1,7 +1,10 @@
 import os
 import cv2
+import sys
 import torch
 import random
+import psutil
+import shutil
 import numpy as np
 import gradio as gr
 from pathlib import Path
@@ -40,6 +43,66 @@ DEFAULT_SETTING_GEOMETRY = "Homography"
 GRADIO_VERSION = gr.__version__.split(".")[0]
 MATCHER_ZOO = None
 models_already_loaded = {}
+
+
+class ModelCache:
+    def __init__(self, max_memory_size: int = 8):
+        self.max_memory_size = max_memory_size
+        self.current_memory_size = 0
+        self.model_dict = {}
+        self.model_timestamps = []
+
+    def cache_model(self, model_key, model_loader_func, model_conf):
+        if model_key in self.model_dict:
+            self.model_timestamps.remove(model_key)
+            self.model_timestamps.append(model_key)
+            logger.info(f"Load cached {model_key}")
+            return self.model_dict[model_key]
+
+        model = self._load_model_from_disk(model_loader_func, model_conf)
+        while self._calculate_model_memory() > self.max_memory_size:
+            if len(self.model_timestamps) == 0:
+                logger.warn(
+                    "RAM: {}GB, MAX RAM: {}GB".format(
+                        self._calculate_model_memory(), self.max_memory_size
+                    )
+                )
+                break
+            oldest_model_key = self.model_timestamps.pop(0)
+            self.current_memory_size = self._calculate_model_memory()
+            logger.info(f"Del cached {oldest_model_key}")
+            del self.model_dict[oldest_model_key]
+
+        self.model_dict[model_key] = model
+        self.model_timestamps.append(model_key)
+
+        self.print_memory_usage()
+        logger.info(f"Total cached {list(self.model_dict.keys())}")
+
+        return model
+
+    def _load_model_from_disk(self, model_loader_func, model_conf):
+        return model_loader_func(model_conf)
+
+    def _calculate_model_memory(self, verbose=False):
+        host_colocation = int(os.environ.get("HOST_COLOCATION", "1"))
+        vm = psutil.virtual_memory()
+        du = shutil.disk_usage(".")
+        vm_ratio = host_colocation * vm.used / vm.total
+        if verbose:
+            logger.info(
+                f"RAM: {vm.used / 1e9:.1f}/{vm.total / host_colocation / 1e9:.1f}GB"
+            )
+            # logger.info(
+            #     f"DISK: {du.used / 1e9:.1f}/{du.total / host_colocation / 1e9:.1f}GB"
+            # )
+        return vm.used / 1e9
+
+    def print_memory_usage(self):
+        self._calculate_model_memory(verbose=True)
+
+
+model_cache = ModelCache()
 
 
 def load_config(config_name: str) -> Dict[str, Any]:
@@ -579,6 +642,7 @@ def run_matching(
     ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
     choice_geometry_type: str = DEFAULT_SETTING_GEOMETRY,
     matcher_zoo: Dict[str, Any] = None,
+    use_cached_model: bool = True,
 ) -> Tuple[
     np.ndarray,
     np.ndarray,
@@ -639,15 +703,12 @@ def run_matching(
     match_conf["model"]["max_keypoints"] = extract_max_keypoints
     t0 = time.time()
     cache_key = "{}_{}".format(key, match_conf["model"]["name"])
-    if cache_key in models_already_loaded:
-        matcher = models_already_loaded[cache_key]
+    matcher = model_cache.cache_model(cache_key, get_model, match_conf)
+    if use_cached_model:
         matcher.conf["max_keypoints"] = extract_max_keypoints
         matcher.conf["match_threshold"] = match_threshold
         logger.info(f"Loaded cached model {cache_key}")
-    else:
-        matcher = get_model(match_conf)
-        models_already_loaded[cache_key] = matcher
-    # gr.Info(f"Loading model using: {time.time()-t0:.3f}s")
+
     logger.info(f"Loading model using: {time.time()-t0:.3f}s")
     t1 = time.time()
 
@@ -663,14 +724,15 @@ def run_matching(
         extract_conf["model"]["max_keypoints"] = extract_max_keypoints
         extract_conf["model"]["keypoint_threshold"] = keypoint_threshold
         cache_key = "{}_{}".format(key, extract_conf["model"]["name"])
-        if cache_key in models_already_loaded:
-            extractor = models_already_loaded[cache_key]
+
+        extractor = model_cache.cache_model(
+            cache_key, get_feature_model, extract_conf
+        )
+        if use_cached_model:
             extractor.conf["max_keypoints"] = extract_max_keypoints
             extractor.conf["keypoint_threshold"] = keypoint_threshold
             logger.info(f"Loaded cached model {cache_key}")
-        else:
-            extractor = get_feature_model(extract_conf)
-            models_already_loaded[cache_key] = extractor
+
         pred0 = extract_features.extract(
             extractor, image0, extract_conf["preprocessing"]
         )

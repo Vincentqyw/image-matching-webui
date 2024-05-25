@@ -7,9 +7,11 @@ from pathlib import Path
 from .. import logger
 from ..utils.base_model import BaseModel
 
-omniglue_path = Path(__file__).parent / "../../third_party/omniglue"
-sys.path.append(str(omniglue_path))
-from src import omniglue
+thirdparty_path = Path(__file__).parent / "../../third_party"
+sys.path.append(str(thirdparty_path))
+from omniglue.src import omniglue
+
+omniglue_path = thirdparty_path / "omniglue"
 
 
 class OmniGlue(BaseModel):
@@ -23,7 +25,7 @@ class OmniGlue(BaseModel):
     }
 
     def _init(self, conf):
-        logger.info(f"Loadeding OmniGlue model")
+        logger.info(f"Loading OmniGlue model")
         og_model_path = omniglue_path / "models" / "omniglue.onnx"
         sp_model_path = omniglue_path / "models" / "sp_v6.onnx"
         dino_model_path = (
@@ -42,7 +44,7 @@ class OmniGlue(BaseModel):
             og_export=str(og_model_path),
             sp_export=str(sp_model_path),
             dino_export=str(dino_model_path),
-            max_keypoints=self.conf["max_keypoints"] * 4,
+            max_keypoints=self.conf["max_keypoints"],
         )
         logger.info(f"Loaded OmniGlue model done!")
 
