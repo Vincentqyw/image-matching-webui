@@ -15,3 +15,4 @@ shapely==2.0.1
 yacs==0.1.8
 loguru==0.7.0
 e2cnn==0.2.3
+onnxruntime

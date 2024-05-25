@@ -58,3 +58,6 @@
 [submodule "third_party/dust3r"]
 	path = third_party/dust3r
 	url = https://github.com/naver/dust3r.git
+[submodule "third_party/omniglue"]
+	path = third_party/omniglue
+	url = https://github.com/Vincentqyw/omniglue-onnx.git

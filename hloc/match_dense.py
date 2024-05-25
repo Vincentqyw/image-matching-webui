@@ -211,6 +211,20 @@ confs = {
             "dfactor": 8,
         },
     },
+    "omniglue": {
+        "output": "matches-omniglue",
+        "model": {
+            "name": "omniglue",
+            "match_threshold": 0.2,
+            "features": "null",
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "force_resize": False,
+        },
+    },
     "sold2": {
         "output": "matches-sold2",
         "model": {
