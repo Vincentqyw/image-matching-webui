@@ -39,7 +39,6 @@ class OmniGlue(BaseModel):
                 subprocess.run(cmd, check=True)
             else:
                 logger.error(f"Invalid dinov2 model: {dino_model_path.name}")
-
         self.net = omniglue.OmniGlue(
             og_export=str(og_model_path),
             sp_export=str(sp_model_path),
@@ -54,9 +53,8 @@ class OmniGlue(BaseModel):
         image0_rgb_np = image0_rgb_np.astype(np.uint8)  # RGB, 0-255
         image1_rgb_np = image1_rgb_np.astype(np.uint8)  # RGB, 0-255
         match_kp0, match_kp1, match_confidences = self.net.FindMatches(
-            image0_rgb_np, image1_rgb_np
+            image0_rgb_np, image1_rgb_np, self.conf["max_keypoints"]
         )
-
         # filter matches
         match_threshold = self.conf["match_threshold"]
         keep_idx = []

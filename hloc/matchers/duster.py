@@ -105,7 +105,7 @@ class Duster(BaseModel):
         reciprocal_in_P2, nn2_in_P1, num_matches = find_reciprocal_matches(
             *pts3d_list
         )
-        print(f"found {num_matches} matches")
+        logger.info(f"Found {num_matches} matches")
         mkpts1 = pts2d_list[1][reciprocal_in_P2]
         mkpts0 = pts2d_list[0][nn2_in_P1][reciprocal_in_P2]
 
@@ -114,7 +114,6 @@ class Duster(BaseModel):
             keep = np.round(np.linspace(0, len(mkpts0) - 1, top_k)).astype(int)
             mkpts0 = mkpts0[keep]
             mkpts1 = mkpts1[keep]
-        breakpoint()
         pred = {
             "keypoints0": torch.from_numpy(mkpts0),
             "keypoints1": torch.from_numpy(mkpts1),

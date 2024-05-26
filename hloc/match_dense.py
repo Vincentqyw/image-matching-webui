@@ -216,6 +216,7 @@ confs = {
         "model": {
             "name": "omniglue",
             "match_threshold": 0.2,
+            "max_keypoints": 2000,
             "features": "null",
         },
         "preprocessing": {

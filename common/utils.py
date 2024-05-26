@@ -642,7 +642,7 @@ def run_matching(
     ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
     choice_geometry_type: str = DEFAULT_SETTING_GEOMETRY,
     matcher_zoo: Dict[str, Any] = None,
-    use_cached_model: bool = True,
+    use_cached_model: bool = False,
 ) -> Tuple[
     np.ndarray,
     np.ndarray,
@@ -696,19 +696,21 @@ def run_matching(
             f"Success! Please be patient and allow for about 2-3 minutes."
             f" Due to CPU inference, {key} is quiet slow."
         )
+    t0 = time.time()
     model = matcher_zoo[key]
     match_conf = model["matcher"]
     # update match config
     match_conf["model"]["match_threshold"] = match_threshold
     match_conf["model"]["max_keypoints"] = extract_max_keypoints
-    t0 = time.time()
     cache_key = "{}_{}".format(key, match_conf["model"]["name"])
-    matcher = model_cache.cache_model(cache_key, get_model, match_conf)
     if use_cached_model:
+        # because of the model cache, we need to update the config
+        matcher = model_cache.cache_model(cache_key, get_model, match_conf)
         matcher.conf["max_keypoints"] = extract_max_keypoints
         matcher.conf["match_threshold"] = match_threshold
         logger.info(f"Loaded cached model {cache_key}")
-
+    else:
+        matcher = get_model(match_conf)
     logger.info(f"Loading model using: {time.time()-t0:.3f}s")
     t1 = time.time()
 
@@ -725,13 +727,16 @@ def run_matching(
         extract_conf["model"]["keypoint_threshold"] = keypoint_threshold
         cache_key = "{}_{}".format(key, extract_conf["model"]["name"])
 
-        extractor = model_cache.cache_model(
-            cache_key, get_feature_model, extract_conf
-        )
         if use_cached_model:
+            extractor = model_cache.cache_model(
+                cache_key, get_feature_model, extract_conf
+            )
+            # because of the model cache, we need to update the config
             extractor.conf["max_keypoints"] = extract_max_keypoints
             extractor.conf["keypoint_threshold"] = keypoint_threshold
             logger.info(f"Loaded cached model {cache_key}")
+        else:
+            extractor = get_feature_model(extract_conf)
 
         pred0 = extract_features.extract(
             extractor, image0, extract_conf["preprocessing"]
