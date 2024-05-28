@@ -27,28 +27,6 @@ warnings.simplefilter("ignore")
 
 class ImageMatchingAPI(torch.nn.Module):
     default_conf = {
-        "dense": True,
-        "matcher": {
-            "model": {
-                "name": "topicfm",
-                "match_threshold": 0.2,
-            }
-        },
-        "feature": {
-            "model": {
-                "name": "xfeat",
-                "max_keypoints": 1024,
-                "keypoint_threshold": 0.015,
-            },
-            "preprocessing": {
-                "grayscale": False,
-                "resize_max": 1600,
-                "force_resize": True,
-                "width": 640,
-                "height": 480,
-                "dfactor": 8,
-            },
-        },
         "ransac": {
             "enable": True,
             "estimator": "poselib",
@@ -83,7 +61,7 @@ class ImageMatchingAPI(torch.nn.Module):
         """
         super().__init__()
         self.device = device
-        self.conf = self.parse_match_config(conf)
+        self.conf = {**self.default_conf, **conf}
         self._updata_config(detect_threshold, max_keypoints, match_threshold)
         self._init_models()
         if device == "cuda":
@@ -126,14 +104,20 @@ class ImageMatchingAPI(torch.nn.Module):
     ):
         self.dense = self.conf["dense"]
         if self.conf["dense"]:
-            self.conf["matcher"]["model"]["match_threshold"] = match_threshold
+            try:
+                self.conf["matcher"]["model"][
+                    "match_threshold"
+                ] = match_threshold
+            except TypeError as e:
+                breakpoint()
         else:
             self.conf["feature"]["model"]["max_keypoints"] = max_keypoints
             self.conf["feature"]["model"][
                 "keypoint_threshold"
             ] = detect_threshold
+            self.extract_conf = self.conf["feature"]
+
         self.match_conf = self.conf["matcher"]
-        self.extract_conf = self.conf["feature"]
 
     def _init_models(self):
         # initialize matcher

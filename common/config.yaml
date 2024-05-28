@@ -16,29 +16,29 @@ defaults:
   setting_geometry: Homography
 
 matcher_zoo:
-  omniglue:
-    enable: true
-    matcher: omniglue
-    dense: true
-    info:
-      name: OmniGlue
-      source: "CVPR 2024"
-      github: https://github.com/Vincentqyw/omniglue-onnx
-      paper: https://arxiv.org/abs/2405.12979
-      project: https://hwjiang1510.github.io/OmniGlue/
-      display: true
-  DUSt3R:
-    # TODO: duster is under development  
-    enable: false
-    matcher: duster
-    dense: true
-    info: 
-      name: DUSt3R #dispaly name
-      source: "CVPR 2024"
-      github: https://github.com/naver/dust3r
-      paper: https://arxiv.org/abs/2312.14132
-      project: https://dust3r.europe.naverlabs.com
-      display: true  
+  # omniglue:
+  #   enable: true
+  #   matcher: omniglue
+  #   dense: true
+  #   info:
+  #     name: OmniGlue
+  #     source: "CVPR 2024"
+  #     github: https://github.com/Vincentqyw/omniglue-onnx
+  #     paper: https://arxiv.org/abs/2405.12979
+  #     project: https://hwjiang1510.github.io/OmniGlue/
+  #     display: true
+  # DUSt3R:
+  #   # TODO: duster is under development  
+  #   enable: false
+  #   matcher: duster
+  #   dense: true
+  #   info: 
+  #     name: DUSt3R #dispaly name
+  #     source: "CVPR 2024"
+  #     github: https://github.com/naver/dust3r
+  #     paper: https://arxiv.org/abs/2312.14132
+  #     project: https://dust3r.europe.naverlabs.com
+  #     display: true  
   GIM(dkm):
     matcher: gim(dkm)
     dense: true

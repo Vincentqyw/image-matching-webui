@@ -41,29 +41,32 @@ def test_one():
     image1 = cv2.imread(str(img_path2))[:, :, ::-1]  # RGB
     # sparse
     conf = {
-        "dense": False,
-        "matcher": {
-            "model": {
-                "name": "NN-mutual",
-                "match_threshold": 0.2,
-            }
-        },
         "feature": {
+            "output": "feats-superpoint-n4096-rmax1600",
             "model": {
-                "name": "xfeat",
-                "max_keypoints": 1024,
-                "keypoint_threshold": 0.015,
-            }
+                "name": "superpoint",
+                "nms_radius": 3,
+                "max_keypoints": 4096,
+                "keypoint_threshold": 0.005,
+            },
+            "preprocessing": {
+                "grayscale": True,
+                "force_resize": True,
+                "resize_max": 1600,
+                "width": 640,
+                "height": 480,
+                "dfactor": 8,
+            },
         },
-        "ransac": {
-            "enable": True,
-            "estimator": "poselib",
-            "geometry": "homography",
-            "method": "RANSAC",
-            "reproj_threshold": 3,
-            "confidence": 0.9999,
-            "max_iter": 10000,
+        "matcher": {
+            "output": "matches-NN-mutual",
+            "model": {
+                "name": "nearest_neighbor",
+                "do_mutual_check": True,
+                "match_threshold": 0.2,
+            },
         },
+        "dense": False,
     }
     api = ImageMatchingAPI(conf=conf, device=device)
     api(image0, image1)
@@ -73,24 +76,28 @@ def test_one():
 
     # dense
     conf = {
-        "dense": True,
         "matcher": {
+            "output": "matches-loftr",
             "model": {
                 "name": "loftr",
+                "weights": "outdoor",
+                "max_keypoints": 2000,
                 "match_threshold": 0.2,
-            }
+            },
+            "preprocessing": {
+                "grayscale": True,
+                "resize_max": 1024,
+                "dfactor": 8,
+                "width": 640,
+                "height": 480,
+                "force_resize": True,
+            },
+            "max_error": 1,
+            "cell_size": 1,
         },
-        "feature": {},
-        "ransac": {
-            "enable": True,
-            "estimator": "poselib",
-            "geometry": "homography",
-            "method": "RANSAC",
-            "reproj_threshold": 3,
-            "confidence": 0.9999,
-            "max_iter": 10000,
-        },
+        "dense": True,
     }
+
     api = ImageMatchingAPI(conf=conf, device=device)
     api(image0, image1)
     log_path = ROOT / "experiments" / "one"
