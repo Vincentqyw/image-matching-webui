@@ -39,7 +39,15 @@ class ImageMatchingAPI(torch.nn.Module):
                 "name": "xfeat",
                 "max_keypoints": 1024,
                 "keypoint_threshold": 0.015,
-            }
+            },
+            "preprocessing": {
+                "grayscale": False,
+                "resize_max": 1600,
+                "force_resize": True,
+                "width": 640,
+                "height": 480,
+                "dfactor": 8,
+            },
         },
         "ransac": {
             "enable": True,
@@ -75,12 +83,18 @@ class ImageMatchingAPI(torch.nn.Module):
         """
         super().__init__()
         self.device = device
-        self.conf = conf = {
-            **self.parse_match_config(self.default_conf),
-            **conf,
-        }
+        self.conf = self.parse_match_config(conf)
         self._updata_config(detect_threshold, max_keypoints, match_threshold)
         self._init_models()
+        if device == "cuda":
+            memory_allocated = torch.cuda.memory_allocated(device)
+            memory_reserved = torch.cuda.memory_reserved(device)
+            logger.info(
+                f"GPU memory allocated: {memory_allocated / 1024**2:.3f} MB"
+            )
+            logger.info(
+                f"GPU memory reserved: {memory_reserved / 1024**2:.3f} MB"
+            )
         self.pred = None
 
     def parse_match_config(self, conf):
@@ -123,7 +137,7 @@ class ImageMatchingAPI(torch.nn.Module):
 
     def _init_models(self):
         # initialize matcher
-        self.matcher = get_model(self.conf["matcher"])
+        self.matcher = get_model(self.match_conf)
         # initialize extractor
         if self.dense:
             self.extractor = None
