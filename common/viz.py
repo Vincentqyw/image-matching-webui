@@ -286,7 +286,7 @@ def draw_matches_core(
     thr = 0.5
     color = error_colormap(conf, thr, alpha=0.1)
     text = [
-        "image name",
+        # "image name",
         f"#Matches: {len(mkpts0)}",
     ]
     if path:
