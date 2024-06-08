@@ -7,7 +7,7 @@ defaults:
   max_keypoints: 2000
   keypoint_threshold: 0.05
   enable_ransac: true
-  ransac_method: USAC_MAGSAC
+  ransac_method: CV2_USAC_MAGSAC
   ransac_reproj_threshold: 8
   ransac_confidence: 0.999
   ransac_max_iter: 10000

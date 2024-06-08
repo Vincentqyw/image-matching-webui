@@ -8,6 +8,7 @@ import shutil
 import numpy as np
 import gradio as gr
 from pathlib import Path
+import poselib
 from itertools import combinations
 from typing import Callable, Dict, Any, Optional, Tuple, List, Union
 from hloc import matchers, extractors, logger
@@ -33,7 +34,7 @@ DEFAULT_SETTING_THRESHOLD = 0.1
 DEFAULT_SETTING_MAX_FEATURES = 2000
 DEFAULT_DEFAULT_KEYPOINT_THRESHOLD = 0.01
 DEFAULT_ENABLE_RANSAC = True
-DEFAULT_RANSAC_METHOD = "USAC_MAGSAC"
+DEFAULT_RANSAC_METHOD = "CV2_USAC_MAGSAC"
 DEFAULT_RANSAC_REPROJ_THRESHOLD = 8
 DEFAULT_RANSAC_CONFIDENCE = 0.999
 DEFAULT_RANSAC_MAX_ITER = 10000
@@ -42,7 +43,6 @@ DEFAULT_MATCHING_THRESHOLD = 0.2
 DEFAULT_SETTING_GEOMETRY = "Homography"
 GRADIO_VERSION = gr.__version__.split(".")[0]
 MATCHER_ZOO = None
-models_already_loaded = {}
 
 
 class ModelCache:
@@ -314,13 +314,141 @@ def set_null_pred(feature_type: str, pred: dict):
     return pred
 
 
+def _filter_matches_opencv(
+    kp0: np.ndarray,
+    kp1: np.ndarray,
+    method: int = cv2.RANSAC,
+    reproj_threshold: float = 3.0,
+    confidence: float = 0.99,
+    max_iter: int = 2000,
+    geometry_type: str = "Homography",
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Filters matches between two sets of keypoints using OpenCV's findHomography.
+
+    Args:
+        kp0 (np.ndarray): Array of keypoints from the first image.
+        kp1 (np.ndarray): Array of keypoints from the second image.
+        method (int, optional): RANSAC method. Defaults to "cv2.RANSAC".
+        reproj_threshold (float, optional): RANSAC reprojection threshold. Defaults to 3.0.
+        confidence (float, optional): RANSAC confidence. Defaults to 0.99.
+        max_iter (int, optional): RANSAC maximum iterations. Defaults to 2000.
+        geometry_type (str, optional): Type of geometry. Defaults to "Homography".
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Homography matrix and mask.
+    """
+    if geometry_type == "Homography":
+        M, mask = cv2.findHomography(
+            kp0,
+            kp1,
+            method=method,
+            ransacReprojThreshold=reproj_threshold,
+            confidence=confidence,
+            maxIters=max_iter,
+        )
+    elif geometry_type == "Fundamental":
+        M, mask = cv2.findFundamentalMat(
+            kp0,
+            kp1,
+            method=method,
+            ransacReprojThreshold=reproj_threshold,
+            confidence=confidence,
+            maxIters=max_iter,
+        )
+    mask = np.array(mask.ravel().astype("bool"), dtype="bool")
+    return M, mask
+
+
+def _filter_matches_poselib(
+    kp0: np.ndarray,
+    kp1: np.ndarray,
+    method: int = None,  # not used
+    reproj_threshold: float = 3,
+    confidence: float = 0.99,
+    max_iter: int = 2000,
+    geometry_type: str = "Homography",
+) -> dict:
+    """
+    Filters matches between two sets of keypoints using the poselib library.
+
+    Args:
+        kp0 (np.ndarray): Array of keypoints from the first image.
+        kp1 (np.ndarray): Array of keypoints from the second image.
+        method (str, optional): RANSAC method. Defaults to "RANSAC".
+        reproj_threshold (float, optional): RANSAC reprojection threshold. Defaults to 3.
+        confidence (float, optional): RANSAC confidence. Defaults to 0.99.
+        max_iter (int, optional): RANSAC maximum iterations. Defaults to 2000.
+        geometry_type (str, optional): Type of geometry. Defaults to "Homography".
+
+    Returns:
+        dict: Information about the homography estimation.
+    """
+    ransac_options = {
+        "max_iterations": max_iter,
+        # "min_iterations":  min_iter,
+        "success_prob": confidence,
+        "max_reproj_error": reproj_threshold,
+        # "progressive_sampling": args.sampler.lower() == 'prosac'
+    }
+
+    if geometry_type == "Homography":
+        M, info = poselib.estimate_homography(kp0, kp1, ransac_options)
+    elif geometry_type == "Fundamental":
+        M, info = poselib.estimate_fundamental(kp0, kp1, ransac_options)
+    else:
+        raise notImplementedError("Not Implemented")
+
+    return M, np.array(info["inliers"])
+
+
+def proc_ransac_matches(
+    mkpts0: np.ndarray,
+    mkpts1: np.ndarray,
+    ransac_method: str = DEFAULT_RANSAC_METHOD,
+    ransac_reproj_threshold: float = 3.0,
+    ransac_confidence: float = 0.99,
+    ransac_max_iter: int = 2000,
+    geometry_type: str = "Homography",
+):
+    if ransac_method.startswith("CV2"):
+        logger.info(
+            f"ransac_method: {ransac_method}, geometry_type: {geometry_type}"
+        )
+        return _filter_matches_opencv(
+            mkpts0,
+            mkpts1,
+            ransac_zoo[ransac_method],
+            ransac_reproj_threshold,
+            ransac_confidence,
+            ransac_max_iter,
+            geometry_type,
+        )
+    elif ransac_method.startswith("POSELIB"):
+        logger.info(
+            f"ransac_method: {ransac_method}, geometry_type: {geometry_type}"
+        )
+        return _filter_matches_poselib(
+            mkpts0,
+            mkpts1,
+            None,
+            ransac_reproj_threshold,
+            ransac_confidence,
+            ransac_max_iter,
+            geometry_type,
+        )
+    else:
+        raise notImplementedError("Not Implemented")
+
+
 def filter_matches(
     pred: Dict[str, Any],
     ransac_method: str = DEFAULT_RANSAC_METHOD,
     ransac_reproj_threshold: float = DEFAULT_RANSAC_REPROJ_THRESHOLD,
     ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
     ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
-) -> Dict[str, Any]:
+    ransac_estimator: str = None,
+):
     """
     Filter matches using RANSAC. If keypoints are available, filter by keypoints.
     If lines are available, filter by lines. If both keypoints and lines are
@@ -359,16 +487,17 @@ def filter_matches(
 
     if len(mkpts0) < DEFAULT_MIN_NUM_MATCHES:
         return set_null_pred(feature_type, pred)
-    H, mask = cv2.findHomography(
-        mkpts0,
-        mkpts1,
-        method=ransac_zoo[ransac_method],
-        ransacReprojThreshold=ransac_reproj_threshold,
-        confidence=ransac_confidence,
-        maxIters=ransac_max_iter,
+
+    geom_info = compute_geometry(
+        pred,
+        ransac_method=ransac_method,
+        ransac_reproj_threshold=ransac_reproj_threshold,
+        ransac_confidence=ransac_confidence,
+        ransac_max_iter=ransac_max_iter,
     )
-    mask = np.array(mask.ravel().astype("bool"), dtype="bool")
-    if H is not None:
+
+    if "Homography" in geom_info.keys():
+        mask = geom_info["mask_h"]
         if feature_type == "KEYPOINT":
             pred["mmkeypoints0_orig"] = mkpts0[mask]
             pred["mmkeypoints1_orig"] = mkpts1[mask]
@@ -376,9 +505,13 @@ def filter_matches(
         elif feature_type == "LINE":
             pred["mline_keypoints0_orig"] = mkpts0[mask]
             pred["mline_keypoints1_orig"] = mkpts1[mask]
-        pred["H"] = H
+        pred["H"] = np.array(geom_info["Homography"])
     else:
         set_null_pred(feature_type, pred)
+    # do not show mask
+    geom_info.pop("mask_h", None)
+    geom_info.pop("mask_f", None)
+    pred["geom_info"] = geom_info
     return pred
 
 
@@ -419,34 +552,41 @@ def compute_geometry(
     if mkpts0 is not None and mkpts1 is not None:
         if len(mkpts0) < 2 * DEFAULT_MIN_NUM_MATCHES:
             return {}
-        h1, w1, _ = pred["image0_orig"].shape
         geo_info: Dict[str, List[float]] = {}
-        F, inliers = cv2.findFundamentalMat(
+
+        F, mask_f = proc_ransac_matches(
             mkpts0,
             mkpts1,
-            method=ransac_zoo[ransac_method],
-            ransacReprojThreshold=ransac_reproj_threshold,
-            confidence=ransac_confidence,
-            maxIters=ransac_max_iter,
+            ransac_method,
+            ransac_reproj_threshold,
+            ransac_confidence,
+            ransac_max_iter,
+            geometry_type="Fundamental",
         )
+
         if F is not None:
             geo_info["Fundamental"] = F.tolist()
-        H, _ = cv2.findHomography(
+            geo_info["mask_f"] = mask_f
+        H, mask_h = proc_ransac_matches(
             mkpts1,
             mkpts0,
-            method=ransac_zoo[ransac_method],
-            ransacReprojThreshold=ransac_reproj_threshold,
-            confidence=ransac_confidence,
-            maxIters=ransac_max_iter,
+            ransac_method,
+            ransac_reproj_threshold,
+            ransac_confidence,
+            ransac_max_iter,
+            geometry_type="Homography",
         )
+
+        h0, w0, _ = pred["image0_orig"].shape
         if H is not None:
             geo_info["Homography"] = H.tolist()
+            geo_info["mask_h"] = mask_h
             try:
                 _, H1, H2 = cv2.stereoRectifyUncalibrated(
                     mkpts0.reshape(-1, 2),
                     mkpts1.reshape(-1, 2),
                     F,
-                    imgSize=(w1, h1),
+                    imgSize=(w0, h0),
                 )
                 geo_info["H1"] = H1.tolist()
                 geo_info["H2"] = H2.tolist()
@@ -475,19 +615,21 @@ def wrap_images(
     Returns:
         A tuple containing a base64 encoded image string and a dictionary with the transformation matrix.
     """
-    h1, w1, _ = img0.shape
-    h2, w2, _ = img1.shape
+    h0, w0, _ = img0.shape
+    h1, w1, _ = img1.shape
     result_matrix: Optional[np.ndarray] = None
     if geo_info is not None and len(geo_info) != 0:
         rectified_image0 = img0
         rectified_image1 = None
+        if "Homography" not in geo_info:
+            logger.warning(f"{geom_type} not exist, maybe too less matches")
+            return None, None
+
         H = np.array(geo_info["Homography"])
 
         title: List[str] = []
         if geom_type == "Homography":
-            rectified_image1 = cv2.warpPerspective(
-                img1, H, (img0.shape[1], img0.shape[0])
-            )
+            rectified_image1 = cv2.warpPerspective(img1, H, (w0, h0))
             result_matrix = H
             title = ["Image 0", "Image 1 - warped"]
         elif geom_type == "Fundamental":
@@ -496,8 +638,8 @@ def wrap_images(
                 return None, None
             else:
                 H1, H2 = np.array(geo_info["H1"]), np.array(geo_info["H2"])
-                rectified_image0 = cv2.warpPerspective(img0, H1, (w1, h1))
-                rectified_image1 = cv2.warpPerspective(img1, H2, (w2, h2))
+                rectified_image0 = cv2.warpPerspective(img0, H1, (w0, h0))
+                rectified_image1 = cv2.warpPerspective(img1, H2, (w1, h1))
                 result_matrix = np.array(geo_info["Fundamental"])
                 title = ["Image 0 - warped", "Image 1 - warped"]
         else:
@@ -537,8 +679,8 @@ def generate_warp_images(
         or "geom_info" not in matches_info.keys()
     ):
         return None, None
-    geom_info: Dict[str, Any] = matches_info["geom_info"]
-    wrapped_images: Optional[np.ndarray] = None
+    geom_info = matches_info["geom_info"]
+    wrapped_images = None
     if choice != "No":
         wrapped_images, _ = wrap_images(
             input_image0, input_image1, geom_info, choice
@@ -603,17 +745,10 @@ def run_ransac(
     t1 = time.time()
 
     # compute warp images
-    geom_info = compute_geometry(
-        state_cache,
-        ransac_method=ransac_method,
-        ransac_reproj_threshold=ransac_reproj_threshold,
-        ransac_confidence=ransac_confidence,
-        ransac_max_iter=ransac_max_iter,
-    )
     output_wrapped, _ = generate_warp_images(
         state_cache["image0_orig"],
         state_cache["image1_orig"],
-        {"geom_info": geom_info},
+        state_cache,
         choice_geometry_type,
     )
     plt.close("all")
@@ -774,6 +909,7 @@ def run_matching(
         ransac_confidence=ransac_confidence,
         ransac_max_iter=ransac_max_iter,
     )
+
     # gr.Info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
     logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
     t1 = time.time()
@@ -791,21 +927,13 @@ def run_matching(
 
     t1 = time.time()
     # plot wrapped images
-    geom_info = compute_geometry(
-        pred,
-        ransac_method=ransac_method,
-        ransac_reproj_threshold=ransac_reproj_threshold,
-        ransac_confidence=ransac_confidence,
-        ransac_max_iter=ransac_max_iter,
-    )
     output_wrapped, _ = generate_warp_images(
         pred["image0_orig"],
         pred["image1_orig"],
-        {"geom_info": geom_info},
+        pred,
         choice_geometry_type,
     )
     plt.close("all")
-    # del pred
     # gr.Info(f"In summary, total time: {time.time()-t0:.3f}s")
     logger.info(f"TOTAL time: {time.time()-t0:.3f}s")
 
@@ -825,7 +953,7 @@ def run_matching(
             "extractor_conf": extract_conf,
         },
         {
-            "geom_info": geom_info,
+            "geom_info": pred["geom_info"],
         },
         output_wrapped,
         state_cache,
@@ -835,14 +963,15 @@ def run_matching(
 # @ref: https://docs.opencv.org/4.x/d0/d74/md__build_4_x-contrib_docs-lin64_opencv_doc_tutorials_calib3d_usac.html
 # AND: https://opencv.org/blog/2021/06/09/evaluating-opencvs-new-ransacs
 ransac_zoo = {
-    "RANSAC": cv2.RANSAC,
-    "USAC_MAGSAC": cv2.USAC_MAGSAC,
-    "USAC_DEFAULT": cv2.USAC_DEFAULT,
-    "USAC_FM_8PTS": cv2.USAC_FM_8PTS,
-    "USAC_PROSAC": cv2.USAC_PROSAC,
-    "USAC_FAST": cv2.USAC_FAST,
-    "USAC_ACCURATE": cv2.USAC_ACCURATE,
-    "USAC_PARALLEL": cv2.USAC_PARALLEL,
+    "POSELIB": "LO-RANSAC",
+    "CV2_RANSAC": cv2.RANSAC,
+    "CV2_USAC_MAGSAC": cv2.USAC_MAGSAC,
+    "CV2_USAC_DEFAULT": cv2.USAC_DEFAULT,
+    "CV2_USAC_FM_8PTS": cv2.USAC_FM_8PTS,
+    "CV2_USAC_PROSAC": cv2.USAC_PROSAC,
+    "CV2_USAC_FAST": cv2.USAC_FAST,
+    "CV2_USAC_ACCURATE": cv2.USAC_ACCURATE,
+    "CV2_USAC_PARALLEL": cv2.USAC_PARALLEL,
 }
 
 
