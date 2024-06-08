@@ -649,8 +649,7 @@ def wrap_images(
             title,
             dpi=300,
         )
-        dictionary = {}
-        return fig2im(fig), dictionary
+        return fig2im(fig), rectified_image1
     else:
         return None, None
 
@@ -660,7 +659,7 @@ def generate_warp_images(
     input_image1: np.ndarray,
     matches_info: Dict[str, Any],
     choice: str,
-) -> Tuple[Optional[np.ndarray], Optional[Dict[str, Any]]]:
+) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
     """
     Changes the estimate of the geometric transformation used to align the images.
 
@@ -671,7 +670,7 @@ def generate_warp_images(
         choice: Type of geometric transformation to use ('Homography' or 'Fundamental') or 'No' to disable.
 
     Returns:
-        A tuple containing the updated images and the updated matches info.
+        A tuple containing the updated images and the warpped images.
     """
     if (
         matches_info is None
@@ -682,10 +681,29 @@ def generate_warp_images(
     geom_info = matches_info["geom_info"]
     wrapped_images = None
     if choice != "No":
-        wrapped_images, _ = wrap_images(
+        wrapped_image_pair, warped_image = wrap_images(
             input_image0, input_image1, geom_info, choice
         )
-        return wrapped_images, matches_info
+        return wrapped_image_pair, warped_image
+    else:
+        return None, None
+
+
+def send_to_match(state_cache: Dict[str, Any]):
+    """
+    Send the state cache to the match function.
+
+    Args:
+        state_cache (Dict[str, Any]): Current state of the app.
+
+    Returns:
+        None
+    """
+    if state_cache:
+        return (
+            state_cache["image0_orig"],
+            state_cache["wrapped_image"],
+        )
     else:
         return None, None
 
@@ -745,7 +763,7 @@ def run_ransac(
     t1 = time.time()
 
     # compute warp images
-    output_wrapped, _ = generate_warp_images(
+    output_wrapped, warped_image = generate_warp_images(
         state_cache["image0_orig"],
         state_cache["image1_orig"],
         state_cache,
@@ -754,6 +772,7 @@ def run_ransac(
     plt.close("all")
 
     num_matches_raw = state_cache["num_matches_raw"]
+    state_cache["wrapped_image"] = warped_image
     return (
         output_matches_ransac,
         {
@@ -927,7 +946,7 @@ def run_matching(
 
     t1 = time.time()
     # plot wrapped images
-    output_wrapped, _ = generate_warp_images(
+    output_wrapped, warped_image = generate_warp_images(
         pred["image0_orig"],
         pred["image1_orig"],
         pred,
@@ -940,6 +959,7 @@ def run_matching(
     state_cache = pred
     state_cache["num_matches_raw"] = num_matches_raw
     state_cache["num_matches_ransac"] = num_matches_ransac
+    state_cache["wrapped_image"] = warped_image
     return (
         output_keypoints,
         output_matches_raw,

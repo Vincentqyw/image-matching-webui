@@ -10,6 +10,7 @@ from common.utils import (
     get_matcher_zoo,
     run_matching,
     run_ransac,
+    send_to_match,
     gen_examples,
     GRADIO_VERSION,
     ROOT,
@@ -212,32 +213,44 @@ class ImageMatchingApp:
                         # Add some examples
                         with gr.Row():
                             # Example inputs
-                            gr.Examples(
-                                examples=gen_examples(),
-                                inputs=inputs,
-                                outputs=[],
-                                fn=run_matching,
-                                cache_examples=False,
-                                label=(
-                                    "Examples (click one of the images below to Run"
-                                    " Match). Thx: WxBS"
-                                ),
-                            )
+                            with gr.Accordion(
+                                "Open for More: Examples", open=True
+                            ):
+                                gr.Examples(
+                                    examples=gen_examples(),
+                                    inputs=inputs,
+                                    outputs=[],
+                                    fn=run_matching,
+                                    cache_examples=False,
+                                    label=(
+                                        "Examples (click one of the images below to Run"
+                                        " Match). Thx: WxBS"
+                                    ),
+                                )
                         with gr.Accordion("Supported Algorithms", open=False):
                             # add a table of supported algorithms
                             self.display_supported_algorithms()
 
                     with gr.Column():
-                        output_keypoints = gr.Image(
-                            label="Keypoints", type="numpy"
-                        )
-                        output_matches_raw = gr.Image(
-                            label="Raw Matches",
-                            type="numpy",
-                        )
-                        output_matches_ransac = gr.Image(
-                            label="Ransac Matches", type="numpy"
-                        )
+                        with gr.Accordion(
+                            "Open for More: Keypoints", open=True
+                        ):
+                            output_keypoints = gr.Image(
+                                label="Keypoints", type="numpy"
+                            )
+                        with gr.Accordion(
+                            "Open for More: Raw Matches", open=False
+                        ):
+                            output_matches_raw = gr.Image(
+                                label="Raw Matches",
+                                type="numpy",
+                            )
+                        with gr.Accordion(
+                            "Open for More: RANSAC Matches", open=True
+                        ):
+                            output_matches_ransac = gr.Image(
+                                label="Ransac Matches", type="numpy"
+                            )
                         with gr.Accordion(
                             "Open for More: Matches Statistics", open=False
                         ):
@@ -247,10 +260,15 @@ class ImageMatchingApp:
                             matcher_info = gr.JSON(label="Match info")
 
                         with gr.Accordion(
-                            "Open for More: Warped Image", open=False
+                            "Open for More: Warped Image", open=True
                         ):
                             output_wrapped = gr.Image(
                                 label="Wrapped Pair", type="numpy"
+                            )
+                            # send to input
+                            button_rerun = gr.Button(
+                                value="Send to Input Match Pair",
+                                variant="primary",
                             )
                             with gr.Accordion(
                                 "Open for More: Geometry info", open=False
@@ -286,7 +304,6 @@ class ImageMatchingApp:
                     button_run.click(
                         fn=run_matching, inputs=inputs, outputs=outputs
                     )
-
                     # Reset images
                     reset_outputs = [
                         input_image0,
@@ -333,6 +350,13 @@ class ImageMatchingApp:
                             matches_result_info,
                             output_wrapped,
                         ],
+                    )
+
+                    # send warped image to match
+                    button_rerun.click(
+                        fn=send_to_match,
+                        inputs=[state_cache],
+                        outputs=[input_image0, input_image1],
                     )
 
                     # estimate geo
