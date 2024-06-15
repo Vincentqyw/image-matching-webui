@@ -311,6 +311,7 @@ def set_null_pred(feature_type: str, pred: dict):
         pred["mline_keypoints0_orig"] = np.array([])
         pred["mline_keypoints1_orig"] = np.array([])
     pred["H"] = None
+    pred["geom_info"] = {}
     return pred
 
 
@@ -973,7 +974,7 @@ def run_matching(
             "extractor_conf": extract_conf,
         },
         {
-            "geom_info": pred["geom_info"],
+            "geom_info": pred.get("geom_info", {}),
         },
         output_wrapped,
         state_cache,
