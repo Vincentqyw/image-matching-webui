@@ -254,6 +254,9 @@ class ImageMatchingApp:
                         with gr.Accordion(
                             "Open for More: Matches Statistics", open=False
                         ):
+                            output_pred = gr.File(
+                                label="Outputs", elem_id="download"
+                            )
                             matches_result_info = gr.JSON(
                                 label="Matches Statistics"
                             )
@@ -299,6 +302,7 @@ class ImageMatchingApp:
                         geometry_result,
                         output_wrapped,
                         state_cache,
+                        output_pred,
                     ]
                     # button callbacks
                     button_run.click(
@@ -327,6 +331,7 @@ class ImageMatchingApp:
                         ransac_confidence,
                         ransac_max_iter,
                         choice_geometry_type,
+                        output_pred,
                     ]
                     button_reset.click(
                         fn=self.ui_reset_state,
@@ -349,6 +354,7 @@ class ImageMatchingApp:
                             output_matches_ransac,
                             matches_result_info,
                             output_wrapped,
+                            output_pred,
                         ],
                     )
 
@@ -492,6 +498,7 @@ class ImageMatchingApp:
             ],  # ransac_confidence: float
             self.cfg["defaults"]["ransac_max_iter"],  # ransac_max_iter: int
             self.cfg["defaults"]["setting_geometry"],  # geometry: str
+            None,  # predictions
         )
 
     def display_supported_algorithms(self, style="tab"):

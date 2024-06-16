@@ -24,6 +24,8 @@ from .viz import (
 import time
 import matplotlib.pyplot as plt
 import warnings
+import tempfile
+import pickle
 
 warnings.simplefilter("ignore")
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -774,6 +776,14 @@ def run_ransac(
 
     num_matches_raw = state_cache["num_matches_raw"]
     state_cache["wrapped_image"] = warped_image
+
+    # tmp_state_cache = tempfile.NamedTemporaryFile(suffix='.pkl', delete=False)
+    tmp_state_cache = "output.pkl"
+    with open(tmp_state_cache, "wb") as f:
+        pickle.dump(state_cache, f)
+
+    logger.info(f"Dump results done!")
+
     return (
         output_matches_ransac,
         {
@@ -781,6 +791,7 @@ def run_ransac(
             "num_matches_ransac": num_matches_ransac,
         },
         output_wrapped,
+        tmp_state_cache,
     )
 
 
@@ -961,6 +972,12 @@ def run_matching(
     state_cache["num_matches_raw"] = num_matches_raw
     state_cache["num_matches_ransac"] = num_matches_ransac
     state_cache["wrapped_image"] = warped_image
+
+    # tmp_state_cache = tempfile.NamedTemporaryFile(suffix='.pkl', delete=False)
+    tmp_state_cache = "output.pkl"
+    with open(tmp_state_cache, "wb") as f:
+        pickle.dump(state_cache, f)
+    logger.info(f"Dump results done!")
     return (
         output_keypoints,
         output_matches_raw,
@@ -978,6 +995,7 @@ def run_matching(
         },
         output_wrapped,
         state_cache,
+        tmp_state_cache,
     )
 
 
