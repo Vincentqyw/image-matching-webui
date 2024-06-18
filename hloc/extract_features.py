@@ -145,8 +145,10 @@ confs = {
     "sift": {
         "output": "feats-sift-n5000-r1600",
         "model": {
-            "name": "dog",
+            "name": "sift",
+            # "name": "dog",
             "descriptor": "sift",
+            "rootsift": False,
             "max_keypoints": 5000,
         },
         "preprocessing": {

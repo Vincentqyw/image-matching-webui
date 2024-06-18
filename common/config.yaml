@@ -197,6 +197,17 @@ matcher_zoo:
       paper: https://arxiv.org/abs/1712.07629
       project: null
       display: false
+  sift+lightglue:
+    matcher: sift-lightglue
+    feature: sift
+    dense: false
+    info:
+      name: LightGlue #dispaly name
+      source: "ICCV 2023"
+      github: https://github.com/cvg/LightGlue
+      paper: https://arxiv.org/pdf/2306.13643
+      project: null
+      display: true
   disk+lightglue:
     matcher: disk-lightglue
     feature: disk

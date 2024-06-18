@@ -63,7 +63,7 @@ confs = {
         },
     },
     "disk-lightglue": {
-        "output": "matches-lightglue",
+        "output": "matches-disk-lightglue",
         "model": {
             "name": "lightglue",
             "match_threshold": 0.2,
@@ -71,6 +71,24 @@ confs = {
             "depth_confidence": 0.95,  # for early stopping,
             "features": "disk",
             "model_name": "disk_lightglue.pth",
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "force_resize": False,
+        },
+    },
+    "sift-lightglue": {
+        "output": "matches-sift-lightglue",
+        "model": {
+            "name": "lightglue",
+            "match_threshold": 0.2,
+            "width_confidence": 0.99,  # for point pruning
+            "depth_confidence": 0.95,  # for early stopping,
+            "features": "sift",
+            "add_scale_ori": True,
+            "model_name": "sift_lightglue.pth",
         },
         "preprocessing": {
             "grayscale": True,
@@ -339,9 +357,7 @@ def match_images(model, feat0, feat1):
         feat0["keypoints"] = feat0["keypoints"][0][None]
     if isinstance(feat1["keypoints"], list):
         feat1["keypoints"] = feat1["keypoints"][0][None]
-
-    pred = model(
-        {
+    input_dict = {
             "image0": feat0["image"],
             "keypoints0": feat0["keypoints"],
             "scores0": feat0["scores"][0].unsqueeze(0),
@@ -350,8 +366,16 @@ def match_images(model, feat0, feat1):
             "keypoints1": feat1["keypoints"],
             "scores1": feat1["scores"][0].unsqueeze(0),
             "descriptors1": desc1,
-        }
-    )
+    }
+    if "scales" in feat0:
+        input_dict = {**input_dict, "scales0": feat0['scales']}
+    if "scales" in feat1:
+        input_dict = {**input_dict, "scales1": feat1['scales']}
+    if "oris" in feat0:
+        input_dict = {**input_dict, "oris0": feat0['oris']}
+    if "oris" in feat1:
+        input_dict = {**input_dict, "oris1": feat1['oris']}
+    pred = model(input_dict)
     pred = {
         k: v.cpu().detach()[0] if isinstance(v, torch.Tensor) else v
         for k, v in pred.items()

@@ -18,6 +18,7 @@ class LightGlue(BaseModel):
         "model_name": "superpoint_lightglue.pth",
         "flash": True,  # enable FlashAttention if available.
         "mp": False,  # enable mixed precision
+        "add_scale_ori": False,
     }
     required_inputs = [
         "image0",
@@ -44,9 +45,18 @@ class LightGlue(BaseModel):
             "keypoints": data["keypoints0"],
             "descriptors": data["descriptors0"].permute(0, 2, 1),
         }
+        if "scales0" in data:
+            input["image0"] = {**input["image0"], "scales": data["scales0"]}
+        if "oris0" in data:
+            input["image0"] = {**input["image0"], "oris": data["oris0"]}
+
         input["image1"] = {
             "image": data["image1"],
             "keypoints": data["keypoints1"],
             "descriptors": data["descriptors1"].permute(0, 2, 1),
         }
+        if "scales1" in data:
+            input["image1"] = {**input["image1"], "scales": data["scales1"]}
+        if "oris1" in data:
+            input["image1"] = {**input["image1"], "oris": data["oris1"]}
         return self.net(input)
