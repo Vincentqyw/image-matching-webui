@@ -358,23 +358,23 @@ def match_images(model, feat0, feat1):
     if isinstance(feat1["keypoints"], list):
         feat1["keypoints"] = feat1["keypoints"][0][None]
     input_dict = {
-            "image0": feat0["image"],
-            "keypoints0": feat0["keypoints"],
-            "scores0": feat0["scores"][0].unsqueeze(0),
-            "descriptors0": desc0,
-            "image1": feat1["image"],
-            "keypoints1": feat1["keypoints"],
-            "scores1": feat1["scores"][0].unsqueeze(0),
-            "descriptors1": desc1,
+        "image0": feat0["image"],
+        "keypoints0": feat0["keypoints"],
+        "scores0": feat0["scores"][0].unsqueeze(0),
+        "descriptors0": desc0,
+        "image1": feat1["image"],
+        "keypoints1": feat1["keypoints"],
+        "scores1": feat1["scores"][0].unsqueeze(0),
+        "descriptors1": desc1,
     }
     if "scales" in feat0:
-        input_dict = {**input_dict, "scales0": feat0['scales']}
+        input_dict = {**input_dict, "scales0": feat0["scales"]}
     if "scales" in feat1:
-        input_dict = {**input_dict, "scales1": feat1['scales']}
+        input_dict = {**input_dict, "scales1": feat1["scales"]}
     if "oris" in feat0:
-        input_dict = {**input_dict, "oris0": feat0['oris']}
+        input_dict = {**input_dict, "oris0": feat0["oris"]}
     if "oris" in feat1:
-        input_dict = {**input_dict, "oris1": feat1['oris']}
+        input_dict = {**input_dict, "oris1": feat1["oris"]}
     pred = model(input_dict)
     pred = {
         k: v.cpu().detach()[0] if isinstance(v, torch.Tensor) else v

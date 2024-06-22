@@ -1,5 +1,5 @@
 import kornia
-
+from hloc import logger
 from ..utils.base_model import BaseModel
 
 
@@ -15,6 +15,7 @@ class DISK(BaseModel):
 
     def _init(self, conf):
         self.model = kornia.feature.DISK.from_pretrained(conf["weights"])
+        logger.info(f"Load DISK model done.")
 
     def _forward(self, data):
         image = data["image"]

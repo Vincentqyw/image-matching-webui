@@ -13,7 +13,7 @@ duster_path = Path(__file__).parent / "../../third_party/dust3r"
 sys.path.append(str(duster_path))
 
 from dust3r.inference import inference
-from dust3r.model import load_model
+from dust3r.model import load_model, AsymmetricCroCo3DStereo
 from dust3r.image_pairs import make_pairs
 from dust3r.cloud_opt import global_aligner, GlobalAlignerMode
 from dust3r.utils.geometry import find_reciprocal_matches, xy_grid
@@ -33,7 +33,11 @@ class Duster(BaseModel):
         self.normalize = tfm.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         self.model_path = self.conf["model_path"]
         self.download_weights()
-        self.net = load_model(self.model_path, device)
+        # self.net = load_model(self.model_path, device)
+        self.net = AsymmetricCroCo3DStereo.from_pretrained(
+            self.model_path
+            # "naver/DUSt3R_ViTLarge_BaseDecoder_512_dpt"
+        ).to(device)
         logger.info(f"Loaded Dust3r model")
 
     def download_weights(self):
@@ -68,8 +72,11 @@ class Duster(BaseModel):
 
     def _forward(self, data):
         img0, img1 = data["image0"], data["image1"]
-        # img0 = self.preprocess(img0)
-        # img1 = self.preprocess(img1)
+        mean = torch.tensor([0.5, 0.5, 0.5]).to(device)
+        std = torch.tensor([0.5, 0.5, 0.5]).to(device)
+
+        img0 = (img0 - mean.view(1, 3, 1, 1)) / std.view(1, 3, 1, 1)
+        img1 = (img1 - mean.view(1, 3, 1, 1)) / std.view(1, 3, 1, 1)
 
         images = [
             {"img": img0, "idx": 0, "instance": 0},
@@ -79,22 +86,13 @@ class Duster(BaseModel):
             images, scene_graph="complete", prefilter=None, symmetrize=True
         )
         output = inference(pairs, self.net, device, batch_size=1)
-
         scene = global_aligner(
             output, device=device, mode=GlobalAlignerMode.PairViewer
         )
-        batch_size = 1
-        schedule = "cosine"
-        lr = 0.01
-        niter = 300
-        loss = scene.compute_global_alignment(
-            init="mst", niter=niter, schedule=schedule, lr=lr
-        )
-
         # retrieve useful values from scene:
+        imgs = scene.imgs
         confidence_masks = scene.get_masks()
         pts3d = scene.get_pts3d()
-        imgs = scene.imgs
         pts2d_list, pts3d_list = [], []
         for i in range(2):
             conf_i = confidence_masks[i].cpu().numpy()
@@ -102,21 +100,29 @@ class Duster(BaseModel):
                 xy_grid(*imgs[i].shape[:2][::-1])[conf_i]
             )  # imgs[i].shape[:2] = (H, W)
             pts3d_list.append(pts3d[i].detach().cpu().numpy()[conf_i])
-        reciprocal_in_P2, nn2_in_P1, num_matches = find_reciprocal_matches(
-            *pts3d_list
-        )
-        logger.info(f"Found {num_matches} matches")
-        mkpts1 = pts2d_list[1][reciprocal_in_P2]
-        mkpts0 = pts2d_list[0][nn2_in_P1][reciprocal_in_P2]
 
-        top_k = self.conf["max_keypoints"]
-        if top_k is not None and len(mkpts0) > top_k:
-            keep = np.round(np.linspace(0, len(mkpts0) - 1, top_k)).astype(int)
-            mkpts0 = mkpts0[keep]
-            mkpts1 = mkpts1[keep]
-        pred = {
-            "keypoints0": torch.from_numpy(mkpts0),
-            "keypoints1": torch.from_numpy(mkpts1),
-        }
-
+        if len(pts3d_list[1]) == 0:
+            pred = {
+                "keypoints0": torch.zeros([0, 2]),
+                "keypoints1": torch.zeros([0, 2]),
+            }
+            logger.warning(f"Matched {0} points")
+        else:
+            reciprocal_in_P2, nn2_in_P1, num_matches = find_reciprocal_matches(
+                *pts3d_list
+            )
+            logger.info(f"Found {num_matches} matches")
+            mkpts1 = pts2d_list[1][reciprocal_in_P2]
+            mkpts0 = pts2d_list[0][nn2_in_P1][reciprocal_in_P2]
+            top_k = self.conf["max_keypoints"]
+            if top_k is not None and len(mkpts0) > top_k:
+                keep = np.round(np.linspace(0, len(mkpts0) - 1, top_k)).astype(
+                    int
+                )
+                mkpts0 = mkpts0[keep]
+                mkpts1 = mkpts1[keep]
+            pred = {
+                "keypoints0": torch.from_numpy(mkpts0),
+                "keypoints1": torch.from_numpy(mkpts1),
+            }
         return pred

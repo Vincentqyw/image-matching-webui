@@ -1,9 +1,11 @@
 import sys
-import subprocess
 from pathlib import Path
 from ..utils.base_model import BaseModel
 import torch
+
+from ..utils.base_model import BaseModel
 from .. import logger
+import subprocess
 
 sold2_path = Path(__file__).parent / "../../third_party/SOLD2"
 sys.path.append(str(sold2_path))
@@ -28,9 +30,11 @@ class SOLD2(BaseModel):
         "image0",
         "image1",
     ]
+
     weight_urls = {
         "sold2_wireframe.tar": "https://www.polybox.ethz.ch/index.php/s/blOrW89gqSLoHOk/download",
     }
+
     # Initialize the line matcher
     def _init(self, conf):
         checkpoint_path = conf["checkpoint_dir"] / conf["weights"]

@@ -138,11 +138,8 @@ confs = {
         },
         "preprocessing": {
             "grayscale": False,
-            "force_resize": True,
-            "resize_max": 1024,
-            "width": 512,
-            "height": 512,
-            "dfactor": 8,
+            "resize_max": 512,
+            "dfactor": 16,
         },
     },
     "xfeat_dense": {

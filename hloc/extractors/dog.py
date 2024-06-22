@@ -75,11 +75,7 @@ class DoG(BaseModel):
                 options=pycolmap.SiftExtractionOptions(options),
                 device=getattr(pycolmap.Device, "cuda" if use_gpu else "cpu"),
             )
-        pred = self.sift.extract(image_np)
-        if len(pred) == 2:
-            keypoints, descriptors = pred
-        elif len(pred) == 3:
-            keypoints, scores, descriptors = pred
+        keypoints, descriptors = self.sift.extract(image_np)
         scales = keypoints[:, 2]
         oris = np.rad2deg(keypoints[:, 3])
 

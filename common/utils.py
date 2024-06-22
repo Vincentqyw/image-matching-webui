@@ -7,6 +7,7 @@ import psutil
 import shutil
 import numpy as np
 import gradio as gr
+from PIL import Image
 from pathlib import Path
 import poselib
 from itertools import combinations
@@ -231,10 +232,10 @@ def gen_examples():
         return [pairs[i] for i in selected]
 
     # rotated examples
-    def gen_rot_image_pairs(count: int = 5):
+    def gen_rot_image_pairs(count: int = 10):
         path = ROOT / "datasets/sacre_coeur/mapping"
         path_rot = ROOT / "datasets/sacre_coeur/mapping_rot"
-        rot_list = [45, 90, 135, 180, 225, 270]
+        rot_list = [45, 180, 90, 225, 270]
         pairs = []
         for file in os.listdir(path):
             if file.lower().endswith((".jpg", ".jpeg", ".png")):
@@ -274,6 +275,7 @@ def gen_examples():
     # image pair path
     pairs = gen_images_pairs()
     pairs += gen_rot_image_pairs()
+    pairs += gen_scale_image_pairs()
     pairs += gen_image_pairs_wxbs()
 
     match_setting_threshold = DEFAULT_SETTING_THRESHOLD
@@ -1015,8 +1017,15 @@ ransac_zoo = {
 
 
 def rotate_image(input_path, degrees, output_path):
-    from PIL import Image
-
     img = Image.open(input_path)
     img_rotated = img.rotate(-degrees)
     img_rotated.save(output_path)
+
+
+def scale_image(input_path, scale_factor, output_path):
+    img = Image.open(input_path)
+    width, height = img.size
+    new_width = int(width * scale_factor)
+    new_height = int(height * scale_factor)
+    img_resized = img.resize((new_width, new_height))
+    img_resized.save(output_path)

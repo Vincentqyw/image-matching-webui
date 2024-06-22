@@ -3,6 +3,7 @@ from pathlib import Path
 import torch
 
 from ..utils.base_model import BaseModel
+from hloc import logger
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
 from SuperGluePretrainedNetwork.models import superpoint  # noqa E402
@@ -42,6 +43,7 @@ class SuperPoint(BaseModel):
         if conf["fix_sampling"]:
             superpoint.sample_descriptors = sample_descriptors_fix_sampling
         self.net = superpoint.SuperPoint(conf)
+        logger.info(f"Load SuperPoint model done.")
 
     def _forward(self, data):
         return self.net(data, self.conf)

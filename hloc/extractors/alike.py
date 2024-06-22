@@ -3,6 +3,7 @@ from pathlib import Path
 import torch
 
 from ..utils.base_model import BaseModel
+from hloc import logger
 
 alike_path = Path(__file__).parent / "../../third_party/ALIKE"
 sys.path.append(str(alike_path))
@@ -33,6 +34,7 @@ class Alike(BaseModel):
             scores_th=conf["detection_threshold"],
             n_limit=conf["max_keypoints"],
         )
+        logger.info(f"Load Alike model done.")
 
     def _forward(self, data):
         image = data["image"]

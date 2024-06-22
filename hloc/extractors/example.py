@@ -10,7 +10,9 @@ example_path = Path(__file__).parent / "../../third_party/example"
 sys.path.append(str(example_path))
 
 # import some modules here
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class Example(BaseModel):
     # change to your default configs

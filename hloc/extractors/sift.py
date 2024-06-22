@@ -11,7 +11,7 @@ try:
     import pycolmap
 except ImportError:
     pycolmap = None
-
+from hloc import logger
 from ..utils.base_model import BaseModel
 
 
@@ -140,6 +140,7 @@ class SIFT(BaseModel):
                 f"Unknown backend: {backend} not in "
                 f"{{{','.join(backends)}}}."
             )
+        logger.info(f"Load SIFT model done.")
 
     def extract_single_image(self, image: torch.Tensor):
         image_np = image.cpu().numpy().squeeze(0)
@@ -196,7 +197,6 @@ class SIFT(BaseModel):
             if num_points is not None and len(pred["keypoints"]) > num_points:
                 indices = torch.topk(pred["scores"], num_points).indices
                 pred = {k: v[indices] for k, v in pred.items()}
-
         return pred
 
     def _forward(self, data: dict) -> dict:

@@ -99,8 +99,12 @@ class SGMNet(BaseModel):
         score2 = data["scores1"].reshape(-1, 1)
         desc1 = data["descriptors0"].permute(0, 2, 1)  # 1 x N x 128
         desc2 = data["descriptors1"].permute(0, 2, 1)
-        size1 = torch.tensor(data["image0"].shape[2:]).flip(0)  # W x H -> x & y
-        size2 = torch.tensor(data["image1"].shape[2:]).flip(0)  # W x H
+        size1 = (
+            torch.tensor(data["image0"].shape[2:]).flip(0).to(x1.device)
+        )  # W x H -> x & y
+        size2 = (
+            torch.tensor(data["image1"].shape[2:]).flip(0).to(x2.device)
+        )  # W x H
         norm_x1 = self.normalize_size(x1, size1)
         norm_x2 = self.normalize_size(x2, size2)
 

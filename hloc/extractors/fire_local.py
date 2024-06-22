@@ -8,6 +8,7 @@ from ..utils.base_model import BaseModel
 from .. import logger
 
 fire_path = Path(__file__).parent / "../../third_party/fire"
+
 sys.path.append(str(fire_path))
 
 

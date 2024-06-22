@@ -1,9 +1,10 @@
 import sys
 from pathlib import Path
-import torch
 import subprocess
-from hloc import logger, checkpoints_hub
+import torch
+
 from ..utils.base_model import BaseModel
+from hloc import logger
 
 lanet_path = Path(__file__).parent / "../../third_party/lanet"
 sys.path.append(str(lanet_path))
@@ -25,22 +26,11 @@ class LANet(BaseModel):
             lanet_path / "checkpoints" / f'PointModel_{conf["model_name"]}.pth'
         )
         if not model_path.exists():
-            logger.warning(f"No model found at {model_path}, start downloading")
-            model_link = "{}/lanet/checkpoints/{}".format(
-                checkpoints_hub, f'PointModel_{conf["model_name"]}.pth'
-            )
-            model_path.parent.mkdir(exist_ok=True)
-            cmd = [
-                "wget",
-                model_link,
-                "-O",
-                str(model_path),
-            ]
-            subprocess.run(cmd, check=True)
-
+            print(f"No model found at {model_path}")
         self.net = PointModel(is_test=True)
         state_dict = torch.load(model_path, map_location="cpu")
         self.net.load_state_dict(state_dict["model_state"])
+        logger.info(f"Load LANet model done.")
 
     def _forward(self, data):
         image = data["image"]

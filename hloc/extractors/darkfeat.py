@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 import subprocess
 from ..utils.base_model import BaseModel
-from .. import logger
+from hloc import logger
 
 darkfeat_path = Path(__file__).parent / "../../third_party/DarkFeat"
 sys.path.append(str(darkfeat_path))
@@ -43,6 +43,7 @@ class DarkFeat(BaseModel):
                     raise e
 
         self.net = DarkFeat_(model_path)
+        logger.info(f"Load DarkFeat model done.")
 
     def _forward(self, data):
         pred = self.net({"image": data["image"]})

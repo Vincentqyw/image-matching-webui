@@ -131,6 +131,7 @@ confs = {
         "output": "feats-rootsift-n5000-r1600",
         "model": {
             "name": "dog",
+            "descriptor": "rootsift",
             "max_keypoints": 5000,
         },
         "preprocessing": {
@@ -146,9 +147,7 @@ confs = {
         "output": "feats-sift-n5000-r1600",
         "model": {
             "name": "sift",
-            # "name": "dog",
-            "descriptor": "sift",
-            "rootsift": False,
+            "rootsift": True,
             "max_keypoints": 5000,
         },
         "preprocessing": {

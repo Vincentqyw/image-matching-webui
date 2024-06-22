@@ -4,11 +4,15 @@ import subprocess
 import torch
 
 from ..utils.base_model import BaseModel
+from hloc import logger
+
+d2net_path = Path(__file__).parent / "../../third_party"
+sys.path.append(str(d2net_path))
+from d2net.lib.model_test import D2Net as _D2Net
+from d2net.lib.pyramid import process_multiscale
 
 d2net_path = Path(__file__).parent / "../../third_party/d2net"
-sys.path.append(str(d2net_path))
-from lib.model_test import D2Net as _D2Net
-from lib.pyramid import process_multiscale
+
 
 class D2Net(BaseModel):
     default_conf = {
@@ -35,6 +39,7 @@ class D2Net(BaseModel):
         self.net = _D2Net(
             model_file=model_file, use_relu=conf["use_relu"], use_cuda=False
         )
+        logger.info(f"Load D2Net model done.")
 
     def _forward(self, data):
         image = data["image"]

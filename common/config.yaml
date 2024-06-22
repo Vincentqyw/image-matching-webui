@@ -25,7 +25,7 @@ matcher_zoo:
       source: "CVPR 2024"
       github: https://github.com/Vincentqyw/omniglue-onnx
       paper: https://arxiv.org/abs/2405.12979
-      project: https://hwjiang1510.github.io/OmniGlue/
+      project: https://hwjiang1510.github.io/OmniGlue
       display: true
   DUSt3R:
     # TODO: duster is under development  
@@ -40,6 +40,7 @@ matcher_zoo:
       project: https://dust3r.europe.naverlabs.com
       display: true  
   GIM(dkm):
+    enable: false
     matcher: gim(dkm)
     dense: true
     info: 

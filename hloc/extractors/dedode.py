@@ -4,7 +4,7 @@ import subprocess
 import torch
 from PIL import Image
 from ..utils.base_model import BaseModel
-from .. import logger
+from hloc import logger
 import torchvision.transforms as transforms
 
 dedode_path = Path(__file__).parent / "../../third_party/DeDoDe"
@@ -14,6 +14,7 @@ from DeDoDe import dedode_detector_L, dedode_descriptor_B
 from DeDoDe.utils import to_pixel_coords
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class DeDoDe(BaseModel):
     default_conf = {
@@ -60,8 +61,6 @@ class DeDoDe(BaseModel):
                 f"Downloading the DeDoDe descriptor model with `{cmd}`."
             )
             subprocess.run(cmd, check=True)
-
-        logger.info(f"Loading DeDoDe model...")
 
         # load the model
         weights_detector = torch.load(model_detector_path, map_location="cpu")

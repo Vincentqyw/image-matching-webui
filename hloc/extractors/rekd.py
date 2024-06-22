@@ -4,10 +4,11 @@ import subprocess
 import torch
 
 from ..utils.base_model import BaseModel
+from hloc import logger
 
-rekd_path = Path(__file__).parent / "../../third_party/REKD"
+rekd_path = Path(__file__).parent / "../../third_party"
 sys.path.append(str(rekd_path))
-from training.model.REKD import REKD as REKD_
+from REKD.training.model.REKD import REKD as REKD_
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -28,6 +29,7 @@ class REKD(BaseModel):
         self.net = REKD_(is_test=True)
         state_dict = torch.load(model_path, map_location="cpu")
         self.net.load_state_dict(state_dict["model_state"])
+        logger.info(f"Load REKD model done.")
 
     def _forward(self, data):
         image = data["image"]

@@ -3,10 +3,12 @@ from pathlib import Path
 import torchvision.transforms as tvf
 
 from ..utils.base_model import BaseModel
+from hloc import logger
 
+base_path = Path(__file__).parent / "../../third_party"
+sys.path.append(str(base_path))
 r2d2_path = Path(__file__).parent / "../../third_party/r2d2"
-sys.path.append(str(r2d2_path))
-from extract import load_network, NonMaxSuppression, extract_multiscale
+from r2d2.extract import load_network, NonMaxSuppression, extract_multiscale
 
 
 class R2D2(BaseModel):
@@ -33,6 +35,7 @@ class R2D2(BaseModel):
             rel_thr=conf["reliability_threshold"],
             rep_thr=conf["repetability_threshold"],
         )
+        logger.info(f"Load R2D2 model done.")
 
     def _forward(self, data):
         img = data["image"]
