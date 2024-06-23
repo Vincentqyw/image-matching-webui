@@ -6,13 +6,10 @@ import torch
 from ..utils.base_model import BaseModel
 from hloc import logger
 
-d2net_path = Path(__file__).parent / "../../third_party"
-sys.path.append(str(d2net_path))
-from d2net.lib.model_test import D2Net as _D2Net
-from d2net.lib.pyramid import process_multiscale
-
 d2net_path = Path(__file__).parent / "../../third_party/d2net"
-
+sys.path.append(str(d2net_path))
+from lib.model_test import D2Net as _D2Net
+from lib.pyramid import process_multiscale
 
 class D2Net(BaseModel):
     default_conf = {

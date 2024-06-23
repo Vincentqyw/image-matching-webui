@@ -8,7 +8,7 @@ from .. import logger
 
 roma_path = Path(__file__).parent / "../../third_party/RoMa"
 sys.path.append(str(roma_path))
-from roma.models.model_zoo import roma_model
+from romatch.models.model_zoo import roma_model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

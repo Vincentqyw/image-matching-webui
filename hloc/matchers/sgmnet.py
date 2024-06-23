@@ -5,7 +5,6 @@ import torch
 from PIL import Image
 from collections import OrderedDict, namedtuple
 from ..utils.base_model import BaseModel
-from ..utils import do_system
 from .. import logger
 
 sgmnet_path = Path(__file__).parent / "../../third_party/SGMNet"
@@ -72,9 +71,9 @@ class SGMNet(BaseModel):
                     except subprocess.CalledProcessError as e:
                         logger.error(f"Failed to download the SGMNet model.")
                         raise e
-            cmd = [f"cd {str(sgmnet_path)} & tar -xvf", str(tar_path)]
+            cmd = ["tar", "-xvf", str(tar_path), "-C", str(sgmnet_path)]
             logger.info(f"Unzip model file `{cmd}`.")
-            do_system(f"cd {str(sgmnet_path)} & tar -xvf {str(tar_path)}")
+            subprocess.run(cmd, check=True)
 
         # config
         config = namedtuple("config", conf.keys())(*conf.values())
