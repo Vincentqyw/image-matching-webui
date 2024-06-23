@@ -17,3 +17,4 @@ loguru==0.7.0
 e2cnn==0.2.3
 onnxruntime
 poselib
+roma

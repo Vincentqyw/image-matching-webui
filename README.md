@@ -23,6 +23,7 @@ Here is a demo of the tool:
 https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c3484d1b-cc00-4fdc-9b31-e5b7af07ecd9
 
 The tool currently supports various popular image matching algorithms, namely:
+- [x] [DUSt3R](https://github.com/naver/dust3r), CVPR 2024
 - [x] [OmniGlue](https://github.com/Vincentqyw/omniglue-onnx), CVPR 2024
 - [x] [XFeat](https://github.com/verlab/accelerated_features), CVPR 2024
 - [x] [RoMa](https://github.com/Vincentqyw/RoMa), CVPR 2024
