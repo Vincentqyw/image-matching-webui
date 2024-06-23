@@ -275,7 +275,6 @@ def gen_examples():
     # image pair path
     pairs = gen_images_pairs()
     pairs += gen_rot_image_pairs()
-    pairs += gen_scale_image_pairs()
     pairs += gen_image_pairs_wxbs()
 
     match_setting_threshold = DEFAULT_SETTING_THRESHOLD

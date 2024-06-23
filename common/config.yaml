@@ -40,7 +40,7 @@ matcher_zoo:
       project: https://dust3r.europe.naverlabs.com
       display: true  
   GIM(dkm):
-    enable: false
+    enable: true
     matcher: gim(dkm)
     dense: true
     info: 
