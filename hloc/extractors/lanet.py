@@ -5,9 +5,10 @@ import subprocess
 from hloc import logger, checkpoints_hub
 from ..utils.base_model import BaseModel
 
+lib_path = Path(__file__).parent / "../../third_party"
+sys.path.append(str(lib_path))
+from lanet.network_v0.model import PointModel
 lanet_path = Path(__file__).parent / "../../third_party/lanet"
-sys.path.append(str(lanet_path))
-from network_v0.model import PointModel
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

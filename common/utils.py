@@ -232,7 +232,7 @@ def gen_examples():
         return [pairs[i] for i in selected]
 
     # rotated examples
-    def gen_rot_image_pairs(count: int = 10):
+    def gen_rot_image_pairs(count: int = 5):
         path = ROOT / "datasets/sacre_coeur/mapping"
         path_rot = ROOT / "datasets/sacre_coeur/mapping_rot"
         rot_list = [45, 180, 90, 225, 270]
@@ -246,6 +246,27 @@ def gen_examples():
                             [
                                 path / file,
                                 path_rot / file_rot,
+                            ]
+                        )
+        if len(pairs) < count:
+            count = len(pairs)
+        selected = random.sample(range(len(pairs)), count)
+        return [pairs[i] for i in selected]
+
+    def gen_scale_image_pairs(count: int = 5):
+        path = ROOT / "datasets/sacre_coeur/mapping"
+        path_scale = ROOT / "datasets/sacre_coeur/mapping_scale"
+        scale_list = [0.3, 0.5]
+        pairs = []
+        for file in os.listdir(path):
+            if file.lower().endswith((".jpg", ".jpeg", ".png")):
+                for scale in scale_list:
+                    file_scale = "{}_scale{}.jpg".format(Path(file).stem, scale)
+                    if (path_scale / file_scale).exists():
+                        pairs.append(
+                            [
+                                path / file,
+                                path_scale / file_scale,
                             ]
                         )
         if len(pairs) < count:
@@ -275,6 +296,7 @@ def gen_examples():
     # image pair path
     pairs = gen_images_pairs()
     pairs += gen_rot_image_pairs()
+    pairs += gen_scale_image_pairs()
     pairs += gen_image_pairs_wxbs()
 
     match_setting_threshold = DEFAULT_SETTING_THRESHOLD
@@ -1026,5 +1048,8 @@ def scale_image(input_path, scale_factor, output_path):
     width, height = img.size
     new_width = int(width * scale_factor)
     new_height = int(height * scale_factor)
+    new_img = Image.new("RGB", (width, height), (0, 0, 0))
     img_resized = img.resize((new_width, new_height))
-    img_resized.save(output_path)
+    position = ((width - new_width) // 2, (height - new_height) // 2)
+    new_img.paste(img_resized, position)
+    new_img.save(output_path)

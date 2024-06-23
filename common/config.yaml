@@ -29,7 +29,7 @@ matcher_zoo:
       display: true
   DUSt3R:
     # TODO: duster is under development  
-    enable: false
+    enable: true
     matcher: duster
     dense: true
     info: 
