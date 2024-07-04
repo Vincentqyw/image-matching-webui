@@ -36,7 +36,7 @@ class IMP(BaseModel):
         weight_path = pram_path / "weights" / self.conf["model_name"]
         self.net = GML(self.conf).eval().cuda()
         self.net.load_state_dict(torch.load(weight_path)['model'], strict=True)
-        logger.info(f"Load imp model done.")
+        logger.info(f"Load IMP model done.")
 
     def _forward(self, data):
         data['descriptors0'] = data['descriptors0'].transpose(2, 1).float()
