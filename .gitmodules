@@ -63,4 +63,4 @@
 	url = https://github.com/Vincentqyw/RoMa.git
 [submodule "third_party/pram"]
 	path = third_party/pram
-	url = https://github.com/feixue94/pram
+	url = https://github.com/feixue94/pram.git
