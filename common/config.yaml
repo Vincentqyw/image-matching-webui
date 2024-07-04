@@ -32,18 +32,18 @@ matcher_zoo:
     enable: true
     matcher: duster
     dense: true
-    info: 
+    info:
       name: DUSt3R #dispaly name
       source: "CVPR 2024"
       github: https://github.com/naver/dust3r
       paper: https://arxiv.org/abs/2312.14132
       project: https://dust3r.europe.naverlabs.com
-      display: true  
+      display: true
   GIM(dkm):
     enable: true
     matcher: gim(dkm)
     dense: true
-    info: 
+    info:
       name: GIM(DKM) #dispaly name
       source: "ICLR 2024"
       github: https://github.com/xuelunshen/gim
@@ -53,7 +53,7 @@ matcher_zoo:
   RoMa:
     matcher: roma
     dense: true
-    info: 
+    info:
       name: RoMa #dispaly name
       source: "CVPR 2024"
       github: https://github.com/Parskatt/RoMa
@@ -63,7 +63,7 @@ matcher_zoo:
   dkm:
     matcher: dkm
     dense: true
-    info: 
+    info:
       name: DKM #dispaly name
       source: "CVPR 2023"
       github: https://github.com/Parskatt/DKM
@@ -73,7 +73,7 @@ matcher_zoo:
   loftr:
     matcher: loftr
     dense: true
-    info: 
+    info:
       name: LoFTR #dispaly name
       source: "CVPR 2021"
       github: https://github.com/zju3dv/LoFTR
@@ -362,4 +362,28 @@ matcher_zoo:
       github: https://github.com/cvg/SOLD2
       paper: https://arxiv.org/abs/2104.03362
       project: null
+      display: true
+
+  sfd2+imp:
+    matcher: imp
+    feature: sfd2
+    dense: false
+    info:
+      name: SFD2+IMP #dispaly name
+      source: "CVPR 2023"
+      github: https://github.com/feixue94/imp-release
+      paper: https://arxiv.org/pdf/2304.14837
+      project: https://feixue94.github.io/
+      display: true
+
+  sfd2+mnn:
+    matcher: NN-mutual
+    feature: sfd2
+    dense: false
+    info:
+      name: SFD2+MNN #dispaly name
+      source: "CVPR 2023"
+      github: https://github.com/feixue94/sfd2
+      paper: https://arxiv.org/abs/2304.14845
+      project: https://feixue94.github.io/
       display: true
