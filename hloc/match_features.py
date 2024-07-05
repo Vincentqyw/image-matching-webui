@@ -162,6 +162,13 @@ confs = {
             "match_threshold": 0.2,
         },
     },
+    "imp": {
+        "output": "matches-imp",
+        "model": {
+            "name": "imp",
+            "match_threshold": 0.2,
+        },
+    },
 }
 
 
