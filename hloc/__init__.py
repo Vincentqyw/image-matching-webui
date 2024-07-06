@@ -1,5 +1,6 @@
 import logging
 from packaging import version
+import torch
 
 __version__ = "1.3"
 
@@ -30,4 +31,5 @@ else:
             minimal_version,
             found_version,
         )
-checkpoints_hub = "https://huggingface.co/spaces/Realcat/image-matching-webui/resolve/main/third_party"
+checkpoints_hub = "https://huggingface.co/spaces/Realcat/image-matching-webui/tree/main/third_party"
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

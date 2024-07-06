@@ -111,4 +111,4 @@ def test_one():
 if __name__ == "__main__":
     config = load_config(ROOT / "common/config.yaml")
     test_one()
-    return test_all(config)
+    test_all(config)

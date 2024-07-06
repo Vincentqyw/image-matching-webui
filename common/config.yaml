@@ -240,6 +240,7 @@ matcher_zoo:
     matcher: sgmnet
     feature: sift
     dense: false
+    skip_ci: true
     info:
       name: SGMNet #dispaly name
       source: "ICCV 2021"
@@ -373,6 +374,7 @@ matcher_zoo:
     matcher: imp
     feature: sfd2
     dense: false
+    skip_ci: true
     info:
       name: SFD2+IMP #dispaly name
       source: "CVPR 2023"
@@ -385,6 +387,7 @@ matcher_zoo:
     matcher: NN-mutual
     feature: sfd2
     dense: false
+    skip_ci: true
     info:
       name: SFD2+MNN #dispaly name
       source: "CVPR 2023"

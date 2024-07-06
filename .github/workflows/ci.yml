@@ -1,0 +1,33 @@
+name: CI_CPU
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.10
+
+    - name: Install dependencies
+      run: |
+        pip install torch==2.2
+        pip install -r env-docker.txt
+        sudo apt-get update && sudo apt-get install ffmpeg libsm6 libxext6 -y
+
+    - name: Run tests
+      run: python test_app_cli.py

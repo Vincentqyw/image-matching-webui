@@ -4,6 +4,7 @@ import subprocess
 import torch
 from PIL import Image
 from collections import OrderedDict, namedtuple
+from huggingface_hub import hf_hub_download
 from ..utils.base_model import BaseModel
 from .. import logger
 
@@ -47,31 +48,16 @@ class SGMNet(BaseModel):
 
         link = self.weight_urls[conf["model_name"]]
         tar_path = sgmnet_path / "weights.tar.gz"
+
+        cached_file = hf_hub_download(
+            repo_type="space", 
+            repo_id="Realcat/image-matching-webui", 
+            filename="third_party/SGMNet/weights.tar.gz"
+        )
+
         # Download the model.
         if not sgmnet_weights.exists():
-            if not tar_path.exists():
-                cmd = [
-                    "gdown",
-                    link,
-                    "-O",
-                    str(tar_path),
-                    "--proxy",
-                    self.proxy,
-                ]
-                cmd_wo_proxy = ["gdown", link, "-O", str(tar_path)]
-                logger.info(
-                    f"Downloading the SGMNet model with `{cmd_wo_proxy}`."
-                )
-                try:
-                    subprocess.run(cmd_wo_proxy, check=True)
-                except subprocess.CalledProcessError as e:
-                    logger.info(f"Downloading the SGMNet model with `{cmd}`.")
-                    try:
-                        subprocess.run(cmd, check=True)
-                    except subprocess.CalledProcessError as e:
-                        logger.error(f"Failed to download the SGMNet model.")
-                        raise e
-            cmd = ["tar", "-xvf", str(tar_path), "-C", str(sgmnet_path)]
+            cmd = ["tar", "-xvf", str(cached_file), "-C", str(sgmnet_path)]
             logger.info(f"Unzip model file `{cmd}`.")
             subprocess.run(cmd, check=True)
 
