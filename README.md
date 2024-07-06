@@ -107,6 +107,7 @@ I provide an example to add local feature in [hloc/extractors/example.py](hloc/e
 
 External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using a linter like flake8 (reformat using command `python -m black .`). This is a non-exhaustive list of features that might be valuable additions:
 
+- [x] add [CPU CI](.github/workflows/ci.yml)
 - [x] add webcam support
 - [x] add [line feature matching](https://github.com/Vincentqyw/LineSegmentsDetection) algorithms
 - [x] example to add a new feature extractor / matcher
