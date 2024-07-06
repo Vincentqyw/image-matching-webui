@@ -31,5 +31,4 @@ else:
             minimal_version,
             found_version,
         )
-checkpoints_hub = "https://huggingface.co/spaces/Realcat/image-matching-webui/tree/main/third_party"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

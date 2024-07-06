@@ -49,14 +49,13 @@ class SGMNet(BaseModel):
         link = self.weight_urls[conf["model_name"]]
         tar_path = sgmnet_path / "weights.tar.gz"
 
-        cached_file = hf_hub_download(
-            repo_type="space", 
-            repo_id="Realcat/image-matching-webui", 
-            filename="third_party/SGMNet/weights.tar.gz"
-        )
-
         # Download the model.
         if not sgmnet_weights.exists():
+            cached_file = hf_hub_download(
+                repo_type="space",
+                repo_id="Realcat/image-matching-webui",
+                filename="third_party/SGMNet/weights.tar.gz",
+            )
             cmd = ["tar", "-xvf", str(cached_file), "-C", str(sgmnet_path)]
             logger.info(f"Unzip model file `{cmd}`.")
             subprocess.run(cmd, check=True)

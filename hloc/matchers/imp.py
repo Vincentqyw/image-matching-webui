@@ -18,7 +18,7 @@ class IMP(BaseModel):
         "match_threshold": 0.2,
         "features": "sfd2",
         "model_name": "imp_gml.920.pth",
-        'sinkhorn_iterations': 20,
+        "sinkhorn_iterations": 20,
     }
     required_inputs = [
         "image0",
@@ -35,11 +35,11 @@ class IMP(BaseModel):
         self.conf = {**self.default_conf, **conf}
         weight_path = pram_path / "weights" / self.conf["model_name"]
         self.net = GML(self.conf).eval().to(device)
-        self.net.load_state_dict(torch.load(weight_path)['model'], strict=True)
+        self.net.load_state_dict(torch.load(weight_path)["model"], strict=True)
         logger.info(f"Load IMP model done.")
 
     def _forward(self, data):
-        data['descriptors0'] = data['descriptors0'].transpose(2, 1).float()
-        data['descriptors1'] = data['descriptors1'].transpose(2, 1).float()
+        data["descriptors0"] = data["descriptors0"].transpose(2, 1).float()
+        data["descriptors1"] = data["descriptors1"].transpose(2, 1).float()
 
         return self.net.produce_matches(data, p=0.2)

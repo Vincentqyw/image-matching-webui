@@ -240,7 +240,6 @@ matcher_zoo:
     matcher: sgmnet
     feature: sift
     dense: false
-    skip_ci: true
     info:
       name: SGMNet #dispaly name
       source: "ICCV 2021"
