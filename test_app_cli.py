@@ -23,7 +23,8 @@ def test_all(config: dict = None):
         if image0 is None or image1 is None:
             logger.error("Error: No images found! Please upload two images.")
         enable = config["matcher_zoo"][k].get("enable", True)
-        if enable:
+        skip_ci = config["matcher_zoo"][k].get("skip_ci", False)
+        if enable and not skip_ci:
             logger.info(f"Testing {k} ...")
             api = ImageMatchingAPI(conf=v, device=device)
             api(image0, image1)
@@ -32,6 +33,7 @@ def test_all(config: dict = None):
             api.visualize(log_path=log_path)
         else:
             logger.info(f"Skipping {k} ...")
+    return 0
 
 
 def test_one():
@@ -103,11 +105,10 @@ def test_one():
     log_path = ROOT / "experiments" / "one"
     log_path.mkdir(exist_ok=True, parents=True)
     api.visualize(log_path=log_path)
+    return 0
 
 
 if __name__ == "__main__":
-    import argparse
-
     config = load_config(ROOT / "common/config.yaml")
     test_one()
-    test_all(config)
+    return test_all(config)
