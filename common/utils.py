@@ -14,17 +14,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import poselib
 import psutil
-import torch
 from PIL import Image
 
 from hloc import (
+    DEVICE,
     extract_features,
     extractors,
     logger,
     match_dense,
     match_features,
     matchers,
-    DEVICE
 )
 from hloc.utils.base_model import dynamic_load
 
