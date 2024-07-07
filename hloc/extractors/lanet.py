@@ -5,6 +5,7 @@ import subprocess
 from huggingface_hub import hf_hub_download
 from ..utils.base_model import BaseModel
 from hloc import logger
+
 lib_path = Path(__file__).parent / "../../third_party"
 sys.path.append(str(lib_path))
 from lanet.network_v0.model import PointModel

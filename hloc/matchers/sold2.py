@@ -43,7 +43,7 @@ class SOLD2(BaseModel):
         if not checkpoint_path.exists():
             checkpoint_path.parent.mkdir(exist_ok=True)
             link = self.weight_urls[conf["weights"]]
-            cmd = ["wget", link, "-O", str(checkpoint_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(checkpoint_path)]
             logger.info(f"Downloading the SOLD2 model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 

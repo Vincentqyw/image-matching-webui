@@ -43,7 +43,7 @@ class Mickey(BaseModel):
             model_path.parent.mkdir(exist_ok=True, parents=True)
             link = self.weight_urls
             if not zip_path.exists():
-                cmd = ["wget", link, "-O", str(zip_path)]
+                cmd = ["wget", "--quiet", link, "-O", str(zip_path)]
                 logger.info(f"Downloading the Mickey model with {cmd}.")
                 subprocess.run(cmd, check=True)
             cmd = ["unzip", "-d", str(model_path.parent.parent), str(zip_path)]

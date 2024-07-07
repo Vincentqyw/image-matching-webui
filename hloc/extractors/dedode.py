@@ -49,14 +49,14 @@ class DeDoDe(BaseModel):
         if not model_detector_path.exists():
             model_detector_path.parent.mkdir(exist_ok=True)
             link = self.weight_urls[conf["model_detector_name"]]
-            cmd = ["wget", link, "-O", str(model_detector_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_detector_path)]
             logger.info(f"Downloading the DeDoDe detector model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 
         if not model_descriptor_path.exists():
             model_descriptor_path.parent.mkdir(exist_ok=True)
             link = self.weight_urls[conf["model_descriptor_name"]]
-            cmd = ["wget", link, "-O", str(model_descriptor_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_descriptor_path)]
             logger.info(
                 f"Downloading the DeDoDe descriptor model with `{cmd}`."
             )

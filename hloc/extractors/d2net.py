@@ -28,6 +28,7 @@ class D2Net(BaseModel):
             model_file.parent.mkdir(exist_ok=True)
             cmd = [
                 "wget",
+                "--quiet",
                 "https://dusmanu.com/files/d2-net/" + conf["model_name"],
                 "-O",
                 str(model_file),

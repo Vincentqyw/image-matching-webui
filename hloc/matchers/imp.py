@@ -35,7 +35,9 @@ class IMP(BaseModel):
         self.conf = {**self.default_conf, **conf}
         weight_path = pram_path / "weights" / self.conf["model_name"]
         self.net = GML(self.conf).eval().to(device)
-        self.net.load_state_dict(torch.load(weight_path)["model"], strict=True)
+        self.net.load_state_dict(
+            torch.load(weight_path, map_location="cpu")["model"], strict=True
+        )
         logger.info(f"Load IMP model done.")
 
     def _forward(self, data):

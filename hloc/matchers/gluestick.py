@@ -42,7 +42,7 @@ class GlueStick(BaseModel):
         if not model_path.exists():
             model_path.parent.mkdir(exist_ok=True)
             link = self.gluestick_models[conf["model_name"]]
-            cmd = ["wget", link, "-O", str(model_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_path)]
             logger.info(f"Downloading the Gluestick model with `{cmd}`.")
             subprocess.run(cmd, check=True)
         logger.info(f"Loading GlueStick model...")

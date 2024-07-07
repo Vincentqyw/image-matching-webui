@@ -60,7 +60,7 @@ class NetVLAD(BaseModel):
         if not checkpoint.exists():
             checkpoint.parent.mkdir(exist_ok=True, parents=True)
             link = self.dir_models[conf["model_name"]]
-            cmd = ["wget", link, "-O", str(checkpoint)]
+            cmd = ["wget", "--quiet", link, "-O", str(checkpoint)]
             logger.info(f"Downloading the NetVLAD model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 

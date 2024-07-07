@@ -41,14 +41,14 @@ class Roma(BaseModel):
         if not model_path.exists():
             model_path.parent.mkdir(exist_ok=True)
             link = self.weight_urls["roma"][conf["model_name"]]
-            cmd = ["wget", link, "-O", str(model_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_path)]
             logger.info(f"Downloading the Roma model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 
         if not dinov2_weights.exists():
             dinov2_weights.parent.mkdir(exist_ok=True)
             link = self.weight_urls[conf["model_utils_name"]]
-            cmd = ["wget", link, "-O", str(dinov2_weights)]
+            cmd = ["wget", "--quiet", link, "-O", str(dinov2_weights)]
             logger.info(f"Downloading the dinov2 model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 

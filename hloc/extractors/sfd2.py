@@ -28,7 +28,7 @@ class SFD2(BaseModel):
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
         model_fn = pram_path / "weights" / self.conf["model_name"]
-        self.net = load_sfd2(weight_path=model_fn).cuda().eval()
+        self.net = load_sfd2(weight_path=model_fn).eval()
 
         logger.info(f"Load SFD2 model done.")
 

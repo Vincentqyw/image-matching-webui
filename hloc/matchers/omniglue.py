@@ -34,7 +34,7 @@ class OmniGlue(BaseModel):
         if not dino_model_path.exists():
             link = self.dino_v2_link_dict.get(dino_model_path.name, None)
             if link is not None:
-                cmd = ["wget", link, "-O", str(dino_model_path)]
+                cmd = ["wget", "--quiet", link, "-O", str(dino_model_path)]
                 logger.info(f"Downloading the dinov2 model with `{cmd}`.")
                 subprocess.run(cmd, check=True)
             else:

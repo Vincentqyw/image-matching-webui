@@ -43,7 +43,7 @@ class GIM(BaseModel):
             if "drive.google.com" in model_link:
                 gdown.download(model_link, output=str(model_path), fuzzy=True)
             else:
-                cmd = ["wget", model_link, "-O", str(model_path)]
+                cmd = ["wget", "--quiet", model_link, "-O", str(model_path)]
                 subprocess.run(cmd, check=True)
             logger.info(f"Downloaded GIM model succeeed!")
 
