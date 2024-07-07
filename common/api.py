@@ -1,26 +1,23 @@
-import cv2
-import torch
 import warnings
-import numpy as np
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple, List, Union
-from hloc import logger
-from hloc import match_dense, match_features, extract_features
-from hloc.utils.viz import add_text, plot_keypoints
-from .utils import (
-    load_config,
-    get_model,
-    get_feature_model,
-    filter_matches,
-    device,
-    ROOT,
-)
-from .viz import (
-    fig2im,
-    plot_images,
-    display_matches,
-)
+from typing import Any, Dict, Optional
+
+import cv2
 import matplotlib.pyplot as plt
+import numpy as np
+import torch
+
+from hloc import extract_features, logger, match_dense, match_features
+from hloc.utils.viz import add_text, plot_keypoints
+
+from .utils import (
+    ROOT,
+    filter_matches,
+    get_feature_model,
+    get_model,
+    load_config,
+)
+from .viz import display_matches, fig2im, plot_images
 
 warnings.simplefilter("ignore")
 
@@ -109,7 +106,7 @@ class ImageMatchingAPI(torch.nn.Module):
                     "match_threshold"
                 ] = match_threshold
             except TypeError as e:
-                breakpoint()
+                logger.error(e)
         else:
             self.conf["feature"]["model"]["max_keypoints"] = max_keypoints
             self.conf["feature"]["model"][
@@ -137,7 +134,9 @@ class ImageMatchingAPI(torch.nn.Module):
                 self.match_conf["preprocessing"],
                 device=self.device,
             )
-            last_fixed = "{}".format(self.match_conf["model"]["name"])
+            last_fixed = "{}".format(  # noqa: F841
+                self.match_conf["model"]["name"]
+            )
         else:
             pred0 = extract_features.extract(
                 self.extractor, img0, self.extract_conf["preprocessing"]
@@ -290,7 +289,5 @@ class ImageMatchingAPI(torch.nn.Module):
 
 
 if __name__ == "__main__":
-    import argparse
-
     config = load_config(ROOT / "common/config.yaml")
-    test_api(config)
+    api = ImageMatchingAPI(config)

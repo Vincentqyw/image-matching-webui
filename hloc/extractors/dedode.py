@@ -1,16 +1,18 @@
+import subprocess
 import sys
 from pathlib import Path
-import subprocess
+
 import torch
-from PIL import Image
-from ..utils.base_model import BaseModel
-from hloc import logger
 import torchvision.transforms as transforms
+
+from hloc import logger
+
+from ..utils.base_model import BaseModel
 
 dedode_path = Path(__file__).parent / "../../third_party/DeDoDe"
 sys.path.append(str(dedode_path))
 
-from DeDoDe import dedode_detector_L, dedode_descriptor_B
+from DeDoDe import dedode_descriptor_B, dedode_detector_L
 from DeDoDe.utils import to_pixel_coords
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -49,14 +51,14 @@ class DeDoDe(BaseModel):
         if not model_detector_path.exists():
             model_detector_path.parent.mkdir(exist_ok=True)
             link = self.weight_urls[conf["model_detector_name"]]
-            cmd = ["wget", link, "-O", str(model_detector_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_detector_path)]
             logger.info(f"Downloading the DeDoDe detector model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 
         if not model_descriptor_path.exists():
             model_descriptor_path.parent.mkdir(exist_ok=True)
             link = self.weight_urls[conf["model_descriptor_name"]]
-            cmd = ["wget", link, "-O", str(model_descriptor_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_descriptor_path)]
             logger.info(
                 f"Downloading the DeDoDe descriptor model with `{cmd}`."
             )
@@ -73,7 +75,7 @@ class DeDoDe(BaseModel):
         self.descriptor = dedode_descriptor_B(
             weights=weights_descriptor, device=device
         )
-        logger.info(f"Load DeDoDe model done.")
+        logger.info("Load DeDoDe model done.")
 
     def _forward(self, data):
         """

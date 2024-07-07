@@ -1,9 +1,11 @@
 import sys
 from pathlib import Path
-import subprocess
+
 from huggingface_hub import hf_hub_download
-from ..utils.base_model import BaseModel
+
 from hloc import logger
+
+from ..utils.base_model import BaseModel
 
 darkfeat_path = Path(__file__).parent / "../../third_party/DarkFeat"
 sys.path.append(str(darkfeat_path))
@@ -24,9 +26,6 @@ class DarkFeat(BaseModel):
     required_inputs = ["image"]
 
     def _init(self, conf):
-        model_path = darkfeat_path / "checkpoints" / conf["model_name"]
-        link = self.weight_urls[conf["model_name"]]
-
         cached_file = hf_hub_download(
             repo_type="space",
             repo_id="Realcat/image-matching-webui",
@@ -34,7 +33,7 @@ class DarkFeat(BaseModel):
         )
 
         self.net = DarkFeat_(cached_file)
-        logger.info(f"Load DarkFeat model done.")
+        logger.info("Load DarkFeat model done.")
 
     def _forward(self, data):
         pred = self.net({"image": data["image"]})

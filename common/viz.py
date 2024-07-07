@@ -1,11 +1,13 @@
-import cv2
 import typing
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
+
+import cv2
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import matplotlib.pyplot as plt
-from pathlib import Path
-from typing import Dict, Any, Optional, Tuple, List, Union
+
 from hloc.utils.viz import add_text, plot_keypoints
 
 

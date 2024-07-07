@@ -1,9 +1,11 @@
+import subprocess
 import sys
 from pathlib import Path
-import subprocess
+
 import torch
-from ..utils.base_model import BaseModel
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 gluestick_path = Path(__file__).parent / "../../third_party/GlueStick"
 sys.path.append(str(gluestick_path))
@@ -42,10 +44,10 @@ class GlueStick(BaseModel):
         if not model_path.exists():
             model_path.parent.mkdir(exist_ok=True)
             link = self.gluestick_models[conf["model_name"]]
-            cmd = ["wget", link, "-O", str(model_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_path)]
             logger.info(f"Downloading the Gluestick model with `{cmd}`.")
             subprocess.run(cmd, check=True)
-        logger.info(f"Loading GlueStick model...")
+        logger.info("Loading GlueStick model...")
 
         gluestick_conf = {
             "name": "two_view_pipeline",

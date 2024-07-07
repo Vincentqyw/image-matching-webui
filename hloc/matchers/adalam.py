@@ -1,9 +1,8 @@
 import torch
-
-from ..utils.base_model import BaseModel
-
 from kornia.feature.adalam import AdalamFilter
 from kornia.utils.helpers import get_cuda_device_if_available
+
+from ..utils.base_model import BaseModel
 
 
 class AdaLAM(BaseModel):

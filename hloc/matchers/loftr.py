@@ -1,8 +1,11 @@
-import torch
 import warnings
-from kornia.feature.loftr.loftr import default_cfg
+
+import torch
 from kornia.feature import LoFTR as LoFTR_
+from kornia.feature.loftr.loftr import default_cfg
+
 from hloc import logger
+
 from ..utils.base_model import BaseModel
 
 

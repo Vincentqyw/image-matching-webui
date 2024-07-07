@@ -1,13 +1,13 @@
+import numpy as np
 import torch
 
 from ..utils.base_model import BaseModel
-import numpy as np
 
 
 # borrow from dedode
 def dual_softmax_matcher(
-    desc_A: tuple["B", "C", "N"],
-    desc_B: tuple["B", "C", "M"],
+    desc_A: tuple["B", "C", "N"],  # noqa: F821
+    desc_B: tuple["B", "C", "M"],  # noqa: F821
     threshold=0.1,
     inv_temperature=20,
     normalize=True,

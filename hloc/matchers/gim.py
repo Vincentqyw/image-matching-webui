@@ -1,11 +1,12 @@
-import os
-import sys
-import torch
 import subprocess
-import gdown
+import sys
 from pathlib import Path
-from ..utils.base_model import BaseModel
+
+import gdown
+import torch
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 gim_path = Path(__file__).parent / "../../third_party/gim"
 sys.path.append(str(gim_path))
@@ -43,9 +44,9 @@ class GIM(BaseModel):
             if "drive.google.com" in model_link:
                 gdown.download(model_link, output=str(model_path), fuzzy=True)
             else:
-                cmd = ["wget", model_link, "-O", str(model_path)]
+                cmd = ["wget", "--quiet", model_link, "-O", str(model_path)]
                 subprocess.run(cmd, check=True)
-            logger.info(f"Downloaded GIM model succeeed!")
+            logger.info("Downloaded GIM model succeeed!")
 
         self.aspect_ratio = 896 / 672
         model = DKMv3(None, 672, 896, upsample_preds=True)
@@ -60,7 +61,7 @@ class GIM(BaseModel):
         model.load_state_dict(state_dict)
 
         self.net = model
-        logger.info(f"Loaded GIM model")
+        logger.info("Loaded GIM model")
 
     def pad_image(self, image, aspect_ratio):
         new_width = max(image.shape[3], int(image.shape[2] * aspect_ratio))

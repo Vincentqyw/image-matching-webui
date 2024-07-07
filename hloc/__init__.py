@@ -1,6 +1,7 @@
 import logging
-from packaging import version
+
 import torch
+from packaging import version
 
 __version__ = "1.3"
 

@@ -1,11 +1,11 @@
+import subprocess
 import sys
 from pathlib import Path
-from ..utils.base_model import BaseModel
+
 import torch
 
-from ..utils.base_model import BaseModel
 from .. import logger
-import subprocess
+from ..utils.base_model import BaseModel
 
 sold2_path = Path(__file__).parent / "../../third_party/SOLD2"
 sys.path.append(str(sold2_path))
@@ -43,7 +43,7 @@ class SOLD2(BaseModel):
         if not checkpoint_path.exists():
             checkpoint_path.parent.mkdir(exist_ok=True)
             link = self.weight_urls[conf["weights"]]
-            cmd = ["wget", link, "-O", str(checkpoint_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(checkpoint_path)]
             logger.info(f"Downloading the SOLD2 model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 

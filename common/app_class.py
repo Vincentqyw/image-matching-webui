@@ -1,21 +1,20 @@
-import argparse
-import numpy as np
-import gradio as gr
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple, List, Union
+from typing import Any, Dict, Optional, Tuple
+
+import gradio as gr
+import numpy as np
+
 from common.utils import (
-    ransac_zoo,
+    GRADIO_VERSION,
+    gen_examples,
     generate_warp_images,
-    load_config,
     get_matcher_zoo,
+    load_config,
+    ransac_zoo,
     run_matching,
     run_ransac,
     send_to_match,
-    gen_examples,
-    GRADIO_VERSION,
-    ROOT,
 )
-
 
 DESCRIPTION = """
 # Image Matching WebUI
@@ -132,12 +131,14 @@ class ImageMatchingApp:
                                         label="Keypoint thres.",
                                         value=0.015,
                                     )
-                                    detect_line_threshold = gr.Slider(
-                                        minimum=0.1,
-                                        maximum=1,
-                                        step=0.01,
-                                        label="Line thres.",
-                                        value=0.2,
+                                    detect_line_threshold = (  # noqa: F841
+                                        gr.Slider(
+                                            minimum=0.1,
+                                            maximum=1,
+                                            step=0.01,
+                                            label="Line thres.",
+                                            value=0.2,
+                                        )
                                     )
                                 # matcher_lists = gr.Radio(
                                 #     ["NN-mutual", "Dual-Softmax"],

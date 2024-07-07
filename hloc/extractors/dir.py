@@ -1,10 +1,11 @@
+import os
 import sys
 from pathlib import Path
-import torch
 from zipfile import ZipFile
-import os
-import sklearn
+
 import gdown
+import sklearn
+import torch
 
 from ..utils.base_model import BaseModel
 
@@ -13,8 +14,8 @@ sys.path.append(
 )
 os.environ["DB_ROOT"] = ""  # required by dirtorch
 
-from dirtorch.utils import common  # noqa: E402
 from dirtorch.extract_features import load_model  # noqa: E402
+from dirtorch.utils import common  # noqa: E402
 
 # The DIR model checkpoints (pickle files) include sklearn.decomposition.pca,
 # which has been deprecated in sklearn v0.24

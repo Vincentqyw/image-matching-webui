@@ -1,7 +1,8 @@
-from pathlib import Path
-import subprocess
 import logging
+import subprocess
 import sys
+from pathlib import Path
+
 import torch
 import torchvision.transforms as tvf
 
@@ -42,11 +43,11 @@ class FIRe(BaseModel):
         if not model_path.exists():
             model_path.parent.mkdir(exist_ok=True)
             link = self.fire_models[conf["model_name"]]
-            cmd = ["wget", link, "-O", str(model_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_path)]
             logger.info(f"Downloading the FIRe model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 
-        logger.info(f"Loading fire model...")
+        logger.info("Loading fire model...")
 
         # Load net
         state = torch.load(model_path)

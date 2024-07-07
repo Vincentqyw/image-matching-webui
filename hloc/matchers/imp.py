@@ -4,8 +4,8 @@ from pathlib import Path
 
 import torch
 
+from .. import device, logger
 from ..utils.base_model import BaseModel
-from .. import logger, device
 
 pram_path = Path(__file__).parent / "../../third_party/pram"
 sys.path.append(str(pram_path))
@@ -35,8 +35,10 @@ class IMP(BaseModel):
         self.conf = {**self.default_conf, **conf}
         weight_path = pram_path / "weights" / self.conf["model_name"]
         self.net = GML(self.conf).eval().to(device)
-        self.net.load_state_dict(torch.load(weight_path)["model"], strict=True)
-        logger.info(f"Load IMP model done.")
+        self.net.load_state_dict(
+            torch.load(weight_path, map_location="cpu")["model"], strict=True
+        )
+        logger.info("Load IMP model done.")
 
     def _forward(self, data):
         data["descriptors0"] = data["descriptors0"].transpose(2, 1).float()

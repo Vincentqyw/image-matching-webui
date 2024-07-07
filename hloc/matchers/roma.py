@@ -1,10 +1,12 @@
+import subprocess
 import sys
 from pathlib import Path
-import subprocess
+
 import torch
 from PIL import Image
-from ..utils.base_model import BaseModel
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 roma_path = Path(__file__).parent / "../../third_party/RoMa"
 sys.path.append(str(roma_path))
@@ -41,18 +43,18 @@ class Roma(BaseModel):
         if not model_path.exists():
             model_path.parent.mkdir(exist_ok=True)
             link = self.weight_urls["roma"][conf["model_name"]]
-            cmd = ["wget", link, "-O", str(model_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_path)]
             logger.info(f"Downloading the Roma model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 
         if not dinov2_weights.exists():
             dinov2_weights.parent.mkdir(exist_ok=True)
             link = self.weight_urls[conf["model_utils_name"]]
-            cmd = ["wget", link, "-O", str(dinov2_weights)]
+            cmd = ["wget", "--quiet", link, "-O", str(dinov2_weights)]
             logger.info(f"Downloading the dinov2 model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 
-        logger.info(f"Loading Roma model")
+        logger.info("Loading Roma model")
         # load the model
         weights = torch.load(model_path, map_location="cpu")
         dinov2_weights = torch.load(dinov2_weights, map_location="cpu")
@@ -66,7 +68,7 @@ class Roma(BaseModel):
             # temp fix issue: https://github.com/Parskatt/RoMa/issues/26
             amp_dtype=torch.float32,
         )
-        logger.info(f"Load Roma model done.")
+        logger.info("Load Roma model done.")
 
     def _forward(self, data):
         img0 = data["image0"].cpu().numpy().squeeze() * 255

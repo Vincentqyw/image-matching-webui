@@ -1,11 +1,12 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
+
 import torch
 import torchvision.transforms as tvf
 
-from ..utils.base_model import BaseModel
 from .. import logger
+from ..utils.base_model import BaseModel
 
 fire_path = Path(__file__).parent / "../../third_party/fire"
 
@@ -13,10 +14,6 @@ sys.path.append(str(fire_path))
 
 
 import fire_network
-from lib.how.how.stages.evaluate import eval_asmk_fire, load_dataset_fire
-
-from lib.asmk import asmk
-from asmk import io_helpers, asmk_method, kernel as kern_pkg
 
 EPS = 1e-6
 
@@ -44,18 +41,18 @@ class FIRe(BaseModel):
 
         # Config paths
         model_path = fire_path / "model" / conf["model_name"]
-        config_path = fire_path / conf["config_name"]
-        asmk_bin_path = fire_path / "model" / conf["asmk_name"]
+        config_path = fire_path / conf["config_name"]  # noqa: F841
+        asmk_bin_path = fire_path / "model" / conf["asmk_name"]  # noqa: F841
 
         # Download the model.
         if not model_path.exists():
             model_path.parent.mkdir(exist_ok=True)
             link = self.fire_models[conf["model_name"]]
-            cmd = ["wget", link, "-O", str(model_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_path)]
             logger.info(f"Downloading the FIRe model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 
-        logger.info(f"Loading fire model...")
+        logger.info("Loading fire model...")
 
         # Load net
         state = torch.load(model_path)

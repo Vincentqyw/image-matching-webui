@@ -1,14 +1,13 @@
 import kornia
-from kornia.feature.laf import (
-    laf_from_center_scale_ori,
-    extract_patches_from_pyramid,
-)
 import numpy as np
-import torch
 import pycolmap
+import torch
+from kornia.feature.laf import (
+    extract_patches_from_pyramid,
+    laf_from_center_scale_ori,
+)
 
 from ..utils.base_model import BaseModel
-
 
 EPS = 1e-6
 

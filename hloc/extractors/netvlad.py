@@ -1,5 +1,6 @@
-from pathlib import Path
 import subprocess
+from pathlib import Path
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -7,8 +8,8 @@ import torch.nn.functional as F
 import torchvision.models as models
 from scipy.io import loadmat
 
-from ..utils.base_model import BaseModel
 from .. import logger
+from ..utils.base_model import BaseModel
 
 EPS = 1e-6
 
@@ -60,7 +61,7 @@ class NetVLAD(BaseModel):
         if not checkpoint.exists():
             checkpoint.parent.mkdir(exist_ok=True, parents=True)
             link = self.dir_models[conf["model_name"]]
-            cmd = ["wget", link, "-O", str(checkpoint)]
+            cmd = ["wget", "--quiet", link, "-O", str(checkpoint)]
             logger.info(f"Downloading the NetVLAD model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 

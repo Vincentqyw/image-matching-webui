@@ -1,10 +1,14 @@
+import subprocess
 import sys
 from pathlib import Path
+
 import torch
-import subprocess
 from huggingface_hub import hf_hub_download
-from ..utils.base_model import BaseModel
+
 from hloc import logger
+
+from ..utils.base_model import BaseModel
+
 lib_path = Path(__file__).parent / "../../third_party"
 sys.path.append(str(lib_path))
 from lanet.network_v0.model import PointModel
@@ -43,7 +47,7 @@ class LANet(BaseModel):
         self.net = PointModel(is_test=True)
         state_dict = torch.load(model_path, map_location="cpu")
         self.net.load_state_dict(state_dict["model_state"])
-        logger.info(f"Load LANet model done.")
+        logger.info("Load LANet model done.")
 
     def _forward(self, data):
         image = data["image"]

@@ -4,14 +4,15 @@ import cv2
 import numpy as np
 import torch
 from kornia.color import rgb_to_grayscale
-from packaging import version
 from omegaconf import OmegaConf
+from packaging import version
 
 try:
     import pycolmap
 except ImportError:
     pycolmap = None
 from hloc import logger
+
 from ..utils.base_model import BaseModel
 
 
@@ -140,7 +141,7 @@ class SIFT(BaseModel):
                 f"Unknown backend: {backend} not in "
                 f"{{{','.join(backends)}}}."
             )
-        logger.info(f"Load SIFT model done.")
+        logger.info("Load SIFT model done.")
 
     def extract_single_image(self, image: torch.Tensor):
         image_np = image.cpu().numpy().squeeze(0)

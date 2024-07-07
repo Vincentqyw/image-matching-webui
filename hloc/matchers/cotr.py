@@ -1,19 +1,19 @@
-import sys
 import argparse
-import torch
-import warnings
-import numpy as np
+import sys
 from pathlib import Path
+
+import numpy as np
+import torch
 from torchvision.transforms import ToPILImage
+
 from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party/COTR"))
-from COTR.utils import utils as utils_cotr
-from COTR.models import build_model
-from COTR.options.options import *
-from COTR.options.options_utils import *
-from COTR.inference.inference_helper import triangulate_corr
 from COTR.inference.sparse_engine import SparseEngine
+from COTR.models import build_model
+from COTR.options.options import *  # noqa: F403
+from COTR.options.options_utils import *  # noqa: F403
+from COTR.utils import utils as utils_cotr
 
 utils_cotr.fix_randomness(0)
 torch.set_grad_enabled(False)
@@ -33,7 +33,7 @@ class COTR(BaseModel):
 
     def _init(self, conf):
         parser = argparse.ArgumentParser()
-        set_COTR_arguments(parser)
+        set_COTR_arguments(parser)  # noqa: F405
         opt = parser.parse_args()
         opt.command = " ".join(sys.argv)
         opt.load_weights_path = str(

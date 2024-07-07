@@ -1,6 +1,7 @@
 import torch
-from pathlib import Path
+
 from hloc import logger
+
 from ..utils.base_model import BaseModel
 
 
@@ -18,7 +19,7 @@ class XFeat(BaseModel):
             pretrained=True,
             top_k=self.conf["max_keypoints"],
         )
-        logger.info(f"Load XFeat(sparse) model done.")
+        logger.info("Load XFeat(sparse) model done.")
 
     def _forward(self, data):
         pred = self.net.detectAndCompute(

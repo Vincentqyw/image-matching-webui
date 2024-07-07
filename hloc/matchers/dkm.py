@@ -1,10 +1,12 @@
+import subprocess
 import sys
 from pathlib import Path
+
 import torch
 from PIL import Image
-import subprocess
-from ..utils.base_model import BaseModel
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
 from DKM.dkm import DKMv3_outdoor
@@ -37,11 +39,11 @@ class DKMv3(BaseModel):
         if not model_path.exists():
             model_path.parent.mkdir(exist_ok=True)
             link = self.dkm_models[conf["model_name"]]
-            cmd = ["wget", link, "-O", str(model_path)]
+            cmd = ["wget", "--quiet", link, "-O", str(model_path)]
             logger.info(f"Downloading the DKMv3 model with `{cmd}`.")
             subprocess.run(cmd, check=True)
         self.net = DKMv3_outdoor(path_to_weights=str(model_path), device=device)
-        logger.info(f"Loading DKMv3 model done")
+        logger.info("Loading DKMv3 model done")
 
     def _forward(self, data):
         img0 = data["image0"].cpu().numpy().squeeze() * 255

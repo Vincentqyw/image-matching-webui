@@ -1,0 +1,36 @@
+[project]
+name = "ImageMatchingWebui"
+description = "Image Matching Webui: A tool for matching images using sota algorithms with a Gradio UI"
+version = "1.0"
+authors = [
+    {name = "vincentqyw"},
+]
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+urls = {Repository = "https://github.com/Vincentqyw/image-matching-webui"}
+dynamic = ["dependencies"]
+
+[project.optional-dependencies]
+dev = ["black", "flake8", "isort"]
+
+[tool.setuptools.packages.find]
+include = ["hloc*",  "common",]
+
+[tool.setuptools.package-data]
+common = ["*.yaml"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["env-docker.txt"]}
+
+[tool.black]
+line-length = 80
+
+[tool.isort]
+profile = "black"
+line_length = 80

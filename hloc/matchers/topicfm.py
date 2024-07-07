@@ -1,12 +1,13 @@
-import torch
-import warnings
-from ..utils.base_model import BaseModel
 import sys
 from pathlib import Path
 
+import torch
+
+from ..utils.base_model import BaseModel
+
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
-from TopicFM.src.models.topic_fm import TopicFM as _TopicFM
 from TopicFM.src import get_model_cfg
+from TopicFM.src.models.topic_fm import TopicFM as _TopicFM
 
 topicfm_path = Path(__file__).parent / "../../third_party/TopicFM"
 
