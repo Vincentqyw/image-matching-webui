@@ -1,9 +1,11 @@
+import subprocess
 import sys
 from pathlib import Path
-import subprocess
+
 import torch
-from ..utils.base_model import BaseModel
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 gluestick_path = Path(__file__).parent / "../../third_party/GlueStick"
 sys.path.append(str(gluestick_path))

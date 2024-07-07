@@ -1,8 +1,9 @@
 import sys
 from pathlib import Path
-import torch
-from .. import logger
 
+import torch
+
+from .. import logger
 from ..utils.base_model import BaseModel
 
 example_path = Path(__file__).parent / "../../third_party/example"

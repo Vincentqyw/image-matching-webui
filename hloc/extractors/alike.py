@@ -1,9 +1,11 @@
 import sys
 from pathlib import Path
+
 import torch
 
-from ..utils.base_model import BaseModel
 from hloc import logger
+
+from ..utils.base_model import BaseModel
 
 alike_path = Path(__file__).parent / "../../third_party/ALIKE"
 sys.path.append(str(alike_path))

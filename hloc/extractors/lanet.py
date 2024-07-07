@@ -1,10 +1,13 @@
+import subprocess
 import sys
 from pathlib import Path
+
 import torch
-import subprocess
 from huggingface_hub import hf_hub_download
-from ..utils.base_model import BaseModel
+
 from hloc import logger
+
+from ..utils.base_model import BaseModel
 
 lib_path = Path(__file__).parent / "../../third_party"
 sys.path.append(str(lib_path))

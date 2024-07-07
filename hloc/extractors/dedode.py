@@ -1,15 +1,18 @@
+import subprocess
 import sys
 from pathlib import Path
-import subprocess
+
 import torch
-from ..utils.base_model import BaseModel
-from hloc import logger
 import torchvision.transforms as transforms
+
+from hloc import logger
+
+from ..utils.base_model import BaseModel
 
 dedode_path = Path(__file__).parent / "../../third_party/DeDoDe"
 sys.path.append(str(dedode_path))
 
-from DeDoDe import dedode_detector_L, dedode_descriptor_B
+from DeDoDe import dedode_descriptor_B, dedode_detector_L
 from DeDoDe.utils import to_pixel_coords
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

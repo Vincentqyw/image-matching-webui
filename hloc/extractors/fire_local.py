@@ -1,11 +1,12 @@
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
+
 import torch
 import torchvision.transforms as tvf
 
-from ..utils.base_model import BaseModel
 from .. import logger
+from ..utils.base_model import BaseModel
 
 fire_path = Path(__file__).parent / "../../third_party/fire"
 
@@ -13,6 +14,7 @@ sys.path.append(str(fire_path))
 
 
 import fire_network
+
 EPS = 1e-6
 
 

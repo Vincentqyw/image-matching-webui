@@ -1,10 +1,12 @@
-import sys
-import torch
 import subprocess
-import gdown
+import sys
 from pathlib import Path
-from ..utils.base_model import BaseModel
+
+import gdown
+import torch
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 gim_path = Path(__file__).parent / "../../third_party/gim"
 sys.path.append(str(gim_path))

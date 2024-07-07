@@ -1,17 +1,19 @@
-import sys
 import argparse
-import torch
-import numpy as np
+import sys
 from pathlib import Path
+
+import numpy as np
+import torch
 from torchvision.transforms import ToPILImage
+
 from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party/COTR"))
-from COTR.utils import utils as utils_cotr
-from COTR.models import build_model
-from COTR.options.options import *   # noqa: F403
-from COTR.options.options_utils import *   # noqa: F403
 from COTR.inference.sparse_engine import SparseEngine
+from COTR.models import build_model
+from COTR.options.options import *  # noqa: F403
+from COTR.options.options_utils import *  # noqa: F403
+from COTR.utils import utils as utils_cotr
 
 utils_cotr.fix_randomness(0)
 torch.set_grad_enabled(False)

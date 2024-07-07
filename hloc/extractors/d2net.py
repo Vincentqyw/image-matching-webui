@@ -1,10 +1,12 @@
+import subprocess
 import sys
 from pathlib import Path
-import subprocess
+
 import torch
 
-from ..utils.base_model import BaseModel
 from hloc import logger
+
+from ..utils.base_model import BaseModel
 
 d2net_path = Path(__file__).parent / "../../third_party/d2net"
 sys.path.append(str(d2net_path))

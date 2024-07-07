@@ -1,11 +1,12 @@
-import sys
-import torch
-from ..utils.base_model import BaseModel
-from pathlib import Path
 import subprocess
+import sys
+from pathlib import Path
+
+import torch
 from huggingface_hub import hf_hub_download
 
 from .. import logger
+from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
 from ASpanFormer.src.ASpanFormer.aspanformer import ASpanFormer as _ASpanFormer

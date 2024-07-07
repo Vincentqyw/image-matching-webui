@@ -1,5 +1,6 @@
-from pathlib import Path
 import subprocess
+from pathlib import Path
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -7,8 +8,8 @@ import torch.nn.functional as F
 import torchvision.models as models
 from scipy.io import loadmat
 
-from ..utils.base_model import BaseModel
 from .. import logger
+from ..utils.base_model import BaseModel
 
 EPS = 1e-6
 

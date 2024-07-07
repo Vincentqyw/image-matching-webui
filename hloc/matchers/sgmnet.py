@@ -1,11 +1,13 @@
-import sys
-from pathlib import Path
 import subprocess
-import torch
+import sys
 from collections import OrderedDict, namedtuple
+from pathlib import Path
+
+import torch
 from huggingface_hub import hf_hub_download
-from ..utils.base_model import BaseModel
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 sgmnet_path = Path(__file__).parent / "../../third_party/SGMNet"
 sys.path.append(str(sgmnet_path))

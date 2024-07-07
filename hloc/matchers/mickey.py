@@ -1,16 +1,17 @@
+import subprocess
 import sys
 from pathlib import Path
-import subprocess
+
 import torch
-from ..utils.base_model import BaseModel
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 mickey_path = Path(__file__).parent / "../../third_party"
 sys.path.append(str(mickey_path))
 
-from mickey.lib.models.builder import build_model
 from mickey.config.default import cfg
-
+from mickey.lib.models.builder import build_model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

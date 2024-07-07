@@ -1,10 +1,12 @@
+import subprocess
 import sys
 from pathlib import Path
+
 import torch
 from PIL import Image
-import subprocess
-from ..utils.base_model import BaseModel
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
 from DKM.dkm import DKMv3_outdoor

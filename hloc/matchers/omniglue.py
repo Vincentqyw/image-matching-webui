@@ -1,8 +1,9 @@
-import sys
-import torch
 import subprocess
-import numpy as np
+import sys
 from pathlib import Path
+
+import numpy as np
+import torch
 
 from .. import logger
 from ..utils.base_model import BaseModel

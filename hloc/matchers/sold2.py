@@ -1,10 +1,11 @@
+import subprocess
 import sys
 from pathlib import Path
-from ..utils.base_model import BaseModel
+
 import torch
 
 from .. import logger
-import subprocess
+from ..utils.base_model import BaseModel
 
 sold2_path = Path(__file__).parent / "../../third_party/SOLD2"
 sys.path.append(str(sold2_path))

@@ -1,7 +1,8 @@
 import sys
 from pathlib import Path
-from ..utils.base_model import BaseModel
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 lightglue_path = Path(__file__).parent / "../../third_party/LightGlue"
 sys.path.append(str(lightglue_path))

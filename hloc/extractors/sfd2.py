@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*-
 import sys
 from pathlib import Path
+
 import torchvision.transforms as tvf
 
-from ..utils.base_model import BaseModel
 from .. import logger
+from ..utils.base_model import BaseModel
 
 pram_path = Path(__file__).parent / "../../third_party/pram"
 sys.path.append(str(pram_path))

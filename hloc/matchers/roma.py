@@ -1,10 +1,12 @@
+import subprocess
 import sys
 from pathlib import Path
-import subprocess
+
 import torch
 from PIL import Image
-from ..utils.base_model import BaseModel
+
 from .. import logger
+from ..utils.base_model import BaseModel
 
 roma_path = Path(__file__).parent / "../../third_party/RoMa"
 sys.path.append(str(roma_path))

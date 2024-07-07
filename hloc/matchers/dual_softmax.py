@@ -1,7 +1,7 @@
+import numpy as np
 import torch
 
 from ..utils.base_model import BaseModel
-import numpy as np
 
 
 # borrow from dedode

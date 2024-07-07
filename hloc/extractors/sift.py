@@ -4,14 +4,15 @@ import cv2
 import numpy as np
 import torch
 from kornia.color import rgb_to_grayscale
-from packaging import version
 from omegaconf import OmegaConf
+from packaging import version
 
 try:
     import pycolmap
 except ImportError:
     pycolmap = None
 from hloc import logger
+
 from ..utils.base_model import BaseModel
 
 
