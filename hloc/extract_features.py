@@ -301,10 +301,9 @@ confs = {
             "resize_max": 1600,
             "width": 640,
             "height": 480,
-            'conf_th': 0.001,
-            'multiscale': False,
-            'scales': [1.0],
-
+            "conf_th": 0.001,
+            "multiscale": False,
+            "scales": [1.0],
         },
     },
     # Global descriptors
@@ -333,13 +332,13 @@ confs = {
 
 def resize_image(image, size, interp):
     if interp.startswith("cv2_"):
-        interp = getattr(cv2, "INTER_" + interp[len("cv2_"):].upper())
+        interp = getattr(cv2, "INTER_" + interp[len("cv2_") :].upper())
         h, w = image.shape[:2]
         if interp == cv2.INTER_AREA and (w < size[0] or h < size[1]):
             interp = cv2.INTER_LINEAR
         resized = cv2.resize(image, size, interpolation=interp)
     elif interp.startswith("pil_"):
-        interp = getattr(PIL.Image, interp[len("pil_"):].upper())
+        interp = getattr(PIL.Image, interp[len("pil_") :].upper())
         resized = PIL.Image.fromarray(image.astype(np.uint8))
         resized = resized.resize(size, resample=interp)
         resized = np.asarray(resized, dtype=image.dtype)
@@ -393,7 +392,7 @@ class ImageDataset(torch.utils.data.Dataset):
         size = image.shape[:2][::-1]
 
         if self.conf.resize_max and (
-                self.conf.force_resize or max(size) > self.conf.resize_max
+            self.conf.force_resize or max(size) > self.conf.resize_max
         ):
             scale = self.conf.resize_max / max(size)
             size_new = tuple(int(round(x * scale)) for x in size)
@@ -477,20 +476,20 @@ def extract(model, image_0, conf):
     #     image0 = image_0[:, :, ::-1]  # BGR to RGB
     data = preprocess(image0, conf)
     pred = model({"image": data["image"]})
-    pred["image_size"] = original_size = data["original_size"]
+    pred["image_size"] = data["original_size"]
     pred = {**pred, **data}
     return pred
 
 
 @torch.no_grad()
 def main(
-        conf: Dict,
-        image_dir: Path,
-        export_dir: Optional[Path] = None,
-        as_half: bool = True,
-        image_list: Optional[Union[Path, List[str]]] = None,
-        feature_path: Optional[Path] = None,
-        overwrite: bool = False,
+    conf: Dict,
+    image_dir: Path,
+    export_dir: Optional[Path] = None,
+    as_half: bool = True,
+    image_list: Optional[Union[Path, List[str]]] = None,
+    feature_path: Optional[Path] = None,
+    overwrite: bool = False,
 ) -> Path:
     logger.info(
         "Extracting local features with configuration:"

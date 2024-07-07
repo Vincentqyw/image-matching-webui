@@ -1,32 +1,38 @@
 import os
-import cv2
-import sys
-import torch
+import pickle
 import random
-import psutil
 import shutil
-import numpy as np
-import gradio as gr
-from PIL import Image
-from pathlib import Path
-import poselib
+import time
+import warnings
 from itertools import combinations
-from typing import Callable, Dict, Any, Optional, Tuple, List, Union
-from hloc import matchers, extractors, logger
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
+import cv2
+import gradio as gr
+import matplotlib.pyplot as plt
+import numpy as np
+import poselib
+import psutil
+import torch
+from PIL import Image
+
+from hloc import (
+    extract_features,
+    extractors,
+    logger,
+    match_dense,
+    match_features,
+    matchers,
+)
 from hloc.utils.base_model import dynamic_load
-from hloc import match_dense, match_features, extract_features
+
 from .viz import (
+    display_keypoints,
+    display_matches,
     fig2im,
     plot_images,
-    display_matches,
-    display_keypoints,
-    plot_color_line_matches,
 )
-import time
-import matplotlib.pyplot as plt
-import warnings
-import tempfile
-import pickle
 
 warnings.simplefilter("ignore")
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -91,14 +97,13 @@ class ModelCache:
         host_colocation = int(os.environ.get("HOST_COLOCATION", "1"))
         vm = psutil.virtual_memory()
         du = shutil.disk_usage(".")
-        vm_ratio = host_colocation * vm.used / vm.total
         if verbose:
             logger.info(
                 f"RAM: {vm.used / 1e9:.1f}/{vm.total / host_colocation / 1e9:.1f}GB"
             )
-            # logger.info(
-            #     f"DISK: {du.used / 1e9:.1f}/{du.total / host_colocation / 1e9:.1f}GB"
-            # )
+            logger.info(
+                f"DISK: {du.used / 1e9:.1f}/{du.total / host_colocation / 1e9:.1f}GB"
+            )
         return vm.used / 1e9
 
     def print_memory_usage(self):
@@ -423,7 +428,7 @@ def _filter_matches_poselib(
     elif geometry_type == "Fundamental":
         M, info = poselib.estimate_fundamental(kp0, kp1, ransac_options)
     else:
-        raise notImplementedError("Not Implemented")
+        raise NotImplementedError
 
     return M, np.array(info["inliers"])
 
@@ -438,9 +443,7 @@ def proc_ransac_matches(
     geometry_type: str = "Homography",
 ):
     if ransac_method.startswith("CV2"):
-        logger.info(
-            f"ransac_method: {ransac_method}, geometry_type: {geometry_type}"
-        )
+        logger.info(f"ransac_method: {ransac_method}, geometry_type: {geometry_type}")
         return _filter_matches_opencv(
             mkpts0,
             mkpts1,
@@ -451,9 +454,7 @@ def proc_ransac_matches(
             geometry_type,
         )
     elif ransac_method.startswith("POSELIB"):
-        logger.info(
-            f"ransac_method: {ransac_method}, geometry_type: {geometry_type}"
-        )
+        logger.info(f"ransac_method: {ransac_method}, geometry_type: {geometry_type}")
         return _filter_matches_poselib(
             mkpts0,
             mkpts1,
@@ -464,7 +465,7 @@ def proc_ransac_matches(
             geometry_type,
         )
     else:
-        raise notImplementedError("Not Implemented")
+        raise NotImplementedError
 
 
 def filter_matches(
@@ -498,8 +499,7 @@ def filter_matches(
         mkpts1 = pred["mkeypoints1_orig"]
         feature_type = "KEYPOINT"
     elif (
-        "line_keypoints0_orig" in pred.keys()
-        and "line_keypoints1_orig" in pred.keys()
+        "line_keypoints0_orig" in pred.keys() and "line_keypoints1_orig" in pred.keys()
     ):
         mkpts0 = pred["line_keypoints0_orig"]
         mkpts1 = pred["line_keypoints1_orig"]
@@ -569,8 +569,7 @@ def compute_geometry(
         mkpts0 = pred["mkeypoints0_orig"]
         mkpts1 = pred["mkeypoints1_orig"]
     elif (
-        "line_keypoints0_orig" in pred.keys()
-        and "line_keypoints1_orig" in pred.keys()
+        "line_keypoints0_orig" in pred.keys() and "line_keypoints1_orig" in pred.keys()
     ):
         mkpts0 = pred["line_keypoints0_orig"]
         mkpts1 = pred["line_keypoints1_orig"]
@@ -617,7 +616,7 @@ def compute_geometry(
                 geo_info["H1"] = H1.tolist()
                 geo_info["H2"] = H2.tolist()
             except cv2.error as e:
-                logger.error(f"StereoRectifyUncalibrated failed, skip!")
+                logger.error(f"StereoRectifyUncalibrated failed, skip! error: {e}")
         return geo_info
     else:
         return {}
@@ -643,7 +642,6 @@ def wrap_images(
     """
     h0, w0, _ = img0.shape
     h1, w1, _ = img1.shape
-    result_matrix: Optional[np.ndarray] = None
     if geo_info is not None and len(geo_info) != 0:
         rectified_image0 = img0
         rectified_image1 = None
@@ -656,7 +654,6 @@ def wrap_images(
         title: List[str] = []
         if geom_type == "Homography":
             rectified_image1 = cv2.warpPerspective(img1, H, (w0, h0))
-            result_matrix = H
             title = ["Image 0", "Image 1 - warped"]
         elif geom_type == "Fundamental":
             if geom_type not in geo_info:
@@ -666,7 +663,6 @@ def wrap_images(
                 H1, H2 = np.array(geo_info["H1"]), np.array(geo_info["H2"])
                 rectified_image0 = cv2.warpPerspective(img0, H1, (w0, h0))
                 rectified_image1 = cv2.warpPerspective(img1, H2, (w1, h1))
-                result_matrix = np.array(geo_info["Fundamental"])
                 title = ["Image 0 - warped", "Image 1 - warped"]
         else:
             print("Error: Unknown geometry type")
@@ -705,7 +701,7 @@ def generate_warp_images(
     ):
         return None, None
     geom_info = matches_info["geom_info"]
-    wrapped_images = None
+    warped_image = None
     if choice != "No":
         wrapped_image_pair, warped_image = wrap_images(
             input_image0, input_image1, geom_info, choice
@@ -805,7 +801,7 @@ def run_ransac(
     with open(tmp_state_cache, "wb") as f:
         pickle.dump(state_cache, f)
 
-    logger.info(f"Dump results done!")
+    logger.info("Dump results done!")
 
     return (
         output_matches_ransac,
@@ -1000,7 +996,7 @@ def run_matching(
     tmp_state_cache = "output.pkl"
     with open(tmp_state_cache, "wb") as f:
         pickle.dump(state_cache, f)
-    logger.info(f"Dump results done!")
+    logger.info("Dump results done!")
     return (
         output_keypoints,
         output_matches_raw,
