@@ -17,7 +17,7 @@ urls = {Repository = "https://github.com/Vincentqyw/image-matching-webui"}
 dynamic = ["dependencies"]
 
 [project.optional-dependencies]
-dev = ["black", "flake8", "isort", "parameterized"]
+dev = ["black", "flake8", "isort"]
 
 [tool.setuptools.packages.find]
 include = ["hloc*",  "common",]
@@ -26,7 +26,10 @@ include = ["hloc*",  "common",]
 common = ["*.yaml"]
 
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+dependencies = {file = ["env-docker.txt"]}
+
+[tool.black]
+line-length = 80
 
 [tool.isort]
 profile = "black"
