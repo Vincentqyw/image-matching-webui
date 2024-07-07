@@ -131,8 +131,8 @@ class ImageMatchingApp:
                                         label="Keypoint thres.",
                                         value=0.015,
                                     )
-                                    detect_line_threshold = (
-                                        gr.Slider(  # noqa: F841
+                                    detect_line_threshold = (  # noqa: F841
+                                        gr.Slider(
                                             minimum=0.1,
                                             maximum=1,
                                             step=0.01,

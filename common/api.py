@@ -134,9 +134,9 @@ class ImageMatchingAPI(torch.nn.Module):
                 self.match_conf["preprocessing"],
                 device=self.device,
             )
-            last_fixed = "{}".format(
+            last_fixed = "{}".format(  # noqa: F841
                 self.match_conf["model"]["name"]
-            )  # noqa: F841
+            )
         else:
             pred0 = extract_features.extract(
                 self.extractor, img0, self.extract_conf["preprocessing"]
