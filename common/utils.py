@@ -14,10 +14,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import poselib
 import psutil
-import torch
 from PIL import Image
 
 from hloc import (
+    DEVICE,
     extract_features,
     extractors,
     logger,
@@ -30,7 +30,6 @@ from hloc.utils.base_model import dynamic_load
 from .viz import display_keypoints, display_matches, fig2im, plot_images
 
 warnings.simplefilter("ignore")
-device = "cuda" if torch.cuda.is_available() else "cpu"
 
 ROOT = Path(__file__).parent.parent
 # some default values
@@ -173,7 +172,7 @@ def get_model(match_conf: Dict[str, Any]):
         A matcher model instance.
     """
     Model = dynamic_load(matchers, match_conf["model"]["name"])
-    model = Model(match_conf["model"]).eval().to(device)
+    model = Model(match_conf["model"]).eval().to(DEVICE)
     return model
 
 
@@ -188,7 +187,7 @@ def get_feature_model(conf: Dict[str, Dict[str, Any]]):
         A feature extraction model instance.
     """
     Model = dynamic_load(extractors, conf["model"]["name"])
-    model = Model(conf["model"]).eval().to(device)
+    model = Model(conf["model"]).eval().to(DEVICE)
     return model
 
 
@@ -879,7 +878,7 @@ def run_matching(
     output_matches_ransac = None
 
     # super slow!
-    if "roma" in key.lower() and device == "cpu":
+    if "roma" in key.lower() and DEVICE == "cpu":
         gr.Info(
             f"Success! Please be patient and allow for about 2-3 minutes."
             f" Due to CPU inference, {key} is quiet slow."
@@ -904,7 +903,7 @@ def run_matching(
 
     if model["dense"]:
         pred = match_dense.match_images(
-            matcher, image0, image1, match_conf["preprocessing"], device=device
+            matcher, image0, image1, match_conf["preprocessing"], device=DEVICE
         )
         del matcher
         extract_conf = None

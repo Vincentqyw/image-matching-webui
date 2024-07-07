@@ -6,7 +6,7 @@ from hloc import logger
 from common.utils import (
     get_matcher_zoo,
     load_config,
-    device,
+    DEVICE,
     ROOT,
 )
 from common.api import ImageMatchingAPI
@@ -26,7 +26,7 @@ def test_all(config: dict = None):
         skip_ci = config["matcher_zoo"][k].get("skip_ci", False)
         if enable and not skip_ci:
             logger.info(f"Testing {k} ...")
-            api = ImageMatchingAPI(conf=v, device=device)
+            api = ImageMatchingAPI(conf=v, device=DEVICE)
             api(image0, image1)
             log_path = ROOT / "experiments" / "all"
             log_path.mkdir(exist_ok=True, parents=True)
@@ -70,7 +70,7 @@ def test_one():
         },
         "dense": False,
     }
-    api = ImageMatchingAPI(conf=conf, device=device)
+    api = ImageMatchingAPI(conf=conf, device=DEVICE)
     api(image0, image1)
     log_path = ROOT / "experiments" / "one"
     log_path.mkdir(exist_ok=True, parents=True)
@@ -100,7 +100,7 @@ def test_one():
         "dense": True,
     }
 
-    api = ImageMatchingAPI(conf=conf, device=device)
+    api = ImageMatchingAPI(conf=conf, device=DEVICE)
     api(image0, image1)
     log_path = ROOT / "experiments" / "one"
     log_path.mkdir(exist_ok=True, parents=True)
