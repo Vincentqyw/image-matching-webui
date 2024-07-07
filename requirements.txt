@@ -18,3 +18,5 @@ e2cnn==0.2.3
 onnxruntime
 poselib
 roma
+huggingface_hub
+psutil

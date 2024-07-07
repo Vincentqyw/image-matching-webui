@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 import torchvision.transforms as tvf
-
+from hloc import logger
 from ..utils.base_model import BaseModel
 
 r2d2_path = Path(__file__).parent / "../../third_party/r2d2"
