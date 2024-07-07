@@ -1,4 +1,3 @@
-import os
 import sys
 import torch
 import subprocess
@@ -45,7 +44,7 @@ class GIM(BaseModel):
             else:
                 cmd = ["wget", "--quiet", model_link, "-O", str(model_path)]
                 subprocess.run(cmd, check=True)
-            logger.info(f"Downloaded GIM model succeeed!")
+            logger.info("Downloaded GIM model succeeed!")
 
         self.aspect_ratio = 896 / 672
         model = DKMv3(None, 672, 896, upsample_preds=True)
@@ -60,7 +59,7 @@ class GIM(BaseModel):
         model.load_state_dict(state_dict)
 
         self.net = model
-        logger.info(f"Loaded GIM model")
+        logger.info("Loaded GIM model")
 
     def pad_image(self, image, aspect_ratio):
         new_width = max(image.shape[3], int(image.shape[2] * aspect_ratio))

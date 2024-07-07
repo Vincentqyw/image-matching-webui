@@ -25,7 +25,7 @@ class OmniGlue(BaseModel):
     }
 
     def _init(self, conf):
-        logger.info(f"Loading OmniGlue model")
+        logger.info("Loading OmniGlue model")
         og_model_path = omniglue_path / "models" / "omniglue.onnx"
         sp_model_path = omniglue_path / "models" / "sp_v6.onnx"
         dino_model_path = (
@@ -45,7 +45,7 @@ class OmniGlue(BaseModel):
             dino_export=str(dino_model_path),
             max_keypoints=self.conf["max_keypoints"],
         )
-        logger.info(f"Loaded OmniGlue model done!")
+        logger.info("Loaded OmniGlue model done!")
 
     def _forward(self, data):
         image0_rgb_np = data["image0"][0].permute(1, 2, 0).cpu().numpy() * 255
@@ -61,7 +61,6 @@ class OmniGlue(BaseModel):
         for i in range(match_kp0.shape[0]):
             if match_confidences[i] > match_threshold:
                 keep_idx.append(i)
-        num_filtered_matches = len(keep_idx)
         scores = torch.from_numpy(match_confidences[keep_idx]).reshape(-1, 1)
         pred = {
             "keypoints0": torch.from_numpy(match_kp0[keep_idx]),

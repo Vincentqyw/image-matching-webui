@@ -29,7 +29,7 @@ class RoRD(BaseModel):
 
     def _init(self, conf):
         model_path = conf["checkpoint_dir"] / conf["model_name"]
-        link = self.weight_urls[conf["model_name"]]
+        link = self.weight_urls[conf["model_name"]]   # noqa: F841
 
         if not model_path.exists():
             model_path.parent.mkdir(exist_ok=True)
@@ -50,7 +50,7 @@ class RoRD(BaseModel):
         self.net = _RoRD(
             model_file=model_path, use_relu=conf["use_relu"], use_cuda=False
         )
-        logger.info(f"Load RoRD model done.")
+        logger.info("Load RoRD model done.")
 
     def _forward(self, data):
         image = data["image"]

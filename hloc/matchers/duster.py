@@ -3,7 +3,6 @@ import sys
 import torch
 from pathlib import Path
 import torchvision.transforms as tfm
-import torch.nn.functional as F
 import urllib.request
 import numpy as np
 from ..utils.base_model import BaseModel
@@ -13,7 +12,7 @@ duster_path = Path(__file__).parent / "../../third_party/dust3r"
 sys.path.append(str(duster_path))
 
 from dust3r.inference import inference
-from dust3r.model import load_model, AsymmetricCroCo3DStereo
+from dust3r.model import AsymmetricCroCo3DStereo
 from dust3r.image_pairs import make_pairs
 from dust3r.cloud_opt import global_aligner, GlobalAlignerMode
 from dust3r.utils.geometry import find_reciprocal_matches, xy_grid
@@ -38,7 +37,7 @@ class Duster(BaseModel):
             self.model_path
             # "naver/DUSt3R_ViTLarge_BaseDecoder_512_dpt"
         ).to(device)
-        logger.info(f"Loaded Dust3r model")
+        logger.info("Loaded Dust3r model")
 
     def download_weights(self):
         url = "https://download.europe.naverlabs.com/ComputerVision/DUSt3R/DUSt3R_ViTLarge_BaseDecoder_512_dpt.pth"

@@ -1,5 +1,4 @@
 import torch
-from pathlib import Path
 from hloc import logger
 from ..utils.base_model import BaseModel
 
@@ -21,7 +20,7 @@ class XFeatDense(BaseModel):
             pretrained=True,
             top_k=self.conf["max_keypoints"],
         )
-        logger.info(f"Load XFeat(dense) model done.")
+        logger.info("Load XFeat(dense) model done.")
 
     def _forward(self, data):
         # Compute coarse feats

@@ -34,7 +34,7 @@ class Alike(BaseModel):
             scores_th=conf["detection_threshold"],
             n_limit=conf["max_keypoints"],
         )
-        logger.info(f"Load Alike model done.")
+        logger.info("Load Alike model done.")
 
     def _forward(self, data):
         image = data["image"]

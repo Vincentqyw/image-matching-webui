@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 import subprocess
 import torch
-from PIL import Image
 from ..utils.base_model import BaseModel
 from .. import logger
 
@@ -10,11 +9,6 @@ mickey_path = Path(__file__).parent / "../../third_party"
 sys.path.append(str(mickey_path))
 
 from mickey.lib.models.builder import build_model
-from mickey.lib.datasets.utils import correct_intrinsic_scale
-from mickey.lib.models.MicKey.modules.utils.training_utils import (
-    colorize,
-    generate_heat_map,
-)
 from mickey.config.default import cfg
 
 
@@ -50,10 +44,10 @@ class Mickey(BaseModel):
             logger.info(f"Running {cmd}.")
             subprocess.run(cmd, check=True)
 
-        logger.info(f"Loading mickey model...")
+        logger.info("Loading mickey model...")
         cfg.merge_from_file(config_path)
         self.net = build_model(cfg, checkpoint=model_path)
-        logger.info(f"Load Mickey model done.")
+        logger.info("Load Mickey model done.")
 
     def _forward(self, data):
         # data['K_color0'] = torch.from_numpy(K['im0.jpg']).unsqueeze(0).to(device)

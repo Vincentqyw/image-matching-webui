@@ -1,5 +1,4 @@
 import torch
-import warnings
 from ..utils.base_model import BaseModel
 import sys
 from pathlib import Path

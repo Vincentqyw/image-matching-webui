@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-import subprocess
 import torch
 from .. import logger
 
@@ -35,7 +34,7 @@ class Example(BaseModel):
         # self.net = ExampleNet(is_test=True)
         state_dict = torch.load(model_path, map_location="cpu")
         self.net.load_state_dict(state_dict["model_state"])
-        logger.info(f"Load example model done.")
+        logger.info("Load example model done.")
 
     def _forward(self, data):
         # data: dict, keys: 'image'

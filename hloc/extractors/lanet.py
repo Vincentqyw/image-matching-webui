@@ -44,7 +44,7 @@ class LANet(BaseModel):
         self.net = PointModel(is_test=True)
         state_dict = torch.load(model_path, map_location="cpu")
         self.net.load_state_dict(state_dict["model_state"])
-        logger.info(f"Load LANet model done.")
+        logger.info("Load LANet model done.")
 
     def _forward(self, data):
         image = data["image"]

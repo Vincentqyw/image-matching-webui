@@ -32,7 +32,9 @@ class ImageMatchingApp:
     def __init__(self, server_name="0.0.0.0", server_port=7860, **kwargs):
         self.server_name = server_name
         self.server_port = server_port
-        self.config_path = kwargs.get("config", Path(__file__).parent / "config.yaml")
+        self.config_path = kwargs.get(
+            "config", Path(__file__).parent / "config.yaml"
+        )
         self.cfg = load_config(self.config_path)
         self.matcher_zoo = get_matcher_zoo(self.cfg["matcher_zoo"])
         self.app = None
@@ -52,7 +54,10 @@ class ImageMatchingApp:
                 with gr.Row():
                     with gr.Column(scale=1):
                         gr.Image(
-                            str(Path(__file__).parent.parent / "assets/logo.webp"),
+                            str(
+                                Path(__file__).parent.parent
+                                / "assets/logo.webp"
+                            ),
                             elem_id="logo-img",
                             show_label=False,
                             show_share_button=False,
@@ -96,7 +101,9 @@ class ImageMatchingApp:
 
                         with gr.Row():
                             button_reset = gr.Button(value="Reset")
-                            button_run = gr.Button(value="Run Match", variant="primary")
+                            button_run = gr.Button(
+                                value="Run Match", variant="primary"
+                            )
 
                         with gr.Accordion("Advanced Setting", open=False):
                             with gr.Accordion("Matching Setting", open=True):
@@ -124,12 +131,14 @@ class ImageMatchingApp:
                                         label="Keypoint thres.",
                                         value=0.015,
                                     )
-                                    detect_line_threshold = gr.Slider(  # noqa: F841
-                                        minimum=0.1,
-                                        maximum=1,
-                                        step=0.01,
-                                        label="Line thres.",
-                                        value=0.2,
+                                    detect_line_threshold = (
+                                        gr.Slider(  # noqa: F841
+                                            minimum=0.1,
+                                            maximum=1,
+                                            step=0.01,
+                                            label="Line thres.",
+                                            value=0.2,
+                                        )
                                     )
                                 # matcher_lists = gr.Radio(
                                 #     ["NN-mutual", "Dual-Softmax"],
@@ -140,7 +149,9 @@ class ImageMatchingApp:
                                 with gr.Row(equal_height=False):
                                     ransac_method = gr.Dropdown(
                                         choices=ransac_zoo.keys(),
-                                        value=self.cfg["defaults"]["ransac_method"],
+                                        value=self.cfg["defaults"][
+                                            "ransac_method"
+                                        ],
                                         label="RANSAC Method",
                                         interactive=True,
                                     )
@@ -156,14 +167,18 @@ class ImageMatchingApp:
                                     maximum=1,
                                     step=0.00001,
                                     label="Ransac Confidence",
-                                    value=self.cfg["defaults"]["ransac_confidence"],
+                                    value=self.cfg["defaults"][
+                                        "ransac_confidence"
+                                    ],
                                 )
                                 ransac_max_iter = gr.Slider(
                                     minimum=0.0,
                                     maximum=100000,
                                     step=100,
                                     label="Ransac Iterations",
-                                    value=self.cfg["defaults"]["ransac_max_iter"],
+                                    value=self.cfg["defaults"][
+                                        "ransac_max_iter"
+                                    ],
                                 )
                                 button_ransac = gr.Button(
                                     value="Rerun RANSAC", variant="primary"
@@ -173,7 +188,9 @@ class ImageMatchingApp:
                                     choice_geometry_type = gr.Radio(
                                         ["Fundamental", "Homography"],
                                         label="Reconstruct Geometry",
-                                        value=self.cfg["defaults"]["setting_geometry"],
+                                        value=self.cfg["defaults"][
+                                            "setting_geometry"
+                                        ],
                                     )
 
                         # collect inputs
@@ -197,7 +214,9 @@ class ImageMatchingApp:
                         # Add some examples
                         with gr.Row():
                             # Example inputs
-                            with gr.Accordion("Open for More: Examples", open=True):
+                            with gr.Accordion(
+                                "Open for More: Examples", open=True
+                            ):
                                 gr.Examples(
                                     examples=gen_examples(),
                                     inputs=inputs,
@@ -214,25 +233,39 @@ class ImageMatchingApp:
                             self.display_supported_algorithms()
 
                     with gr.Column():
-                        with gr.Accordion("Open for More: Keypoints", open=True):
-                            output_keypoints = gr.Image(label="Keypoints", type="numpy")
-                        with gr.Accordion("Open for More: Raw Matches", open=False):
+                        with gr.Accordion(
+                            "Open for More: Keypoints", open=True
+                        ):
+                            output_keypoints = gr.Image(
+                                label="Keypoints", type="numpy"
+                            )
+                        with gr.Accordion(
+                            "Open for More: Raw Matches", open=False
+                        ):
                             output_matches_raw = gr.Image(
                                 label="Raw Matches",
                                 type="numpy",
                             )
-                        with gr.Accordion("Open for More: RANSAC Matches", open=True):
+                        with gr.Accordion(
+                            "Open for More: RANSAC Matches", open=True
+                        ):
                             output_matches_ransac = gr.Image(
                                 label="Ransac Matches", type="numpy"
                             )
                         with gr.Accordion(
                             "Open for More: Matches Statistics", open=False
                         ):
-                            output_pred = gr.File(label="Outputs", elem_id="download")
-                            matches_result_info = gr.JSON(label="Matches Statistics")
+                            output_pred = gr.File(
+                                label="Outputs", elem_id="download"
+                            )
+                            matches_result_info = gr.JSON(
+                                label="Matches Statistics"
+                            )
                             matcher_info = gr.JSON(label="Match info")
 
-                        with gr.Accordion("Open for More: Warped Image", open=True):
+                        with gr.Accordion(
+                            "Open for More: Warped Image", open=True
+                        ):
                             output_wrapped = gr.Image(
                                 label="Wrapped Pair", type="numpy"
                             )
@@ -273,7 +306,9 @@ class ImageMatchingApp:
                         output_pred,
                     ]
                     # button callbacks
-                    button_run.click(fn=run_matching, inputs=inputs, outputs=outputs)
+                    button_run.click(
+                        fn=run_matching, inputs=inputs, outputs=outputs
+                    )
                     # Reset images
                     reset_outputs = [
                         input_image0,
@@ -354,9 +389,15 @@ class ImageMatchingApp:
                     gr.Textbox("Under construction", label="C", visible=True)
                 with gr.Row():
                     with gr.Accordion("Open for More", open=False):
-                        gr.Textbox("Under construction", label="A1", visible=True)
-                        gr.Textbox("Under construction", label="B1", visible=True)
-                        gr.Textbox("Under construction", label="C1", visible=True)
+                        gr.Textbox(
+                            "Under construction", label="A1", visible=True
+                        )
+                        gr.Textbox(
+                            "Under construction", label="B1", visible=True
+                        )
+                        gr.Textbox(
+                            "Under construction", label="C1", visible=True
+                        )
             with gr.Column():
                 gr.Textbox("Under construction", label="D", visible=True)
                 gr.Textbox("Under construction", label="E", visible=True)
@@ -431,9 +472,13 @@ class ImageMatchingApp:
         return (
             None,  # image0: Optional[np.ndarray]
             None,  # image1: Optional[np.ndarray]
-            self.cfg["defaults"]["match_threshold"],  # matching_threshold: float
+            self.cfg["defaults"][
+                "match_threshold"
+            ],  # matching_threshold: float
             self.cfg["defaults"]["max_keypoints"],  # max_features: int
-            self.cfg["defaults"]["keypoint_threshold"],  # keypoint_threshold: float
+            self.cfg["defaults"][
+                "keypoint_threshold"
+            ],  # keypoint_threshold: float
             key,  # matcher: str
             self.ui_change_imagebox("upload"),  # input image0: Dict[str, Any]
             self.ui_change_imagebox("upload"),  # input image1: Dict[str, Any]
@@ -449,7 +494,9 @@ class ImageMatchingApp:
             self.cfg["defaults"][
                 "ransac_reproj_threshold"
             ],  # ransac_reproj_threshold: float
-            self.cfg["defaults"]["ransac_confidence"],  # ransac_confidence: float
+            self.cfg["defaults"][
+                "ransac_confidence"
+            ],  # ransac_confidence: float
             self.cfg["defaults"]["ransac_max_iter"],  # ransac_max_iter: int
             self.cfg["defaults"]["setting_geometry"],  # geometry: str
             None,  # predictions
@@ -463,7 +510,9 @@ class ImageMatchingApp:
         cfg = self.cfg["matcher_zoo"]
         if style == "md":
             markdown_table = "| Algo. | Conference | Code | Project | Paper |\n"
-            markdown_table += "| ----- | ---------- | ---- | ------- | ----- |\n"
+            markdown_table += (
+                "| ----- | ---------- | ---- | ------- | ----- |\n"
+            )
 
             for k, v in cfg.items():
                 if not v["info"]["display"]:

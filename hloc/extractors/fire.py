@@ -46,7 +46,7 @@ class FIRe(BaseModel):
             logger.info(f"Downloading the FIRe model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 
-        logger.info(f"Loading fire model...")
+        logger.info("Loading fire model...")
 
         # Load net
         state = torch.load(model_path)

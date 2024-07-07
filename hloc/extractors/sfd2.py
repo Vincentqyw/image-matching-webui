@@ -3,15 +3,13 @@ import sys
 from pathlib import Path
 import torchvision.transforms as tvf
 
-import torch
-
 from ..utils.base_model import BaseModel
 from .. import logger
 
 pram_path = Path(__file__).parent / "../../third_party/pram"
 sys.path.append(str(pram_path))
 
-from nets.sfd2 import load_sfd2, extract_sfd2_return
+from nets.sfd2 import load_sfd2
 
 
 class SFD2(BaseModel):
@@ -30,7 +28,7 @@ class SFD2(BaseModel):
         model_fn = pram_path / "weights" / self.conf["model_name"]
         self.net = load_sfd2(weight_path=model_fn).eval()
 
-        logger.info(f"Load SFD2 model done.")
+        logger.info("Load SFD2 model done.")
 
     def _forward(self, data):
         pred = self.net.extract_local_global(

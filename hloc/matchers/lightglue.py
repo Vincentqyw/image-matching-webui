@@ -36,7 +36,7 @@ class LightGlue(BaseModel):
         conf["weights"] = str(weight_path)
         conf["filter_threshold"] = conf["match_threshold"]
         self.net = LG(**conf)
-        logger.info(f"Load lightglue model done.")
+        logger.info("Load lightglue model done.")
 
     def _forward(self, data):
         input = {}

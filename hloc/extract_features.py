@@ -1,20 +1,22 @@
 import argparse
-import torch
-from pathlib import Path
-from typing import Dict, List, Union, Optional
-import h5py
-from types import SimpleNamespace
-import cv2
-import numpy as np
-from tqdm import tqdm
-import pprint
 import collections.abc as collections
+import pprint
+from pathlib import Path
+from types import SimpleNamespace
+from typing import Dict, List, Optional, Union
+
+import cv2
+import h5py
+import numpy as np
 import PIL.Image
+import torch
 import torchvision.transforms.functional as F
+from tqdm import tqdm
+
 from . import extractors, logger
 from .utils.base_model import dynamic_load
+from .utils.io import list_h5_names, read_image
 from .utils.parsers import parse_image_lists
-from .utils.io import read_image, list_h5_names
 
 """
 A set of standard configurations that can be directly selected from the command

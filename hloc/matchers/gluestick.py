@@ -45,7 +45,7 @@ class GlueStick(BaseModel):
             cmd = ["wget", "--quiet", link, "-O", str(model_path)]
             logger.info(f"Downloading the Gluestick model with `{cmd}`.")
             subprocess.run(cmd, check=True)
-        logger.info(f"Loading GlueStick model...")
+        logger.info("Loading GlueStick model...")
 
         gluestick_conf = {
             "name": "two_view_pipeline",

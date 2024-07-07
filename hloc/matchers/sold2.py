@@ -3,7 +3,6 @@ from pathlib import Path
 from ..utils.base_model import BaseModel
 import torch
 
-from ..utils.base_model import BaseModel
 from .. import logger
 import subprocess
 

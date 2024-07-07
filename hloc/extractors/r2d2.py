@@ -33,7 +33,7 @@ class R2D2(BaseModel):
             rel_thr=conf["reliability_threshold"],
             rep_thr=conf["repetability_threshold"],
         )
-        logger.info(f"Load R2D2 model done.")
+        logger.info("Load R2D2 model done.")
 
     def _forward(self, data):
         img = data["image"]

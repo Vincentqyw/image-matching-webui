@@ -43,7 +43,7 @@ class SuperPoint(BaseModel):
         if conf["fix_sampling"]:
             superpoint.sample_descriptors = sample_descriptors_fix_sampling
         self.net = superpoint.SuperPoint(conf)
-        logger.info(f"Load SuperPoint model done.")
+        logger.info("Load SuperPoint model done.")
 
     def _forward(self, data):
         return self.net(data, self.conf)

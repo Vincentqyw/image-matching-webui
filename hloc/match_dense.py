@@ -1,9 +1,11 @@
+from types import SimpleNamespace
+
+import cv2
 import numpy as np
 import torch
 import torchvision.transforms.functional as F
-from types import SimpleNamespace
+
 from .extract_features import read_image, resize_image
-import cv2
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 

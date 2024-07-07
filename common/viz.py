@@ -159,7 +159,11 @@ def make_matching_figure(
         axes[1].scatter(kpts1[:, 0], kpts1[:, 1], c="w", s=5)
 
     # draw matches
-    if mkpts0.shape[0] != 0 and mkpts1.shape[0] != 0 and mkpts0.shape == mkpts1.shape:
+    if (
+        mkpts0.shape[0] != 0
+        and mkpts1.shape[0] != 0
+        and mkpts0.shape == mkpts1.shape
+    ):
         fig.canvas.draw()
         transFigure = fig.transFigure.inverted()
         fkpts0 = transFigure.transform(axes[0].transData.transform(mkpts0))
@@ -203,7 +207,9 @@ def make_matching_figure(
         return fig
 
 
-def error_colormap(err: np.ndarray, thr: float, alpha: float = 1.0) -> np.ndarray:
+def error_colormap(
+    err: np.ndarray, thr: float, alpha: float = 1.0
+) -> np.ndarray:
     """
     Create a colormap based on the error values.
 
@@ -218,7 +224,9 @@ def error_colormap(err: np.ndarray, thr: float, alpha: float = 1.0) -> np.ndarra
     assert alpha <= 1.0 and alpha > 0, f"Invaid alpha value: {alpha}"
     x = 1 - np.clip(err / (thr * 2), 0, 1)
     return np.clip(
-        np.stack([2 - x * 2, x * 2, np.zeros_like(x), np.ones_like(x) * alpha], -1),
+        np.stack(
+            [2 - x * 2, x * 2, np.zeros_like(x), np.ones_like(x) * alpha], -1
+        ),
         0,
         1,
     )
@@ -477,8 +485,12 @@ def display_matches(
                 mconf = pred["mconf"]
             else:
                 mconf = np.ones(len(mkpts0))
-            fig_mkpts = draw_matches_core(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
-            fig_lines = cv2.resize(fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0]))
+            fig_mkpts = draw_matches_core(
+                mkpts0, mkpts1, img0, img1, mconf, dpi=300
+            )
+            fig_lines = cv2.resize(
+                fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0])
+            )
             fig = np.concatenate([fig_mkpts, fig_lines], axis=0)
         else:
             fig = fig_lines

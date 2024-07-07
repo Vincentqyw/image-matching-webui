@@ -1,7 +1,6 @@
 import sys
 import torch
 from ..utils.base_model import BaseModel
-from ..utils import do_system
 from pathlib import Path
 import subprocess
 from huggingface_hub import hf_hub_download
@@ -12,7 +11,6 @@ sys.path.append(str(Path(__file__).parent / "../../third_party"))
 from ASpanFormer.src.ASpanFormer.aspanformer import ASpanFormer as _ASpanFormer
 from ASpanFormer.src.config.default import get_cfg_defaults
 from ASpanFormer.src.utils.misc import lower_config
-from ASpanFormer.demo import demo_utils
 
 aspanformer_path = Path(__file__).parent / "../../third_party/ASpanFormer"
 
@@ -69,7 +67,7 @@ class ASpanFormer(BaseModel):
             "state_dict"
         ]
         self.net.load_state_dict(state_dict, strict=False)
-        logger.info(f"Loaded Aspanformer model")
+        logger.info("Loaded Aspanformer model")
 
     def _forward(self, data):
         data_ = {

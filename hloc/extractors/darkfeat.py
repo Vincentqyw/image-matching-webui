@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-import subprocess
 from huggingface_hub import hf_hub_download
 from ..utils.base_model import BaseModel
 from hloc import logger
@@ -24,8 +23,6 @@ class DarkFeat(BaseModel):
     required_inputs = ["image"]
 
     def _init(self, conf):
-        model_path = darkfeat_path / "checkpoints" / conf["model_name"]
-        link = self.weight_urls[conf["model_name"]]
 
         cached_file = hf_hub_download(
             repo_type="space",
@@ -34,7 +31,7 @@ class DarkFeat(BaseModel):
         )
 
         self.net = DarkFeat_(cached_file)
-        logger.info(f"Load DarkFeat model done.")
+        logger.info("Load DarkFeat model done.")
 
     def _forward(self, data):
         pred = self.net({"image": data["image"]})

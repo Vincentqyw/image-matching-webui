@@ -38,7 +38,7 @@ class IMP(BaseModel):
         self.net.load_state_dict(
             torch.load(weight_path, map_location="cpu")["model"], strict=True
         )
-        logger.info(f"Load IMP model done.")
+        logger.info("Load IMP model done.")
 
     def _forward(self, data):
         data["descriptors0"] = data["descriptors0"].transpose(2, 1).float()

@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 import subprocess
 import torch
-from PIL import Image
 from ..utils.base_model import BaseModel
 from hloc import logger
 import torchvision.transforms as transforms
@@ -73,7 +72,7 @@ class DeDoDe(BaseModel):
         self.descriptor = dedode_descriptor_B(
             weights=weights_descriptor, device=device
         )
-        logger.info(f"Load DeDoDe model done.")
+        logger.info("Load DeDoDe model done.")
 
     def _forward(self, data):
         """

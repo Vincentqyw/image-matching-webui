@@ -41,7 +41,7 @@ class DKMv3(BaseModel):
             logger.info(f"Downloading the DKMv3 model with `{cmd}`.")
             subprocess.run(cmd, check=True)
         self.net = DKMv3_outdoor(path_to_weights=str(model_path), device=device)
-        logger.info(f"Loading DKMv3 model done")
+        logger.info("Loading DKMv3 model done")
 
     def _forward(self, data):
         img0 = data["image0"].cpu().numpy().squeeze() * 255

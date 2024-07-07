@@ -64,22 +64,32 @@ class ImageMatchingAPI(torch.nn.Module):
         if device == "cuda":
             memory_allocated = torch.cuda.memory_allocated(device)
             memory_reserved = torch.cuda.memory_reserved(device)
-            logger.info(f"GPU memory allocated: {memory_allocated / 1024**2:.3f} MB")
-            logger.info(f"GPU memory reserved: {memory_reserved / 1024**2:.3f} MB")
+            logger.info(
+                f"GPU memory allocated: {memory_allocated / 1024**2:.3f} MB"
+            )
+            logger.info(
+                f"GPU memory reserved: {memory_reserved / 1024**2:.3f} MB"
+            )
         self.pred = None
 
     def parse_match_config(self, conf):
         if conf["dense"]:
             return {
                 **conf,
-                "matcher": match_dense.confs.get(conf["matcher"]["model"]["name"]),
+                "matcher": match_dense.confs.get(
+                    conf["matcher"]["model"]["name"]
+                ),
                 "dense": True,
             }
         else:
             return {
                 **conf,
-                "feature": extract_features.confs.get(conf["feature"]["model"]["name"]),
-                "matcher": match_features.confs.get(conf["matcher"]["model"]["name"]),
+                "feature": extract_features.confs.get(
+                    conf["feature"]["model"]["name"]
+                ),
+                "matcher": match_features.confs.get(
+                    conf["matcher"]["model"]["name"]
+                ),
                 "dense": False,
             }
 
@@ -92,12 +102,16 @@ class ImageMatchingAPI(torch.nn.Module):
         self.dense = self.conf["dense"]
         if self.conf["dense"]:
             try:
-                self.conf["matcher"]["model"]["match_threshold"] = match_threshold
+                self.conf["matcher"]["model"][
+                    "match_threshold"
+                ] = match_threshold
             except TypeError as e:
                 logger.error(e)
         else:
             self.conf["feature"]["model"]["max_keypoints"] = max_keypoints
-            self.conf["feature"]["model"]["keypoint_threshold"] = detect_threshold
+            self.conf["feature"]["model"][
+                "keypoint_threshold"
+            ] = detect_threshold
             self.extract_conf = self.conf["feature"]
 
         self.match_conf = self.conf["matcher"]
@@ -120,7 +134,9 @@ class ImageMatchingAPI(torch.nn.Module):
                 self.match_conf["preprocessing"],
                 device=self.device,
             )
-            last_fixed = "{}".format(self.match_conf["model"]["name"])  # noqa: F841
+            last_fixed = "{}".format(
+                self.match_conf["model"]["name"]
+            )  # noqa: F841
         else:
             pred0 = extract_features.extract(
                 self.extractor, img0, self.extract_conf["preprocessing"]
@@ -222,7 +238,10 @@ class ImageMatchingAPI(torch.nn.Module):
         output_keypoints: np.ndarray = plot_images(
             [image0, image1], titles=titles, dpi=300
         )
-        if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
+        if (
+            "keypoints0_orig" in pred.keys()
+            and "keypoints1_orig" in pred.keys()
+        ):
             plot_keypoints([pred["keypoints0_orig"], pred["keypoints1_orig"]])
             text: str = (
                 f"# keypoints0: {len(pred['keypoints0_orig'])} \n"
@@ -248,7 +267,9 @@ class ImageMatchingAPI(torch.nn.Module):
         )
         if log_path is not None:
             img_keypoints_path: Path = log_path / f"img_keypoints_{postfix}.png"
-            img_matches_raw_path: Path = log_path / f"img_matches_raw_{postfix}.png"
+            img_matches_raw_path: Path = (
+                log_path / f"img_matches_raw_{postfix}.png"
+            )
             img_matches_ransac_path: Path = (
                 log_path / f"img_matches_ransac_{postfix}.png"
             )

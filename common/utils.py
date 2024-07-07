@@ -27,12 +27,7 @@ from hloc import (
 )
 from hloc.utils.base_model import dynamic_load
 
-from .viz import (
-    display_keypoints,
-    display_matches,
-    fig2im,
-    plot_images,
-)
+from .viz import display_keypoints, display_matches, fig2im, plot_images
 
 warnings.simplefilter("ignore")
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -443,7 +438,9 @@ def proc_ransac_matches(
     geometry_type: str = "Homography",
 ):
     if ransac_method.startswith("CV2"):
-        logger.info(f"ransac_method: {ransac_method}, geometry_type: {geometry_type}")
+        logger.info(
+            f"ransac_method: {ransac_method}, geometry_type: {geometry_type}"
+        )
         return _filter_matches_opencv(
             mkpts0,
             mkpts1,
@@ -454,7 +451,9 @@ def proc_ransac_matches(
             geometry_type,
         )
     elif ransac_method.startswith("POSELIB"):
-        logger.info(f"ransac_method: {ransac_method}, geometry_type: {geometry_type}")
+        logger.info(
+            f"ransac_method: {ransac_method}, geometry_type: {geometry_type}"
+        )
         return _filter_matches_poselib(
             mkpts0,
             mkpts1,
@@ -499,7 +498,8 @@ def filter_matches(
         mkpts1 = pred["mkeypoints1_orig"]
         feature_type = "KEYPOINT"
     elif (
-        "line_keypoints0_orig" in pred.keys() and "line_keypoints1_orig" in pred.keys()
+        "line_keypoints0_orig" in pred.keys()
+        and "line_keypoints1_orig" in pred.keys()
     ):
         mkpts0 = pred["line_keypoints0_orig"]
         mkpts1 = pred["line_keypoints1_orig"]
@@ -569,7 +569,8 @@ def compute_geometry(
         mkpts0 = pred["mkeypoints0_orig"]
         mkpts1 = pred["mkeypoints1_orig"]
     elif (
-        "line_keypoints0_orig" in pred.keys() and "line_keypoints1_orig" in pred.keys()
+        "line_keypoints0_orig" in pred.keys()
+        and "line_keypoints1_orig" in pred.keys()
     ):
         mkpts0 = pred["line_keypoints0_orig"]
         mkpts1 = pred["line_keypoints1_orig"]
@@ -616,7 +617,9 @@ def compute_geometry(
                 geo_info["H1"] = H1.tolist()
                 geo_info["H2"] = H2.tolist()
             except cv2.error as e:
-                logger.error(f"StereoRectifyUncalibrated failed, skip! error: {e}")
+                logger.error(
+                    f"StereoRectifyUncalibrated failed, skip! error: {e}"
+                )
         return geo_info
     else:
         return {}

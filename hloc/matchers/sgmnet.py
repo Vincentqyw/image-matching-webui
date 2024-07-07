@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 import subprocess
 import torch
-from PIL import Image
 from collections import OrderedDict, namedtuple
 from huggingface_hub import hf_hub_download
 from ..utils.base_model import BaseModel
@@ -46,9 +45,6 @@ class SGMNet(BaseModel):
     def _init(self, conf):
         sgmnet_weights = sgmnet_path / "weights/sgm/root" / conf["model_name"]
 
-        link = self.weight_urls[conf["model_name"]]
-        tar_path = sgmnet_path / "weights.tar.gz"
-
         # Download the model.
         if not sgmnet_weights.exists():
             cached_file = hf_hub_download(
@@ -74,7 +70,7 @@ class SGMNet(BaseModel):
                 new_stat_dict[key[7:]] = value
             checkpoint["state_dict"] = new_stat_dict
         self.net.load_state_dict(checkpoint["state_dict"])
-        logger.info(f"Load SGMNet model done.")
+        logger.info("Load SGMNet model done.")
 
     def _forward(self, data):
         x1 = data["keypoints0"].squeeze()  # N x 2

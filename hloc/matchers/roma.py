@@ -52,7 +52,7 @@ class Roma(BaseModel):
             logger.info(f"Downloading the dinov2 model with `{cmd}`.")
             subprocess.run(cmd, check=True)
 
-        logger.info(f"Loading Roma model")
+        logger.info("Loading Roma model")
         # load the model
         weights = torch.load(model_path, map_location="cpu")
         dinov2_weights = torch.load(dinov2_weights, map_location="cpu")
@@ -66,7 +66,7 @@ class Roma(BaseModel):
             # temp fix issue: https://github.com/Parskatt/RoMa/issues/26
             amp_dtype=torch.float32,
         )
-        logger.info(f"Load Roma model done.")
+        logger.info("Load Roma model done.")
 
     def _forward(self, data):
         img0 = data["image0"].cpu().numpy().squeeze() * 255

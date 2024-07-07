@@ -1,18 +1,19 @@
 import argparse
-from typing import Union, Optional, Dict, List, Tuple
-from pathlib import Path
 import pprint
+from functools import partial
+from pathlib import Path
 from queue import Queue
 from threading import Thread
-from functools import partial
-from tqdm import tqdm
-import h5py
-import torch
+from typing import Dict, List, Optional, Tuple, Union
 
-from . import matchers, logger
+import h5py
+import numpy as np
+import torch
+from tqdm import tqdm
+
+from . import logger, matchers
 from .utils.base_model import dynamic_load
 from .utils.parsers import names_to_pair, names_to_pair_old, parse_retrieval
-import numpy as np
 
 """
 A set of standard configurations that can be directly selected from the command

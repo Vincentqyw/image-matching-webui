@@ -38,7 +38,7 @@ class D2Net(BaseModel):
         self.net = _D2Net(
             model_file=model_file, use_relu=conf["use_relu"], use_cuda=False
         )
-        logger.info(f"Load D2Net model done.")
+        logger.info("Load D2Net model done.")
 
     def _forward(self, data):
         image = data["image"]
