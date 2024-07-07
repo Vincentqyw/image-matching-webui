@@ -21,3 +21,4 @@ hloc/matchers/quadtree.py
 third_party/QuadTreeAttention
 desktop.ini
 *.egg-info
+output.pkl
