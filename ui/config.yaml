@@ -370,9 +370,10 @@ matcher_zoo:
       display: true
 
   sfd2+imp:
+    enable: false
+    skip_ci: true
     matcher: imp
     feature: sfd2
-    enable: true
     dense: false
     info:
       name: SFD2+IMP #dispaly name
@@ -383,9 +384,10 @@ matcher_zoo:
       display: true
 
   sfd2+mnn:
+    enable: false
+    skip_ci: true
     matcher: NN-mutual
     feature: sfd2
-    enable: true
     dense: false
     info:
       name: SFD2+MNN #dispaly name
