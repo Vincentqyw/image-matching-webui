@@ -20,10 +20,10 @@ dynamic = ["dependencies"]
 dev = ["black", "flake8", "isort"]
 
 [tool.setuptools.packages.find]
-include = ["hloc*",  "common",]
+include = ["hloc*",  "ui",]
 
 [tool.setuptools.package-data]
-common = ["*.yaml"]
+ui = ["*.yaml"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}

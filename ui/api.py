@@ -289,5 +289,5 @@ class ImageMatchingAPI(torch.nn.Module):
 
 
 if __name__ == "__main__":
-    config = load_config(ROOT / "common/config.yaml")
+    config = load_config(ROOT / "ui/config.yaml")
     api = ImageMatchingAPI(config)

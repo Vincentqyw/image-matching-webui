@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Tuple
 import gradio as gr
 import numpy as np
 
-from common.utils import (
+from ui.utils import (
     GRADIO_VERSION,
     gen_examples,
     generate_warp_images,
