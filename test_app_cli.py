@@ -3,13 +3,13 @@ import warnings
 import numpy as np
 from pathlib import Path
 from hloc import logger
-from common.utils import (
+from ui.utils import (
     get_matcher_zoo,
     load_config,
     DEVICE,
     ROOT,
 )
-from common.api import ImageMatchingAPI
+from ui.api import ImageMatchingAPI
 
 
 def test_all(config: dict = None):
@@ -109,6 +109,6 @@ def test_one():
 
 
 if __name__ == "__main__":
-    config = load_config(ROOT / "common/config.yaml")
+    config = load_config(ROOT / "ui/config.yaml")
     test_one()
     test_all(config)

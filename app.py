@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from common.app_class import ImageMatchingApp
+from ui.app_class import ImageMatchingApp
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--config",
         type=str,
-        default=Path(__file__).parent / "common/config.yaml",
+        default=Path(__file__).parent / "ui/config.yaml",
         help="config file",
     )
     args = parser.parse_args()
