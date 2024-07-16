@@ -1,11 +1,18 @@
-import os
-import numpy as np
+import glob
 import logging
+import os
 from pathlib import Path
 
-from ...utils.read_write_model import qvec2rotmat, rotmat2qvec
-from ...utils.read_write_model import Image, write_model, Camera
+import numpy as np
+
 from ...utils.parsers import parse_retrieval
+from ...utils.read_write_model import (
+    Camera,
+    Image,
+    qvec2rotmat,
+    rotmat2qvec,
+    write_model,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +35,10 @@ def get_timestamps(files, idx):
 
 def delete_unused_images(root, timestamps):
     """Delete all images in root if they are not contained in timestamps."""
-    images = list(root.glob("**/*.png"))
+    images = glob.glob((root / "**/*.png").as_posix(), recursive=True)
     deleted = 0
     for image in images:
-        ts = image.stem
+        ts = Path(image).stem
         if ts not in timestamps:
             os.remove(image)
             deleted += 1
@@ -48,11 +55,7 @@ def camera_from_calibration_file(id_, path):
     model_name = "PINHOLE"
     params = [float(i) for i in [fx, fy, cx, cy]]
     camera = Camera(
-        id=id_,
-        model=model_name,
-        width=int(width),
-        height=int(height),
-        params=params,
+        id=id_, model=model_name, width=int(width), height=int(height), params=params
     )
     return camera
 
@@ -153,9 +156,7 @@ def generate_localization_pairs(sequence, reloc, num, ref_pairs, out_path):
     """
     if "test" in sequence:
         # hard pairs will be overwritten by easy ones if available
-        relocs = [
-            str(reloc).replace("*", d) for d in ["hard", "moderate", "easy"]
-        ]
+        relocs = [str(reloc).replace("*", d) for d in ["hard", "moderate", "easy"]]
     else:
         relocs = [reloc]
     query_to_ref_ts = {}
@@ -213,12 +214,8 @@ def evaluate_submission(submission_dir, relocs, ths=[0.1, 0.2, 0.5]):
     """Compute the relocalization recall from predicted and ground truth poses."""
     for reloc in relocs.parent.glob(relocs.name):
         poses_gt = parse_relocalization(reloc, has_poses=True)
-        poses_pred = parse_relocalization(
-            submission_dir / reloc.name, has_poses=True
-        )
-        poses_pred = {
-            (ref_ts, q_ts): (R, t) for ref_ts, q_ts, R, t in poses_pred
-        }
+        poses_pred = parse_relocalization(submission_dir / reloc.name, has_poses=True)
+        poses_pred = {(ref_ts, q_ts): (R, t) for ref_ts, q_ts, R, t in poses_pred}
 
         error = []
         for ref_ts, q_ts, R_gt, t_gt in poses_gt:

@@ -29,12 +29,13 @@
 #
 # Author: Johannes L. Schoenberger (jsch-at-demuc-dot-de)
 
-import os
-import collections
-import numpy as np
-import struct
 import argparse
+import collections
 import logging
+import os
+import struct
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -42,9 +43,7 @@ logger = logging.getLogger(__name__)
 CameraModel = collections.namedtuple(
     "CameraModel", ["model_id", "model_name", "num_params"]
 )
-Camera = collections.namedtuple(
-    "Camera", ["id", "model", "width", "height", "params"]
-)
+Camera = collections.namedtuple("Camera", ["id", "model", "width", "height", "params"])
 BaseImage = collections.namedtuple(
     "Image", ["id", "qvec", "tvec", "camera_id", "name", "xys", "point3D_ids"]
 )
@@ -128,11 +127,7 @@ def read_cameras_text(path):
                 height = int(elems[3])
                 params = np.array(tuple(map(float, elems[4:])))
                 cameras[camera_id] = Camera(
-                    id=camera_id,
-                    model=model,
-                    width=width,
-                    height=height,
-                    params=params,
+                    id=camera_id, model=model, width=width, height=height, params=params
                 )
     return cameras
 
@@ -157,9 +152,7 @@ def read_cameras_binary(path_to_model_file):
             height = camera_properties[3]
             num_params = CAMERA_MODEL_IDS[model_id].num_params
             params = read_next_bytes(
-                fid,
-                num_bytes=8 * num_params,
-                format_char_sequence="d" * num_params,
+                fid, num_bytes=8 * num_params, format_char_sequence="d" * num_params
             )
             cameras[camera_id] = Camera(
                 id=camera_id,
@@ -230,10 +223,7 @@ def read_images_text(path):
                 image_name = elems[9]
                 elems = fid.readline().split()
                 xys = np.column_stack(
-                    [
-                        tuple(map(float, elems[0::3])),
-                        tuple(map(float, elems[1::3])),
-                    ]
+                    [tuple(map(float, elems[0::3])), tuple(map(float, elems[1::3]))]
                 )
                 point3D_ids = np.array(tuple(map(int, elems[2::3])))
                 images[image_id] = Image(
@@ -270,19 +260,16 @@ def read_images_binary(path_to_model_file):
             while current_char != b"\x00":  # look for the ASCII 0 entry
                 image_name += current_char.decode("utf-8")
                 current_char = read_next_bytes(fid, 1, "c")[0]
-            num_points2D = read_next_bytes(
-                fid, num_bytes=8, format_char_sequence="Q"
-            )[0]
+            num_points2D = read_next_bytes(fid, num_bytes=8, format_char_sequence="Q")[
+                0
+            ]
             x_y_id_s = read_next_bytes(
                 fid,
                 num_bytes=24 * num_points2D,
                 format_char_sequence="ddq" * num_points2D,
             )
             xys = np.column_stack(
-                [
-                    tuple(map(float, x_y_id_s[0::3])),
-                    tuple(map(float, x_y_id_s[1::3])),
-                ]
+                [tuple(map(float, x_y_id_s[0::3])), tuple(map(float, x_y_id_s[1::3]))]
             )
             point3D_ids = np.array(tuple(map(int, x_y_id_s[2::3])))
             images[image_id] = Image(
@@ -321,13 +308,7 @@ def write_images_text(images, path):
     with open(path, "w") as fid:
         fid.write(HEADER)
         for _, img in images.items():
-            image_header = [
-                img.id,
-                *img.qvec,
-                *img.tvec,
-                img.camera_id,
-                img.name,
-            ]
+            image_header = [img.id, *img.qvec, *img.tvec, img.camera_id, img.name]
             first_line = " ".join(map(str, image_header))
             fid.write(first_line + "\n")
 
@@ -407,9 +388,9 @@ def read_points3D_binary(path_to_model_file):
             xyz = np.array(binary_point_line_properties[1:4])
             rgb = np.array(binary_point_line_properties[4:7])
             error = np.array(binary_point_line_properties[7])
-            track_length = read_next_bytes(
-                fid, num_bytes=8, format_char_sequence="Q"
-            )[0]
+            track_length = read_next_bytes(fid, num_bytes=8, format_char_sequence="Q")[
+                0
+            ]
             track_elems = read_next_bytes(
                 fid,
                 num_bytes=8 * track_length,
@@ -442,7 +423,7 @@ def write_points3D_text(points3D, path):
         ) / len(points3D)
     HEADER = (
         "# 3D point list with one line of data per point:\n"
-        + "#   POINT3D_ID, X, Y, Z, R, G, B, ERROR, TRACK[] as (IMAGE_ID, POINT2D_IDX)\n"
+        + "#   POINT3D_ID, X, Y, Z, R, G, B, ERROR, TRACK[] as (IMAGE_ID, POINT2D_IDX)\n"  # noqa: E501
         + "# Number of points: {}, mean track length: {}\n".format(
             len(points3D), mean_track_length
         )
@@ -498,12 +479,8 @@ def read_model(path, ext=""):
             ext = ".txt"
         else:
             try:
-                cameras, images, points3D = read_model(
-                    os.path.join(path, "model/")
-                )
-                logger.warning(
-                    "This SfM file structure was deprecated in hloc v1.1"
-                )
+                cameras, images, points3D = read_model(os.path.join(path, "model/"))
+                logger.warning("This SfM file structure was deprecated in hloc v1.1")
                 return cameras, images, points3D
             except FileNotFoundError:
                 raise FileNotFoundError(
@@ -595,9 +572,7 @@ def main():
     )
     args = parser.parse_args()
 
-    cameras, images, points3D = read_model(
-        path=args.input_model, ext=args.input_format
-    )
+    cameras, images, points3D = read_model(path=args.input_model, ext=args.input_format)
 
     print("num_cameras:", len(cameras))
     print("num_images:", len(images))
@@ -605,11 +580,7 @@ def main():
 
     if args.output_model is not None:
         write_model(
-            cameras,
-            images,
-            points3D,
-            path=args.output_model,
-            ext=args.output_format,
+            cameras, images, points3D, path=args.output_model, ext=args.output_format
         )
 
 

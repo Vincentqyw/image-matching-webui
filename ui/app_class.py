@@ -3,7 +3,10 @@ from typing import Any, Dict, Optional, Tuple
 
 import gradio as gr
 import numpy as np
+from easydict import EasyDict as edict
+from omegaconf import OmegaConf
 
+from ui.sfm import SfmEngine
 from ui.utils import (
     GRADIO_VERSION,
     gen_examples,
@@ -115,7 +118,7 @@ class ImageMatchingApp:
                                         label="Match thres.",
                                         value=0.1,
                                     )
-                                    match_setting_max_features = gr.Slider(
+                                    match_setting_max_keypoints = gr.Slider(
                                         minimum=10,
                                         maximum=10000,
                                         step=10,
@@ -199,7 +202,7 @@ class ImageMatchingApp:
                             input_image0,
                             input_image1,
                             match_setting_threshold,
-                            match_setting_max_features,
+                            match_setting_max_keypoints,
                             detect_keypoints_threshold,
                             matcher_list,
                             ransac_method,
@@ -314,7 +317,7 @@ class ImageMatchingApp:
                         input_image0,
                         input_image1,
                         match_setting_threshold,
-                        match_setting_max_features,
+                        match_setting_max_keypoints,
                         detect_keypoints_threshold,
                         matcher_list,
                         input_image0,
@@ -377,31 +380,15 @@ class ImageMatchingApp:
                         ],
                         outputs=[output_wrapped, geometry_result],
                     )
-            with gr.Tab("Under construction"):
-                self.init_tab_sfm()
-
-    def init_tab_sfm(self):
-        with gr.Row():
-            with gr.Column():
-                with gr.Row():
-                    gr.Textbox("Under construction", label="A", visible=True)
-                    gr.Textbox("Under construction", label="B", visible=True)
-                    gr.Textbox("Under construction", label="C", visible=True)
-                with gr.Row():
-                    with gr.Accordion("Open for More", open=False):
-                        gr.Textbox(
-                            "Under construction", label="A1", visible=True
-                        )
-                        gr.Textbox(
-                            "Under construction", label="B1", visible=True
-                        )
-                        gr.Textbox(
-                            "Under construction", label="C1", visible=True
-                        )
-            with gr.Column():
-                gr.Textbox("Under construction", label="D", visible=True)
-                gr.Textbox("Under construction", label="E", visible=True)
-                gr.Textbox("Under construction", label="F", visible=True)
+            with gr.Tab("Structure from Motion(under-dev)"):
+                sfm_ui = AppSfmUI(  # noqa: F841
+                    {
+                        **self.cfg,
+                        "matcher_zoo": self.matcher_zoo,
+                        "outputs": "experiments/sfm",
+                    }
+                )
+                sfm_ui.call_empty()
 
     def run(self):
         self.app.queue().launch(
@@ -559,3 +546,256 @@ class ImageMatchingApp:
                 # height=1000,
             )
             return tab
+
+
+class AppBaseUI:
+    def __init__(self, cfg: Dict[str, Any] = {}):
+        self.cfg = OmegaConf.create(cfg)
+        self.inputs = edict({})
+        self.outputs = edict({})
+        self.ui = edict({})
+
+    def _init_ui(self):
+        NotImplemented
+
+    def call(self, **kwargs):
+        NotImplemented
+
+    def info(self):
+        gr.Info("SFM is under construction.")
+
+
+class AppSfmUI(AppBaseUI):
+    def __init__(self, cfg: Dict[str, Any] = None):
+        super().__init__(cfg)
+        assert "matcher_zoo" in self.cfg
+        self.matcher_zoo = self.cfg["matcher_zoo"]
+        self.sfm_engine = SfmEngine(cfg)
+        self._init_ui()
+
+    def init_retrieval_dropdown(self):
+        algos = []
+        for k, v in self.cfg["retrieval_zoo"].items():
+            if v.get("enable", True):
+                algos.append(k)
+        return algos
+
+    def _update_options(self, option):
+        if option == "sparse":
+            return gr.Textbox("sparse", visible=True)
+        elif option == "dense":
+            return gr.Textbox("dense", visible=True)
+        else:
+            return gr.Textbox("not set", visible=True)
+
+    def _on_select_custom_params(self, value: bool = False):
+        return gr.Textbox(
+            label="Camera Params",
+            value="0,0,0,0",
+            interactive=value,
+            visible=value,
+        )
+
+    def _init_ui(self):
+        with gr.Row():
+            # data settting and camera settings
+            with gr.Column():
+                self.inputs.input_images = gr.File(
+                    label="SfM",
+                    interactive=True,
+                    file_count="multiple",
+                    min_width=300,
+                )
+                # camera setting
+                with gr.Accordion("Camera Settings", open=True):
+                    with gr.Column():
+                        with gr.Row():
+                            with gr.Column():
+                                self.inputs.camera_model = gr.Dropdown(
+                                    choices=[
+                                        "PINHOLE",
+                                        "SIMPLE_RADIAL",
+                                        "OPENCV",
+                                    ],
+                                    value="PINHOLE",
+                                    label="Camera Model",
+                                    interactive=True,
+                                )
+                            with gr.Column():
+                                gr.Checkbox(
+                                    label="Shared Params",
+                                    value=True,
+                                    interactive=True,
+                                )
+                                camera_custom_params_cb = gr.Checkbox(
+                                    label="Custom Params",
+                                    value=False,
+                                    interactive=True,
+                                )
+                        with gr.Row():
+                            self.inputs.camera_params = gr.Textbox(
+                                label="Camera Params",
+                                value="0,0,0,0",
+                                interactive=False,
+                                visible=False,
+                            )
+                        camera_custom_params_cb.select(
+                            fn=self._on_select_custom_params,
+                            inputs=camera_custom_params_cb,
+                            outputs=self.inputs.camera_params,
+                        )
+
+                with gr.Accordion("Matching Settings", open=True):
+                    # feature extraction and matching setting
+                    with gr.Row():
+                        # matcher setting
+                        self.inputs.matcher_key = gr.Dropdown(
+                            choices=self.matcher_zoo.keys(),
+                            value="disk+lightglue",
+                            label="Matching Model",
+                            interactive=True,
+                        )
+                    with gr.Row():
+                        with gr.Accordion("Advanced Settings", open=False):
+                            with gr.Column():
+                                with gr.Row():
+                                    # matching setting
+                                    self.inputs.max_keypoints = gr.Slider(
+                                        label="Max Keypoints",
+                                        minimum=100,
+                                        maximum=10000,
+                                        value=1000,
+                                        interactive=True,
+                                    )
+                                    self.inputs.keypoint_threshold = gr.Slider(
+                                        label="Keypoint Threshold",
+                                        minimum=0,
+                                        maximum=1,
+                                        value=0.01,
+                                    )
+                                with gr.Row():
+                                    self.inputs.match_threshold = gr.Slider(
+                                        label="Match Threshold",
+                                        minimum=0.01,
+                                        maximum=12.0,
+                                        value=0.2,
+                                    )
+                                    self.inputs.ransac_threshold = gr.Slider(
+                                        label="Ransac Threshold",
+                                        minimum=0.01,
+                                        maximum=12.0,
+                                        value=4.0,
+                                        step=0.01,
+                                        interactive=True,
+                                    )
+
+                                with gr.Row():
+                                    self.inputs.ransac_confidence = gr.Slider(
+                                        label="Ransac Confidence",
+                                        minimum=0.01,
+                                        maximum=1.0,
+                                        value=0.9999,
+                                        step=0.0001,
+                                        interactive=True,
+                                    )
+                                    self.inputs.ransac_max_iter = gr.Slider(
+                                        label="Ransac Max Iter",
+                                        minimum=1,
+                                        maximum=100,
+                                        value=100,
+                                        step=1,
+                                        interactive=True,
+                                    )
+                with gr.Accordion("Scene Graph Settings", open=True):
+                    # mapping setting
+                    self.inputs.scene_graph = gr.Dropdown(
+                        choices=["all", "swin", "oneref"],
+                        value="all",
+                        label="Scene Graph",
+                        interactive=True,
+                    )
+
+                    # global feature setting
+                    self.inputs.global_feature = gr.Dropdown(
+                        choices=self.init_retrieval_dropdown(),
+                        value="netvlad",
+                        label="Global features",
+                        interactive=True,
+                    )
+                    self.inputs.top_k = gr.Slider(
+                        label="Number of Images per Image to Match",
+                        minimum=1,
+                        maximum=100,
+                        value=10,
+                        step=1,
+                    )
+                # button_match = gr.Button("Run Matching", variant="primary")
+
+            # mapping setting
+            with gr.Column():
+                with gr.Accordion("Mapping Settings", open=True):
+                    with gr.Row():
+                        with gr.Accordion("Buddle Settings", open=True):
+                            with gr.Row():
+                                self.inputs.mapper_refine_focal_length = (
+                                    gr.Checkbox(
+                                        label="Refine Focal Length",
+                                        value=False,
+                                        interactive=True,
+                                    )
+                                )
+                                self.inputs.mapper_refine_principle_points = (
+                                    gr.Checkbox(
+                                        label="Refine Principle Points",
+                                        value=False,
+                                        interactive=True,
+                                    )
+                                )
+                                self.inputs.mapper_refine_extra_params = (
+                                    gr.Checkbox(
+                                        label="Refine Extra Params",
+                                        value=False,
+                                        interactive=True,
+                                    )
+                                )
+                    with gr.Accordion("Retriangluation Settings", open=True):
+                        gr.Textbox(
+                            label="Retriangluation Details",
+                        )
+                    self.ui.button_sfm = gr.Button("Run SFM", variant="primary")
+                self.outputs.model_3d = gr.Model3D(
+                    interactive=True,
+                )
+                self.outputs.output_image = gr.Image(
+                    label="SFM Visualize",
+                    type="numpy",
+                    image_mode="RGB",
+                    interactive=False,
+                )
+
+    def call_empty(self):
+        self.ui.button_sfm.click(fn=self.info, inputs=[], outputs=[])
+
+    def call(self):
+        self.ui.button_sfm.click(
+            fn=self.sfm_engine.call,
+            inputs=[
+                self.inputs.matcher_key,
+                self.inputs.input_images,  # images
+                self.inputs.camera_model,
+                self.inputs.camera_params,
+                self.inputs.max_keypoints,
+                self.inputs.keypoint_threshold,
+                self.inputs.match_threshold,
+                self.inputs.ransac_threshold,
+                self.inputs.ransac_confidence,
+                self.inputs.ransac_max_iter,
+                self.inputs.scene_graph,
+                self.inputs.global_feature,
+                self.inputs.top_k,
+                self.inputs.mapper_refine_focal_length,
+                self.inputs.mapper_refine_principle_points,
+                self.inputs.mapper_refine_extra_params,
+            ],
+            outputs=[self.outputs.model_3d, self.outputs.output_image],
+        )

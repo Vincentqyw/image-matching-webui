@@ -9,9 +9,10 @@ Written by Paul-Edouard Sarlin and Philipp Lindenberger.
 """
 
 from typing import Optional
+
 import numpy as np
-import pycolmap
 import plotly.graph_objects as go
+import pycolmap
 
 
 def to_homogeneous(points):
@@ -46,9 +47,7 @@ def init_figure(height: int = 800) -> go.Figure:
             dragmode="orbit",
         ),
         margin=dict(l=0, r=0, b=0, t=0, pad=0),
-        legend=dict(
-            orientation="h", yanchor="top", y=0.99, xanchor="left", x=0.1
-        ),
+        legend=dict(orientation="h", yanchor="top", y=0.99, xanchor="left", x=0.1),
     )
     return fig
 
@@ -70,9 +69,7 @@ def plot_points(
         mode="markers",
         name=name,
         legendgroup=name,
-        marker=dict(
-            size=ps, color=color, line_width=0.0, colorscale=colorscale
-        ),
+        marker=dict(size=ps, color=color, line_width=0.0, colorscale=colorscale),
     )
     fig.add_trace(tr)
 
@@ -85,7 +82,9 @@ def plot_camera(
     color: str = "rgb(0, 0, 255)",
     name: Optional[str] = None,
     legendgroup: Optional[str] = None,
+    fill: bool = False,
     size: float = 1.0,
+    text: Optional[str] = None,
 ):
     """Plot a camera frustum from pose and intrinsic matrix."""
     W, H = K[0, 2] * 2, K[1, 2] * 2
@@ -98,43 +97,34 @@ def plot_camera(
         scale = 1.0
     corners = to_homogeneous(corners) @ np.linalg.inv(K).T
     corners = (corners / 2 * scale) @ R.T + t
-
-    x, y, z = corners.T
-    rect = go.Scatter3d(
-        x=x,
-        y=y,
-        z=z,
-        line=dict(color=color),
-        legendgroup=legendgroup,
-        name=name,
-        marker=dict(size=0.0001),
-        showlegend=False,
-    )
-    fig.add_trace(rect)
+    legendgroup = legendgroup if legendgroup is not None else name
 
     x, y, z = np.concatenate(([t], corners)).T
     i = [0, 0, 0, 0]
     j = [1, 2, 3, 4]
     k = [2, 3, 4, 1]
 
-    pyramid = go.Mesh3d(
-        x=x,
-        y=y,
-        z=z,
-        color=color,
-        i=i,
-        j=j,
-        k=k,
-        legendgroup=legendgroup,
-        name=name,
-        showlegend=False,
-    )
-    fig.add_trace(pyramid)
+    if fill:
+        pyramid = go.Mesh3d(
+            x=x,
+            y=y,
+            z=z,
+            color=color,
+            i=i,
+            j=j,
+            k=k,
+            legendgroup=legendgroup,
+            name=name,
+            showlegend=False,
+            hovertemplate=text.replace("\n", "<br>"),
+        )
+        fig.add_trace(pyramid)
+
     triangles = np.vstack((i, j, k)).T
     vertices = np.concatenate(([t], corners))
     tri_points = np.array([vertices[i] for i in triangles.reshape(-1)])
-
     x, y, z = tri_points.T
+
     pyramid = go.Scatter3d(
         x=x,
         y=y,
@@ -144,6 +134,7 @@ def plot_camera(
         name=name,
         line=dict(color=color, width=1),
         showlegend=False,
+        hovertemplate=text.replace("\n", "<br>"),
     )
     fig.add_trace(pyramid)
 
@@ -156,19 +147,19 @@ def plot_camera_colmap(
     **kwargs
 ):
     """Plot a camera frustum from PyCOLMAP objects"""
+    world_t_camera = image.cam_from_world.inverse()
     plot_camera(
         fig,
-        image.rotmat().T,
-        image.projection_center(),
+        world_t_camera.rotation.matrix(),
+        world_t_camera.translation,
         camera.calibration_matrix(),
         name=name or str(image.image_id),
+        text=str(image),
         **kwargs
     )
 
 
-def plot_cameras(
-    fig: go.Figure, reconstruction: pycolmap.Reconstruction, **kwargs
-):
+def plot_cameras(fig: go.Figure, reconstruction: pycolmap.Reconstruction, **kwargs):
     """Plot a camera as a cone with camera frustum."""
     for image_id, image in reconstruction.images.items():
         plot_camera_colmap(
@@ -185,13 +176,14 @@ def plot_reconstruction(
     min_track_length: int = 2,
     points: bool = True,
     cameras: bool = True,
+    points_rgb: bool = True,
     cs: float = 1.0,
 ):
     # Filter outliers
     bbs = rec.compute_bounding_box(0.001, 0.999)
     # Filter points, use original reproj error here
-    xyzs = [
-        p3D.xyz
+    p3Ds = [
+        p3D
         for _, p3D in rec.points3D.items()
         if (
             (p3D.xyz >= bbs[0]).all()
@@ -200,7 +192,12 @@ def plot_reconstruction(
             and p3D.track.length() >= min_track_length
         )
     ]
+    xyzs = [p3D.xyz for p3D in p3Ds]
+    if points_rgb:
+        pcolor = [p3D.color for p3D in p3Ds]
+    else:
+        pcolor = color
     if points:
-        plot_points(fig, np.array(xyzs), color=color, ps=1, name=name)
+        plot_points(fig, np.array(xyzs), color=pcolor, ps=1, name=name)
     if cameras:
         plot_cameras(fig, rec, color=color, legendgroup=name, size=cs)

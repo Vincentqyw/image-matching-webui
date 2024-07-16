@@ -22,3 +22,8 @@ third_party/QuadTreeAttention
 desktop.ini
 *.egg-info
 output.pkl
+experiments*
+gen_example.py
+datasets/lines/terrace0.JPG
+datasets/lines/terrace1.JPG
+datasets/South-Building*

@@ -1,15 +1,16 @@
-import cv2
 import logging
+
+import cv2
 import numpy as np
 
 from hloc.utils.read_write_model import (
+    qvec2rotmat,
     read_cameras_binary,
+    read_cameras_text,
     read_images_binary,
+    read_images_text,
     read_model,
     write_model,
-    qvec2rotmat,
-    read_images_text,
-    read_cameras_text,
 )
 
 logger = logging.getLogger(__name__)
@@ -42,9 +43,7 @@ def scale_sfm_images(full_model, scaled_model, image_dir):
         sy = h / camera.height
         assert sx == sy, (sx, sy)
         scaled_cameras[cam_id] = camera._replace(
-            width=w,
-            height=h,
-            params=camera.params * np.array([sx, sx, sy, 1.0]),
+            width=w, height=h, params=camera.params * np.array([sx, sx, sy, 1.0])
         )
 
     write_model(scaled_cameras, images, points3D, scaled_model)

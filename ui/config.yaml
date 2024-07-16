@@ -27,6 +27,17 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2405.12979
       project: https://hwjiang1510.github.io/OmniGlue
       display: true
+  Mast3R:
+    enable: false
+    matcher: mast3r
+    dense: true
+    info:
+      name: Mast3R #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/naver/mast3r
+      paper: https://arxiv.org/abs/2406.09756
+      project: https://dust3r.europe.naverlabs.com
+      display: true
   DUSt3R:
     # TODO: duster is under development  
     enable: true
@@ -396,3 +407,11 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2304.14845
       project: https://feixue94.github.io/
       display: true
+
+retrieval_zoo:
+  netvlad:
+    enable: true
+  openibl:
+    enable: true
+  cosplace:
+    enable: true

@@ -1,11 +1,17 @@
-from pathlib import Path
 import argparse
+from pathlib import Path
 
-from .utils import create_reference_sfm
-from .create_gt_sfm import correct_sfm_with_gt_depth
+from ... import (
+    extract_features,
+    localize_sfm,
+    logger,
+    match_features,
+    pairs_from_covisibility,
+    triangulation,
+)
 from ..Cambridge.utils import create_query_list_with_intrinsics, evaluate
-from ... import extract_features, match_features, pairs_from_covisibility
-from ... import triangulation, localize_sfm, logger
+from .create_gt_sfm import correct_sfm_with_gt_depth
+from .utils import create_reference_sfm
 
 SCENES = ["chess", "fire", "heads", "office", "pumpkin", "redkitchen", "stairs"]
 
@@ -45,9 +51,7 @@ def run_scene(
     create_reference_sfm(gt_dir, ref_sfm_sift, test_list)
     create_query_list_with_intrinsics(gt_dir, query_list, test_list)
 
-    features = extract_features.main(
-        feature_conf, images, outputs, as_half=True
-    )
+    features = extract_features.main(feature_conf, images, outputs, as_half=True)
 
     sfm_pairs = outputs / f"pairs-db-covis{num_covis}.txt"
     pairs_from_covisibility.main(ref_sfm_sift, sfm_pairs, num_matched=num_covis)
@@ -114,9 +118,7 @@ if __name__ == "__main__":
         results = (
             args.outputs
             / scene
-            / "results_{}.txt".format(
-                "dense" if args.use_dense_depth else "sparse"
-            )
+            / "results_{}.txt".format("dense" if args.use_dense_depth else "sparse")
         )
         if args.overwrite or not results.exists():
             run_scene(

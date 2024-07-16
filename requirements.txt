@@ -16,7 +16,7 @@ opencv-python==4.6.0.66
 pandas==2.0.3
 plotly==5.15.0
 protobuf==4.23.2
-pycolmap==0.5.0
+pycolmap==0.6.0
 pytlsd==0.0.2
 pytorch-lightning==1.4.9
 PyYAML==6.0
@@ -35,3 +35,4 @@ poselib
 roma #dust3r
 huggingface_hub
 psutil
+easydict

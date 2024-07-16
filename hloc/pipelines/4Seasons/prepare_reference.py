@@ -1,10 +1,8 @@
-from pathlib import Path
 import argparse
+from pathlib import Path
 
-from ... import extract_features, match_features
-from ... import pairs_from_poses, triangulation
-from .utils import get_timestamps, delete_unused_images
-from .utils import build_empty_colmap_model
+from ... import extract_features, match_features, pairs_from_poses, triangulation
+from .utils import build_empty_colmap_model, delete_unused_images, get_timestamps
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
