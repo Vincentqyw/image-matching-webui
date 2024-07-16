@@ -370,11 +370,11 @@ matcher_zoo:
       display: true
 
   sfd2+imp:
+    enable: false
+    skip_ci: true
     matcher: imp
     feature: sfd2
-    enable: false
     dense: false
-    skip_ci: true
     info:
       name: SFD2+IMP #dispaly name
       source: "CVPR 2023"
@@ -384,11 +384,11 @@ matcher_zoo:
       display: true
 
   sfd2+mnn:
+    enable: false
+    skip_ci: true
     matcher: NN-mutual
     feature: sfd2
-    enable: false
     dense: false
-    skip_ci: true
     info:
       name: SFD2+MNN #dispaly name
       source: "CVPR 2023"
