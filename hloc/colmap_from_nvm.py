@@ -1,5 +1,4 @@
 import argparse
-import logging
 import sqlite3
 from collections import defaultdict
 from pathlib import Path
@@ -7,33 +6,76 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from ...colmap_from_nvm import (
-    camera_center_to_translation,
-    recover_database_images_and_ids,
-)
-from ...utils.read_write_model import (
-    CAMERA_MODEL_IDS,
+from . import logger
+from .utils.read_write_model import (
+    CAMERA_MODEL_NAMES,
     Camera,
     Image,
     Point3D,
     write_model,
 )
 
-logger = logging.getLogger(__name__)
 
-
-def read_nvm_model(nvm_path, database_path, image_ids, camera_ids, skip_points=False):
-    # Extract the intrinsics from the db file instead of the NVM model
-    db = sqlite3.connect(str(database_path))
-    ret = db.execute("SELECT camera_id, model, width, height, params FROM cameras;")
+def recover_database_images_and_ids(database_path):
+    images = {}
     cameras = {}
-    for camera_id, camera_model, width, height, params in ret:
-        params = np.fromstring(params, dtype=np.double).reshape(-1)
-        camera_model = CAMERA_MODEL_IDS[camera_model]
-        assert len(params) == camera_model.num_params, (
-            len(params),
-            camera_model.num_params,
-        )
+    db = sqlite3.connect(str(database_path))
+    ret = db.execute("SELECT name, image_id, camera_id FROM images;")
+    for name, image_id, camera_id in ret:
+        images[name] = image_id
+        cameras[name] = camera_id
+    db.close()
+    logger.info(
+        f"Found {len(images)} images and {len(cameras)} cameras in database."
+    )
+    return images, cameras
+
+
+def quaternion_to_rotation_matrix(qvec):
+    qvec = qvec / np.linalg.norm(qvec)
+    w, x, y, z = qvec
+    R = np.array(
+        [
+            [
+                1 - 2 * y * y - 2 * z * z,
+                2 * x * y - 2 * z * w,
+                2 * x * z + 2 * y * w,
+            ],
+            [
+                2 * x * y + 2 * z * w,
+                1 - 2 * x * x - 2 * z * z,
+                2 * y * z - 2 * x * w,
+            ],
+            [
+                2 * x * z - 2 * y * w,
+                2 * y * z + 2 * x * w,
+                1 - 2 * x * x - 2 * y * y,
+            ],
+        ]
+    )
+    return R
+
+
+def camera_center_to_translation(c, qvec):
+    R = quaternion_to_rotation_matrix(qvec)
+    return (-1) * np.matmul(R, c)
+
+
+def read_nvm_model(
+    nvm_path, intrinsics_path, image_ids, camera_ids, skip_points=False
+):
+    with open(intrinsics_path, "r") as f:
+        raw_intrinsics = f.readlines()
+
+    logger.info(f"Reading {len(raw_intrinsics)} cameras...")
+    cameras = {}
+    for intrinsics in raw_intrinsics:
+        intrinsics = intrinsics.strip("\n").split(" ")
+        name, camera_model, width, height = intrinsics[:4]
+        params = [float(p) for p in intrinsics[4:]]
+        camera_model = CAMERA_MODEL_NAMES[camera_model]
+        assert len(params) == camera_model.num_params
+        camera_id = camera_ids[name]
         camera = Camera(
             id=camera_id,
             model=camera_model.model_name,
@@ -48,7 +90,7 @@ def read_nvm_model(nvm_path, database_path, image_ids, camera_ids, skip_points=F
     while line == "\n" or line.startswith("NVM_V3"):
         line = nvm_f.readline()
     num_images = int(line)
-    # assert num_images == len(cameras), (num_images, len(cameras))
+    assert num_images == len(cameras)
 
     logger.info(f"Reading {num_images} images...")
     image_idx_to_db_image_id = []
@@ -58,7 +100,7 @@ def read_nvm_model(nvm_path, database_path, image_ids, camera_ids, skip_points=F
         line = nvm_f.readline()
         if line == "\n":
             continue
-        data = line.strip("\n").lstrip("./").split(" ")
+        data = line.strip("\n").split(" ")
         image_data.append(data)
         image_idx_to_db_image_id.append(image_ids[data[0]])
         i += 1
@@ -140,7 +182,7 @@ def read_nvm_model(nvm_path, database_path, image_ids, camera_ids, skip_points=F
             qvec=qvec,
             tvec=t,
             camera_id=camera_ids[name],
-            name=name.replace("png", "jpg"),  # some hack required for RobotCar
+            name=name,
             xys=xys,
             point3D_ids=point3D_ids,
         )
@@ -149,15 +191,16 @@ def read_nvm_model(nvm_path, database_path, image_ids, camera_ids, skip_points=F
     return cameras, images, points3D
 
 
-def main(nvm, database, output, skip_points=False):
+def main(nvm, intrinsics, database, output, skip_points=False):
     assert nvm.exists(), nvm
+    assert intrinsics.exists(), intrinsics
     assert database.exists(), database
 
     image_ids, camera_ids = recover_database_images_and_ids(database)
 
     logger.info("Reading the NVM model...")
     model = read_nvm_model(
-        nvm, database, image_ids, camera_ids, skip_points=skip_points
+        nvm, intrinsics, image_ids, camera_ids, skip_points=skip_points
     )
 
     logger.info("Writing the COLMAP model...")
@@ -169,6 +212,7 @@ def main(nvm, database, output, skip_points=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--nvm", required=True, type=Path)
+    parser.add_argument("--intrinsics", required=True, type=Path)
     parser.add_argument("--database", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--skip_points", action="store_true")

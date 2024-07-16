@@ -1,16 +1,21 @@
-from pathlib import Path
 import argparse
+from pathlib import Path
 
-from ... import extract_features, match_features, localize_sfm, logger
-from .utils import get_timestamps, delete_unused_images
-from .utils import generate_query_lists, generate_localization_pairs
-from .utils import prepare_submission, evaluate_submission
+from ... import extract_features, localize_sfm, logger, match_features
+from .utils import (
+    delete_unused_images,
+    evaluate_submission,
+    generate_localization_pairs,
+    generate_query_lists,
+    get_timestamps,
+    prepare_submission,
+)
 
 relocalization_files = {
-    "training": "RelocalizationFilesTrain//relocalizationFile_recording_2020-03-24_17-36-22.txt",
-    "validation": "RelocalizationFilesVal/relocalizationFile_recording_2020-03-03_12-03-23.txt",
-    "test0": "RelocalizationFilesTest/relocalizationFile_recording_2020-03-24_17-45-31_*.txt",
-    "test1": "RelocalizationFilesTest/relocalizationFile_recording_2020-04-23_19-37-00_*.txt",
+    "training": "RelocalizationFilesTrain//relocalizationFile_recording_2020-03-24_17-36-22.txt",  # noqa: E501
+    "validation": "RelocalizationFilesVal/relocalizationFile_recording_2020-03-03_12-03-23.txt",  # noqa: E501
+    "test0": "RelocalizationFilesTest/relocalizationFile_recording_2020-03-24_17-45-31_*.txt",  # noqa: E501
+    "test1": "RelocalizationFilesTest/relocalizationFile_recording_2020-04-23_19-37-00_*.txt",  # noqa: E501
 }
 
 parser = argparse.ArgumentParser()
@@ -67,9 +72,7 @@ delete_unused_images(seq_images, timestamps)
 generate_query_lists(timestamps, seq_dir, query_list)
 
 # Generate the localization pairs from the given reference frames.
-generate_localization_pairs(
-    sequence, reloc, num_loc_pairs, ref_pairs, loc_pairs
-)
+generate_localization_pairs(sequence, reloc, num_loc_pairs, ref_pairs, loc_pairs)
 
 # Extract, match, amd localize.
 ffile = extract_features.main(fconf, seq_images, output_dir)

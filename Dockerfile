@@ -20,7 +20,7 @@ ENV PATH /opt/conda/envs/imw/bin:$PATH
 # Make RUN commands use the new environment
 SHELL ["conda", "run", "-n", "imw", "/bin/bash", "-c"]
 RUN pip install --upgrade pip
-RUN pip install -r env-docker.txt
+RUN pip install -r requirements.txt
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 -y
 
 # Export port

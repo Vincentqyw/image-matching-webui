@@ -1,17 +1,18 @@
-from pathlib import Path
 import argparse
+from pathlib import Path
 
-from .utils import create_query_list_with_intrinsics, scale_sfm_images, evaluate
-from ... import extract_features, match_features, pairs_from_covisibility
-from ... import triangulation, localize_sfm, pairs_from_retrieval, logger
+from ... import (
+    extract_features,
+    localize_sfm,
+    logger,
+    match_features,
+    pairs_from_covisibility,
+    pairs_from_retrieval,
+    triangulation,
+)
+from .utils import create_query_list_with_intrinsics, evaluate, scale_sfm_images
 
-SCENES = [
-    "KingsCollege",
-    "OldHospital",
-    "ShopFacade",
-    "StMarysChurch",
-    "GreatCourt",
-]
+SCENES = ["KingsCollege", "OldHospital", "ShopFacade", "StMarysChurch", "GreatCourt"]
 
 
 def run_scene(images, gt_dir, outputs, results, num_covis, num_loc):
@@ -41,11 +42,7 @@ def run_scene(images, gt_dir, outputs, results, num_covis, num_loc):
     retrieval_conf = extract_features.confs["netvlad"]
 
     create_query_list_with_intrinsics(
-        gt_dir / "empty_all",
-        query_list,
-        test_list,
-        ext=".txt",
-        image_dir=images,
+        gt_dir / "empty_all", query_list, test_list, ext=".txt", image_dir=images
     )
     with open(test_list, "r") as f:
         query_seqs = {q.split("/")[0] for q in f.read().rstrip().split("\n")}
@@ -59,9 +56,7 @@ def run_scene(images, gt_dir, outputs, results, num_covis, num_loc):
         query_prefix=query_seqs,
     )
 
-    features = extract_features.main(
-        feature_conf, images, outputs, as_half=True
-    )
+    features = extract_features.main(feature_conf, images, outputs, as_half=True)
     pairs_from_covisibility.main(ref_sfm_sift, sfm_pairs, num_matched=num_covis)
     sfm_matches = match_features.main(
         matcher_conf, sfm_pairs, feature_conf["output"], outputs
