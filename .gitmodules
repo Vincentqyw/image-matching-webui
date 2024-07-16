@@ -64,3 +64,6 @@
 [submodule "third_party/DarkFeat"]
 	path = third_party/DarkFeat
 	url = https://github.com/agipro/DarkFeat.git
+[submodule "third_party/mast3r"]
+	path = third_party/mast3r
+	url = https://github.com/naver/mast3r
