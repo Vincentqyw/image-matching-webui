@@ -6,6 +6,7 @@ import numpy as np
 from easydict import EasyDict as edict
 from omegaconf import OmegaConf
 
+from hloc import flush_logs, read_logs
 from ui.sfm import SfmEngine
 from ui.utils import (
     GRADIO_VERSION,
@@ -30,6 +31,11 @@ This Space demonstrates [Image Matching WebUI](https://github.com/Vincentqyw/ima
 🐛 Your feedback is valuable to me. Please do not hesitate to report any bugs [here](https://github.com/Vincentqyw/image-matching-webui/issues).
 """
 
+CSS = """
+#warning {background-color: #FFCCCB}
+.logs_class textarea {font-size: 12px !important}
+"""
+
 
 class ImageMatchingApp:
     def __init__(self, server_name="0.0.0.0", server_port=7860, **kwargs):
@@ -52,7 +58,7 @@ class ImageMatchingApp:
         return algos
 
     def init_interface(self):
-        with gr.Blocks() as self.app:
+        with gr.Blocks(css=CSS) as self.app:
             with gr.Tab("Image Matching"):
                 with gr.Row():
                     with gr.Column(scale=1):
@@ -109,13 +115,36 @@ class ImageMatchingApp:
                             )
 
                         with gr.Accordion("Advanced Setting", open=False):
+                            with gr.Accordion("Image Setting", open=True):
+                                with gr.Row():
+                                    image_force_resize_cb = gr.Checkbox(
+                                        label="Force Resize",
+                                        value=False,
+                                        interactive=True,
+                                    )
+                                    image_setting_height = gr.Slider(
+                                        minimum=48,
+                                        maximum=2048,
+                                        step=16,
+                                        label="Image Height",
+                                        value=480,
+                                        visible=False,
+                                    )
+                                    image_setting_width = gr.Slider(
+                                        minimum=64,
+                                        maximum=2048,
+                                        step=16,
+                                        label="Image Width",
+                                        value=640,
+                                        visible=False,
+                                    )
                             with gr.Accordion("Matching Setting", open=True):
                                 with gr.Row():
                                     match_setting_threshold = gr.Slider(
                                         minimum=0.0,
                                         maximum=1,
                                         step=0.001,
-                                        label="Match thres.",
+                                        label="Match threshold",
                                         value=0.1,
                                     )
                                     match_setting_max_keypoints = gr.Slider(
@@ -131,7 +160,7 @@ class ImageMatchingApp:
                                         minimum=0,
                                         maximum=1,
                                         step=0.001,
-                                        label="Keypoint thres.",
+                                        label="Keypoint threshold",
                                         value=0.015,
                                     )
                                     detect_line_threshold = (  # noqa: F841
@@ -139,7 +168,7 @@ class ImageMatchingApp:
                                             minimum=0.1,
                                             maximum=1,
                                             step=0.01,
-                                            label="Line thres.",
+                                            label="Line threshold",
                                             value=0.2,
                                         )
                                     )
@@ -195,7 +224,12 @@ class ImageMatchingApp:
                                             "setting_geometry"
                                         ],
                                     )
-
+                        # image resize
+                        image_force_resize_cb.select(
+                            fn=self._on_select_force_resize,
+                            inputs=image_force_resize_cb,
+                            outputs=[image_setting_width, image_setting_height],
+                        )
                         # collect inputs
                         state_cache = gr.State({})
                         inputs = [
@@ -211,7 +245,9 @@ class ImageMatchingApp:
                             ransac_max_iter,
                             choice_geometry_type,
                             gr.State(self.matcher_zoo),
-                            # state_cache,
+                            image_force_resize_cb,
+                            image_setting_width,
+                            image_setting_height,
                         ]
 
                         # Add some examples
@@ -236,6 +272,25 @@ class ImageMatchingApp:
                             self.display_supported_algorithms()
 
                     with gr.Column():
+                        with gr.Accordion("Open for More: Logs", open=False):
+                            logs = gr.Textbox(
+                                placeholder="\n" * 10,
+                                label="Logs",
+                                info="Verbose from inference will be displayed below.",
+                                lines=10,
+                                max_lines=10,
+                                autoscroll=True,
+                                elem_id="logs",
+                                show_copy_button=True,
+                                container=True,
+                                elem_classes="logs_class",
+                            )
+                            self.app.load(read_logs, None, logs, every=1)
+                            btn_clear_logs = gr.Button(
+                                "Clear logs", elem_id="logs-button"
+                            )
+                            btn_clear_logs.click(flush_logs, [], [])
+
                         with gr.Accordion(
                             "Open for More: Keypoints", open=True
                         ):
@@ -295,7 +350,6 @@ class ImageMatchingApp:
                         inputs=match_image_src,
                         outputs=input_image1,
                     )
-
                     # collect outputs
                     outputs = [
                         output_keypoints,
@@ -336,6 +390,7 @@ class ImageMatchingApp:
                         ransac_max_iter,
                         choice_geometry_type,
                         output_pred,
+                        image_force_resize_cb,
                     ]
                     button_reset.click(
                         fn=self.ui_reset_state,
@@ -422,6 +477,9 @@ class ImageMatchingApp:
                 "source": choice,  # The list of image sources to be displayed
             }
 
+    def _on_select_force_resize(self, visible: bool = False):
+        return gr.update(visible=visible), gr.update(visible=visible)
+
     def ui_reset_state(
         self,
         *args: Any,
@@ -446,6 +504,7 @@ class ImageMatchingApp:
         int,
         float,
         int,
+        bool,
     ]:
         """
         Reset the state of the UI.
@@ -462,7 +521,7 @@ class ImageMatchingApp:
             self.cfg["defaults"][
                 "match_threshold"
             ],  # matching_threshold: float
-            self.cfg["defaults"]["max_keypoints"],  # max_features: int
+            self.cfg["defaults"]["max_keypoints"],  # max_keypoints: int
             self.cfg["defaults"][
                 "keypoint_threshold"
             ],  # keypoint_threshold: float
@@ -487,6 +546,7 @@ class ImageMatchingApp:
             self.cfg["defaults"]["ransac_max_iter"],  # ransac_max_iter: int
             self.cfg["defaults"]["setting_geometry"],  # geometry: str
             None,  # predictions
+            False,
         )
 
     def display_supported_algorithms(self, style="tab"):
@@ -589,12 +649,7 @@ class AppSfmUI(AppBaseUI):
             return gr.Textbox("not set", visible=True)
 
     def _on_select_custom_params(self, value: bool = False):
-        return gr.Textbox(
-            label="Camera Params",
-            value="0,0,0,0",
-            interactive=value,
-            visible=value,
-        )
+        return gr.update(visible=value)
 
     def _init_ui(self):
         with gr.Row():
