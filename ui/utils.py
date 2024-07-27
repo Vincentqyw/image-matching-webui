@@ -829,6 +829,9 @@ def run_matching(
     ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
     choice_geometry_type: str = DEFAULT_SETTING_GEOMETRY,
     matcher_zoo: Dict[str, Any] = None,
+    force_resize: bool = False,
+    image_width: int = 640,
+    image_height: int = 480,
     use_cached_model: bool = False,
 ) -> Tuple[
     np.ndarray,
@@ -853,6 +856,11 @@ def run_matching(
         ransac_confidence (float, optional): RANSAC confidence level.
         ransac_max_iter (int, optional): RANSAC maximum number of iterations.
         choice_geometry_type (str, optional): setting of geometry estimation.
+        matcher_zoo (Dict[str, Any], optional): matcher zoo. Defaults to None.
+        force_resize (bool, optional): force resize. Defaults to False.
+        image_width (int, optional): image width. Defaults to 640.
+        image_height (int, optional): image height. Defaults to 480.
+        use_cached_model (bool, optional): use cached model. Defaults to False.
 
     Returns:
         tuple:
@@ -902,6 +910,12 @@ def run_matching(
     t1 = time.time()
 
     if model["dense"]:
+        match_conf["preprocessing"]["force_resize"] = force_resize
+        if force_resize:
+            match_conf["preprocessing"]["height"] = image_height
+            match_conf["preprocessing"]["width"] = image_width
+            logger.info(f"Force resize to {image_width}x{image_height}")
+
         pred = match_dense.match_images(
             matcher, image0, image1, match_conf["preprocessing"], device=DEVICE
         )
@@ -925,6 +939,12 @@ def run_matching(
         else:
             extractor = get_feature_model(extract_conf)
 
+        extract_conf["preprocessing"]["force_resize"] = force_resize
+        if force_resize:
+            extract_conf["preprocessing"]["height"] = image_height
+            extract_conf["preprocessing"]["width"] = image_width
+            logger.info(f"Force resize to {image_width}x{image_height}")
+
         pred0 = extract_features.extract(
             extractor, image0, extract_conf["preprocessing"]
         )
@@ -933,9 +953,9 @@ def run_matching(
         )
         pred = match_features.match_images(matcher, pred0, pred1)
         del extractor
-    gr.Info(
-        f"Matching images done using: {time.time()-t1:.3f}s",
-    )
+    # gr.Info(
+    #     f"Matching images done using: {time.time()-t1:.3f}s",
+    # )
     logger.info(f"Matching images done using: {time.time()-t1:.3f}s")
     t1 = time.time()
 

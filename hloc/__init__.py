@@ -1,21 +1,44 @@
 import logging
+import sys
 
 import torch
 from packaging import version
 
 __version__ = "1.5"
 
+LOG_PATH = "log.txt"
+
+
+def read_logs():
+    sys.stdout.flush()
+    with open(LOG_PATH, "r") as f:
+        return f.read()
+
+
+def flush_logs():
+    sys.stdout.flush()
+    logs = open(LOG_PATH, "w")
+    logs.close()
+
+
 formatter = logging.Formatter(
     fmt="[%(asctime)s %(name)s %(levelname)s] %(message)s",
     datefmt="%Y/%m/%d %H:%M:%S",
 )
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-handler.setLevel(logging.INFO)
 
+logs_file = open(LOG_PATH, "w")
+logs_file.close()
+
+file_handler = logging.FileHandler(filename=LOG_PATH)
+file_handler.setFormatter(formatter)
+file_handler.setLevel(logging.INFO)
+stdout_handler = logging.StreamHandler()
+stdout_handler.setFormatter(formatter)
+stdout_handler.setLevel(logging.INFO)
 logger = logging.getLogger("hloc")
 logger.setLevel(logging.INFO)
-logger.addHandler(handler)
+logger.addHandler(file_handler)
+logger.addHandler(stdout_handler)
 logger.propagate = False
 
 try:
