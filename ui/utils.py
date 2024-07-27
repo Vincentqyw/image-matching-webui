@@ -856,6 +856,11 @@ def run_matching(
         ransac_confidence (float, optional): RANSAC confidence level.
         ransac_max_iter (int, optional): RANSAC maximum number of iterations.
         choice_geometry_type (str, optional): setting of geometry estimation.
+        matcher_zoo (Dict[str, Any], optional): matcher zoo. Defaults to None.
+        force_resize (bool, optional): force resize. Defaults to False.
+        image_width (int, optional): image width. Defaults to 640.
+        image_height (int, optional): image height. Defaults to 480.
+        use_cached_model (bool, optional): use cached model. Defaults to False.
 
     Returns:
         tuple:

@@ -515,6 +515,7 @@ class ImageMatchingApp:
         key: str = list(self.matcher_zoo.keys())[
             0
         ]  # Get the first key from matcher_zoo
+        flush_logs()
         return (
             None,  # image0: Optional[np.ndarray]
             None,  # image1: Optional[np.ndarray]
