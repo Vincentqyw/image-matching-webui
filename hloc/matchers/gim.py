@@ -2,7 +2,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import gdown
 import torch
 from huggingface_hub import hf_hub_download
 

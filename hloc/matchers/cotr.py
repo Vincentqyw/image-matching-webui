@@ -1,14 +1,14 @@
 import argparse
+import subprocess
 import sys
 from pathlib import Path
-import subprocess
 
 import numpy as np
 import torch
-from torchvision.transforms import ToPILImage
 from huggingface_hub import hf_hub_download
-from .. import logger
+from torchvision.transforms import ToPILImage
 
+from .. import logger
 from ..utils.base_model import BaseModel
 
 cotr_path = Path(__file__).parent / "../../third_party/COTR"
