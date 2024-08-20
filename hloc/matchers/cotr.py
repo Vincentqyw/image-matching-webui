@@ -1,14 +1,19 @@
 import argparse
 import sys
 from pathlib import Path
+import subprocess
 
 import numpy as np
 import torch
 from torchvision.transforms import ToPILImage
+from huggingface_hub import hf_hub_download
+from .. import logger
 
 from ..utils.base_model import BaseModel
 
-sys.path.append(str(Path(__file__).parent / "../../third_party/COTR"))
+cotr_path = Path(__file__).parent / "../../third_party/COTR"
+
+sys.path.append(str(cotr_path))
 from COTR.inference.sparse_engine import SparseEngine
 from COTR.models import build_model
 from COTR.options.options import *  # noqa: F403
@@ -18,7 +23,6 @@ from COTR.utils import utils as utils_cotr
 utils_cotr.fix_randomness(0)
 torch.set_grad_enabled(False)
 
-cotr_path = Path(__file__).parent / "../../third_party/COTR"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -36,10 +40,27 @@ class COTR(BaseModel):
         set_COTR_arguments(parser)  # noqa: F405
         opt = parser.parse_args()
         opt.command = " ".join(sys.argv)
-        opt.load_weights_path = str(
-            cotr_path / conf["weights"] / "checkpoint.pth.tar"
-        )
+        model_path = cotr_path / conf["weights"] / "checkpoint.pth.tar"
 
+        if not model_path.exists():
+            model_path.parent.mkdir(exist_ok=True, parents=True)
+            cached_file = hf_hub_download(
+                repo_type="space",
+                repo_id="Realcat/image-matching-webui",
+                filename="third_party/COTR/{}/{}".format(
+                    conf["weights"], "checkpoint.pth.tar"
+                ),
+            )
+            logger.info("Downloaded COTR model succeeed!")
+            cmd = [
+                "cp",
+                str(cached_file),
+                str(model_path.parent),
+            ]
+            subprocess.run(cmd, check=True)
+            logger.info(f"Copy model file `{cmd}`.")
+
+        opt.load_weights_path = str(model_path)
         layer_2_channels = {
             "layer1": 256,
             "layer2": 512,

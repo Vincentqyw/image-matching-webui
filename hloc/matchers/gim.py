@@ -4,6 +4,7 @@ from pathlib import Path
 
 import gdown
 import torch
+from huggingface_hub import hf_hub_download
 
 from .. import logger
 from ..utils.base_model import BaseModel
@@ -26,6 +27,7 @@ class GIM(BaseModel):
         "image0",
         "image1",
     ]
+    model_list = ["gim_lightglue_100h.ckpt", "gim_dkm_100h.ckpt"]
     model_dict = {
         "gim_lightglue_100h.ckpt": "https://github.com/xuelunshen/gim/blob/main/weights/gim_lightglue_100h.ckpt",
         "gim_dkm_100h.ckpt": "https://drive.google.com/file/d/1gk97V4IROnR1Nprq10W9NCFUv2mxXR_-/view",
@@ -33,20 +35,28 @@ class GIM(BaseModel):
 
     def _init(self, conf):
         conf["model_name"] = str(conf["weights"])
-        if conf["model_name"] not in self.model_dict:
+        if conf["model_name"] not in self.model_list:
             raise ValueError(f"Unknown GIM model {conf['model_name']}.")
         model_path = conf["checkpoint_dir"] / conf["model_name"]
 
         # Download the model.
         if not model_path.exists():
             model_path.parent.mkdir(exist_ok=True)
-            model_link = self.model_dict[conf["model_name"]]
-            if "drive.google.com" in model_link:
-                gdown.download(model_link, output=str(model_path), fuzzy=True)
-            else:
-                cmd = ["wget", "--quiet", model_link, "-O", str(model_path)]
-                subprocess.run(cmd, check=True)
+            cached_file = hf_hub_download(
+                repo_type="space",
+                repo_id="Realcat/image-matching-webui",
+                filename="third_party/gim/weights/{}".format(
+                    conf["model_name"]
+                ),
+            )
             logger.info("Downloaded GIM model succeeed!")
+            cmd = [
+                "cp",
+                str(cached_file),
+                str(conf["checkpoint_dir"]),
+            ]
+            subprocess.run(cmd, check=True)
+            logger.info(f"Copy model file `{cmd}`.")
 
         self.aspect_ratio = 896 / 672
         model = DKMv3(None, 672, 896, upsample_preds=True)
