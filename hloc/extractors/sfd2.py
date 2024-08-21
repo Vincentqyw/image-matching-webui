@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 import sys
 from pathlib import Path
 
@@ -7,11 +6,9 @@ import torchvision.transforms as tvf
 from .. import logger
 from ..utils.base_model import BaseModel
 
-pram_path = Path(__file__).parent / "../../third_party/pram"
-sys.path.append(str(pram_path))
-
-from nets.sfd2 import load_sfd2
-
+tp_path = Path(__file__).parent / "../../third_party"
+sys.path.append(str(tp_path))
+from pram.nets.sfd2 import load_sfd2
 
 class SFD2(BaseModel):
     default_conf = {
@@ -26,7 +23,7 @@ class SFD2(BaseModel):
         self.norm_rgb = tvf.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
-        model_fn = pram_path / "weights" / self.conf["model_name"]
+        model_fn = tp_path / "pram" / "weights" / self.conf["model_name"]
         self.net = load_sfd2(weight_path=model_fn).eval()
 
         logger.info("Load SFD2 model done.")

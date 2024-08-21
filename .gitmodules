@@ -64,3 +64,6 @@
 [submodule "third_party/mast3r"]
 	path = third_party/mast3r
 	url = https://github.com/naver/mast3r
+[submodule "third_party/pram"]
+	path = third_party/pram
+	url = https://github.com/agipro/pram.git
