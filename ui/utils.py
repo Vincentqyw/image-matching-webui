@@ -910,8 +910,9 @@ def run_matching(
     t1 = time.time()
 
     if model["dense"]:
-        if not match_conf["preprocessing"]["force_resize"]:
+        if not match_conf["preprocessing"].get("force_resize", False):
             match_conf["preprocessing"]["force_resize"] = force_resize
+        else:
             logger.info("preprocessing is already resized")
         if force_resize:
             match_conf["preprocessing"]["height"] = image_height
@@ -941,7 +942,7 @@ def run_matching(
         else:
             extractor = get_feature_model(extract_conf)
 
-        if not extract_conf["preprocessing"]["force_resize"]:
+        if not extract_conf["preprocessing"].get("force_resize", False):
             extract_conf["preprocessing"]["force_resize"] = force_resize
         else:
             logger.info("preprocessing is already resized")
