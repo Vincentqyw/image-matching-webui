@@ -55,9 +55,6 @@
 [submodule "third_party/RoMa"]
 	path = third_party/RoMa
 	url = https://github.com/Vincentqyw/RoMa.git
-[submodule "third_party/pram"]
-	path = third_party/pram
-	url = https://github.com/feixue94/pram.git
 [submodule "third_party/SGMNet"]
 	path = third_party/SGMNet
 	url = https://github.com/agipro/SGMNet.git
