@@ -381,8 +381,7 @@ matcher_zoo:
       display: true
 
   sfd2+imp:
-    enable: false
-    skip_ci: true
+    enable: true
     matcher: imp
     feature: sfd2
     dense: false
@@ -395,8 +394,7 @@ matcher_zoo:
       display: true
 
   sfd2+mnn:
-    enable: false
-    skip_ci: true
+    enable: true
     matcher: NN-mutual
     feature: sfd2
     dense: false

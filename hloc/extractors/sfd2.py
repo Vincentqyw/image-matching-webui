@@ -10,6 +10,7 @@ tp_path = Path(__file__).parent / "../../third_party"
 sys.path.append(str(tp_path))
 from pram.nets.sfd2 import load_sfd2
 
+
 class SFD2(BaseModel):
     default_conf = {
         "max_keypoints": 4096,
