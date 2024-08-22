@@ -67,3 +67,6 @@
 [submodule "third_party/pram"]
 	path = third_party/pram
 	url = https://github.com/agipro/pram.git
+[submodule "third_party/EfficientLoFTR"]
+	path = third_party/EfficientLoFTR
+	url = https://github.com/zju3dv/EfficientLoFTR.git
