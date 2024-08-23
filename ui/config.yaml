@@ -41,7 +41,7 @@ matcher_zoo:
   DUSt3R:
     # TODO: duster is under development  
     enable: true
-    skip_ci: true
+    # skip_ci: true
     matcher: duster
     dense: true
     info:
@@ -53,7 +53,7 @@ matcher_zoo:
       display: true
   GIM(dkm):
     enable: true
-    skip_ci: true
+    # skip_ci: true
     matcher: gim(dkm)
     dense: true
     info:
@@ -94,6 +94,16 @@ matcher_zoo:
       github: https://github.com/zju3dv/LoFTR
       paper: https://arxiv.org/pdf/2104.00680
       project: https://zju3dv.github.io/loftr
+      display: true
+  eloftr:
+    matcher: eloftr
+    dense: true
+    info:
+      name: Efficient LoFTR #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/zju3dv/efficientloftr
+      paper: https://zju3dv.github.io/efficientloftr/files/EfficientLoFTR.pdf
+      project: https://zju3dv.github.io/efficientloftr
       display: true
   cotr:
     enable: false

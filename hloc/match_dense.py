@@ -44,6 +44,25 @@ confs = {
         "max_error": 1,  # max error for assigned keypoints (in px)
         "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
     },
+    "eloftr": {
+        "output": "matches-eloftr",
+        "model": {
+            "name": "eloftr",
+            "weights": "weights/eloftr_outdoor.ckpt",
+            "max_keypoints": 2000,
+            "match_threshold": 0.2,
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 32,
+            "width": 640,
+            "height": 480,
+            "force_resize": True,
+        },
+        "max_error": 1,  # max error for assigned keypoints (in px)
+        "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
+    },
     # "loftr_quadtree": {
     #     "output": "matches-loftr-quadtree",
     #     "model": {

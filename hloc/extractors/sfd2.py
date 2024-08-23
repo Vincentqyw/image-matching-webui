@@ -24,8 +24,8 @@ class SFD2(BaseModel):
         self.norm_rgb = tvf.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
-        model_fn = tp_path / "pram" / "weights" / self.conf["model_name"]
-        self.net = load_sfd2(weight_path=model_fn).eval()
+        model_path = tp_path / "pram" / "weights" / self.conf["model_name"]
+        self.net = load_sfd2(weight_path=model_path).eval()
 
         logger.info("Load SFD2 model done.")
 
