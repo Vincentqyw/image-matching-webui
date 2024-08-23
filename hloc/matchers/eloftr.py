@@ -7,18 +7,22 @@ from pathlib import Path
 import torch
 from huggingface_hub import hf_hub_download
 
-eloftr_path = Path(__file__).parent / "../../third_party/EfficientLoFTR"
-sys.path.append(str(eloftr_path))
+tp_path = Path(__file__).parent / "../../third_party"
+sys.path.append(str(tp_path))
 
-from src.loftr import LoFTR as ELoFTR_
-from src.loftr import full_default_cfg, opt_default_cfg, reparameter
+from EfficientLoFTR.src.loftr import LoFTR as ELoFTR_
+from EfficientLoFTR.src.loftr import (
+    full_default_cfg,
+    opt_default_cfg,
+    reparameter,
+)
 
 from hloc import logger
 
 from ..utils.base_model import BaseModel
 
 
-class LoFTR(BaseModel):
+class ELoFTR(BaseModel):
     default_conf = {
         "weights": "weights/eloftr_outdoor.ckpt",
         "match_threshold": 0.2,
@@ -42,7 +46,8 @@ class LoFTR(BaseModel):
             _default_cfg["mp"] = True
         elif self.conf["precision"] == "fp16":
             _default_cfg["half"] = True
-        model_path = eloftr_path / self.conf["weights"]
+
+        model_path = tp_path / "EfficientLoFTR" / self.conf["weights"]
 
         # Download the model.
         if not model_path.exists():
