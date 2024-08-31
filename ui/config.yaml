@@ -137,6 +137,17 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2208.14201
       project: null
       display: true
+  xfeat+lightglue:
+    enable: true
+    matcher: xfeat_lightglue
+    dense: true
+    info:
+      name: xfeat+lightglue
+      source: "CVPR 2024"
+      github: https://github.com/Vincentqyw/omniglue-onnx
+      paper: https://arxiv.org/abs/2405.12979
+      project: https://hwjiang1510.github.io/OmniGlue
+      display: true
   xfeat(sparse):
     matcher: NN-mutual
     feature: xfeat
