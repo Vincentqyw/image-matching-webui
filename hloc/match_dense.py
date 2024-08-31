@@ -123,7 +123,14 @@ confs = {
             "max_keypoints": 2000,
             "match_threshold": 0.2,
         },
-        "preprocessing": {"grayscale": True, "resize_max": 1024, "dfactor": 8},
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "width": 640,
+            "height": 480,
+            "force_resize": True,
+        },
         "max_error": 4,  # max error for assigned keypoints (in px)
         "cell_size": 4,  # size of quantization patch (max 1 kp/patch)
     },
@@ -189,6 +196,21 @@ confs = {
             "grayscale": False,
             "resize_max": 512,
             "dfactor": 16,
+        },
+    },
+    "xfeat_lightglue": {
+        "output": "matches-xfeat_lightglue",
+        "model": {
+            "name": "xfeat_lightglue",
+            "max_keypoints": 8000,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": False,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
         },
     },
     "xfeat_dense": {
@@ -270,6 +292,10 @@ confs = {
             "resize_max": 1024,
             "dfactor": 8,
             "force_resize": False,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
         },
     },
     "sold2": {
