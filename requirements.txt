@@ -1,28 +1,32 @@
 e2cnn
-einops
+easydict
 gdown
 gradio==4.28.3
 gradio_client==0.16.0
 h5py
+huggingface_hub
 imageio
 Jinja2
 kornia
 loguru
 matplotlib
-numpy==1.23.5
+numpy
 omegaconf
+onnxruntime
 opencv-contrib-python
 opencv-python
 pandas
 plotly
+poselib
 protobuf
 pycolmap
 pytlsd
 pytorch-lightning==1.4.9
 PyYAML
-scikit-image==0.21.0
-scikit-learn==1.2.2
-scipy==1.11.1
+roma #dust3r
+scikit-image
+scikit-learn
+scipy
 seaborn
 shapely
 tensorboardX==2.6.1
@@ -30,9 +34,3 @@ torchmetrics==0.6.0
 torchvision==0.17.1
 tqdm
 yacs
-onnxruntime
-poselib
-roma #dust3r
-huggingface_hub
-psutil
-easydict
