@@ -32,7 +32,7 @@ seaborn
 shapely
 tensorboardX==2.6.1
 torchmetrics==0.6.0
-torchvision==0.17.1
+torchvision==0.19.0
 roma #dust3r
 tqdm
 yacs

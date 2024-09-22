@@ -1,11 +1,12 @@
 name: imw
 channels:
   - pytorch
+  - nvidia
   - conda-forge
   - defaults
 dependencies:
   - python=3.10.10
-  - cudatoolkit=12.1
+  - pytorch-cuda=12.1
   - pytorch=2.4.0
   - pip
   - pip:
