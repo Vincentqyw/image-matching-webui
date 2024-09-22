@@ -1,5 +1,5 @@
 # Use an official conda-based Python image as a parent image
-FROM pytorch/pytorch:2.2.1-cuda12.1-cudnn8-runtime
+FROM pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
 LABEL maintainer vincentqyw
 ARG PYTHON_VERSION=3.10.10
 
