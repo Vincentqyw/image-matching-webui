@@ -11,7 +11,7 @@ Jinja2
 kornia
 loguru
 matplotlib
-numpy
+numpy==1.23.5
 onnxruntime
 omegaconf
 opencv-python
