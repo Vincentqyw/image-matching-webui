@@ -3,8 +3,6 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List
 
-import pycolmap
-
 from hloc import (
     extract_features,
     logger,
@@ -13,6 +11,11 @@ from hloc import (
     reconstruction,
     visualization,
 )
+
+try:
+    import pycolmap
+except ImportError:
+    logger.warning("pycolmap not installed, some features may not work")
 
 from .viz import fig2im
 
