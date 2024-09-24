@@ -1,36 +1,112 @@
 import argparse
 import requests
 import numpy as np
-import cv2
 import json
-import pickle
 import time
 from loguru import logger
+import sys
+import pickle
+from typing import Dict
 
-# Update this URL to your server's URL if hosted remotely
-API_URL = "http://127.0.0.1:8001/v1/predict"
+sys.path.append("..")
+API_URL_MATCH = "http://127.0.0.1:8001/v1/match"
+API_URL_EXTRACT = "http://127.0.0.1:8001/v1/extract"
+API_URL_EXTRACT_V2 = "http://127.0.0.1:8001/v2/extract"
 
 
-def send_generate_request(path0, path1):
-    with open(path0, "rb") as f:
-        file0 = f.read()
+def send_generate_request(path0: str, path1: str) -> Dict[str, np.ndarray]:
+    """
+    Send a request to the API to generate a match between two images.
 
-    with open(path1, "rb") as f:
-        file1 = f.read()
+    Args:
+        path0 (str): The path to the first image.
+        path1 (str): The path to the second image.
 
-    files = {
-        "image0": ("image0", file0),
-        "image1": ("image1", file1),
+    Returns:
+        Dict[str, np.ndarray]: A dictionary containing the generated matches.
+            The keys are "keypoints0", "keypoints1", "matches0", and "matches1",
+            and the values are ndarrays of shape (N, 2), (N, 2), (N, 2), and
+            (N, 2), respectively.
+    """
+    files = {"image0": open(path0, "rb"), "image1": open(path1, "rb")}
+    try:
+        response = requests.post(API_URL_MATCH, files=files)
+        pred = {}
+        if response.status_code == 200:
+            pred = response.json()
+            for key in list(pred.keys()):
+                pred[key] = np.array(pred[key])
+        else:
+            print(
+                f"Error: Response code {response.status_code} - {response.text}"
+            )
+    finally:
+        files["image0"].close()
+        files["image1"].close()
+    return pred
+
+
+def send_generate_request1(path0: str) -> Dict[str, np.ndarray]:
+    """
+    Send a request to the API to extract features from an image.
+
+    Args:
+        path0 (str): The path to the image.
+
+    Returns:
+        Dict[str, np.ndarray]: A dictionary containing the extracted features.
+            The keys are "keypoints", "descriptors", and "scores", and the
+            values are ndarrays of shape (N, 2), (N, 128), and (N,),
+            respectively.
+    """
+    files = {"image": open(path0, "rb")}
+    try:
+        response = requests.post(API_URL_EXTRACT, files=files)
+        pred: Dict[str, np.ndarray] = {}
+        if response.status_code == 200:
+            pred = response.json()
+            for key in list(pred.keys()):
+                pred[key] = np.array(pred[key])
+        else:
+            print(
+                f"Error: Response code {response.status_code} - {response.text}"
+            )
+    finally:
+        files["image"].close()
+    return pred
+
+
+def send_generate_request2(image_path: str) -> Dict[str, np.ndarray]:
+    """
+    Send a request to the API to extract features from an image.
+
+    Args:
+        image_path (str): The path to the image.
+
+    Returns:
+        Dict[str, np.ndarray]: A dictionary containing the extracted features.
+            The keys are "keypoints", "descriptors", and "scores", and the
+            values are ndarrays of shape (N, 2), (N, 128), and (N,), respectively.
+    """
+    data = {
+        "image_path": image_path,
+        "max_keypoints": 1024,
+        "reference_points": [[0.0, 0.0], [1.0, 1.0]],
     }
-    response = requests.post(API_URL, files=files)
     pred = {}
-    if response.status_code == 200:
-        response_json = response.json()
-        pred = json.loads(response_json)
-        for key in list(pred.keys()):
-            pred[key] = np.array(pred[key])
-    else:
-        print(f"Error: Response code {response.status_code} - {response.text}")
+    try:
+        response = requests.post(API_URL_EXTRACT_V2, json=data)
+        pred: Dict[str, np.ndarray] = {}
+        if response.status_code == 200:
+            pred = response.json()
+            for key in list(pred.keys()):
+                pred[key] = np.array(pred[key])
+        else:
+            print(
+                f"Error: Response code {response.status_code} - {response.text}"
+            )
+    except Exception as e:
+        print(f"An error occurred: {e}")
     return pred
 
 
@@ -51,11 +127,23 @@ if __name__ == "__main__":
         default="../datasets/sacre_coeur/mapping_rot/02928139_3448003521_rot90.jpg",
     )
     args = parser.parse_args()
-    for i in range(100):
+    for i in range(10):
         t1 = time.time()
         preds = send_generate_request(args.image0, args.image1)
         t2 = time.time()
-        logger.info(f"Time cost: {(t2 - t1)} seconds")
+        logger.info(f"Time cost1: {(t2 - t1)} seconds")
 
-    # with open("preds.pkl", "wb") as f:
-    #     pickle.dump(preds, f)
+    for i in range(10):
+        t1 = time.time()
+        preds = send_generate_request1(args.image0)
+        t2 = time.time()
+        logger.info(f"Time cost2: {(t2 - t1)} seconds")
+
+    for i in range(10):
+        t1 = time.time()
+        preds = send_generate_request2(args.image0)
+        t2 = time.time()
+        logger.info(f"Time cost2: {(t2 - t1)} seconds")
+
+    with open("preds1.pkl", "wb") as f:
+        pickle.dump(preds, f)
