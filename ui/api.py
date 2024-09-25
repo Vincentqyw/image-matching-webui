@@ -148,6 +148,25 @@ class ImageMatchingAPI(torch.nn.Module):
         return pred
 
     @torch.inference_mode()
+    def extract(
+        self,
+        img0: np.ndarray,
+    ) -> Dict[str, np.ndarray]:
+        """Extract features from a single image.
+
+        Args:
+            img0 (np.ndarray): image
+
+        Returns:
+            Dict[str, np.ndarray]: feature dict
+        """
+
+        pred = extract_features.extract(
+            self.extractor, img0, self.extract_conf["preprocessing"]
+        )
+        return pred
+
+    @torch.inference_mode()
     def forward(
         self,
         img0: np.ndarray,
