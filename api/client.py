@@ -1,12 +1,12 @@
 import argparse
-import requests
-import numpy as np
-import json
-import time
-from loguru import logger
-import sys
 import pickle
+import sys
+import time
 from typing import Dict
+
+import numpy as np
+import requests
+from loguru import logger
 
 sys.path.append("..")
 API_URL_MATCH = "http://127.0.0.1:8001/v1/match"

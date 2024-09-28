@@ -164,6 +164,10 @@ class ImageMatchingAPI(torch.nn.Module):
         pred = extract_features.extract(
             self.extractor, img0, self.extract_conf["preprocessing"]
         )
+        pred = {
+            k: v.cpu().detach()[0].numpy() if isinstance(v, torch.Tensor) else v
+            for k, v in pred.items()
+        }
         return pred
 
     @torch.inference_mode()

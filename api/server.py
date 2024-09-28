@@ -1,17 +1,19 @@
 # server.py
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
-import uvicorn
-from PIL import Image
-import numpy as np
 import sys
 from pathlib import Path
 from typing import Union
 
+import numpy as np
+import uvicorn
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
+from PIL import Image
+
 sys.path.append("..")
-from ui.api import ImageMatchingAPI
-from ui.utils import load_config, DEVICE
 from pydantic import BaseModel
+
+from ui.api import ImageMatchingAPI
+from ui.utils import DEVICE
 
 
 class ImageInfo(BaseModel):
