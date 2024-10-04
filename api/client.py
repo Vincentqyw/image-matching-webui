@@ -1,6 +1,5 @@
 import argparse
 import pickle
-import sys
 import time
 from typing import Dict
 
@@ -8,7 +7,6 @@ import numpy as np
 import requests
 from loguru import logger
 
-sys.path.append("..")
 API_URL_MATCH = "http://127.0.0.1:8001/v1/match"
 API_URL_EXTRACT = "http://127.0.0.1:8001/v1/extract"
 API_URL_EXTRACT_V2 = "http://127.0.0.1:8001/v2/extract"
@@ -145,5 +143,5 @@ if __name__ == "__main__":
         t2 = time.time()
         logger.info(f"Time cost2: {(t2 - t1)} seconds")
 
-    with open("preds1.pkl", "wb") as f:
+    with open("preds.pkl", "wb") as f:
         pickle.dump(preds, f)
