@@ -10,6 +10,10 @@ import seaborn as sns
 
 from hloc.utils.viz import add_text, plot_keypoints
 
+np.random.seed(1995)
+color_map = np.arange(100)
+np.random.shuffle(color_map)
+
 
 def plot_images(
     imgs: List[np.ndarray],
@@ -232,11 +236,6 @@ def error_colormap(
     )
 
 
-np.random.seed(1995)
-color_map = np.arange(100)
-np.random.shuffle(color_map)
-
-
 def fig2im(fig: matplotlib.figure.Figure) -> np.ndarray:
     """
     Convert a matplotlib figure to a numpy array with RGB values.
@@ -284,9 +283,8 @@ def draw_matches_core(
         The figure as a numpy array with shape (height, width, 3) and dtype uint8
         containing the RGB values of the figure.
     """
-    thr = 5e-4
     thr = 0.5
-    color = error_colormap(conf, thr, alpha=0.1)
+    color = error_colormap(1 - conf, thr, alpha=0.1)
     text = [
         # "image name",
         f"#Matches: {len(mkpts0)}",
