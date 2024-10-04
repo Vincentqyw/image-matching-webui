@@ -1,7 +1,4 @@
 import cv2
-import warnings
-import numpy as np
-from pathlib import Path
 from hloc import logger
 from ui.utils import (
     get_matcher_zoo,
