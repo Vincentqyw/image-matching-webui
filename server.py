@@ -1,5 +1,4 @@
 # server.py
-import sys
 from pathlib import Path
 from typing import Union
 
@@ -9,7 +8,6 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from PIL import Image
 
-sys.path.append("..")
 from pydantic import BaseModel
 
 from ui.api import ImageMatchingAPI
