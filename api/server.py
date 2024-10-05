@@ -13,7 +13,6 @@ from pydantic import BaseModel
 from ui.api import ImageMatchingAPI
 from ui.utils import DEVICE
 
-
 class ImageInfo(BaseModel):
     image_path: str
     max_keypoints: int

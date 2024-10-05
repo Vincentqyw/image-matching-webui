@@ -92,6 +92,14 @@ or using [docker](https://hub.docker.com/r/vincentqin/image-matching-webui):
 docker pull vincentqin/image-matching-webui:latest
 docker run -it -p 7860:7860 vincentqin/image-matching-webui:latest python app.py --server_name "0.0.0.0" --server_port=7860
 ```
+
+### Deploy to Railway
+
+Deploy to [Railway](https://railway.app/), setting up a `Custom Start Command` in `Deploy` section:
+
+``` bash
+python -m api.server
+```
  
 ### Run demo
 ``` bash
