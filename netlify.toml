@@ -1,0 +1,15 @@
+[build]
+  command = """
+    git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git &&
+    pip install -r requirements.txt && 
+    python server.py
+"""
+  publish = "."
+
+[context.production.environment]
+  PYTHON_VERSION = "3.10"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

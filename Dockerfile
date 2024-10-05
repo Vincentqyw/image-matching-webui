@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y git-lfs
 RUN git lfs install
 
 # Clone the Git repository
-RUN git clone https://huggingface.co/spaces/Realcat/image-matching-webui /code
+RUN git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git /code
 
 RUN conda create -n imw python=${PYTHON_VERSION}
 RUN echo "source activate imw" > ~/.bashrc

@@ -1,15 +1,21 @@
+import os
 import argparse
 import pickle
 import time
 from typing import Dict
-
 import numpy as np
 import requests
 from loguru import logger
 
-API_URL_MATCH = "http://127.0.0.1:8001/v1/match"
-API_URL_EXTRACT = "http://127.0.0.1:8001/v1/extract"
-API_URL_EXTRACT_V2 = "http://127.0.0.1:8001/v2/extract"
+URL = "http://127.0.0.1:8001"
+if "REMOTE_URL_RAILWAY" in os.environ:
+    URL = os.environ["REMOTE_URL_RAILWAY"]
+
+logger.info(f"API URL: {URL}")
+
+API_URL_MATCH = f"{URL}/v1/match"
+API_URL_EXTRACT = f"{URL}/v1/extract"
+API_URL_EXTRACT_V2 = f"{URL}/v2/extract"
 
 
 def send_generate_request(path0: str, path1: str) -> Dict[str, np.ndarray]:
