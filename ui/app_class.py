@@ -298,14 +298,22 @@ class ImageMatchingApp:
                                 label="Keypoints", type="numpy"
                             )
                         with gr.Accordion(
-                            "Open for More: Raw Matches", open=False
+                            (
+                                "Open for More: Raw Matches"
+                                " (Green for good matches, Red for bad)"
+                            ),
+                            open=False,
                         ):
                             output_matches_raw = gr.Image(
                                 label="Raw Matches",
                                 type="numpy",
                             )
                         with gr.Accordion(
-                            "Open for More: RANSAC Matches", open=True
+                            (
+                                "Open for More: Ransac Matches"
+                                " (Green for good matches, Red for bad)"
+                            ),
+                            open=True,
                         ):
                             output_matches_ransac = gr.Image(
                                 label="Ransac Matches", type="numpy"
