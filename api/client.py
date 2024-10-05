@@ -10,8 +10,6 @@ from loguru import logger
 URL = "http://127.0.0.1:8001"
 if "REMOTE_URL_RAILWAY" in os.environ:
     URL = os.environ["REMOTE_URL_RAILWAY"]
-else:
-    URL = "https://match.realcat.top"
 
 logger.info(f"API URL: {URL}")
 
