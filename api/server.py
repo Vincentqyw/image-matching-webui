@@ -1,4 +1,5 @@
 # server.py
+import sys
 from pathlib import Path
 from typing import Union
 
@@ -10,8 +11,11 @@ from PIL import Image
 
 from pydantic import BaseModel
 
+sys.path.append(str(Path(__file__).parent.parent))
+
 from ui.api import ImageMatchingAPI
 from ui.utils import DEVICE
+
 
 class ImageInfo(BaseModel):
     image_path: str
