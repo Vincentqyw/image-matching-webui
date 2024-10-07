@@ -1,7 +1,10 @@
 import shutil
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, List
+
+sys.path.append(str(Path(__file__).parents[1]))
 
 from hloc import (
     extract_features,
@@ -17,7 +20,7 @@ try:
 except ImportError:
     logger.warning("pycolmap not installed, some features may not work")
 
-from .viz import fig2im
+from ui.viz import fig2im
 
 
 class SfmEngine:

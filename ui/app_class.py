@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
@@ -5,6 +6,8 @@ import gradio as gr
 import numpy as np
 from easydict import EasyDict as edict
 from omegaconf import OmegaConf
+
+sys.path.append(str(Path(__file__).parents[1]))
 
 from hloc import flush_logs, read_logs
 from ui.sfm import SfmEngine
