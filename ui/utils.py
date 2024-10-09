@@ -2,6 +2,7 @@ import os
 import pickle
 import random
 import shutil
+import sys
 import time
 import warnings
 from itertools import combinations
@@ -16,6 +17,8 @@ import poselib
 import psutil
 from PIL import Image
 
+sys.path.append(str(Path(__file__).parents[1]))
+
 from hloc import (
     DEVICE,
     extract_features,
@@ -26,8 +29,7 @@ from hloc import (
     matchers,
 )
 from hloc.utils.base_model import dynamic_load
-
-from .viz import display_keypoints, display_matches, fig2im, plot_images
+from ui.viz import display_keypoints, display_matches, fig2im, plot_images
 
 warnings.simplefilter("ignore")
 

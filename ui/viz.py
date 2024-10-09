@@ -1,3 +1,4 @@
+import sys
 import typing
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
@@ -7,6 +8,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+
+sys.path.append(str(Path(__file__).parents[1]))
 
 from hloc.utils.viz import add_text, plot_keypoints
 

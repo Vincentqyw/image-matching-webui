@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+
 from ui.app_class import ImageMatchingApp
 
 if __name__ == "__main__":

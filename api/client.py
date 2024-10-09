@@ -1,17 +1,17 @@
-import os
 import argparse
+import os
 import pickle
 import time
 from typing import Dict
+
 import numpy as np
 import requests
-from loguru import logger
 
 URL = "http://127.0.0.1:8001"
 if "REMOTE_URL_RAILWAY" in os.environ:
     URL = os.environ["REMOTE_URL_RAILWAY"]
 
-logger.info(f"API URL: {URL}")
+print(f"API URL: {URL}")
 
 API_URL_MATCH = f"{URL}/v1/match"
 API_URL_EXTRACT = f"{URL}/v1/extract"
@@ -135,19 +135,19 @@ if __name__ == "__main__":
         t1 = time.time()
         preds = send_generate_request(args.image0, args.image1)
         t2 = time.time()
-        logger.info(f"Time cost1: {(t2 - t1)} seconds")
+        print(f"Time cost1: {(t2 - t1)} seconds")
 
     for i in range(10):
         t1 = time.time()
         preds = send_generate_request1(args.image0)
         t2 = time.time()
-        logger.info(f"Time cost2: {(t2 - t1)} seconds")
+        print(f"Time cost2: {(t2 - t1)} seconds")
 
     for i in range(10):
         t1 = time.time()
         preds = send_generate_request2(args.image0)
         t2 = time.time()
-        logger.info(f"Time cost2: {(t2 - t1)} seconds")
+        print(f"Time cost2: {(t2 - t1)} seconds")
 
     with open("preds.pkl", "wb") as f:
         pickle.dump(preds, f)
