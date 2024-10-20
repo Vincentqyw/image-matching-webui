@@ -2,8 +2,7 @@ e2cnn
 einops
 easydict
 gdown
-gradio==4.44.0
-gradio_client==1.3.0
+gradio==5.1.0
 h5py
 huggingface_hub
 imageio

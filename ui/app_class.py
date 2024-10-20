@@ -9,7 +9,6 @@ from omegaconf import OmegaConf
 
 sys.path.append(str(Path(__file__).parents[1]))
 
-from hloc import flush_logs, read_logs
 from ui.sfm import SfmEngine
 from ui.utils import (
     GRADIO_VERSION,
@@ -275,24 +274,6 @@ class ImageMatchingApp:
                             self.display_supported_algorithms()
 
                     with gr.Column():
-                        with gr.Accordion("Open for More: Logs", open=False):
-                            logs = gr.Textbox(
-                                placeholder="\n" * 10,
-                                label="Logs",
-                                info="Verbose from inference will be displayed below.",
-                                lines=10,
-                                max_lines=10,
-                                autoscroll=True,
-                                elem_id="logs",
-                                show_copy_button=True,
-                                container=True,
-                                elem_classes="logs_class",
-                            )
-                            self.app.load(read_logs, None, logs, every=1)
-                            btn_clear_logs = gr.Button(
-                                "Clear logs", elem_id="logs-button"
-                            )
-                            btn_clear_logs.click(flush_logs, [], [])
 
                         with gr.Accordion(
                             "Open for More: Keypoints", open=True
@@ -526,7 +507,7 @@ class ImageMatchingApp:
         key: str = list(self.matcher_zoo.keys())[
             0
         ]  # Get the first key from matcher_zoo
-        flush_logs()
+        # flush_logs()
         return (
             None,  # image0: Optional[np.ndarray]
             None,  # image1: Optional[np.ndarray]
