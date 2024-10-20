@@ -1,4 +1,6 @@
 # server.py
+import base64
+import io
 import sys
 import warnings
 from pathlib import Path
@@ -10,24 +12,37 @@ import numpy as np
 import torch
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
+from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from PIL import Image
-from pydantic import BaseModel
 
 sys.path.append(str(Path(__file__).parents[1]))
 
+from api.types import ImagesInput
 from hloc import DEVICE, extract_features, logger, match_dense, match_features
 from hloc.utils.viz import add_text, plot_keypoints
+from ui import get_version
 from ui.utils import filter_matches, get_feature_model, get_model
 from ui.viz import display_matches, fig2im, plot_images
 
 warnings.simplefilter("ignore")
 
 
-class ImageInfo(BaseModel):
-    image_path: str
-    max_keypoints: int
-    reference_points: list
+def decode_base64_to_image(encoding):
+    if encoding.startswith("data:image/"):
+        encoding = encoding.split(";")[1].split(",")[1]
+    try:
+        image = Image.open(io.BytesIO(base64.b64decode(encoding)))
+        return image
+    except Exception as e:
+        logger.warning(f"API cannot decode image: {e}")
+        raise HTTPException(
+            status_code=500, detail="Invalid encoded image"
+        ) from e
+
+
+def to_base64_nparray(encoding: str) -> np.ndarray:
+    return np.array(decode_base64_to_image(encoding)).astype("uint8")
 
 
 class ImageMatchingAPI(torch.nn.Module):
@@ -156,10 +171,7 @@ class ImageMatchingAPI(torch.nn.Module):
         return pred
 
     @torch.inference_mode()
-    def extract(
-        self,
-        img0: np.ndarray,
-    ) -> Dict[str, np.ndarray]:
+    def extract(self, img0: np.ndarray, **kwargs) -> Dict[str, np.ndarray]:
         """Extract features from a single image.
 
         Args:
@@ -169,6 +181,12 @@ class ImageMatchingAPI(torch.nn.Module):
             Dict[str, np.ndarray]: feature dict
         """
 
+        # setting prams
+        self.extractor.conf["max_keypoints"] = kwargs.get("max_keypoints", 512)
+        self.extractor.conf["keypoint_threshold"] = kwargs.get(
+            "keypoint_threshold", 0.0
+        )
+
         pred = extract_features.extract(
             self.extractor, img0, self.extract_conf["preprocessing"]
         )
@@ -176,6 +194,11 @@ class ImageMatchingAPI(torch.nn.Module):
             k: v.cpu().detach()[0].numpy() if isinstance(v, torch.Tensor) else v
             for k, v in pred.items()
         }
+        binarize = kwargs.get("binarize", False)
+        if binarize:
+            assert "descriptors" in pred
+            pred["descriptors"] = (pred["descriptors"] > 0).astype(np.uint8)
+            pred["descriptors"] = pred["descriptors"].T  # N x DIM
         return pred
 
     @torch.inference_mode()
@@ -321,50 +344,83 @@ class ImageMatchingAPI(torch.nn.Module):
 
 class ImageMatchingService:
     def __init__(self, conf: dict, device: str):
+        self.conf = conf
         self.api = ImageMatchingAPI(conf=conf, device=device)
         self.app = FastAPI()
         self.register_routes()
 
     def register_routes(self):
+
+        @self.app.get("/version")
+        async def version():
+            return {"version": get_version()}
+
         @self.app.post("/v1/match")
         async def match(
             image0: UploadFile = File(...), image1: UploadFile = File(...)
         ):
+            """
+            Handle the image matching request and return the processed result.
+
+            Args:
+                image0 (UploadFile): The first image file for matching.
+                image1 (UploadFile): The second image file for matching.
+
+            Returns:
+                JSONResponse: A JSON response containing the filtered match results
+                              or an error message in case of failure.
+            """
             try:
+                # Load the images from the uploaded files
                 image0_array = self.load_image(image0)
                 image1_array = self.load_image(image1)
 
+                # Perform image matching using the API
                 output = self.api(image0_array, image1_array)
 
+                # Keys to skip in the output
                 skip_keys = ["image0_orig", "image1_orig"]
-                pred = self.filter_output(output, skip_keys)
 
+                # Postprocess the output to filter unwanted data
+                pred = self.postprocess(output, skip_keys)
+
+                # Return the filtered prediction as a JSON response
                 return JSONResponse(content=pred)
             except Exception as e:
+                # Return an error message with status code 500 in case of exception
                 return JSONResponse(content={"error": str(e)}, status_code=500)
 
         @self.app.post("/v1/extract")
-        async def extract(image: UploadFile = File(...)):
-            try:
-                image_array = self.load_image(image)
-                output = self.api.extract(image_array)
-                skip_keys = ["descriptors", "image", "image_orig"]
-                pred = self.filter_output(output, skip_keys)
-                return JSONResponse(content=pred)
-            except Exception as e:
-                return JSONResponse(content={"error": str(e)}, status_code=500)
+        async def extract(input_info: ImagesInput):
+            """
+            Extract keypoints and descriptors from images.
 
-        @self.app.post("/v2/extract")
-        async def extract_v2(image_path: ImageInfo):
-            img_path = image_path.image_path
+            Args:
+                input_info: An object containing the image data and options.
+
+            Returns:
+                A list of dictionaries containing the keypoints and descriptors.
+            """
             try:
-                safe_path = Path(img_path).resolve(strict=False)
-                image_array = self.load_image(str(safe_path))
-                output = self.api.extract(image_array)
-                skip_keys = ["descriptors", "image", "image_orig"]
-                pred = self.filter_output(output, skip_keys)
-                return JSONResponse(content=pred)
+                preds = []
+                for i, input_image in enumerate(input_info.data):
+                    # Load the image from the input data
+                    image_array = to_base64_nparray(input_image)
+                    # Extract keypoints and descriptors
+                    output = self.api.extract(
+                        image_array,
+                        max_keypoints=input_info.max_keypoints[i],
+                        binarize=input_info.binarize,
+                    )
+                    # Do not return the original image and image_orig
+                    skip_keys = ["image", "image_orig"]
+                    # Postprocess the output
+                    pred = self.postprocess(output, skip_keys)
+                    preds.append(pred)
+                # Return the list of extracted features
+                return JSONResponse(content=preds)
             except Exception as e:
+                # Return an error message if an exception occurs
                 return JSONResponse(content={"error": str(e)}, status_code=500)
 
     def load_image(self, file_path: Union[str, UploadFile]) -> np.ndarray:
@@ -385,7 +441,9 @@ class ImageMatchingService:
             image_array = np.array(img)
         return image_array
 
-    def filter_output(self, output: dict, skip_keys: list) -> dict:
+    def postprocess(
+        self, output: dict, skip_keys: list, binarize: bool = True
+    ) -> dict:
         pred = {}
         for key, value in output.items():
             if key in skip_keys:
