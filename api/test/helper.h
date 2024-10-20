@@ -51,28 +51,51 @@ struct APIParams {
  */
 class KeyPointResults {
 public:
+    KeyPointResults() {}
+
     /**
      * @brief Constructor.
      *
      * @param kp The keypoints for each image.
      */
-    KeyPointResults(const std::vector<std::vector<cv::KeyPoint>>& kp): keypoints(kp) {}
+    KeyPointResults(const std::vector<std::vector<cv::KeyPoint>>& kp, 
+                    const std::vector<cv::Mat>& desc)
+        : keypoints(kp), descriptors(desc) {}
 
     /**
      * @brief Append keypoints to the result.
      *
      * @param kpts The keypoints to append.
      */
-    inline void append_keypoints(std::vector<cv::KeyPoint>&kpts) {
+    inline void append_keypoints(std::vector<cv::KeyPoint>& kpts) {
         keypoints.emplace_back(kpts);
     }
+
     /**
      * @brief Append descriptors to the result.
      *
      * @param desc The descriptors to append.
      */
-    inline void append_descriptors(cv::Mat &desc) {
+    inline void append_descriptors(cv::Mat& desc) {
         descriptors.emplace_back(desc);
+    }
+
+    /**
+     * @brief Get the keypoints.
+     *
+     * @return The keypoints.
+     */
+    inline std::vector<std::vector<cv::KeyPoint>> get_keypoints() {
+        return keypoints;
+    }
+
+    /**
+     * @brief Get the descriptors.
+     *
+     * @return The descriptors.
+     */
+    inline std::vector<cv::Mat> get_descriptors() {
+        return descriptors;
     }
 
 private:
@@ -308,9 +331,13 @@ cv::Mat jsonToMat(Json::Value json) {
 /**
  * @brief Decodes the response of the server and prints the keypoints
  *
+ * This function takes the response of the server, a JSON string, and decodes
+ * it. It then prints the keypoints and draws them on the original image.
+ *
  * @param response The response of the server
+ * @return The keypoints and descriptors
  */
-void decode_response(const std::string& response) {
+KeyPointResults decode_response(const std::string& response, bool viz=true) {
     Json::CharReaderBuilder builder;
     Json::CharReader* reader = builder.newCharReader();
 
@@ -326,12 +353,15 @@ void decode_response(const std::string& response) {
         // Handle error
         std::cout << "Failed to parse the JSON, errors:" << std::endl;
         std::cout << errors << std::endl;
-        return;
+        return KeyPointResults();
     }
+
+    KeyPointResults kpts_results;
 
     // Iterate over the images
     for (const auto& jsonItem : jsonData) {
         auto jkeypoints = jsonItem["keypoints"];
+        auto jkeypoints_orig = jsonItem["keypoints_orig"];
         auto jdescriptors = jsonItem["descriptors"];
         auto jscores = jsonItem["scores"];
         auto jimageSize = jsonItem["image_size"];
@@ -343,7 +373,7 @@ void decode_response(const std::string& response) {
 
         // Iterate over the keypoints
         int counter = 0;
-        for (const auto& keypoint : jkeypoints) {
+        for (const auto& keypoint : jkeypoints_orig) {
             if (counter < 10) {
                 // Print the first 10 keypoints
                 std::cout << keypoint[0].asFloat() << ", "
@@ -355,8 +385,26 @@ void decode_response(const std::string& response) {
                 keypoint[1].asFloat(), 0.0));
         }
 
+        if (viz && jsonItem.isMember("image_orig")) {
+
+            auto jimg_orig = jsonItem["image_orig"];
+            cv::Mat img = jsonToMat<uchar>(jimg_orig);
+            cv::imwrite("viz_image_orig.jpg", img);
+
+            // Draw keypoints on the image
+            cv::Mat imgWithKeypoints;
+            cv::drawKeypoints(img, vkeypoints, 
+                imgWithKeypoints, cv::Scalar(0, 0, 255));
+
+            // Write the image with keypoints
+            std::string filename = "viz_image_orig_keypoints.jpg";
+            cv::imwrite(filename, imgWithKeypoints);
+        }
+
         // Iterate over the descriptors
         cv::Mat descriptors = jsonToMat<uchar>(jdescriptors); 
-        std::cout << "len keypoints: " << vkeypoints.size() << std::endl;
+        kpts_results.append_keypoints(vkeypoints);
+        kpts_results.append_descriptors(descriptors);
     }
+    return kpts_results;
 }

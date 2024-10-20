@@ -194,6 +194,13 @@ class ImageMatchingAPI(torch.nn.Module):
             k: v.cpu().detach()[0].numpy() if isinstance(v, torch.Tensor) else v
             for k, v in pred.items()
         }
+        # back to origin scale
+        s0 = pred["original_size"] / pred["size"]
+        pred["keypoints_orig"] = (
+            match_features.scale_keypoints(pred["keypoints"] + 0.5, s0) - 0.5
+        )
+        # TODO: rotate back
+
         binarize = kwargs.get("binarize", False)
         if binarize:
             assert "descriptors" in pred
@@ -413,7 +420,9 @@ class ImageMatchingService:
                         binarize=input_info.binarize,
                     )
                     # Do not return the original image and image_orig
-                    skip_keys = ["image", "image_orig"]
+                    # skip_keys = ["image", "image_orig"]
+                    skip_keys = []
+
                     # Postprocess the output
                     pred = self.postprocess(output, skip_keys)
                     preds.append(pred)
