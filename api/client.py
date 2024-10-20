@@ -129,7 +129,9 @@ def send_request_match(path0: str, path1: str) -> Dict[str, np.ndarray]:
     return pred
 
 
-def send_request_extract(input_images: str) -> List[Dict[str, np.ndarray]]:
+def send_request_extract(
+    input_images: str, viz: bool = False
+) -> List[Dict[str, np.ndarray]]:
     """
     Send a request to the API to extract features from an image.
 
@@ -151,6 +153,23 @@ def send_request_extract(input_images: str) -> List[Dict[str, np.ndarray]]:
         **inputs,
     )
     print("Keypoints detected: {}".format(len(response[0]["keypoints"])))
+
+    # draw matching, debug only
+    if viz:
+        from hloc.utils.viz import plot_keypoints
+        from ui.viz import fig2im, plot_images
+
+        kpts = np.array(response[0]["keypoints_orig"])
+        if "image_orig" in response[0].keys():
+            img_orig = np.array(["image_orig"])
+
+            output_keypoints = plot_images([img_orig], titles="titles", dpi=300)
+            plot_keypoints([kpts])
+            output_keypoints = fig2im(output_keypoints)
+            cv2.imwrite(
+                "demo_match.jpg",
+                output_keypoints[:, :, ::-1].copy(),  # RGB -> BGR
+            )
     return response
 
 
@@ -184,11 +203,15 @@ if __name__ == "__main__":
     get_api_version()
 
     # request match
-    for i in range(10):
-        t1 = time.time()
-        preds = send_request_match(args.image0, args.image1)
-        t2 = time.time()
-        print(f"Time cost1: {(t2 - t1)} seconds")
+    # for i in range(10):
+    #     t1 = time.time()
+    #     preds = send_request_match(args.image0, args.image1)
+    #     t2 = time.time()
+    #     print(
+    #         "Time cost1: {} seconds, matched: {}".format(
+    #             (t2 - t1), len(preds["mmkeypoints0_orig"])
+    #         )
+    #     )
 
     # request extract
     for i in range(10):

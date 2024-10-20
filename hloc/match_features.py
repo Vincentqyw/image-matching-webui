@@ -347,8 +347,17 @@ def match_from_paths(
 
 
 def scale_keypoints(kpts, scale):
-    if np.any(scale != 1.0):
-        kpts *= kpts.new_tensor(scale)
+    if (
+        isinstance(scale, (list, tuple, np.ndarray))
+        and len(scale) == 2
+        and np.any(scale != np.array([1.0, 1.0]))
+    ):
+        if isinstance(kpts, torch.Tensor):
+            kpts[:, 0] *= scale[0]  # scale x-dimension
+            kpts[:, 1] *= scale[1]  # scale y-dimension
+        elif isinstance(kpts, np.ndarray):
+            kpts[:, 0] *= scale[0]  # scale x-dimension
+            kpts[:, 1] *= scale[1]  # scale y-dimension
     return kpts
 
 

@@ -45,6 +45,8 @@ int main() {
         .binarize = {1}
     };
 
+    KeyPointResults kpts_results;
+
     // Convert the parameters to JSON
     Json::Value jsonData = paramsToJson(params);
     std::string url = "http://127.0.0.1:8001/v1/extract";
@@ -72,7 +74,7 @@ int main() {
                     curl_easy_strerror(res));
         else {
             // std::cout << "Response from server: " << readBuffer << std::endl;
-            decode_response(readBuffer);
+           kpts_results =  decode_response(readBuffer);
         }
         curl_easy_cleanup(curl);
     }
