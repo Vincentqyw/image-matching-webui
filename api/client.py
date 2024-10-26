@@ -11,7 +11,7 @@ import requests
 
 ENDPOINT = "http://127.0.0.1:8001"
 if "REMOTE_URL_RAILWAY" in os.environ:
-    URL = os.environ["REMOTE_URL_RAILWAY"]
+    ENDPOINT = os.environ["REMOTE_URL_RAILWAY"]
 
 print(f"API ENDPOINT: {ENDPOINT}")
 
