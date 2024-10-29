@@ -1,11 +1,10 @@
-import subprocess
 import sys
 from pathlib import Path
 
 import torch
 from PIL import Image
 
-from .. import logger
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 roma_path = Path(__file__).parent / "../../third_party/RoMa"
@@ -26,33 +25,22 @@ class Roma(BaseModel):
         "image0",
         "image1",
     ]
-    weight_urls = {
-        "roma": {
-            "roma_outdoor.pth": "https://github.com/Parskatt/storage/releases/download/roma/roma_outdoor.pth",
-            "roma_indoor.pth": "https://github.com/Parskatt/storage/releases/download/roma/roma_indoor.pth",
-        },
-        "dinov2_vitl14_pretrain.pth": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vitl14/dinov2_vitl14_pretrain.pth",
-    }
 
     # Initialize the line matcher
     def _init(self, conf):
-        model_path = roma_path / "pretrained" / conf["model_name"]
-        dinov2_weights = roma_path / "pretrained" / conf["model_utils_name"]
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
 
-        # Download the model.
-        if not model_path.exists():
-            model_path.parent.mkdir(exist_ok=True)
-            link = self.weight_urls["roma"][conf["model_name"]]
-            cmd = ["wget", "--quiet", link, "-O", str(model_path)]
-            logger.info(f"Downloading the Roma model with `{cmd}`.")
-            subprocess.run(cmd, check=True)
-
-        if not dinov2_weights.exists():
-            dinov2_weights.parent.mkdir(exist_ok=True)
-            link = self.weight_urls[conf["model_utils_name"]]
-            cmd = ["wget", "--quiet", link, "-O", str(dinov2_weights)]
-            logger.info(f"Downloading the dinov2 model with `{cmd}`.")
-            subprocess.run(cmd, check=True)
+        dinov2_weights = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_utils_name"]
+            ),
+        )
 
         logger.info("Loading Roma model")
         # load the model

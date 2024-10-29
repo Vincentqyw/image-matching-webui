@@ -3,7 +3,7 @@ from pathlib import Path
 
 import torch
 
-from hloc import logger
+from hloc import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 
@@ -22,8 +22,12 @@ class REKD(BaseModel):
     required_inputs = ["image"]
 
     def _init(self, conf):
-        model_path = (
-            rekd_path / "checkpoints" / f'PointModel_{conf["model_name"]}.pth'
+        # TODO: download model
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
         )
         if not model_path.exists():
             print(f"No model found at {model_path}")

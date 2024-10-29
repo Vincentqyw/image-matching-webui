@@ -3,6 +3,8 @@ from pathlib import Path
 
 import torch
 
+from hloc import MODEL_REPO_ID
+
 from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
@@ -15,6 +17,7 @@ topicfm_path = Path(__file__).parent / "../../third_party/TopicFM"
 class TopicFM(BaseModel):
     default_conf = {
         "weights": "outdoor",
+        "model_name": "model_best.ckpt",
         "match_threshold": 0.2,
         "n_sampling_topics": 4,
         "max_keypoints": -1,
@@ -25,9 +28,14 @@ class TopicFM(BaseModel):
         _conf = dict(get_model_cfg())
         _conf["match_coarse"]["thr"] = conf["match_threshold"]
         _conf["coarse"]["n_samples"] = conf["n_sampling_topics"]
-        weight_path = topicfm_path / "pretrained/model_best.ckpt"
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
         self.net = _TopicFM(config=_conf)
-        ckpt_dict = torch.load(weight_path, map_location="cpu")
+        ckpt_dict = torch.load(model_path, map_location="cpu")
         self.net.load_state_dict(ckpt_dict["state_dict"])
 
     def _forward(self, data):

@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from torch import nn
 from copy import copy
 import inspect
+from huggingface_hub import hf_hub_download
 
 
 class BaseModel(nn.Module, metaclass=ABCMeta):
@@ -32,7 +33,14 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
     def _forward(self, data):
         """To be implemented by the child class."""
         raise NotImplementedError
-
+    
+    def _download_model(self, repo_id=None, filename=None, **kwargs):
+        """Download model from hf hub and return the path."""
+        return hf_hub_download(
+            repo_type="model",
+            repo_id=repo_id,
+            filename=filename,
+        )
 
 def dynamic_load(root, model):
     module_path = f"{root.__name__}.{model}"

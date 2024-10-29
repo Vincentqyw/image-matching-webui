@@ -1,11 +1,11 @@
-import subprocess
 import sys
 import warnings
 from copy import deepcopy
 from pathlib import Path
 
 import torch
-from huggingface_hub import hf_hub_download
+
+from hloc import MODEL_REPO_ID
 
 tp_path = Path(__file__).parent / "../../third_party"
 sys.path.append(str(tp_path))
@@ -24,7 +24,7 @@ from ..utils.base_model import BaseModel
 
 class ELoFTR(BaseModel):
     default_conf = {
-        "weights": "weights/eloftr_outdoor.ckpt",
+        "model_name": "eloftr_outdoor.ckpt",
         "match_threshold": 0.2,
         # "sinkhorn_iterations": 20,
         "max_keypoints": -1,
@@ -47,26 +47,12 @@ class ELoFTR(BaseModel):
         elif self.conf["precision"] == "fp16":
             _default_cfg["half"] = True
 
-        model_path = tp_path / "EfficientLoFTR" / self.conf["weights"]
-
-        # Download the model.
-        if not model_path.exists():
-            model_path.parent.mkdir(exist_ok=True)
-            cached_file = hf_hub_download(
-                repo_type="space",
-                repo_id="Realcat/image-matching-webui",
-                filename="third_party/EfficientLoFTR/{}".format(
-                    conf["weights"]
-                ),
-            )
-            logger.info("Downloaded EfficientLoFTR model succeeed!")
-            cmd = [
-                "cp",
-                str(cached_file),
-                str(model_path),
-            ]
-            subprocess.run(cmd, check=True)
-            logger.info(f"Copy model file `{cmd}`.")
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
 
         cfg = _default_cfg
         cfg["match_coarse"]["thr"] = conf["match_threshold"]
@@ -78,7 +64,7 @@ class ELoFTR(BaseModel):
 
         if self.conf["precision"] == "fp16":
             self.net = self.net.half()
-        logger.info(f"Loaded Efficient LoFTR with weights {conf['weights']}")
+        logger.info(f"Loaded Efficient LoFTR with weights {conf['model_name']}")
 
     def _forward(self, data):
         # For consistency with hloc pairs, we refine kpts in image0!

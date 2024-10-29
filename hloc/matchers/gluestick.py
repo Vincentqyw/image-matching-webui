@@ -1,10 +1,9 @@
-import subprocess
 import sys
 from pathlib import Path
 
 import torch
 
-from .. import logger
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 gluestick_path = Path(__file__).parent / "../../third_party/GlueStick"
@@ -12,8 +11,6 @@ sys.path.append(str(gluestick_path))
 
 from gluestick import batch_to_np
 from gluestick.models.two_view_pipeline import TwoViewPipeline
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class GlueStick(BaseModel):
@@ -30,23 +27,15 @@ class GlueStick(BaseModel):
         "image1",
     ]
 
-    gluestick_models = {
-        "checkpoint_GlueStick_MD.tar": "https://github.com/cvg/GlueStick/releases/download/v0.1_arxiv/checkpoint_GlueStick_MD.tar",
-    }
-
     # Initialize the line matcher
     def _init(self, conf):
-        model_path = (
-            gluestick_path / "resources" / "weights" / conf["model_name"]
-        )
-
         # Download the model.
-        if not model_path.exists():
-            model_path.parent.mkdir(exist_ok=True)
-            link = self.gluestick_models[conf["model_name"]]
-            cmd = ["wget", "--quiet", link, "-O", str(model_path)]
-            logger.info(f"Downloading the Gluestick model with `{cmd}`.")
-            subprocess.run(cmd, check=True)
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
         logger.info("Loading GlueStick model...")
 
         gluestick_conf = {

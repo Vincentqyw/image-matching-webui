@@ -1,11 +1,10 @@
-import subprocess
 import sys
 from pathlib import Path
 
 import numpy as np
 import torch
 
-from .. import logger
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 thirdparty_path = Path(__file__).parent / "../../third_party"
@@ -27,19 +26,21 @@ class OmniGlue(BaseModel):
 
     def _init(self, conf):
         logger.info("Loading OmniGlue model")
-        og_model_path = omniglue_path / "models" / "omniglue.onnx"
-        sp_model_path = omniglue_path / "models" / "sp_v6.onnx"
-        dino_model_path = (
-            omniglue_path / "models" / "dinov2_vitb14_pretrain.pth"  # ~330MB
+        og_model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(Path(__file__).stem, "omniglue.onnx"),
         )
-        if not dino_model_path.exists():
-            link = self.dino_v2_link_dict.get(dino_model_path.name, None)
-            if link is not None:
-                cmd = ["wget", "--quiet", link, "-O", str(dino_model_path)]
-                logger.info(f"Downloading the dinov2 model with `{cmd}`.")
-                subprocess.run(cmd, check=True)
-            else:
-                logger.error(f"Invalid dinov2 model: {dino_model_path.name}")
+        sp_model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(Path(__file__).stem, "sp_v6.onnx"),
+        )
+        dino_model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, "dinov2_vitb14_pretrain.pth"
+            ),
+        )
+
         self.net = omniglue.OmniGlue(
             og_export=str(og_model_path),
             sp_export=str(sp_model_path),

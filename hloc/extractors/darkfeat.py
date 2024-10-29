@@ -1,9 +1,7 @@
 import sys
 from pathlib import Path
 
-from huggingface_hub import hf_hub_download
-
-from hloc import logger
+from hloc import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 
@@ -19,20 +17,17 @@ class DarkFeat(BaseModel):
         "detection_threshold": 0.5,
         "sub_pixel": False,
     }
-    weight_urls = {
-        "DarkFeat.pth": "https://drive.google.com/uc?id=1Thl6m8NcmQ7zSAF-1_xaFs3F4H8UU6HX&confirm=t",
-    }
-    proxy = "http://localhost:1080"
     required_inputs = ["image"]
 
     def _init(self, conf):
-        cached_file = hf_hub_download(
-            repo_type="space",
-            repo_id="Realcat/image-matching-webui",
-            filename="third_party/DarkFeat/checkpoints/DarkFeat.pth",
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
         )
-
-        self.net = DarkFeat_(cached_file)
+        logger.info("Loaded DarkFeat model: {}".format(model_path))
+        self.net = DarkFeat_(model_path)
         logger.info("Load DarkFeat model done.")
 
     def _forward(self, data):

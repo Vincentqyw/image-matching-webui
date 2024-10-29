@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from .. import logger
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 lightglue_path = Path(__file__).parent / "../../third_party/LightGlue"
@@ -33,8 +33,14 @@ class LightGlue(BaseModel):
     ]
 
     def _init(self, conf):
-        weight_path = lightglue_path / "weights" / conf["model_name"]
-        conf["weights"] = str(weight_path)
+        logger.info("Loading lightglue model, {}".format(conf["model_name"]))
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
+        conf["weights"] = str(model_path)
         conf["filter_threshold"] = conf["match_threshold"]
         self.net = LG(**conf)
         logger.info("Load lightglue model done.")

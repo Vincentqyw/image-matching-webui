@@ -1,13 +1,11 @@
-import os
 import sys
-import urllib.request
 from pathlib import Path
 
 import numpy as np
 import torch
 import torchvision.transforms as tfm
 
-from .. import logger
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 duster_path = Path(__file__).parent / "../../third_party/dust3r"
@@ -25,29 +23,23 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class Duster(BaseModel):
     default_conf = {
         "name": "Duster3r",
-        "model_path": duster_path / "model_weights/duster_vit_large.pth",
+        "model_name": "duster_vit_large.pth",
         "max_keypoints": 3000,
         "vit_patch_size": 16,
     }
 
     def _init(self, conf):
         self.normalize = tfm.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        self.model_path = self.conf["model_path"]
-        self.download_weights()
-        # self.net = load_model(self.model_path, device)
-        self.net = AsymmetricCroCo3DStereo.from_pretrained(
-            self.model_path
-            # "naver/DUSt3R_ViTLarge_BaseDecoder_512_dpt"
-        ).to(device)
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
+        self.net = AsymmetricCroCo3DStereo.from_pretrained(model_path).to(
+            device
+        )
         logger.info("Loaded Dust3r model")
-
-    def download_weights(self):
-        url = "https://download.europe.naverlabs.com/ComputerVision/DUSt3R/DUSt3R_ViTLarge_BaseDecoder_512_dpt.pth"
-
-        self.model_path.parent.mkdir(parents=True, exist_ok=True)
-        if not os.path.isfile(self.model_path):
-            logger.info("Downloading Duster(ViT large)... (takes a while)")
-            urllib.request.urlretrieve(url, self.model_path)
 
     def preprocess(self, img):
         # the super-class already makes sure that img0,img1 have

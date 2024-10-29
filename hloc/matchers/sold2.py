@@ -1,10 +1,9 @@
-import subprocess
 import sys
 from pathlib import Path
 
 import torch
 
-from .. import logger
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 sold2_path = Path(__file__).parent / "../../third_party/SOLD2"
@@ -17,7 +16,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class SOLD2(BaseModel):
     default_conf = {
-        "weights": "sold2_wireframe.tar",
+        "model_name": "sold2_wireframe.tar",
         "match_threshold": 0.2,
         "checkpoint_dir": sold2_path / "pretrained",
         "detect_thresh": 0.25,
@@ -31,21 +30,15 @@ class SOLD2(BaseModel):
         "image1",
     ]
 
-    weight_urls = {
-        "sold2_wireframe.tar": "https://www.polybox.ethz.ch/index.php/s/blOrW89gqSLoHOk/download",
-    }
-
     # Initialize the line matcher
     def _init(self, conf):
-        checkpoint_path = conf["checkpoint_dir"] / conf["weights"]
-
-        # Download the model.
-        if not checkpoint_path.exists():
-            checkpoint_path.parent.mkdir(exist_ok=True)
-            link = self.weight_urls[conf["weights"]]
-            cmd = ["wget", "--quiet", link, "-O", str(checkpoint_path)]
-            logger.info(f"Downloading the SOLD2 model with `{cmd}`.")
-            subprocess.run(cmd, check=True)
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
+        logger.info("Loading SOLD2 model: {}".format(model_path))
 
         mode = "dynamic"  # 'dynamic' or 'static'
         match_config = {
@@ -127,7 +120,7 @@ class SOLD2(BaseModel):
         }
         self.net = LineMatcher(
             match_config["model_cfg"],
-            checkpoint_path,
+            model_path,
             device,
             match_config["line_detector_cfg"],
             match_config["line_matcher_cfg"],

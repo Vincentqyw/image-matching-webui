@@ -3,7 +3,7 @@ from pathlib import Path
 
 import torch
 
-from .. import DEVICE, logger
+from .. import DEVICE, MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 tp_path = Path(__file__).parent / "../../third_party"
@@ -31,11 +31,15 @@ class IMP(BaseModel):
 
     def _init(self, conf):
         self.conf = {**self.default_conf, **conf}
-        weight_path = tp_path / "pram" / "weights" / self.conf["model_name"]
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format("pram", self.conf["model_name"]),
+        )
+
         # self.net = nets.gml(self.conf).eval().to(DEVICE)
         self.net = GML(self.conf).eval().to(DEVICE)
         self.net.load_state_dict(
-            torch.load(weight_path, map_location="cpu")["model"], strict=True
+            torch.load(model_path, map_location="cpu")["model"], strict=True
         )
         logger.info("Load IMP model done.")
 
