@@ -250,6 +250,7 @@ confs = {
         "model": {
             "name": "roma",
             "weights": "outdoor",
+            "model_name": "roma_outdoor.pth",
             "max_keypoints": 2000,
             "match_threshold": 0.2,
         },
@@ -266,7 +267,7 @@ confs = {
         "output": "matches-gim",
         "model": {
             "name": "gim",
-            "weights": "gim_dkm_100h.ckpt",
+            "model_name": "gim_dkm_100h.ckpt",
             "max_keypoints": 2000,
             "match_threshold": 0.2,
         },
