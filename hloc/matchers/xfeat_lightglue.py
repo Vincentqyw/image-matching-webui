@@ -37,7 +37,11 @@ class XFeatLightGlue(BaseModel):
         ]
         out0.update({"image_size": (im0.shape[-1], im0.shape[-2])})  # W H
         out1.update({"image_size": (im1.shape[-1], im1.shape[-2])})  # W H
-        mkpts_0, mkpts_1 = self.net.match_lighterglue(out0, out1)
+        pred = self.net.match_lighterglue(out0, out1)
+        if len(pred) == 3:
+            mkpts_0, mkpts_1, _ = pred
+        else:
+            mkpts_0, mkpts_1 = pred
         mkpts_0 = torch.from_numpy(mkpts_0)  # n x 2
         mkpts_1 = torch.from_numpy(mkpts_1)  # n x 2
         pred = {
