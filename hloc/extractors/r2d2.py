@@ -3,7 +3,7 @@ from pathlib import Path
 
 import torchvision.transforms as tvf
 
-from hloc import logger
+from hloc import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 
@@ -27,11 +27,16 @@ class R2D2(BaseModel):
     required_inputs = ["image"]
 
     def _init(self, conf):
-        model_fn = r2d2_path / "models" / conf["model_name"]
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
         self.norm_rgb = tvf.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
-        self.net = load_network(model_fn)
+        self.net = load_network(model_path)
         self.detector = NonMaxSuppression(
             rel_thr=conf["reliability_threshold"],
             rep_thr=conf["repetability_threshold"],

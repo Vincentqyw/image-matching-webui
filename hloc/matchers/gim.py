@@ -1,65 +1,53 @@
-import subprocess
 import sys
 from pathlib import Path
 
 import torch
-from huggingface_hub import hf_hub_download
 
-from .. import logger
+from .. import DEVICE, MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 gim_path = Path(__file__).parent / "../../third_party/gim"
 sys.path.append(str(gim_path))
 
-from dkm.models.model_zoo.DKMv3 import DKMv3
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def load_model(weight_name, checkpoints_path):
+    # load model
+    model = None
+    detector = None
+    if weight_name == "gim_dkm":
+        from dkm.models.model_zoo.DKMv3 import DKMv3
 
+        model = DKMv3(weights=None, h=672, w=896)
+    elif weight_name == "gim_loftr":
+        from loftr.config import get_cfg_defaults
+        from loftr.loftr import LoFTR
+        from loftr.misc import lower_config
 
-class GIM(BaseModel):
-    default_conf = {
-        "model_name": "gim_dkm_100h.ckpt",
-        "match_threshold": 0.2,
-        "checkpoint_dir": gim_path / "weights",
-    }
-    required_inputs = [
-        "image0",
-        "image1",
-    ]
-    model_list = ["gim_lightglue_100h.ckpt", "gim_dkm_100h.ckpt"]
-    model_dict = {
-        "gim_lightglue_100h.ckpt": "https://github.com/xuelunshen/gim/blob/main/weights/gim_lightglue_100h.ckpt",
-        "gim_dkm_100h.ckpt": "https://drive.google.com/file/d/1gk97V4IROnR1Nprq10W9NCFUv2mxXR_-/view",
-    }
+        model = LoFTR(lower_config(get_cfg_defaults())["loftr"])
+    elif weight_name == "gim_lightglue":
+        from lightglue.models.matchers.lightglue import LightGlue
+        from lightglue.superpoint import SuperPoint
 
-    def _init(self, conf):
-        conf["model_name"] = str(conf["weights"])
-        if conf["model_name"] not in self.model_list:
-            raise ValueError(f"Unknown GIM model {conf['model_name']}.")
-        model_path = conf["checkpoint_dir"] / conf["model_name"]
+        detector = SuperPoint(
+            {
+                "max_num_keypoints": 2048,
+                "force_num_keypoints": True,
+                "detection_threshold": 0.0,
+                "nms_radius": 3,
+                "trainable": False,
+            }
+        )
+        model = LightGlue(
+            {
+                "filter_threshold": 0.1,
+                "flash": False,
+                "checkpointed": True,
+            }
+        )
 
-        # Download the model.
-        if not model_path.exists():
-            model_path.parent.mkdir(exist_ok=True)
-            cached_file = hf_hub_download(
-                repo_type="space",
-                repo_id="Realcat/image-matching-webui",
-                filename="third_party/gim/weights/{}".format(
-                    conf["model_name"]
-                ),
-            )
-            logger.info("Downloaded GIM model succeeed!")
-            cmd = [
-                "cp",
-                str(cached_file),
-                str(conf["checkpoint_dir"]),
-            ]
-            subprocess.run(cmd, check=True)
-            logger.info(f"Copy model file `{cmd}`.")
-
-        self.aspect_ratio = 896 / 672
-        model = DKMv3(None, 672, 896, upsample_preds=True)
-        state_dict = torch.load(str(model_path), map_location="cpu")
+    # load state dict
+    if weight_name == "gim_dkm":
+        state_dict = torch.load(checkpoints_path, map_location="cpu")
         if "state_dict" in state_dict.keys():
             state_dict = state_dict["state_dict"]
         for k in list(state_dict.keys()):
@@ -69,6 +57,64 @@ class GIM(BaseModel):
                 state_dict.pop(k)
         model.load_state_dict(state_dict)
 
+    elif weight_name == "gim_loftr":
+        state_dict = torch.load(checkpoints_path, map_location="cpu")
+        if "state_dict" in state_dict.keys():
+            state_dict = state_dict["state_dict"]
+        model.load_state_dict(state_dict)
+
+    elif weight_name == "gim_lightglue":
+        state_dict = torch.load(checkpoints_path, map_location="cpu")
+        if "state_dict" in state_dict.keys():
+            state_dict = state_dict["state_dict"]
+        for k in list(state_dict.keys()):
+            if k.startswith("model."):
+                state_dict.pop(k)
+            if k.startswith("superpoint."):
+                state_dict[k.replace("superpoint.", "", 1)] = state_dict.pop(k)
+        detector.load_state_dict(state_dict)
+
+        state_dict = torch.load(checkpoints_path, map_location="cpu")
+        if "state_dict" in state_dict.keys():
+            state_dict = state_dict["state_dict"]
+        for k in list(state_dict.keys()):
+            if k.startswith("superpoint."):
+                state_dict.pop(k)
+            if k.startswith("model."):
+                state_dict[k.replace("model.", "", 1)] = state_dict.pop(k)
+        model.load_state_dict(state_dict)
+
+    # eval mode
+    if detector is not None:
+        detector = detector.eval().to(DEVICE)
+    model = model.eval().to(DEVICE)
+    return model
+
+
+class GIM(BaseModel):
+    default_conf = {
+        "match_threshold": 0.2,
+        "checkpoint_dir": gim_path / "weights",
+        "weights": "gim_dkm",
+    }
+    required_inputs = [
+        "image0",
+        "image1",
+    ]
+    ckpt_name_dict = {
+        "gim_dkm": "gim_dkm_100h.ckpt",
+        "gim_loftr": "gim_loftr_50h.ckpt",
+        "gim_lightglue": "gim_lightglue_100h.ckpt",
+    }
+
+    def _init(self, conf):
+        ckpt_name = self.ckpt_name_dict[conf["weights"]]
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(Path(__file__).stem, ckpt_name),
+        )
+        self.aspect_ratio = 896 / 672
+        model = load_model(conf["weights"], model_path)
         self.net = model
         logger.info("Loaded GIM model")
 
@@ -120,6 +166,7 @@ class GIM(BaseModel):
         return mask
 
     def _forward(self, data):
+        # TODO: only support dkm+gim
         image0, image1 = self.pad_image(
             data["image0"], self.aspect_ratio
         ), self.pad_image(data["image1"], self.aspect_ratio)

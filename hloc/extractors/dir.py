@@ -43,6 +43,7 @@ class DIR(BaseModel):
     }
 
     def _init(self, conf):
+        # todo: download from google drive -> huggingface models
         checkpoint = Path(
             torch.hub.get_dir(), "dirtorch", conf["model_name"] + ".pt"
         )

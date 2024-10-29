@@ -48,10 +48,4 @@ class SuperPoint(BaseModel):
         logger.info("Load SuperPoint model done.")
 
     def _forward(self, data):
-        pred = self.net(data, self.conf)
-        pred = {
-            "keypoints": pred["keypoints"][0][None],
-            "scores": pred["scores"][0][None],
-            "descriptors": pred["descriptors"][0][None],
-        }
-        return pred
+        return self.net(data, self.conf)

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import torch
 
-from hloc import logger
+from hloc import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 
@@ -29,6 +29,14 @@ class Alike(BaseModel):
     required_inputs = ["image"]
 
     def _init(self, conf):
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}.pth".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
+        logger.info("Loaded Alike model from {}".format(model_path))
+        configs[conf["model_name"]]["model_path"] = model_path
         self.net = Alike_(
             **configs[conf["model_name"]],
             device=device,

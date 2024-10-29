@@ -1,11 +1,10 @@
-import subprocess
 import sys
 from pathlib import Path
 
 import torch
 import torchvision.transforms as transforms
 
-from hloc import logger
+from hloc import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 
@@ -30,39 +29,25 @@ class DeDoDe(BaseModel):
     required_inputs = [
         "image",
     ]
-    weight_urls = {
-        "dedode_detector_L.pth": "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth",
-        "dedode_descriptor_B.pth": "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_B.pth",
-    }
 
     # Initialize the line matcher
     def _init(self, conf):
-        model_detector_path = (
-            dedode_path / "pretrained" / conf["model_detector_name"]
+        model_detector_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, conf["model_detector_name"]
+            ),
         )
-        model_descriptor_path = (
-            dedode_path / "pretrained" / conf["model_descriptor_name"]
+        model_descriptor_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, conf["model_descriptor_name"]
+            ),
         )
-
+        logger.info("Loaded DarkFeat model: {}".format(model_detector_path))
         self.normalizer = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
-        # Download the model.
-        if not model_detector_path.exists():
-            model_detector_path.parent.mkdir(exist_ok=True)
-            link = self.weight_urls[conf["model_detector_name"]]
-            cmd = ["wget", "--quiet", link, "-O", str(model_detector_path)]
-            logger.info(f"Downloading the DeDoDe detector model with `{cmd}`.")
-            subprocess.run(cmd, check=True)
-
-        if not model_descriptor_path.exists():
-            model_descriptor_path.parent.mkdir(exist_ok=True)
-            link = self.weight_urls[conf["model_descriptor_name"]]
-            cmd = ["wget", "--quiet", link, "-O", str(model_descriptor_path)]
-            logger.info(
-                f"Downloading the DeDoDe descriptor model with `{cmd}`."
-            )
-            subprocess.run(cmd, check=True)
 
         # load the model
         weights_detector = torch.load(model_detector_path, map_location="cpu")

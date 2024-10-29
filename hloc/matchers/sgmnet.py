@@ -1,12 +1,10 @@
-import subprocess
 import sys
 from collections import OrderedDict, namedtuple
 from pathlib import Path
 
 import torch
-from huggingface_hub import hf_hub_download
 
-from .. import logger
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 sgmnet_path = Path(__file__).parent / "../../third_party/SGMNet"
@@ -20,7 +18,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class SGMNet(BaseModel):
     default_conf = {
         "name": "SGM",
-        "model_name": "model_best.pth",
+        "model_name": "weights/sgm/root/model_best.pth",
         "seed_top_k": [256, 256],
         "seed_radius_coe": 0.01,
         "net_channels": 128,
@@ -38,30 +36,20 @@ class SGMNet(BaseModel):
         "image0",
         "image1",
     ]
-    weight_urls = {
-        "model_best.pth": "https://drive.google.com/uc?id=1Ca0WmKSSt2G6P7m8YAOlSAHEFar_TAWb&confirm=t",
-    }
-    proxy = "http://localhost:1080"
 
     # Initialize the line matcher
     def _init(self, conf):
-        sgmnet_weights = sgmnet_path / "weights/sgm/root" / conf["model_name"]
-
-        # Download the model.
-        if not sgmnet_weights.exists():
-            cached_file = hf_hub_download(
-                repo_type="space",
-                repo_id="Realcat/image-matching-webui",
-                filename="third_party/SGMNet/weights.tar.gz",
-            )
-            cmd = ["tar", "-xvf", str(cached_file), "-C", str(sgmnet_path)]
-            logger.info(f"Unzip model file `{cmd}`.")
-            subprocess.run(cmd, check=True)
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
 
         # config
         config = namedtuple("config", conf.keys())(*conf.values())
         self.net = SGM_Model(config)
-        checkpoint = torch.load(sgmnet_weights, map_location="cpu")
+        checkpoint = torch.load(model_path, map_location="cpu")
         # for ddp model
         if (
             list(checkpoint["state_dict"].items())[0][0].split(".")[0]

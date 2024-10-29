@@ -1,10 +1,9 @@
-import subprocess
 import sys
 from pathlib import Path
 
 import torch
 
-from hloc import logger
+from hloc import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 
@@ -25,20 +24,17 @@ class D2Net(BaseModel):
     required_inputs = ["image"]
 
     def _init(self, conf):
-        model_file = conf["checkpoint_dir"] / conf["model_name"]
-        if not model_file.exists():
-            model_file.parent.mkdir(exist_ok=True)
-            cmd = [
-                "wget",
-                "--quiet",
-                "https://dusmanu.com/files/d2-net/" + conf["model_name"],
-                "-O",
-                str(model_file),
-            ]
-            subprocess.run(cmd, check=True)
 
+        logger.info("Loading D2Net model...")
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
+        logger.info(f"Loading model from {model_path}...")
         self.net = _D2Net(
-            model_file=model_file, use_relu=conf["use_relu"], use_cuda=False
+            model_file=model_path, use_relu=conf["use_relu"], use_cuda=False
         )
         logger.info("Load D2Net model done.")
 

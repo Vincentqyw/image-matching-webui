@@ -1,11 +1,9 @@
-import subprocess
 import sys
 from pathlib import Path
 
 import torch
-from huggingface_hub import hf_hub_download
 
-from hloc import logger
+from hloc import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 
@@ -24,31 +22,14 @@ class RoRD(BaseModel):
         "max_keypoints": 1024,
     }
     required_inputs = ["image"]
-    weight_urls = {
-        "rord.pth": "https://drive.google.com/uc?id=12414ZGKwgPAjNTGtNrlB4VV9l7W76B2o&confirm=t",
-    }
-    proxy = "http://localhost:1080"
 
     def _init(self, conf):
-        model_path = conf["checkpoint_dir"] / conf["model_name"]
-        link = self.weight_urls[conf["model_name"]]  # noqa: F841
-
-        if not model_path.exists():
-            model_path.parent.mkdir(exist_ok=True)
-            cached_file_0 = hf_hub_download(
-                repo_type="space",
-                repo_id="Realcat/image-matching-webui",
-                filename="third_party/RoRD/models/d2net.pth",
-            )
-            cached_file_1 = hf_hub_download(
-                repo_type="space",
-                repo_id="Realcat/image-matching-webui",
-                filename="third_party/RoRD/models/rord.pth",
-            )
-
-            subprocess.run(["cp", cached_file_0, model_path], check=True)
-            subprocess.run(["cp", cached_file_1, model_path], check=True)
-
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(
+                Path(__file__).stem, self.conf["model_name"]
+            ),
+        )
         self.net = _RoRD(
             model_file=model_path, use_relu=conf["use_relu"], use_cuda=False
         )
