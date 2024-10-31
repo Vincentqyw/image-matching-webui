@@ -36,3 +36,6 @@ roma #dust3r
 tqdm
 yacs
 fastapi
+uvicorn
+ray
+ray[serve]

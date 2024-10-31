@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 import requests
 
-ENDPOINT = "http://127.0.0.1:8001"
+ENDPOINT = "http://127.0.0.1:8000"
 if "REMOTE_URL_RAILWAY" in os.environ:
     ENDPOINT = os.environ["REMOTE_URL_RAILWAY"]
 
@@ -152,7 +152,8 @@ def send_request_extract(
         url=API_URL_EXTRACT,
         **inputs,
     )
-    print("Keypoints detected: {}".format(len(response[0]["keypoints"])))
+    # breakpoint()
+    # print("Keypoints detected: {}".format(len(response[0]["keypoints"])))
 
     # draw matching, debug only
     if viz:
@@ -214,7 +215,7 @@ if __name__ == "__main__":
     #     )
 
     # request extract
-    for i in range(10):
+    for i in range(1000):
         t1 = time.time()
         preds = send_request_extract(args.image0)
         t2 = time.time()

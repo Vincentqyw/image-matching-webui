@@ -1,0 +1,51 @@
+# This file was generated using the `serve build` command on Ray v2.38.0.
+
+proxy_location: EveryNode
+http_options:
+  host: 0.0.0.0
+  port: 8000
+
+grpc_options:
+  port: 9000
+  grpc_servicer_functions: []
+
+logging_config:
+  encoding: TEXT
+  log_level: INFO
+  logs_dir: null
+  enable_access_log: true
+
+applications:
+- name: app1
+  route_prefix: /
+  import_path: api.server:service
+  runtime_env: {}
+  deployments:
+  - name: ImageMatchingService
+    num_replicas: 4
+    ray_actor_options:
+      num_cpus: 2.0
+      num_gpus: 1.0
+
+api:
+  feature:
+    output: feats-superpoint-n4096-rmax1600
+    model:
+      name: superpoint
+      nms_radius: 3
+      max_keypoints: 4096
+      keypoint_threshold: 0.005
+    preprocessing:
+      grayscale: True
+      force_resize: True
+      resize_max: 1600
+      width: 640
+      height: 480
+      dfactor: 8
+  matcher:
+    output: matches-NN-mutual
+    model:
+      name: nearest_neighbor
+      do_mutual_check: True
+      match_threshold: 0.2
+  dense: False
