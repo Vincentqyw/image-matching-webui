@@ -103,7 +103,7 @@ python -m api.server
  
 ### Run demo
 ``` bash
-python3 ./app.py
+python ./app.py
 ```
 then open http://localhost:7860 in your browser.
 
@@ -133,7 +133,14 @@ Adding local features / matchers as submodules is very easy. For example, to add
 git submodule add https://github.com/cvg/GlueStick.git third_party/GlueStick
 ```
 
-If remote submodule repositories are updated, don't forget to pull submodules with `git submodule update --remote`, if you only want to update one submodule, use `git submodule update --remote third_party/GlueStick`.
+If remote submodule repositories are updated, don't forget to pull submodules with:
+
+``` bash
+git submodule init
+git submodule update --remote
+```
+
+if you only want to update one submodule, use `git submodule update --remote third_party/GlueStick`.
 
 ## Contributors
 

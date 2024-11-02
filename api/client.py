@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 import requests
 
-ENDPOINT = "http://127.0.0.1:8000"
+ENDPOINT = "http://127.0.0.1:8001"
 if "REMOTE_URL_RAILWAY" in os.environ:
     ENDPOINT = os.environ["REMOTE_URL_RAILWAY"]
 
