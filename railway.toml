@@ -6,6 +6,6 @@ dockerfilePath = "Dockerfile"
 runtime = "V2"
 numReplicas = 1
 startCommand = "python -m api.server"
-sleepApplication = true
+sleepApplication = false
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
