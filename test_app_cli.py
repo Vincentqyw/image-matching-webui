@@ -1,13 +1,7 @@
-import sys
-from pathlib import Path
-
 import cv2
-
 from hloc import logger
 from ui.utils import DEVICE, ROOT, get_matcher_zoo, load_config
-
-sys.path.append(str(Path(__file__).parents[1]))
-from api.server import ImageMatchingAPI
+from api import ImageMatchingAPI
 
 
 def test_all(config: dict = None):
