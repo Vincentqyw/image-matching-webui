@@ -63,6 +63,25 @@ confs = {
         "max_error": 1,  # max error for assigned keypoints (in px)
         "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
     },
+    "xoftr": {
+        "output": "matches-xoftr",
+        "model": {
+            "name": "xoftr",
+            "weights": "weights_xoftr_640.ckpt",
+            "max_keypoints": 2000,
+            "match_threshold": 0.3,
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "width": 640,
+            "height": 480,
+            "force_resize": True,
+        },
+        "max_error": 1,  # max error for assigned keypoints (in px)
+        "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
+    },
     # "loftr_quadtree": {
     #     "output": "matches-loftr-quadtree",
     #     "model": {

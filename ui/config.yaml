@@ -105,6 +105,16 @@ matcher_zoo:
       paper: https://zju3dv.github.io/efficientloftr/files/EfficientLoFTR.pdf
       project: https://zju3dv.github.io/efficientloftr
       display: true
+  xoftr:
+    matcher: xoftr
+    dense: true
+    info:
+      name: XoFTR #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/OnderT/XoFTR
+      paper: https://arxiv.org/pdf/2404.09692
+      project: null
+      display: true
   cotr:
     enable: false
     skip_ci: true
