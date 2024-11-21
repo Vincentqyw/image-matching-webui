@@ -33,7 +33,7 @@ The tool currently supports various popular image matching algorithms, namely:
 - [x] [DeDoDe](https://github.com/Parskatt/DeDoDe), 3DV 2024
 - [ ] [Mickey](https://github.com/nianticlabs/mickey), CVPR 2024
 - [x] [GIM](https://github.com/xuelunshen/gim), ICLR 2024
-- [x] [DUSt3R](https://github.com/naver/dust3r), arXiv 2023
+- [x] [ALIKED](https://github.com/Shiaoming/ALIKED), ICCV 2023
 - [x] [LightGlue](https://github.com/cvg/LightGlue), ICCV 2023
 - [x] [DarkFeat](https://github.com/THU-LYJ-Lab/DarkFeat), AAAI 2023
 - [x] [SFD2](https://github.com/feixue94/sfd2), CVPR 2023
