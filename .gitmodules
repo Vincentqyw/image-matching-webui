@@ -22,6 +22,12 @@
 [submodule "third_party/ALIKE"]
 	path = third_party/ALIKE
 	url = https://github.com/Shiaoming/ALIKE.git
+[submodule "third_party/LightGlue"]
+	path = third_party/LightGlue
+	url = https://github.com/cvg/LightGlue.git
+[submodule "third_party/DeDoDe"]
+	path = third_party/DeDoDe
+	url = https://github.com/Parskatt/DeDoDe.git
 [submodule "third_party/RoRD"]
 	path = third_party/RoRD
 	url = https://github.com/Vincentqyw/RoRD.git
