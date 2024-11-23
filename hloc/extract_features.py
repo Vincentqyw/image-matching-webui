@@ -214,7 +214,6 @@ confs = {
             "resize_max": 1600,
         },
     },
-
     "aliked-n16-rot": {
         "output": "feats-aliked-n16-rot",
         "model": {

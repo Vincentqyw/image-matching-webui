@@ -8,6 +8,7 @@ sys.path.append(str(lightglue_path))
 
 from lightglue import ALIKED as ALIKED_
 
+
 class ALIKED(BaseModel):
     default_conf = {
         "model_name": "aliked-n16",
