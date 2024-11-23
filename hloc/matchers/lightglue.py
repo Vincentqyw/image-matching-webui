@@ -1,8 +1,9 @@
-import torch
 import kornia.feature as KF
+import torch
 
 from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
+
 
 class LightGlue(BaseModel):
     default_conf = {
