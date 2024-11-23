@@ -1,7 +1,12 @@
-from lightglue import ALIKED as ALIKED_
+import sys
+from pathlib import Path
 
 from ..utils.base_model import BaseModel
 
+lightglue_path = Path(__file__).parent / "../../third_party/LightGlue"
+sys.path.append(str(lightglue_path))
+
+from lightglue import ALIKED as ALIKED_
 
 class ALIKED(BaseModel):
     default_conf = {
