@@ -179,9 +179,31 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2404.19174
       project: null
       display: false
-  dedode:
+  dedodev2:
     matcher: Dual-Softmax
-    feature: dedode
+    feature: dedodeg-v2
+    dense: false
+    info:
+      name: DeDoDeV2 #dispaly name
+      source: "3DV 2024"
+      github: https://github.com/Parskatt/DeDoDe
+      paper: https://arxiv.org/abs/2308.08479
+      project: null
+      display: true
+  dedode+lightglue:
+    matcher: dedode-lightglue
+    feature: dedodeg
+    dense: false
+    info:
+      name: DeDoDe #dispaly name
+      source: "3DV 2024"
+      github: https://github.com/Parskatt/DeDoDe
+      paper: https://arxiv.org/abs/2308.08479
+      project: null
+      display: true
+  dedodev2+lightglue:
+    matcher: dedode-lightglue
+    feature: dedodeg-v2
     dense: false
     info:
       name: DeDoDe #dispaly name

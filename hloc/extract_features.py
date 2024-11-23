@@ -259,10 +259,44 @@ confs = {
             "dfactor": 8,
         },
     },
-    "dedode": {
-        "output": "feats-dedode-n5000-r1600",
+    "dedodeg": {
+        "output": "feats-dedodeg-n5000-r1600",
         "model": {
             "name": "dedode",
+            "detector_model": "L-upright",
+            "descriptor_model": "G-upright",
+            "max_keypoints": 5000,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1600,
+            "width": 768,
+            "height": 768,
+            "dfactor": 8,
+        },
+    },
+    "dedodeg-v2": {
+        "output": "feats-dedodegv2-n5000-r1600",
+        "model": {
+            "name": "dedode",
+            "detector_model": "L-C4-v2",
+            "descriptor_model": "G-upright",
+            "max_keypoints": 5000,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1600,
+            "width": 768,
+            "height": 768,
+            "dfactor": 8,
+        },
+    },
+    "mickey": {
+        "output": "feats-mickey",
+        "model": {
+            "name": "mickey",
             "max_keypoints": 5000,
         },
         "preprocessing": {
