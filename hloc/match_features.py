@@ -112,6 +112,23 @@ confs = {
             "force_resize": False,
         },
     },
+    "aliked-lightglue": {
+        "output": "matches-aliked-lightglue",
+        "model": {
+            "name": "lightglue",
+            "match_threshold": 0.2,
+            "width_confidence": 0.99,  # for point pruning
+            "depth_confidence": 0.95,  # for early stopping,
+            "features": "aliked",
+            "model_name": "aliked_lightglue.pth",
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "force_resize": False,
+        },
+    },
     "sift-lightglue": {
         "output": "matches-sift-lightglue",
         "model": {

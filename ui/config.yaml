@@ -289,6 +289,17 @@ matcher_zoo:
       paper: https://arxiv.org/pdf/2306.13643
       project: null
       display: true
+  aliked+lightglue:
+    matcher: aliked-lightglue
+    feature: aliked-n16
+    dense: false
+    info:
+      name: ALIKED
+      source: "ICCV 2023"
+      github: https://github.com/Shiaoming/ALIKED
+      paper: https://arxiv.org/pdf/2304.03608.pdf
+      project: null
+      display: true
   superpoint+mnn:
     matcher: NN-mutual
     feature: superpoint_max
