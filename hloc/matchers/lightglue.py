@@ -1,12 +1,8 @@
-import sys
-from pathlib import Path
+import kornia.feature as KF
+import torch
 
 from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
-
-lightglue_path = Path(__file__).parent / "../../third_party/LightGlue"
-sys.path.append(str(lightglue_path))
-from lightglue import LightGlue as LG
 
 
 class LightGlue(BaseModel):
@@ -33,22 +29,17 @@ class LightGlue(BaseModel):
     ]
 
     def _init(self, conf):
-        logger.info("Loading lightglue model, {}".format(conf["model_name"]))
-        model_path = self._download_model(
-            repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
-        )
-        conf["weights"] = str(model_path)
-        conf["filter_threshold"] = conf["match_threshold"]
-        self.net = LG(**conf)
+        features = conf.pop("features")
+        logger.info("Loading lightglue model, {}".format(features))
+
+        self.net = KF.LightGlue(features, **conf)
         logger.info("Load lightglue model done.")
 
     def _forward(self, data):
         input = {}
         input["image0"] = {
-            "image": data["image0"],
+            # "image": data["image0"],
+            "image_size": torch.tensor(data["image0"].shape[-2:][::-1])[None],
             "keypoints": data["keypoints0"],
             "descriptors": data["descriptors0"].permute(0, 2, 1),
         }
@@ -58,7 +49,8 @@ class LightGlue(BaseModel):
             input["image0"] = {**input["image0"], "oris": data["oris0"]}
 
         input["image1"] = {
-            "image": data["image1"],
+            # "image": data["image1"],
+            "image_size": torch.tensor(data["image1"].shape[-2:][::-1])[None],
             "keypoints": data["keypoints1"],
             "descriptors": data["descriptors1"].permute(0, 2, 1),
         }

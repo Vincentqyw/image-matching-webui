@@ -80,6 +80,38 @@ confs = {
             "force_resize": False,
         },
     },
+    "dedode-lightglue": {
+        "output": "matches-dedode-lightglue",
+        "model": {
+            "name": "lightglue",
+            "match_threshold": 0.2,
+            "width_confidence": 0.99,  # for point pruning
+            "depth_confidence": 0.95,  # for early stopping,
+            "features": "dedodeg",
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "force_resize": False,
+        },
+    },
+    "dedodev2-lightglue": {
+        "output": "matches-dedode-lightglue",
+        "model": {
+            "name": "lightglue",
+            "match_threshold": 0.2,
+            "width_confidence": 0.99,  # for point pruning
+            "depth_confidence": 0.95,  # for early stopping,
+            "features": "dedodeg-v2",
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "force_resize": False,
+        },
+    },
     "aliked-lightglue": {
         "output": "matches-aliked-lightglue",
         "model": {
