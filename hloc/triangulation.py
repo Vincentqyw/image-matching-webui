@@ -118,9 +118,7 @@ def estimation_and_geometric_verification(
             pycolmap.verify_matches(
                 database_path,
                 pairs_path,
-                options=dict(
-                    ransac=dict(max_num_trials=20000, min_inlier_ratio=0.1)
-                ),
+                options=dict(ransac=dict(max_num_trials=20000, min_inlier_ratio=0.1)),
             )
 
 
@@ -144,9 +142,7 @@ def geometric_verification(
         id0 = image_ids[name0]
         image0 = reference.images[id0]
         cam0 = reference.cameras[image0.camera_id]
-        kps0, noise0 = get_keypoints(
-            features_path, name0, return_uncertainty=True
-        )
+        kps0, noise0 = get_keypoints(features_path, name0, return_uncertainty=True)
         noise0 = 1.0 if noise0 is None else noise0
         if len(kps0) > 0:
             kps0 = np.stack(cam0.cam_from_img(kps0))
@@ -157,9 +153,7 @@ def geometric_verification(
             id1 = image_ids[name1]
             image1 = reference.images[id1]
             cam1 = reference.cameras[image1.camera_id]
-            kps1, noise1 = get_keypoints(
-                features_path, name1, return_uncertainty=True
-            )
+            kps1, noise1 = get_keypoints(features_path, name1, return_uncertainty=True)
             noise1 = 1.0 if noise1 is None else noise1
             if len(kps1) > 0:
                 kps1 = np.stack(cam1.cam_from_img(kps1))
@@ -176,9 +170,7 @@ def geometric_verification(
                 db.add_two_view_geometry(id0, id1, matches)
                 continue
 
-            cam1_from_cam0 = (
-                image1.cam_from_world * image0.cam_from_world.inverse()
-            )
+            cam1_from_cam0 = image1.cam_from_world * image0.cam_from_world.inverse()
             errors0, errors1 = compute_epipolar_errors(
                 cam1_from_cam0, kps0[matches[:, 0]], kps1[matches[:, 1]]
             )
@@ -291,8 +283,7 @@ def parse_option_args(args: List[str], default_options) -> Dict[str, Any]:
         target_type = type(getattr(default_options, key))
         if not isinstance(value, target_type):
             raise ValueError(
-                f'Incorrect type for option "{key}":'
-                f" {type(value)} vs {target_type}"
+                f'Incorrect type for option "{key}":' f" {type(value)} vs {target_type}"
             )
         options[key] = value
     return options

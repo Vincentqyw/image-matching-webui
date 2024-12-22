@@ -19,9 +19,7 @@ def parse_names(prefix, names, names_all):
             prefix = tuple(prefix)
         names = [n for n in names_all if n.startswith(prefix)]
         if len(names) == 0:
-            raise ValueError(
-                f"Could not find any image with the prefix `{prefix}`."
-            )
+            raise ValueError(f"Could not find any image with the prefix `{prefix}`.")
     elif names is not None:
         if isinstance(names, (str, Path)):
             names = parse_image_lists(names)
@@ -92,9 +90,7 @@ def main(
         db_descriptors = descriptors
     if isinstance(db_descriptors, (Path, str)):
         db_descriptors = [db_descriptors]
-    name2db = {
-        n: i for i, p in enumerate(db_descriptors) for n in list_h5_names(p)
-    }
+    name2db = {n: i for i, p in enumerate(db_descriptors) for n in list_h5_names(p)}
     db_names_h5 = list(name2db.keys())
     query_names_h5 = list_h5_names(descriptors)
 

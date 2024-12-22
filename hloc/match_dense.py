@@ -312,10 +312,8 @@ confs = {
             "resize_max": 1024,
             "dfactor": 8,
             "force_resize": False,
-            "resize_max": 1024,
             "width": 640,
             "height": 480,
-            "dfactor": 8,
         },
     },
     "sold2": {
@@ -467,9 +465,7 @@ class ImagePairDataset(torch.utils.data.Dataset):
         self.pairs = pairs
         if self.conf.cache_images:
             image_names = set(sum(pairs, ()))  # unique image names in pairs
-            logger.info(
-                f"Loading and caching {len(image_names)} unique images."
-            )
+            logger.info(f"Loading and caching {len(image_names)} unique images.")
             self.images = {}
             self.scales = {}
             for name in tqdm(image_names):
@@ -641,9 +637,7 @@ def aggregate_matches(
         required_queries -= set(list_h5_names(feature_path))
 
     # if an entry in cpdict is provided as np.ndarray we assume it is fixed
-    required_queries -= set(
-        [k for k, v in cpdict.items() if isinstance(v, np.ndarray)]
-    )
+    required_queries -= set([k for k, v in cpdict.items() if isinstance(v, np.ndarray)])
 
     # sort pairs for reduced RAM
     pairs_per_q = Counter(list(chain(*pairs)))
@@ -651,9 +645,7 @@ def aggregate_matches(
     pairs = [p for _, p in sorted(zip(pairs_score, pairs))]
 
     if len(required_queries) > 0:
-        logger.info(
-            f"Aggregating keypoints for {len(required_queries)} images."
-        )
+        logger.info(f"Aggregating keypoints for {len(required_queries)} images.")
     n_kps = 0
     with h5py.File(str(match_path), "a") as fd:
         for name0, name1 in tqdm(pairs, smoothing=0.1):
@@ -1062,8 +1054,7 @@ def main(
     overwrite: bool = False,
 ) -> Path:
     logger.info(
-        "Extracting semi-dense features with configuration:"
-        f"\n{pprint.pformat(conf)}"
+        "Extracting semi-dense features with configuration:" f"\n{pprint.pformat(conf)}"
     )
 
     if features is None:
@@ -1073,8 +1064,7 @@ def main(
         features_q = features
         if matches is None:
             raise ValueError(
-                "Either provide both features and matches as Path"
-                " or both as names."
+                "Either provide both features and matches as Path" " or both as names."
             )
     else:
         if export_dir is None:
@@ -1114,15 +1104,11 @@ if __name__ == "__main__":
     parser.add_argument("--pairs", type=Path, required=True)
     parser.add_argument("--image_dir", type=Path, required=True)
     parser.add_argument("--export_dir", type=Path, required=True)
-    parser.add_argument(
-        "--matches", type=Path, default=confs["loftr"]["output"]
-    )
+    parser.add_argument("--matches", type=Path, default=confs["loftr"]["output"])
     parser.add_argument(
         "--features", type=str, default="feats_" + confs["loftr"]["output"]
     )
-    parser.add_argument(
-        "--conf", type=str, default="loftr", choices=list(confs.keys())
-    )
+    parser.add_argument("--conf", type=str, default="loftr", choices=list(confs.keys()))
     args = parser.parse_args()
     main(
         confs[args.conf],

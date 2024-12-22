@@ -51,6 +51,7 @@ def plot_images(
     fig.tight_layout(pad=pad)
     return fig
 
+
 def plot_keypoints(kpts, colors="lime", ps=4):
     """Plot keypoints for existing images.
     Args:
@@ -64,7 +65,7 @@ def plot_keypoints(kpts, colors="lime", ps=4):
     try:
         for a, k, c in zip(axes, kpts, colors):
             a.scatter(k[:, 0], k[:, 1], c=c, s=ps, linewidths=0)
-    except IndexError as e:
+    except IndexError:
         pass
 
 

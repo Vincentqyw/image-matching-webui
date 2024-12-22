@@ -37,9 +37,7 @@ def decode_base64_to_image(encoding):
         return image
     except Exception as e:
         logger.warning(f"API cannot decode image: {e}")
-        raise HTTPException(
-            status_code=500, detail="Invalid encoded image"
-        ) from e
+        raise HTTPException(status_code=500, detail="Invalid encoded image") from e
 
 
 def to_base64_nparray(encoding: str) -> np.ndarray:

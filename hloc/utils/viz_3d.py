@@ -144,7 +144,7 @@ def plot_camera_colmap(
     image: pycolmap.Image,
     camera: pycolmap.Camera,
     name: Optional[str] = None,
-    **kwargs
+    **kwargs,
 ):
     """Plot a camera frustum from PyCOLMAP objects"""
     world_t_camera = image.cam_from_world.inverse()
@@ -155,7 +155,7 @@ def plot_camera_colmap(
         camera.calibration_matrix(),
         name=name or str(image.image_id),
         text=str(image),
-        **kwargs
+        **kwargs,
     )
 
 

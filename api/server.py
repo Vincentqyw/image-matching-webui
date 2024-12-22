@@ -136,9 +136,7 @@ class ImageMatchingService:
             image_array = np.array(img)
         return image_array
 
-    def postprocess(
-        self, output: dict, skip_keys: list, binarize: bool = True
-    ) -> dict:
+    def postprocess(self, output: dict, skip_keys: list, binarize: bool = True) -> dict:
         pred = {}
         for key, value in output.items():
             if key in skip_keys:

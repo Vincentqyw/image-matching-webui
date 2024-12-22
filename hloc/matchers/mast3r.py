@@ -33,9 +33,7 @@ class Mast3r(Duster):
         self.normalize = tfm.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
         self.net = AsymmetricMASt3R.from_pretrained(model_path).to(DEVICE)
         logger.info("Loaded Mast3r model")
@@ -86,12 +84,9 @@ class Mast3r(Duster):
             }
             logger.warning(f"Matched {0} points")
         else:
-
             top_k = self.conf["max_keypoints"]
             if top_k is not None and len(mkpts0) > top_k:
-                keep = np.round(np.linspace(0, len(mkpts0) - 1, top_k)).astype(
-                    int
-                )
+                keep = np.round(np.linspace(0, len(mkpts0) - 1, top_k)).astype(int)
                 mkpts0 = mkpts0[keep]
                 mkpts1 = mkpts1[keep]
             pred = {

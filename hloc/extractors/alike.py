@@ -31,9 +31,7 @@ class Alike(BaseModel):
     def _init(self, conf):
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}.pth".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}.pth".format(Path(__file__).stem, self.conf["model_name"]),
         )
         logger.info("Loaded Alike model from {}".format(model_path))
         configs[conf["model_name"]]["model_path"] = model_path

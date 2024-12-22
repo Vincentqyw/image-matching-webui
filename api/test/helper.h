@@ -1,15 +1,15 @@
 
-#include <sstream>
-#include <fstream>
-#include <vector>
 #include <b64/encode.h>
+#include <fstream>
 #include <jsoncpp/json/json.h>
 #include <opencv2/opencv.hpp>
+#include <sstream>
+#include <vector>
 
 // base64 to image
+#include <boost/archive/iterators/base64_from_binary.hpp>
 #include <boost/archive/iterators/binary_from_base64.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
-#include <boost/archive/iterators/base64_from_binary.hpp>
 
 /// Parameters used in the API
 struct APIParams {
@@ -50,17 +50,19 @@ struct APIParams {
  * @details Stores the keypoints and descriptors for each image.
  */
 class KeyPointResults {
-public:
-    KeyPointResults() {}
+      public:
+    KeyPointResults() {
+    }
 
     /**
      * @brief Constructor.
      *
      * @param kp The keypoints for each image.
      */
-    KeyPointResults(const std::vector<std::vector<cv::KeyPoint>>& kp, 
+    KeyPointResults(const std::vector<std::vector<cv::KeyPoint>>& kp,
                     const std::vector<cv::Mat>& desc)
-        : keypoints(kp), descriptors(desc) {}
+        : keypoints(kp), descriptors(desc) {
+    }
 
     /**
      * @brief Append keypoints to the result.
@@ -98,12 +100,11 @@ public:
         return descriptors;
     }
 
-private:
+      private:
     std::vector<std::vector<cv::KeyPoint>> keypoints;
     std::vector<cv::Mat> descriptors;
     std::vector<std::vector<float>> scores;
 };
-
 
 /**
  * @brief Decodes a base64 encoded string.
@@ -125,8 +126,6 @@ std::string base64_decode(const std::string& base64) {
     // Decode the base64 string and return the result
     return std::string(It(base64.begin()), It(base64.begin() + end));
 }
-
-
 
 /**
  * @brief Decodes a base64 string into an OpenCV image
@@ -150,7 +149,6 @@ cv::Mat base64_to_image(const std::string& base64) {
     return img;
 }
 
-
 /**
  * @brief Encodes an OpenCV image into a base64 string
  *
@@ -163,7 +161,7 @@ cv::Mat base64_to_image(const std::string& base64) {
  *
  * @throws std::runtime_error if the image is empty or encoding fails
  */
-std::string image_to_base64(cv::Mat &img) {
+std::string image_to_base64(cv::Mat& img) {
     if (img.empty()) {
         throw std::runtime_error("Failed to read image");
     }
@@ -176,7 +174,8 @@ std::string image_to_base64(cv::Mat &img) {
 
     // Encode the bytes as a base64 string
     using namespace boost::archive::iterators;
-    using It = base64_from_binary<transform_width<std::vector<uchar>::const_iterator, 6, 8>>;
+    using It =
+        base64_from_binary<transform_width<std::vector<uchar>::const_iterator, 6, 8>>;
     std::string base64(It(buf.begin()), It(buf.end()));
 
     // Pad the string with '=' characters to a multiple of 4 bytes
@@ -184,7 +183,6 @@ std::string image_to_base64(cv::Mat &img) {
 
     return base64;
 }
-
 
 /**
  * @brief Callback function for libcurl to write data to a string
@@ -227,8 +225,7 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* s) 
  * @param val The value to convert
  * @return The converted Json::Value
  */
-template <typename T>
-Json::Value toJson(const T& val) {
+template <typename T> Json::Value toJson(const T& val) {
     return Json::Value(val);
 }
 
@@ -241,8 +238,7 @@ Json::Value toJson(const T& val) {
  * @param vec The vector to convert to Json::Value
  * @return The Json::Value representing the vector
  */
-template <typename T>
-Json::Value vectorToJson(const std::vector<T>& vec) {
+template <typename T> Json::Value vectorToJson(const std::vector<T>& vec) {
     Json::Value json(Json::arrayValue);
     for (const auto& item : vec) {
         json.append(item);
@@ -253,8 +249,9 @@ Json::Value vectorToJson(const std::vector<T>& vec) {
 /**
  * @brief Converts a nested vector to a Json::Value
  *
- * This function takes a nested vector of type T and converts it to a Json::Value.
- * Each sub-vector is converted to a Json::Value array and appended to the main Json::Value array.
+ * This function takes a nested vector of type T and converts it to a
+ * Json::Value. Each sub-vector is converted to a Json::Value array and appended
+ * to the main Json::Value array.
  *
  * @param vec The nested vector to convert to Json::Value
  * @return The Json::Value representing the nested vector
@@ -268,22 +265,23 @@ Json::Value nestedVectorToJson(const std::vector<std::vector<T>>& vec) {
     return json;
 }
 
-
-
 /**
  * @brief Converts the APIParams struct to a Json::Value
  *
  * This function takes an APIParams struct and converts it to a Json::Value.
  * The Json::Value is a JSON object with the following fields:
  * - data: a JSON array of base64 encoded images
- * - max_keypoints: a JSON array of integers, max number of keypoints for each image
+ * - max_keypoints: a JSON array of integers, max number of keypoints for each
+ * image
  * - timestamps: a JSON array of timestamps, one for each image
  * - grayscale: a JSON boolean, whether to convert images to grayscale
- * - image_hw: a nested JSON array, each sub-array contains the height and width of an image
+ * - image_hw: a nested JSON array, each sub-array contains the height and width
+ * of an image
  * - feature_type: a JSON integer, the type of feature detector to use
  * - rotates: a JSON array of doubles, the rotation of each image
  * - scales: a JSON array of doubles, the scale of each image
- * - reference_points: a nested JSON array, each sub-array contains the reference points of an image
+ * - reference_points: a nested JSON array, each sub-array contains the
+ * reference points of an image
  * - binarize: a JSON boolean, whether to binarize the descriptors
  *
  * @param params The APIParams struct to convert
@@ -304,8 +302,7 @@ Json::Value paramsToJson(const APIParams& params) {
     return json;
 }
 
-template<typename T>
-cv::Mat jsonToMat(Json::Value json) {
+template <typename T> cv::Mat jsonToMat(Json::Value json) {
     int rows = json.size();
     int cols = json[0].size();
 
@@ -320,13 +317,13 @@ cv::Mat jsonToMat(Json::Value json) {
     }
 
     // Create a cv::Mat object that points to the data.
-    cv::Mat mat(rows, cols, CV_8UC1, data.data());  // Change the type if necessary.
-    // cv::Mat mat(cols, rows,CV_8UC1, data.data());  // Change the type if necessary.
+    cv::Mat mat(rows, cols, CV_8UC1,
+                data.data());  // Change the type if necessary.
+    // cv::Mat mat(cols, rows,CV_8UC1, data.data());  // Change the type if
+    // necessary.
 
     return mat;
 }
-
-
 
 /**
  * @brief Decodes the response of the server and prints the keypoints
@@ -337,7 +334,7 @@ cv::Mat jsonToMat(Json::Value json) {
  * @param response The response of the server
  * @return The keypoints and descriptors
  */
-KeyPointResults decode_response(const std::string& response, bool viz=true) {
+KeyPointResults decode_response(const std::string& response, bool viz = true) {
     Json::CharReaderBuilder builder;
     Json::CharReader* reader = builder.newCharReader();
 
@@ -345,8 +342,8 @@ KeyPointResults decode_response(const std::string& response, bool viz=true) {
     std::string errors;
 
     // Parse the JSON response
-    bool parsingSuccessful = reader->parse(response.c_str(),
-        response.c_str() + response.size(), &jsonData, &errors);
+    bool parsingSuccessful = reader->parse(
+        response.c_str(), response.c_str() + response.size(), &jsonData, &errors);
     delete reader;
 
     if (!parsingSuccessful) {
@@ -376,25 +373,23 @@ KeyPointResults decode_response(const std::string& response, bool viz=true) {
         for (const auto& keypoint : jkeypoints_orig) {
             if (counter < 10) {
                 // Print the first 10 keypoints
-                std::cout << keypoint[0].asFloat() << ", "
-                    << keypoint[1].asFloat() << std::endl;
+                std::cout << keypoint[0].asFloat() << ", " << keypoint[1].asFloat()
+                          << std::endl;
             }
             counter++;
             // Convert the Json::Value to a cv::KeyPoint
-            vkeypoints.emplace_back(cv::KeyPoint(keypoint[0].asFloat(),
-                keypoint[1].asFloat(), 0.0));
+            vkeypoints.emplace_back(
+                cv::KeyPoint(keypoint[0].asFloat(), keypoint[1].asFloat(), 0.0));
         }
 
         if (viz && jsonItem.isMember("image_orig")) {
-
             auto jimg_orig = jsonItem["image_orig"];
             cv::Mat img = jsonToMat<uchar>(jimg_orig);
             cv::imwrite("viz_image_orig.jpg", img);
 
             // Draw keypoints on the image
             cv::Mat imgWithKeypoints;
-            cv::drawKeypoints(img, vkeypoints, 
-                imgWithKeypoints, cv::Scalar(0, 0, 255));
+            cv::drawKeypoints(img, vkeypoints, imgWithKeypoints, cv::Scalar(0, 0, 255));
 
             // Write the image with keypoints
             std::string filename = "viz_image_orig_keypoints.jpg";
@@ -402,7 +397,7 @@ KeyPointResults decode_response(const std::string& response, bool viz=true) {
         }
 
         // Iterate over the descriptors
-        cv::Mat descriptors = jsonToMat<uchar>(jdescriptors); 
+        cv::Mat descriptors = jsonToMat<uchar>(jdescriptors);
         kpts_results.append_keypoints(vkeypoints);
         kpts_results.append_descriptors(descriptors);
     }

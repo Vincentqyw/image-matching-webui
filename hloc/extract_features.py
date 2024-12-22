@@ -408,17 +408,13 @@ class ImageDataset(torch.utils.data.Dataset):
             if isinstance(paths, (Path, str)):
                 self.names = parse_image_lists(paths)
             elif isinstance(paths, collections.Iterable):
-                self.names = [
-                    p.as_posix() if isinstance(p, Path) else p for p in paths
-                ]
+                self.names = [p.as_posix() if isinstance(p, Path) else p for p in paths]
             else:
                 raise ValueError(f"Unknown format for path argument {paths}.")
 
             for name in self.names:
                 if not (root / name).exists():
-                    raise ValueError(
-                        f"Image {name} does not exists in root: {root}."
-                    )
+                    raise ValueError(f"Image {name} does not exists in root: {root}.")
 
     def __getitem__(self, idx):
         name = self.names[idx]
@@ -527,8 +523,7 @@ def main(
     overwrite: bool = False,
 ) -> Path:
     logger.info(
-        "Extracting local features with configuration:"
-        f"\n{pprint.pformat(conf)}"
+        "Extracting local features with configuration:" f"\n{pprint.pformat(conf)}"
     )
 
     dataset = ImageDataset(image_dir, conf["preprocessing"], image_list)
@@ -536,9 +531,7 @@ def main(
         feature_path = Path(export_dir, conf["output"] + ".h5")
     feature_path.parent.mkdir(exist_ok=True, parents=True)
     skip_names = set(
-        list_h5_names(feature_path)
-        if feature_path.exists() and not overwrite
-        else ()
+        list_h5_names(feature_path) if feature_path.exists() and not overwrite else ()
     )
     dataset.names = [n for n in dataset.names if n not in skip_names]
     if len(dataset.names) == 0:

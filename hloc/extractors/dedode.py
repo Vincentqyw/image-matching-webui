@@ -34,15 +34,11 @@ class DeDoDe(BaseModel):
     def _init(self, conf):
         model_detector_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, conf["model_detector_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, conf["model_detector_name"]),
         )
         model_descriptor_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, conf["model_descriptor_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, conf["model_descriptor_name"]),
         )
         logger.info("Loaded DarkFeat model: {}".format(model_detector_path))
         self.normalizer = transforms.Normalize(
@@ -51,15 +47,9 @@ class DeDoDe(BaseModel):
 
         # load the model
         weights_detector = torch.load(model_detector_path, map_location="cpu")
-        weights_descriptor = torch.load(
-            model_descriptor_path, map_location="cpu"
-        )
-        self.detector = dedode_detector_L(
-            weights=weights_detector, device=device
-        )
-        self.descriptor = dedode_descriptor_B(
-            weights=weights_descriptor, device=device
-        )
+        weights_descriptor = torch.load(model_descriptor_path, map_location="cpu")
+        self.detector = dedode_detector_L(weights=weights_detector, device=device)
+        self.descriptor = dedode_descriptor_B(weights=weights_descriptor, device=device)
         logger.info("Load DeDoDe model done.")
 
     def _forward(self, data):
@@ -84,9 +74,9 @@ class DeDoDe(BaseModel):
 
         # step 2: describe keypoints
         # dim: 1 x N x 256
-        description_A = self.descriptor.describe_keypoints(
-            batch_A, keypoints_A
-        )["descriptions"]
+        description_A = self.descriptor.describe_keypoints(batch_A, keypoints_A)[
+            "descriptions"
+        ]
         keypoints_A = to_pixel_coords(keypoints_A, H_A, W_A)
 
         return {

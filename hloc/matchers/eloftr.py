@@ -36,7 +36,6 @@ class ELoFTR(BaseModel):
     required_inputs = ["image0", "image1"]
 
     def _init(self, conf):
-
         if self.conf["model_type"] == "full":
             _default_cfg = deepcopy(full_default_cfg)
         elif self.conf["model_type"] == "opt":
@@ -49,9 +48,7 @@ class ELoFTR(BaseModel):
 
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
 
         cfg = _default_cfg

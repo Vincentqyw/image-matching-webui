@@ -31,20 +31,14 @@ class ASpanFormer(BaseModel):
 
         # update: match threshold
         _config["aspan"]["match_coarse"]["thr"] = conf["match_threshold"]
-        _config["aspan"]["match_coarse"]["skh_iters"] = conf[
-            "sinkhorn_iterations"
-        ]
+        _config["aspan"]["match_coarse"]["skh_iters"] = conf["sinkhorn_iterations"]
 
         self.net = _ASpanFormer(config=_config["aspan"])
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
-        state_dict = torch.load(str(model_path), map_location="cpu")[
-            "state_dict"
-        ]
+        state_dict = torch.load(str(model_path), map_location="cpu")["state_dict"]
         self.net.load_state_dict(state_dict, strict=False)
         logger.info("Loaded Aspanformer model")
 

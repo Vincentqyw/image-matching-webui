@@ -25,9 +25,7 @@ class REKD(BaseModel):
         # TODO: download model
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
         if not model_path.exists():
             print(f"No model found at {model_path}")
@@ -43,29 +41,15 @@ class REKD(BaseModel):
 
         # Scores & Descriptors
         kpts_score = (
-            torch.cat([keypoints, scores], dim=1)
-            .view(3, -1)
-            .t()
-            .cpu()
-            .detach()
-            .numpy()
+            torch.cat([keypoints, scores], dim=1).view(3, -1).t().cpu().detach().numpy()
         )
         descriptors = (
-            descriptors.view(256, Hc, Wc)
-            .view(256, -1)
-            .t()
-            .cpu()
-            .detach()
-            .numpy()
+            descriptors.view(256, Hc, Wc).view(256, -1).t().cpu().detach().numpy()
         )
 
         # Filter based on confidence threshold
-        descriptors = descriptors[
-            kpts_score[:, 0] > self.conf["keypoint_threshold"], :
-        ]
-        kpts_score = kpts_score[
-            kpts_score[:, 0] > self.conf["keypoint_threshold"], :
-        ]
+        descriptors = descriptors[kpts_score[:, 0] > self.conf["keypoint_threshold"], :]
+        kpts_score = kpts_score[kpts_score[:, 0] > self.conf["keypoint_threshold"], :]
         keypoints = kpts_score[:, 1:]
         scores = kpts_score[:, 0]
 

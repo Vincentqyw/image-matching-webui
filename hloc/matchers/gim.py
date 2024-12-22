@@ -167,9 +167,10 @@ class GIM(BaseModel):
 
     def _forward(self, data):
         # TODO: only support dkm+gim
-        image0, image1 = self.pad_image(
-            data["image0"], self.aspect_ratio
-        ), self.pad_image(data["image1"], self.aspect_ratio)
+        image0, image1 = (
+            self.pad_image(data["image0"], self.aspect_ratio),
+            self.pad_image(data["image1"], self.aspect_ratio),
+        )
         dense_matches, dense_certainty = self.net.match(image0, image1)
         sparse_matches, mconf = self.net.sample(
             dense_matches, dense_certainty, self.conf["max_keypoints"]

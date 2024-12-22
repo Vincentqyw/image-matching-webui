@@ -123,9 +123,7 @@ class SfmEngine:
         )
         pairs_from_retrieval.main(retrieval_path, sfm_pairs, num_matched=top_k)
 
-        feature_path = extract_features.main(
-            feature_conf, temp_images, self.outputs
-        )
+        feature_path = extract_features.main(feature_conf, temp_images, self.outputs)
         # match features
         match_path = match_features.main(
             match_conf, sfm_pairs, feature_conf["output"], self.outputs
@@ -159,9 +157,7 @@ class SfmEngine:
                 f.write("v {} {} {}\n".format(p[0], p[1], p[2]))
                 # Write vertex normal (color)
                 f.write(
-                    "vn {} {} {}\n".format(
-                        c[0] / 255.0, c[1] / 255.0, c[2] / 255.0
-                    )
+                    "vn {} {} {}\n".format(c[0] / 255.0, c[1] / 255.0, c[2] / 255.0)
                 )
         viz_2d = visualization.visualize_sfm_2d(
             model, temp_images, color_by="visibility", n=2, dpi=300

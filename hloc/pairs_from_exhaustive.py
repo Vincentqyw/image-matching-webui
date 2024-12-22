@@ -34,9 +34,7 @@ def main(
         elif isinstance(image_list, collections.Iterable):
             names_ref = list(ref_list)
         else:
-            raise ValueError(
-                f"Unknown type for reference image list: {ref_list}"
-            )
+            raise ValueError(f"Unknown type for reference image list: {ref_list}")
     elif ref_features is not None:
         names_ref = list_h5_names(ref_features)
     else:

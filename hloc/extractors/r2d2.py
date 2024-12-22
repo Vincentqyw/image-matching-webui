@@ -29,9 +29,7 @@ class R2D2(BaseModel):
     def _init(self, conf):
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
         self.norm_rgb = tvf.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]

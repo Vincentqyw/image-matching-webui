@@ -194,8 +194,7 @@ class WorkQueue:
     def __init__(self, work_fn, num_threads=1):
         self.queue = Queue(num_threads)
         self.threads = [
-            Thread(target=self.thread_fn, args=(work_fn,))
-            for _ in range(num_threads)
+            Thread(target=self.thread_fn, args=(work_fn,)) for _ in range(num_threads)
         ]
         for thread in self.threads:
             thread.start()
@@ -268,20 +267,16 @@ def main(
         features_q = features
         if matches is None:
             raise ValueError(
-                "Either provide both features and matches as Path"
-                " or both as names."
+                "Either provide both features and matches as Path" " or both as names."
             )
     else:
         if export_dir is None:
             raise ValueError(
-                "Provide an export_dir if features is not"
-                f" a file path: {features}."
+                "Provide an export_dir if features is not" f" a file path: {features}."
             )
         features_q = Path(export_dir, features + ".h5")
         if matches is None:
-            matches = Path(
-                export_dir, f'{features}_{conf["output"]}_{pairs.stem}.h5'
-            )
+            matches = Path(export_dir, f'{features}_{conf["output"]}_{pairs.stem}.h5')
 
     if features_ref is None:
         features_ref = features_q
@@ -323,8 +318,7 @@ def match_from_paths(
     overwrite: bool = False,
 ) -> Path:
     logger.info(
-        "Matching local features with configuration:"
-        f"\n{pprint.pformat(conf)}"
+        "Matching local features with configuration:" f"\n{pprint.pformat(conf)}"
     )
 
     if not feature_path_q.exists():
@@ -456,9 +450,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--pairs", type=Path, required=True)
     parser.add_argument("--export_dir", type=Path)
-    parser.add_argument(
-        "--features", type=str, default="feats-superpoint-n4096-r1024"
-    )
+    parser.add_argument("--features", type=str, default="feats-superpoint-n4096-r1024")
     parser.add_argument("--matches", type=Path)
     parser.add_argument(
         "--conf", type=str, default="superglue", choices=list(confs.keys())

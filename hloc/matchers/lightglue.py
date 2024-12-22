@@ -36,9 +36,7 @@ class LightGlue(BaseModel):
         logger.info("Loading lightglue model, {}".format(conf["model_name"]))
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
         conf["weights"] = str(model_path)
         conf["filter_threshold"] = conf["match_threshold"]

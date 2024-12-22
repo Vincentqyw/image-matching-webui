@@ -24,9 +24,7 @@ def interpolate_scan(scan, kp):
 
     # To maximize the number of points that have depth:
     # do bilinear interpolation first and then nearest for the remaining points
-    interp_lin = grid_sample(scan, kp, align_corners=True, mode="bilinear")[
-        0, :, 0
-    ]
+    interp_lin = grid_sample(scan, kp, align_corners=True, mode="bilinear")[0, :, 0]
     interp_nn = torch.nn.functional.grid_sample(
         scan, kp, align_corners=True, mode="nearest"
     )[0, :, 0]
@@ -66,9 +64,7 @@ def get_scan_pose(dataset_dir, rpath):
     return P_after_GICP
 
 
-def pose_from_cluster(
-    dataset_dir, q, retrieved, feature_file, match_file, skip=None
-):
+def pose_from_cluster(dataset_dir, q, retrieved, feature_file, match_file, skip=None):
     height, width = cv2.imread(str(dataset_dir / q)).shape[:2]
     cx = 0.5 * width
     cy = 0.5 * height

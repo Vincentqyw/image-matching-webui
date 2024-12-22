@@ -16,6 +16,4 @@ for catg in os.listdir(wxbs_path):
             continue
         img1_path = scene_path / "01.png"
         img2_path = scene_path / "02.png"
-        pairs.append([str(img1_path),str(img2_path)])
-
-breakpoint()
+        pairs.append([str(img1_path), str(img2_path)])

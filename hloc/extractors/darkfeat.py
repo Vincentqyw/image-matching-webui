@@ -22,9 +22,7 @@ class DarkFeat(BaseModel):
     def _init(self, conf):
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
         logger.info("Loaded DarkFeat model: {}".format(model_path))
         self.net = DarkFeat_(model_path)

@@ -36,9 +36,7 @@ class OmniGlue(BaseModel):
         )
         dino_model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, "dinov2_vitb14_pretrain.pth"
-            ),
+            filename="{}/{}".format(Path(__file__).stem, "dinov2_vitb14_pretrain.pth"),
         )
 
         self.net = omniglue.OmniGlue(

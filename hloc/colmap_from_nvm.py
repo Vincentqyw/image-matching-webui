@@ -25,9 +25,7 @@ def recover_database_images_and_ids(database_path):
         images[name] = image_id
         cameras[name] = camera_id
     db.close()
-    logger.info(
-        f"Found {len(images)} images and {len(cameras)} cameras in database."
-    )
+    logger.info(f"Found {len(images)} images and {len(cameras)} cameras in database.")
     return images, cameras
 
 
@@ -61,9 +59,7 @@ def camera_center_to_translation(c, qvec):
     return (-1) * np.matmul(R, c)
 
 
-def read_nvm_model(
-    nvm_path, intrinsics_path, image_ids, camera_ids, skip_points=False
-):
+def read_nvm_model(nvm_path, intrinsics_path, image_ids, camera_ids, skip_points=False):
     with open(intrinsics_path, "r") as f:
         raw_intrinsics = f.readlines()
 

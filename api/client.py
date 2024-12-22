@@ -120,9 +120,7 @@ def send_request_match(path0: str, path1: str) -> Dict[str, np.ndarray]:
             for key in list(pred.keys()):
                 pred[key] = np.array(pred[key])
         else:
-            print(
-                f"Error: Response code {response.status_code} - {response.text}"
-            )
+            print(f"Error: Response code {response.status_code} - {response.text}")
     finally:
         files["image0"].close()
         files["image1"].close()

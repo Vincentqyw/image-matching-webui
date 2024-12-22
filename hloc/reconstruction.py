@@ -93,16 +93,13 @@ def run_reconstruction(
             largest_num_images = num_images
     assert largest_index is not None
     logger.info(
-        f"Largest model is #{largest_index} "
-        f"with {largest_num_images} images."
+        f"Largest model is #{largest_index} " f"with {largest_num_images} images."
     )
 
     for filename in ["images.bin", "cameras.bin", "points3D.bin"]:
         if (sfm_dir / filename).exists():
             (sfm_dir / filename).unlink()
-        shutil.move(
-            str(models_path / str(largest_index) / filename), str(sfm_dir)
-        )
+        shutil.move(str(models_path / str(largest_index) / filename), str(sfm_dir))
     return reconstructions[largest_index]
 
 
@@ -175,9 +172,7 @@ if __name__ == "__main__":
         "--image_options",
         nargs="+",
         default=[],
-        help="List of key=value from {}".format(
-            pycolmap.ImageReaderOptions().todict()
-        ),
+        help="List of key=value from {}".format(pycolmap.ImageReaderOptions().todict()),
     )
     parser.add_argument(
         "--mapper_options",

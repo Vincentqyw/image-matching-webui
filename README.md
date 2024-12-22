@@ -5,7 +5,7 @@
 
 <p align="center">
   <h1 align="center"><br><ins>$\color{red}{\textnormal{Image\ Matching\ WebUI}}$
-</ins><br>Identify matching points between two images</h1> 
+</ins><br>Identify matching points between two images</h1>
 </p>
 
 ## Description
@@ -13,7 +13,7 @@
 This simple tool efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
 **Note**: the images source can be either local images or webcam images.
 
-Try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a> 
+Try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
 <a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui">
   <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/>
 </a>
@@ -72,7 +72,7 @@ The tool currently supports various popular image matching algorithms, namely:
 
 ### HuggingFace / Lightning AI
 
-Just try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a> 
+Just try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
 <a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui">
   <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/>
 </a>
@@ -101,7 +101,7 @@ Deploy to [Railway](https://railway.app/), setting up a `Custom Start Command` i
 ``` bash
 python -m api.server
 ```
- 
+
 ### Run demo
 ``` bash
 python ./app.py
@@ -123,12 +123,12 @@ External contributions are very much welcome. Please follow the [PEP8 style guid
 - [x] add [line feature matching](https://github.com/Vincentqyw/LineSegmentsDetection) algorithms
 - [x] example to add a new feature extractor / matcher
 - [x] ransac to filter outliers
-- [ ] add [rotation images](https://github.com/pidahbus/deep-image-orientation-angle-detection) options before matching 
+- [ ] add [rotation images](https://github.com/pidahbus/deep-image-orientation-angle-detection) options before matching
 - [ ] support export matches to colmap ([#issue 6](https://github.com/Vincentqyw/image-matching-webui/issues/6))
 - [ ] add config file to set default parameters
 - [ ] dynamically load models and reduce GPU overload
 
-Adding local features / matchers as submodules is very easy. For example, to add the [GlueStick](https://github.com/cvg/GlueStick): 
+Adding local features / matchers as submodules is very easy. For example, to add the [GlueStick](https://github.com/cvg/GlueStick):
 
 ``` bash
 git submodule add https://github.com/cvg/GlueStick.git third_party/GlueStick
