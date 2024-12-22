@@ -6,6 +6,7 @@ from api import ImageMatchingAPI
 
 ROOT = Path(__file__).parent
 
+
 def test_all():
     config = load_config(ROOT / "config.yaml")
     img_path1 = ROOT / "data/02928139_3448003521.jpg"
