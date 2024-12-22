@@ -13,7 +13,7 @@ jobs:
       matrix:
         # platform: [macos-13, ubuntu-latest]
         platform: [ubuntu-latest]
-        python-version: ["3.8", "3.10",  "3.12"]
+        python-version: ["3.8", "3.9", "3.10"]
 
     runs-on: ${{ matrix.platform }}
     # runs-on: self-hosted
@@ -26,6 +26,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Upgrade setuptools and wheel
+      run: |
+        pip install --upgrade setuptools wheel
+      
     - name: Install dependencies on Ubuntu
       if: runner.os == 'Linux'
       run: |
@@ -48,6 +52,7 @@ jobs:
 
     - name: Install Python dependencies
       run: |
+        pip install pytest
         pip install -r requirements.txt
         sudo apt-get update && sudo apt-get install ffmpeg libsm6 libxext6 -y
 
