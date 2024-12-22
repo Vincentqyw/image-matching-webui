@@ -13,22 +13,14 @@ jobs:
       matrix:
         # platform: [macos-13, ubuntu-latest]
         platform: [ubuntu-latest]
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.10",  "3.12"]
 
-    # runs-on: ${{ matrix.platform }}
-    runs-on: self-hosted
+    runs-on: ${{ matrix.platform }}
+    # runs-on: self-hosted
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: true
-
-    - name: Checkout lfs
-      run: |
-          git lfs install --local
-          AUTH=$(git config --local http.${{ github.server_url }}/.extraheader)
-          git config --local --unset http.${{ github.server_url }}/.extraheader
-          git config --local http.${{ github.server_url }}/${{ github.repository }}.git/info/lfs/objects/batch.extraheader "$AUTH"
-          git lfs pull
 
     - uses: actions/setup-python@v5
       with:
