@@ -1,5 +1,7 @@
 name: CI CPU
 
+runs-on: self-hosted
+
 on:
   push:
     branches:
@@ -29,7 +31,7 @@ jobs:
         sudo apt-get update && sudo apt-get install ffmpeg libsm6 libxext6 -y
 
     - name: Build and install
-      run: pip install --verbose .
+      run: pip install .
 
     - name: Run tests
       # run: python -m pytest

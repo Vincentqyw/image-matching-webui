@@ -10,7 +10,7 @@ imageio
 Jinja2
 kornia
 loguru
-matplotlib
+matplotlib<3.9
 numpy==1.23.5
 omegaconf
 onnxruntime
