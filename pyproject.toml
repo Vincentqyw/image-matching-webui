@@ -20,17 +20,19 @@ dynamic = ["dependencies"]
 dev = ["black", "flake8", "isort"]
 
 [tool.setuptools.packages.find]
-include = ["hloc*",  "ui",]
+include = ["hloc*", "ui", "api", "third_party*"]
 
 [tool.setuptools.package-data]
 ui = ["*.yaml"]
+api = ["*.yaml"]
+third_party = ["**/*.yaml", "**/*.cfg", "**/*.yml", "**/*.pth"]
+
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
-[tool.black]
-line-length = 80
-
-[tool.isort]
-profile = "black"
-line_length = 80
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
+xfail_strict = true
+testpaths = ["tests"]

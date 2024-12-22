@@ -28,5 +28,9 @@ jobs:
         pip install -r requirements.txt
         sudo apt-get update && sudo apt-get install ffmpeg libsm6 libxext6 -y
 
+    - name: Build and install
+      run: pip install --verbose .
+
     - name: Run tests
-      run: python test_app_cli.py
+      # run: python -m pytest
+      run: python tests/test_basic.py
