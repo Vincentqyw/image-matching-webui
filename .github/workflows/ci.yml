@@ -10,21 +10,15 @@ on:
 
 jobs:
   build:
-    # runs-on: ubuntu-latest
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    # runs-on: self-hosted
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: Checkout lfs
-      run: |
-          git lfs install --local
-          AUTH=$(git config --local http.${{ github.server_url }}/.extraheader)
-          git config --local --unset http.${{ github.server_url }}/.extraheader
-          git config --local http.${{ github.server_url }}/${{ github.repository }}.git/info/lfs/objects/batch.extraheader "$AUTH"
-          git lfs pull
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
