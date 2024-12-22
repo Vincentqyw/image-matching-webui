@@ -116,7 +116,7 @@ I provide an example to add local feature in [hloc/extractors/example.py](hloc/e
 
 ## Contributions welcome!
 
-External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using a linter like flake8 (reformat using command `python -m black .`). This is a non-exhaustive list of features that might be valuable additions:
+External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using a linter like flake8. This is a non-exhaustive list of features that might be valuable additions:
 
 - [x] add [CPU CI](.github/workflows/ci.yml)
 - [x] add webcam support
@@ -137,11 +137,17 @@ git submodule add https://github.com/cvg/GlueStick.git third_party/GlueStick
 If remote submodule repositories are updated, don't forget to pull submodules with:
 
 ``` bash
-git submodule init
+git submodule update --init --recursive
 git submodule update --remote
 ```
 
 if you only want to update one submodule, use `git submodule update --remote third_party/GlueStick`.
+
+To format code before committing, run:
+
+```bash
+pre-commit run -a  # Auto-checks and fixes
+```
 
 ## Contributors
 
