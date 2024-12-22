@@ -1,12 +1,15 @@
 import cv2
+from pathlib import Path
 from hloc import logger
-from ui.utils import DEVICE, ROOT, get_matcher_zoo, load_config
+from ui.utils import DEVICE, get_matcher_zoo, load_config
 from api import ImageMatchingAPI
 
+ROOT = Path(__file__).parent
 
-def test_all(config: dict = None):
-    img_path1 = ROOT / "datasets/sacre_coeur/mapping/02928139_3448003521.jpg"
-    img_path2 = ROOT / "datasets/sacre_coeur/mapping/17295357_9106075285.jpg"
+def test_all():
+    config = load_config(ROOT / "config.yaml")
+    img_path1 = ROOT / "data/02928139_3448003521.jpg"
+    img_path2 = ROOT / "data/17295357_9106075285.jpg"
     image0 = cv2.imread(str(img_path1))[:, :, ::-1]  # RGB
     image1 = cv2.imread(str(img_path2))[:, :, ::-1]  # RGB
 
@@ -19,18 +22,19 @@ def test_all(config: dict = None):
         if enable and not skip_ci:
             logger.info(f"Testing {k} ...")
             api = ImageMatchingAPI(conf=v, device=DEVICE)
-            api(image0, image1)
+            pred = api(image0, image1)
+            assert pred is not None
             log_path = ROOT / "experiments" / "all"
             log_path.mkdir(exist_ok=True, parents=True)
             api.visualize(log_path=log_path)
         else:
             logger.info(f"Skipping {k} ...")
-    return 0
 
 
 def test_one():
-    img_path1 = ROOT / "datasets/sacre_coeur/mapping/02928139_3448003521.jpg"
-    img_path2 = ROOT / "datasets/sacre_coeur/mapping/17295357_9106075285.jpg"
+    img_path1 = ROOT / "data/02928139_3448003521.jpg"
+    img_path2 = ROOT / "data/17295357_9106075285.jpg"
+
     image0 = cv2.imread(str(img_path1))[:, :, ::-1]  # RGB
     image1 = cv2.imread(str(img_path2))[:, :, ::-1]  # RGB
     # sparse
@@ -63,7 +67,8 @@ def test_one():
         "dense": False,
     }
     api = ImageMatchingAPI(conf=conf, device=DEVICE)
-    api(image0, image1)
+    pred = api(image0, image1)
+    assert pred is not None
     log_path = ROOT / "experiments" / "one"
     log_path.mkdir(exist_ok=True, parents=True)
     api.visualize(log_path=log_path)
@@ -93,14 +98,13 @@ def test_one():
     }
 
     api = ImageMatchingAPI(conf=conf, device=DEVICE)
-    api(image0, image1)
+    pred = api(image0, image1)
+    assert pred is not None
     log_path = ROOT / "experiments" / "one"
     log_path.mkdir(exist_ok=True, parents=True)
     api.visualize(log_path=log_path)
-    return 0
 
 
 if __name__ == "__main__":
-    config = load_config(ROOT / "ui/config.yaml")
     test_one()
-    test_all(config)
+    test_all()
