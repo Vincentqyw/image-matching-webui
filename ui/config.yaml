@@ -39,7 +39,7 @@ matcher_zoo:
       project: https://dust3r.europe.naverlabs.com
       display: true
   DUSt3R:
-    # TODO: duster is under development  
+    # TODO: duster is under development
     enable: true
     # skip_ci: true
     matcher: duster

@@ -136,9 +136,7 @@ def visualize_loc_from_log(
         counts = np.zeros(n)
         dbs_kp_q_db = [[] for _ in range(n)]
         inliers_dbs = [[] for _ in range(n)]
-        for i, (inl, (p3D_id, db_idxs)) in enumerate(
-            zip(inliers, kp_to_3D_to_db)
-        ):
+        for i, (inl, (p3D_id, db_idxs)) in enumerate(zip(inliers, kp_to_3D_to_db)):
             track = reconstruction.points3D[p3D_id].track
             track = {el.image_id: el.point2D_idx for el in track.elements}
             for db_idx in db_idxs:
@@ -150,9 +148,7 @@ def visualize_loc_from_log(
         # for inloc the database keypoints are already in the logs
         assert "keypoints_db" in loc
         assert "indices_db" in loc
-        counts = np.array(
-            [np.sum(loc["indices_db"][inliers] == i) for i in range(n)]
-        )
+        counts = np.array([np.sum(loc["indices_db"][inliers] == i) for i in range(n)])
 
     # display the database images with the most inlier matches
     db_sort = np.argsort(-counts)

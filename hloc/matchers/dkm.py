@@ -24,9 +24,7 @@ class DKMv3(BaseModel):
     def _init(self, conf):
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
 
         self.net = DKMv3_outdoor(path_to_weights=str(model_path), device=DEVICE)
@@ -46,9 +44,7 @@ class DKMv3(BaseModel):
         matches, certainty = self.net.sample(
             warp, certainty, num=self.conf["max_keypoints"]
         )
-        kpts1, kpts2 = self.net.to_pixel_coordinates(
-            matches, H_A, W_A, H_B, W_B
-        )
+        kpts1, kpts2 = self.net.to_pixel_coordinates(matches, H_A, W_A, H_B, W_B)
         pred = {
             "keypoints0": kpts1,
             "keypoints1": kpts2,

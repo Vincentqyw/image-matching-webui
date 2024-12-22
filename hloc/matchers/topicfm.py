@@ -30,9 +30,7 @@ class TopicFM(BaseModel):
         _conf["coarse"]["n_samples"] = conf["n_sampling_topics"]
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
         self.net = _TopicFM(config=_conf)
         ckpt_dict = torch.load(model_path, map_location="cpu")

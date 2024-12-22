@@ -32,13 +32,9 @@ class Duster(BaseModel):
         self.normalize = tfm.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
-        self.net = AsymmetricCroCo3DStereo.from_pretrained(model_path).to(
-            device
-        )
+        self.net = AsymmetricCroCo3DStereo.from_pretrained(model_path).to(device)
         logger.info("Loaded Dust3r model")
 
     def preprocess(self, img):
@@ -47,16 +43,12 @@ class Duster(BaseModel):
         _, h, _ = img.shape
         imsize = h
         if not ((h % self.vit_patch_size) == 0):
-            imsize = int(
-                self.vit_patch_size * round(h / self.vit_patch_size, 0)
-            )
+            imsize = int(self.vit_patch_size * round(h / self.vit_patch_size, 0))
             img = tfm.functional.resize(img, imsize, antialias=True)
 
         _, new_h, new_w = img.shape
         if not ((new_w % self.vit_patch_size) == 0):
-            safe_w = int(
-                self.vit_patch_size * round(new_w / self.vit_patch_size, 0)
-            )
+            safe_w = int(self.vit_patch_size * round(new_w / self.vit_patch_size, 0))
             img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
 
         img = self.normalize(img).unsqueeze(0)
@@ -79,9 +71,7 @@ class Duster(BaseModel):
             images, scene_graph="complete", prefilter=None, symmetrize=True
         )
         output = inference(pairs, self.net, device, batch_size=1)
-        scene = global_aligner(
-            output, device=device, mode=GlobalAlignerMode.PairViewer
-        )
+        scene = global_aligner(output, device=device, mode=GlobalAlignerMode.PairViewer)
         # retrieve useful values from scene:
         imgs = scene.imgs
         confidence_masks = scene.get_masks()
@@ -109,9 +99,7 @@ class Duster(BaseModel):
             mkpts0 = pts2d_list[0][nn2_in_P1][reciprocal_in_P2]
             top_k = self.conf["max_keypoints"]
             if top_k is not None and len(mkpts0) > top_k:
-                keep = np.round(np.linspace(0, len(mkpts0) - 1, top_k)).astype(
-                    int
-                )
+                keep = np.round(np.linspace(0, len(mkpts0) - 1, top_k)).astype(int)
                 mkpts0 = mkpts0[keep]
                 mkpts1 = mkpts1[keep]
             pred = {

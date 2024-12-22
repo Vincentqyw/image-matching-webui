@@ -29,9 +29,7 @@ class LANet(BaseModel):
 
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
         self.net = PointModel(is_test=True)
         state_dict = torch.load(model_path, map_location="cpu")
@@ -48,12 +46,8 @@ class LANet(BaseModel):
         descriptors = descriptors.view(256, Hc, Wc).view(256, -1).t()
 
         # Filter based on confidence threshold
-        descriptors = descriptors[
-            kpts_score[:, 0] > self.conf["keypoint_threshold"], :
-        ]
-        kpts_score = kpts_score[
-            kpts_score[:, 0] > self.conf["keypoint_threshold"], :
-        ]
+        descriptors = descriptors[kpts_score[:, 0] > self.conf["keypoint_threshold"], :]
+        kpts_score = kpts_score[kpts_score[:, 0] > self.conf["keypoint_threshold"], :]
         keypoints = kpts_score[:, 1:]
         scores = kpts_score[:, 0]
 

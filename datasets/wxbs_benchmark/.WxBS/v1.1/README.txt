@@ -10,7 +10,7 @@ The images are organized into several categories:
 - WGABS: with Geometric and Appearance changes.
 
 Compared to the original dataset from 2015, v.1.1 contains more correspondences, which are also cleaned, and 3 additional image pairs: WGALBS/kyiv_dolltheater, WGALBS/kyiv_dolltheater2, WGBS/kn-church.
-We also provide cross-validation errors for each of the GT correspondences. 
+We also provide cross-validation errors for each of the GT correspondences.
 They are estimated in the following way:
 
 - the fundamental matrix F is estimated with OpenCV 8pt algorithm (no RANSAC), using all points, except one.
@@ -30,17 +30,17 @@ There are main intended ways of using the dataset.
 a) First, is evaluation of the image matchers, which are estimating fundamental matrix. One calculates reprojection error on the GT correspondences and report mean error, or the percentage of the GT correspondences, which are in agreement with the estimated F. For more details see the paper[1]
 
 b) For the methods like [CoTR](https://arxiv.org/abs/2103.14167), which look for the correspondences in the image 2, given the query point in image 1, one can directly calculate error between returned point and GT correspondence.
- 
+
 
 ***
 If you are using this dataset, please cite us:
 
 [1] WxBS: Wide Baseline Stereo Generalizations. D. Mishkin and M. Perdoch and J.Matas and K. Lenc. In Proc BMVC, 2015
 
-@InProceedings{Mishkin2015WXBS, 
+@InProceedings{Mishkin2015WXBS,
    author = {{Mishkin}, D. and {Matas}, J. and {Perdoch}, M. and {Lenc}, K. },
-   booktitle = {Proceedings of the British Machine Vision Conference}, 
-   publisher = {BMVA}, 
+   booktitle = {Proceedings of the British Machine Vision Conference},
+   publisher = {BMVA},
    title = "{WxBS: Wide Baseline Stereo Generalizations}",
    year = 2015,
    month = sep

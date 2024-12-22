@@ -29,12 +29,8 @@ class XFeatLightGlue(BaseModel):
         im0 = data["image0"]
         im1 = data["image1"]
         # Compute coarse feats
-        out0 = self.net.detectAndCompute(im0, top_k=self.conf["max_keypoints"])[
-            0
-        ]
-        out1 = self.net.detectAndCompute(im1, top_k=self.conf["max_keypoints"])[
-            0
-        ]
+        out0 = self.net.detectAndCompute(im0, top_k=self.conf["max_keypoints"])[0]
+        out1 = self.net.detectAndCompute(im1, top_k=self.conf["max_keypoints"])[0]
         out0.update({"image_size": (im0.shape[-1], im0.shape[-2])})  # W H
         out1.update({"image_size": (im1.shape[-1], im1.shape[-2])})  # W H
         pred = self.net.match_lighterglue(out0, out1)

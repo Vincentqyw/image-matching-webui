@@ -16,9 +16,7 @@ from hloc import logger
 from ..utils.base_model import BaseModel
 
 
-def filter_dog_point(
-    points, scales, angles, image_shape, nms_radius, scores=None
-):
+def filter_dog_point(points, scales, angles, image_shape, nms_radius, scores=None):
     h, w = image_shape
     ij = np.round(points - 0.5).astype(int).T[::-1]
 
@@ -76,9 +74,7 @@ def run_opencv_sift(features: cv2.Feature2D, image: np.ndarray) -> np.ndarray:
     points = np.array([k.pt for k in detections], dtype=np.float32)
     scores = np.array([k.response for k in detections], dtype=np.float32)
     scales = np.array([k.size for k in detections], dtype=np.float32)
-    angles = np.deg2rad(
-        np.array([k.angle for k in detections], dtype=np.float32)
-    )
+    angles = np.deg2rad(np.array([k.angle for k in detections], dtype=np.float32))
     return points, scores, scales, angles, descriptors
 
 
@@ -113,9 +109,7 @@ class SIFT(BaseModel):
                 "normalization": pycolmap.Normalization.L2,  # L1_ROOT is buggy.
             }
             device = (
-                "auto"
-                if backend == "pycolmap"
-                else backend.replace("pycolmap_", "")
+                "auto" if backend == "pycolmap" else backend.replace("pycolmap_", "")
             )
             if (
                 backend == "pycolmap_cpu" or not pycolmap.has_cuda
@@ -138,8 +132,7 @@ class SIFT(BaseModel):
         else:
             backends = {"opencv", "pycolmap", "pycolmap_cpu", "pycolmap_cuda"}
             raise ValueError(
-                f"Unknown backend: {backend} not in "
-                f"{{{','.join(backends)}}}."
+                f"Unknown backend: {backend} not in " f"{{{','.join(backends)}}}."
             )
         logger.info("Load SIFT model done.")
 
@@ -215,9 +208,7 @@ class SIFT(BaseModel):
                 img = img[:, :h, :w]
             p = self.extract_single_image(img)
             pred.append(p)
-        pred = {
-            k: torch.stack([p[k] for p in pred], 0).to(device) for k in pred[0]
-        }
+        pred = {k: torch.stack([p[k] for p in pred], 0).to(device) for k in pred[0]}
         if self.conf.rootsift:
             pred["descriptors"] = sift_to_rootsift(pred["descriptors"])
         pred["descriptors"] = pred["descriptors"].permute(0, 2, 1)

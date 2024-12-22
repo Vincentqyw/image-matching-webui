@@ -34,9 +34,7 @@ class XFeatDense(BaseModel):
         )
 
         # Match batches of pairs
-        idxs_list = self.net.batch_match(
-            out0["descriptors"], out1["descriptors"]
-        )
+        idxs_list = self.net.batch_match(out0["descriptors"], out1["descriptors"])
         B = len(data["image0"])
 
         # Refine coarse matches
@@ -44,9 +42,7 @@ class XFeatDense(BaseModel):
         matches = []
         for b in range(B):
             matches.append(
-                self.net.refine_matches(
-                    out0, out1, matches=idxs_list, batch_idx=b
-                )
+                self.net.refine_matches(out0, out1, matches=idxs_list, batch_idx=b)
             )
         # we use results from one batch
         matches = matches[0]

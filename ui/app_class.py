@@ -43,9 +43,7 @@ class ImageMatchingApp:
     def __init__(self, server_name="0.0.0.0", server_port=7860, **kwargs):
         self.server_name = server_name
         self.server_port = server_port
-        self.config_path = kwargs.get(
-            "config", Path(__file__).parent / "config.yaml"
-        )
+        self.config_path = kwargs.get("config", Path(__file__).parent / "config.yaml")
         self.cfg = load_config(self.config_path)
         self.matcher_zoo = get_matcher_zoo(self.cfg["matcher_zoo"])
         self.app = None
@@ -65,10 +63,7 @@ class ImageMatchingApp:
                 with gr.Row():
                     with gr.Column(scale=1):
                         gr.Image(
-                            str(
-                                Path(__file__).parent.parent
-                                / "assets/logo.webp"
-                            ),
+                            str(Path(__file__).parent.parent / "assets/logo.webp"),
                             elem_id="logo-img",
                             show_label=False,
                             show_share_button=False,
@@ -112,9 +107,7 @@ class ImageMatchingApp:
 
                         with gr.Row():
                             button_reset = gr.Button(value="Reset")
-                            button_run = gr.Button(
-                                value="Run Match", variant="primary"
-                            )
+                            button_run = gr.Button(value="Run Match", variant="primary")
 
                         with gr.Accordion("Advanced Setting", open=False):
                             with gr.Accordion("Image Setting", open=True):
@@ -183,9 +176,7 @@ class ImageMatchingApp:
                                 with gr.Row(equal_height=False):
                                     ransac_method = gr.Dropdown(
                                         choices=ransac_zoo.keys(),
-                                        value=self.cfg["defaults"][
-                                            "ransac_method"
-                                        ],
+                                        value=self.cfg["defaults"]["ransac_method"],
                                         label="RANSAC Method",
                                         interactive=True,
                                     )
@@ -201,18 +192,14 @@ class ImageMatchingApp:
                                     maximum=1,
                                     step=0.00001,
                                     label="Ransac Confidence",
-                                    value=self.cfg["defaults"][
-                                        "ransac_confidence"
-                                    ],
+                                    value=self.cfg["defaults"]["ransac_confidence"],
                                 )
                                 ransac_max_iter = gr.Slider(
                                     minimum=0.0,
                                     maximum=100000,
                                     step=100,
                                     label="Ransac Iterations",
-                                    value=self.cfg["defaults"][
-                                        "ransac_max_iter"
-                                    ],
+                                    value=self.cfg["defaults"]["ransac_max_iter"],
                                 )
                                 button_ransac = gr.Button(
                                     value="Rerun RANSAC", variant="primary"
@@ -222,9 +209,7 @@ class ImageMatchingApp:
                                     choice_geometry_type = gr.Radio(
                                         ["Fundamental", "Homography"],
                                         label="Reconstruct Geometry",
-                                        value=self.cfg["defaults"][
-                                            "setting_geometry"
-                                        ],
+                                        value=self.cfg["defaults"]["setting_geometry"],
                                     )
                         # image resize
                         image_force_resize_cb.select(
@@ -255,9 +240,7 @@ class ImageMatchingApp:
                         # Add some examples
                         with gr.Row():
                             # Example inputs
-                            with gr.Accordion(
-                                "Open for More: Examples", open=True
-                            ):
+                            with gr.Accordion("Open for More: Examples", open=True):
                                 gr.Examples(
                                     examples=gen_examples(),
                                     inputs=inputs,
@@ -274,13 +257,8 @@ class ImageMatchingApp:
                             self.display_supported_algorithms()
 
                     with gr.Column():
-
-                        with gr.Accordion(
-                            "Open for More: Keypoints", open=True
-                        ):
-                            output_keypoints = gr.Image(
-                                label="Keypoints", type="numpy"
-                            )
+                        with gr.Accordion("Open for More: Keypoints", open=True):
+                            output_keypoints = gr.Image(label="Keypoints", type="numpy")
                         with gr.Accordion(
                             (
                                 "Open for More: Raw Matches"
@@ -305,17 +283,11 @@ class ImageMatchingApp:
                         with gr.Accordion(
                             "Open for More: Matches Statistics", open=False
                         ):
-                            output_pred = gr.File(
-                                label="Outputs", elem_id="download"
-                            )
-                            matches_result_info = gr.JSON(
-                                label="Matches Statistics"
-                            )
+                            output_pred = gr.File(label="Outputs", elem_id="download")
+                            matches_result_info = gr.JSON(label="Matches Statistics")
                             matcher_info = gr.JSON(label="Match info")
 
-                        with gr.Accordion(
-                            "Open for More: Warped Image", open=True
-                        ):
+                        with gr.Accordion("Open for More: Warped Image", open=True):
                             output_wrapped = gr.Image(
                                 label="Wrapped Pair", type="numpy"
                             )
@@ -355,9 +327,7 @@ class ImageMatchingApp:
                         output_pred,
                     ]
                     # button callbacks
-                    button_run.click(
-                        fn=run_matching, inputs=inputs, outputs=outputs
-                    )
+                    button_run.click(fn=run_matching, inputs=inputs, outputs=outputs)
                     # Reset images
                     reset_outputs = [
                         input_image0,
@@ -511,13 +481,9 @@ class ImageMatchingApp:
         return (
             None,  # image0: Optional[np.ndarray]
             None,  # image1: Optional[np.ndarray]
-            self.cfg["defaults"][
-                "match_threshold"
-            ],  # matching_threshold: float
+            self.cfg["defaults"]["match_threshold"],  # matching_threshold: float
             self.cfg["defaults"]["max_keypoints"],  # max_keypoints: int
-            self.cfg["defaults"][
-                "keypoint_threshold"
-            ],  # keypoint_threshold: float
+            self.cfg["defaults"]["keypoint_threshold"],  # keypoint_threshold: float
             key,  # matcher: str
             self.ui_change_imagebox("upload"),  # input image0: Dict[str, Any]
             self.ui_change_imagebox("upload"),  # input image1: Dict[str, Any]
@@ -533,9 +499,7 @@ class ImageMatchingApp:
             self.cfg["defaults"][
                 "ransac_reproj_threshold"
             ],  # ransac_reproj_threshold: float
-            self.cfg["defaults"][
-                "ransac_confidence"
-            ],  # ransac_confidence: float
+            self.cfg["defaults"]["ransac_confidence"],  # ransac_confidence: float
             self.cfg["defaults"]["ransac_max_iter"],  # ransac_max_iter: int
             self.cfg["defaults"]["setting_geometry"],  # geometry: str
             None,  # predictions
@@ -550,9 +514,7 @@ class ImageMatchingApp:
         cfg = self.cfg["matcher_zoo"]
         if style == "md":
             markdown_table = "| Algo. | Conference | Code | Project | Paper |\n"
-            markdown_table += (
-                "| ----- | ---------- | ---- | ------- | ----- |\n"
-            )
+            markdown_table += "| ----- | ---------- | ---- | ------- | ----- |\n"
 
             for k, v in cfg.items():
                 if not v["info"]["display"]:
@@ -785,12 +747,10 @@ class AppSfmUI(AppBaseUI):
                     with gr.Row():
                         with gr.Accordion("Buddle Settings", open=True):
                             with gr.Row():
-                                self.inputs.mapper_refine_focal_length = (
-                                    gr.Checkbox(
-                                        label="Refine Focal Length",
-                                        value=False,
-                                        interactive=True,
-                                    )
+                                self.inputs.mapper_refine_focal_length = gr.Checkbox(
+                                    label="Refine Focal Length",
+                                    value=False,
+                                    interactive=True,
                                 )
                                 self.inputs.mapper_refine_principle_points = (
                                     gr.Checkbox(
@@ -799,12 +759,10 @@ class AppSfmUI(AppBaseUI):
                                         interactive=True,
                                     )
                                 )
-                                self.inputs.mapper_refine_extra_params = (
-                                    gr.Checkbox(
-                                        label="Refine Extra Params",
-                                        value=False,
-                                        interactive=True,
-                                    )
+                                self.inputs.mapper_refine_extra_params = gr.Checkbox(
+                                    label="Refine Extra Params",
+                                    value=False,
+                                    interactive=True,
                                 )
                     with gr.Accordion("Retriangluation Settings", open=True):
                         gr.Textbox(

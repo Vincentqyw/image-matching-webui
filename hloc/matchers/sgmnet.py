@@ -41,9 +41,7 @@ class SGMNet(BaseModel):
     def _init(self, conf):
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
 
         # config
@@ -51,10 +49,7 @@ class SGMNet(BaseModel):
         self.net = SGM_Model(config)
         checkpoint = torch.load(model_path, map_location="cpu")
         # for ddp model
-        if (
-            list(checkpoint["state_dict"].items())[0][0].split(".")[0]
-            == "module"
-        ):
+        if list(checkpoint["state_dict"].items())[0][0].split(".")[0] == "module":
             new_stat_dict = OrderedDict()
             for key, value in checkpoint["state_dict"].items():
                 new_stat_dict[key[7:]] = value
@@ -72,9 +67,7 @@ class SGMNet(BaseModel):
         size1 = (
             torch.tensor(data["image0"].shape[2:]).flip(0).to(x1.device)
         )  # W x H -> x & y
-        size2 = (
-            torch.tensor(data["image1"].shape[2:]).flip(0).to(x2.device)
-        )  # W x H
+        size2 = torch.tensor(data["image1"].shape[2:]).flip(0).to(x2.device)  # W x H
         norm_x1 = self.normalize_size(x1, size1)
         norm_x2 = self.normalize_size(x2, size2)
 

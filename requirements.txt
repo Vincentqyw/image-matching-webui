@@ -1,6 +1,7 @@
 e2cnn
-einops
 easydict
+einops
+fastapi
 gdown
 gradio==5.4.0
 h5py
@@ -11,19 +12,22 @@ kornia
 loguru
 matplotlib
 numpy==1.23.5
-onnxruntime
 omegaconf
-opencv-python
+onnxruntime
 opencv-contrib-python
+opencv-python
 pandas
-psutil
 plotly
-protobuf
 poselib
+protobuf
+psutil
 pycolmap==0.6.1
 pytlsd
-PyYAML
 pytorch-lightning==1.4.9
+PyYAML
+ray
+ray[serve]
+roma #dust3r
 scikit-image
 scikit-learn
 scipy
@@ -32,10 +36,6 @@ shapely
 tensorboardX==2.6.1
 torchmetrics==0.6.0
 torchvision==0.19.0
-roma #dust3r
 tqdm
-yacs
-fastapi
 uvicorn
-ray
-ray[serve]
+yacs

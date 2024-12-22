@@ -63,8 +63,6 @@ if __name__ == "__main__":
     parser.add_argument("--model", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--num_matched", required=True, type=int)
-    parser.add_argument(
-        "--rotation_threshold", default=DEFAULT_ROT_THRESH, type=float
-    )
+    parser.add_argument("--rotation_threshold", default=DEFAULT_ROT_THRESH, type=float)
     args = parser.parse_args()
     main(**args.__dict__)

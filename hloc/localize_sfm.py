@@ -40,9 +40,7 @@ def do_covisibility_clustering(
                 obs.image_id
                 for p2D in observed
                 if p2D.has_point3D()
-                for obs in reconstruction.points3D[
-                    p2D.point3D_id
-                ].track.elements
+                for obs in reconstruction.points3D[p2D.point3D_id].track.elements
             }
             connected_frames &= set(frame_ids)
             connected_frames -= visited
@@ -167,9 +165,7 @@ def main(
     logger.info("Starting localization...")
     for qname, qcam in tqdm(queries):
         if qname not in retrieval_dict:
-            logger.warning(
-                f"No images retrieved for query image {qname}. Skipping..."
-            )
+            logger.warning(f"No images retrieved for query image {qname}. Skipping...")
             continue
         db_names = retrieval_dict[qname]
         db_ids = []

@@ -37,9 +37,7 @@ class COTR(BaseModel):
         opt.command = " ".join(sys.argv)
         opt.load_weights_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
 
         layer_2_channels = {

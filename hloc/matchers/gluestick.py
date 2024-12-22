@@ -32,9 +32,7 @@ class GlueStick(BaseModel):
         # Download the model.
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(
-                Path(__file__).stem, self.conf["model_name"]
-            ),
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
         logger.info("Loading GlueStick model...")
 
@@ -93,8 +91,9 @@ class GlueStick(BaseModel):
 
         pred["raw_lines0"], pred["raw_lines1"] = line_seg0, line_seg1
         pred["lines0"], pred["lines1"] = matched_lines0, matched_lines1
-        pred["keypoints0"], pred["keypoints1"] = torch.from_numpy(
-            matched_kps0
-        ), torch.from_numpy(matched_kps1)
+        pred["keypoints0"], pred["keypoints1"] = (
+            torch.from_numpy(matched_kps0),
+            torch.from_numpy(matched_kps1),
+        )
         pred = {**pred, **data}
         return pred

@@ -68,9 +68,7 @@ CREATE_IMAGES_TABLE = """CREATE TABLE IF NOT EXISTS images (
     prior_tz REAL,
     CONSTRAINT image_id_check CHECK(image_id >= 0 and image_id < {}),
     FOREIGN KEY(camera_id) REFERENCES cameras(camera_id))
-""".format(
-    MAX_IMAGE_ID
-)
+""".format(MAX_IMAGE_ID)
 
 CREATE_TWO_VIEW_GEOMETRIES_TABLE = """
 CREATE TABLE IF NOT EXISTS two_view_geometries (
@@ -384,7 +382,7 @@ def example_usage():
 
     # Read and check matches.
 
-    pair_ids = [
+    pair_ids = [  # noqa: F841
         image_ids_to_pair_id(*pair)
         for pair in (
             (image_id1, image_id2),

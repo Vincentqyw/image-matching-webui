@@ -1,5 +1,4 @@
 import os
-import logging
 import sys
 from .. import logger
 
@@ -9,5 +8,5 @@ def do_system(cmd, verbose=False):
         logger.info(f"Run cmd: `{cmd}`.")
     err = os.system(cmd)
     if err:
-        logger.info(f"Run cmd err.")
+        logger.info("Run cmd err.")
         sys.exit(err)
