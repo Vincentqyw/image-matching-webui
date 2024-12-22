@@ -1,5 +1,4 @@
 name: Pip
-runs-on: self-hosted
 on:
   workflow_dispatch:
   pull_request:
@@ -15,8 +14,8 @@ jobs:
         platform: [macos-13, ubuntu-latest]
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
 
-    runs-on: ${{ matrix.platform }}
-
+    # runs-on: ${{ matrix.platform }}
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v4
       with:
