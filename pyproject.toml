@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "ImageMatchingWebui"
 description = "Image Matching Webui: A tool for matching images using sota algorithms with a Gradio UI"
@@ -22,7 +26,7 @@ dev = ["black", "flake8", "isort"]
 
 
 [tool.setuptools.packages.find]
-include = ["hloc*", "ui", "api", "third_party*"]
+include = ["hloc*", "ui", "api", "third_party*", "app.py"]
 
 
 [tool.setuptools.package-data]
