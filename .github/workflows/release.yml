@@ -1,22 +1,19 @@
-name: Pip
+name: PyPI Release
 on:
-  workflow_dispatch:
-  pull_request:
   push:
-    branches:
-      - main
+    branches: [main]
+  release:
+    types: [published]
 
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        # platform: [macos-13, ubuntu-latest]
         platform: [ubuntu-latest]
         python-version: ["3.8", "3.9", "3.10"]
 
     runs-on: ${{ matrix.platform }}
-    # runs-on: self-hosted
     steps:
     - uses: actions/checkout@v4
       with:
@@ -48,7 +45,7 @@ jobs:
         choco install opencv -y
 
     - name: Add requirements
-      run: python -m pip install --upgrade wheel setuptools
+      run: python -m pip install --upgrade setuptools wheel build
 
     - name: Install Python dependencies
       run: |
@@ -61,3 +58,22 @@ jobs:
 
     - name: Test
       run: python -m pytest
+
+    - name: Build source distribution
+      run: |
+        python -m build --outdir dist/
+        ls -lh dist/
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: pypi-packages-${{ github.sha }}
+        path: dist
+
+    - name: Upload to GitHub Release
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./dist
+        asset_name: my_package-${{ matrix.python-version }}-${{ github.sha }}.whl
+        asset_content_type: application/zip
