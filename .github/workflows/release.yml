@@ -64,7 +64,7 @@ jobs:
         path: dist
 
     - name: Upload to GitHub Release
-      # if: github.event_name == 'release'
+      if: github.event_name == 'release'
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ github.event.release.upload_url }}
