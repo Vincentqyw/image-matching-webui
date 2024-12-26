@@ -11,9 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # platform: [macos-13, ubuntu-latest]
         platform: [ubuntu-latest]
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.9", "3.10"]
 
     runs-on: ${{ matrix.platform }}
     # runs-on: self-hosted
