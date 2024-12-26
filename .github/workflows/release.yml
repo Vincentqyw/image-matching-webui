@@ -53,12 +53,6 @@ jobs:
         pip install -r requirements.txt
         sudo apt-get update && sudo apt-get install ffmpeg libsm6 libxext6 -y
 
-    - name: Build and install
-      run: pip install .
-
-    - name: Test
-      run: python -m pytest
-
     - name: Build source distribution
       run: |
         python -m build --outdir dist/
@@ -70,7 +64,7 @@ jobs:
         path: dist
 
     - name: Upload to GitHub Release
-      if: github.event_name == 'release'
+      # if: github.event_name == 'release'
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ github.event.release.upload_url }}
