@@ -31,3 +31,4 @@ datasets/South-Building*
 *.pkl
 oryx-build-commands.txt
 .ruff_cache*
+dist

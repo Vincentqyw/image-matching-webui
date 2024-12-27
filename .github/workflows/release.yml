@@ -57,9 +57,9 @@ jobs:
         ls -lh dist/
 
     - name: Upload to GitHub Release
-      if: github.event_name == 'release'
+      if: matrix.python-version == '3.10' && github.event_name == 'release'
       uses: softprops/action-gh-release@v2
       with:
-        files: dist/*
+        files: dist/*.whl
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
