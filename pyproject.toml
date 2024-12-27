@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ImageMatchingWebui"
+name = "image-matching-webui"
 description = "Image Matching Webui: A tool for matching images using sota algorithms with a Gradio UI"
 version = "1.0"
 authors = [
@@ -25,14 +25,9 @@ dynamic = ["dependencies"]
 dev = ["black", "flake8", "isort"]
 
 
-[tool.setuptools.packages.find]
-include = ["hloc*", "ui", "api", "third_party*", "app.py"]
-
-
-[tool.setuptools.package-data]
-ui = ["*.yaml"]
-api = ["*.yaml"]
-third_party = ["**/*.yaml", "**/*.cfg", "**/*.yml", "**/*.pth"]
+[tool.setuptools]
+packages = { find = { include = ["hloc*", "ui", "api", "third_party*", "app.py", "datasets", "assets"] } }
+include-package-data = true
 
 
 [tool.setuptools.dynamic]
