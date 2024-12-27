@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest]
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.9", "3.10", "3.11"]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -56,16 +56,10 @@ jobs:
         python -m build --outdir dist/
         ls -lh dist/
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: pypi-packages-${{ github.sha }}
-        path: dist
-
     - name: Upload to GitHub Release
       if: github.event_name == 'release'
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v2
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./dist
-        asset_name: my_package-${{ matrix.python-version }}-${{ github.sha }}.whl
-        asset_content_type: application/zip
+        files: dist/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
