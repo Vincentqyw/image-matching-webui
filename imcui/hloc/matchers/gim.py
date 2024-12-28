@@ -15,18 +15,18 @@ def load_model(weight_name, checkpoints_path):
     model = None
     detector = None
     if weight_name == "gim_dkm":
-        from dkm.models.model_zoo.DKMv3 import DKMv3
+        from networks.dkm.models.model_zoo.DKMv3 import DKMv3
 
         model = DKMv3(weights=None, h=672, w=896)
     elif weight_name == "gim_loftr":
-        from loftr.config import get_cfg_defaults
-        from loftr.loftr import LoFTR
-        from loftr.misc import lower_config
+        from networks.loftr.config import get_cfg_defaults
+        from networks.loftr.loftr import LoFTR
+        from networks.loftr.misc import lower_config
 
         model = LoFTR(lower_config(get_cfg_defaults())["loftr"])
     elif weight_name == "gim_lightglue":
-        from lightglue.models.matchers.lightglue import LightGlue
-        from lightglue.superpoint import SuperPoint
+        from networks.lightglue.models.matchers.lightglue import LightGlue
+        from networks.lightglue.superpoint import SuperPoint
 
         detector = SuperPoint(
             {
