@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "image-matching-webui"
+name = "imcui"
 description = "Image Matching Webui: A tool for matching images using sota algorithms with a Gradio UI"
 version = "1.0"
 authors = [
@@ -26,7 +26,7 @@ dev = ["black", "flake8", "isort"]
 
 
 [tool.setuptools]
-packages = { find = { include = ["hloc*", "ui", "api", "third_party*", "app.py", "datasets", "assets"] } }
+packages = { find = { include = ["imcui*"] } }
 include-package-data = true
 
 

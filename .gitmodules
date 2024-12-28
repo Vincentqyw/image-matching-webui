@@ -1,75 +1,75 @@
 [submodule "imcui/third_party/SOLD2"]
-	path = imcui/third_party/SOLD2
-	url = https://github.com/cvg/SOLD2.git
+    path = imcui/third_party/SOLD2
+    url = https://github.com/cvg/SOLD2.git
 [submodule "imcui/third_party/GlueStick"]
-	path = imcui/third_party/GlueStick
-	url = https://github.com/cvg/GlueStick.git
+    path = imcui/third_party/GlueStick
+    url = https://github.com/cvg/GlueStick.git
 [submodule "imcui/third_party/ASpanFormer"]
-	path = imcui/third_party/ASpanFormer
-	url = https://github.com/Vincentqyw/ml-aspanformer.git
+    path = imcui/third_party/ASpanFormer
+    url = https://github.com/Vincentqyw/ml-aspanformer.git
 [submodule "imcui/third_party/TopicFM"]
-	path = imcui/third_party/TopicFM
-	url = https://github.com/Vincentqyw/TopicFM.git
+    path = imcui/third_party/TopicFM
+    url = https://github.com/Vincentqyw/TopicFM.git
 [submodule "imcui/third_party/d2net"]
-	path = imcui/third_party/d2net
-	url = https://github.com/Vincentqyw/d2-net.git
+    path = imcui/third_party/d2net
+    url = https://github.com/Vincentqyw/d2-net.git
 [submodule "imcui/third_party/r2d2"]
-	path = imcui/third_party/r2d2
-	url = https://github.com/naver/r2d2.git
+    path = imcui/third_party/r2d2
+    url = https://github.com/naver/r2d2.git
 [submodule "imcui/third_party/DKM"]
-	path = imcui/third_party/DKM
-	url = https://github.com/Vincentqyw/DKM.git
+    path = imcui/third_party/DKM
+    url = https://github.com/Vincentqyw/DKM.git
 [submodule "imcui/third_party/ALIKE"]
-	path = imcui/third_party/ALIKE
-	url = https://github.com/Shiaoming/ALIKE.git
+    path = imcui/third_party/ALIKE
+    url = https://github.com/Shiaoming/ALIKE.git
 [submodule "imcui/third_party/LightGlue"]
-	path = imcui/third_party/LightGlue
-	url = https://github.com/cvg/LightGlue.git
+    path = imcui/third_party/LightGlue
+    url = https://github.com/cvg/LightGlue.git
 [submodule "imcui/third_party/DeDoDe"]
-	path = imcui/third_party/DeDoDe
-	url = https://github.com/Parskatt/DeDoDe.git
+    path = imcui/third_party/DeDoDe
+    url = https://github.com/Parskatt/DeDoDe.git
 [submodule "imcui/third_party/RoRD"]
-	path = imcui/third_party/RoRD
-	url = https://github.com/Vincentqyw/RoRD.git
+    path = imcui/third_party/RoRD
+    url = https://github.com/Vincentqyw/RoRD.git
 [submodule "imcui/third_party/lanet"]
-	path = imcui/third_party/lanet
-	url = https://github.com/agipro/lanet.git
+    path = imcui/third_party/lanet
+    url = https://github.com/agipro/lanet.git
 [submodule "imcui/third_party/mickey"]
-	path = imcui/third_party/mickey
-	url = https://github.com/agipro/mickey.git
+    path = imcui/third_party/mickey
+    url = https://github.com/agipro/mickey.git
 [submodule "imcui/third_party/SuperGluePretrainedNetwork"]
-	path = imcui/third_party/SuperGluePretrainedNetwork
-	url = https://github.com/Vincentqyw/SuperGluePretrainedNetwork.git
+    path = imcui/third_party/SuperGluePretrainedNetwork
+    url = https://github.com/Vincentqyw/SuperGluePretrainedNetwork.git
 [submodule "imcui/third_party/COTR"]
-	path = imcui/third_party/COTR
-	url = https://github.com/Vincentqyw/COTR.git
+    path = imcui/third_party/COTR
+    url = https://github.com/Vincentqyw/COTR.git
 [submodule "imcui/third_party/gim"]
-	path = imcui/third_party/gim
-	url = https://github.com/xuelunshen/gim.git
+    path = imcui/third_party/gim
+    url = https://github.com/xuelunshen/gim.git
 [submodule "imcui/third_party/dust3r"]
-	path = imcui/third_party/dust3r
-	url = https://github.com/naver/dust3r.git
+    path = imcui/third_party/dust3r
+    url = https://github.com/naver/dust3r.git
 [submodule "imcui/third_party/omniglue"]
-	path = imcui/third_party/omniglue
-	url = https://github.com/Vincentqyw/omniglue-onnx.git
+    path = imcui/third_party/omniglue
+    url = https://github.com/Vincentqyw/omniglue-onnx.git
 [submodule "imcui/third_party/RoMa"]
-	path = imcui/third_party/RoMa
-	url = https://github.com/Vincentqyw/RoMa.git
+    path = imcui/third_party/RoMa
+    url = https://github.com/Vincentqyw/RoMa.git
 [submodule "imcui/third_party/SGMNet"]
-	path = imcui/third_party/SGMNet
-	url = https://github.com/agipro/SGMNet.git
+    path = imcui/third_party/SGMNet
+    url = https://github.com/agipro/SGMNet.git
 [submodule "imcui/third_party/DarkFeat"]
-	path = imcui/third_party/DarkFeat
-	url = https://github.com/agipro/DarkFeat.git
+    path = imcui/third_party/DarkFeat
+    url = https://github.com/agipro/DarkFeat.git
 [submodule "imcui/third_party/mast3r"]
-	path = imcui/third_party/mast3r
-	url = https://github.com/naver/mast3r.git
+    path = imcui/third_party/mast3r
+    url = https://github.com/naver/mast3r.git
 [submodule "imcui/third_party/pram"]
-	path = imcui/third_party/pram
-	url = https://github.com/agipro/pram.git
+    path = imcui/third_party/pram
+    url = https://github.com/agipro/pram.git
 [submodule "imcui/third_party/EfficientLoFTR"]
-	path = imcui/third_party/EfficientLoFTR
-	url = https://github.com/zju3dv/EfficientLoFTR.git
+    path = imcui/third_party/EfficientLoFTR
+    url = https://github.com/zju3dv/EfficientLoFTR.git
 [submodule "imcui/third_party/XoFTR"]
-	path = imcui/third_party/XoFTR
-	url = https://github.com/OnderT/XoFTR.git
+    path = imcui/third_party/XoFTR
+    url = https://github.com/OnderT/XoFTR.git

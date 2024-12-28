@@ -1,12 +1,12 @@
 # logo
-include assets/logo.webp
+include imcui/assets/logo.webp
 
-recursive-include ui *.yaml
-recursive-include api *.yaml
-recursive-include third_party *.yaml *.cfg *.yml
+recursive-include imcui/ui *.yaml
+recursive-include imcui/api *.yaml
+recursive-include imcui/third_party *.yaml *.cfg *.yml
 
 # ui examples
-recursive-include datasets *.JPG *.jpg *.png
+recursive-include imcui/datasets *.JPG *.jpg *.png
 
 # model
-recursive-include third_party/SuperGluePretrainedNetwork *.pth
+recursive-include imcui/third_party/SuperGluePretrainedNetwork *.pth

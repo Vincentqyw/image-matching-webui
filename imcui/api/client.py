@@ -181,6 +181,8 @@ def get_api_version():
 
 
 if __name__ == "__main__":
+    from pathlib import Path
+
     parser = argparse.ArgumentParser(
         description="Send text to stable audio server and receive generated audio."
     )
@@ -188,13 +190,19 @@ if __name__ == "__main__":
         "--image0",
         required=False,
         help="Path for the file's melody",
-        default="datasets/sacre_coeur/mapping_rot/02928139_3448003521_rot45.jpg",
+        default=str(
+            Path(__file__).parents[1]
+            / "datasets/sacre_coeur/mapping_rot/02928139_3448003521_rot45.jpg"
+        ),
     )
     parser.add_argument(
         "--image1",
         required=False,
         help="Path for the file's melody",
-        default="datasets/sacre_coeur/mapping_rot/02928139_3448003521_rot90.jpg",
+        default=str(
+            Path(__file__).parents[1]
+            / "datasets/sacre_coeur/mapping_rot/02928139_3448003521_rot90.jpg"
+        ),
     )
     args = parser.parse_args()
 

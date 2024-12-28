@@ -112,7 +112,7 @@ then open http://localhost:7860 in your browser.
 
 ### Add your own feature / matcher
 
-I provide an example to add local feature in [hloc/extractors/example.py](hloc/extractors/example.py). Then add feature settings in `confs` in file [hloc/extract_features.py](hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in file [ui/config.yaml](ui/config.yaml).
+I provide an example to add local feature in [hloc/extractors/example.py](imcui/hloc/extractors/example.py). Then add feature settings in `confs` in file [imcui/hloc/extract_features.py](imcui/hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in file [imcui/ui/config.yaml](imcui/ui/config.yaml).
 
 ## Contributions welcome!
 
@@ -131,7 +131,7 @@ External contributions are very much welcome. Please follow the [PEP8 style guid
 Adding local features / matchers as submodules is very easy. For example, to add the [GlueStick](https://github.com/cvg/GlueStick):
 
 ``` bash
-git submodule add https://github.com/cvg/GlueStick.git third_party/GlueStick
+git submodule add https://github.com/cvg/GlueStick.git imcui/third_party/GlueStick
 ```
 
 If remote submodule repositories are updated, don't forget to pull submodules with:
@@ -141,7 +141,7 @@ git submodule update --init --recursive
 git submodule update --remote
 ```
 
-if you only want to update one submodule, use `git submodule update --remote third_party/GlueStick`.
+if you only want to update one submodule, use `git submodule update --remote imcui/third_party/GlueStick`.
 
 To format code before committing, run:
 

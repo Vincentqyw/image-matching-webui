@@ -1,8 +1,8 @@
 import cv2
 from pathlib import Path
-from hloc import logger
-from ui.utils import DEVICE, get_matcher_zoo, load_config
-from api import ImageMatchingAPI
+from imcui.hloc import logger
+from imcui.ui.utils import DEVICE, get_matcher_zoo, load_config
+from imcui.api import ImageMatchingAPI
 
 ROOT = Path(__file__).parent
 
