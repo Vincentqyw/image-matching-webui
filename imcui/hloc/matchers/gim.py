@@ -6,7 +6,7 @@ import torch
 from .. import DEVICE, MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
-gim_path = Path(__file__).parent / "../../third_party/gim"
+gim_path = Path(__file__).parents[2] / "third_party/gim"
 sys.path.append(str(gim_path))
 
 
