@@ -7,8 +7,13 @@ from hloc import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 
-r2d2_path = Path(__file__).parent / "../../third_party/r2d2"
+r2d2_path = Path(__file__).parents[2] / "third_party/r2d2"
 sys.path.append(str(r2d2_path))
+
+gim_path = Path(__file__).parents[2] / "third_party/gim"
+if str(gim_path) in sys.path:
+    sys.path.remove(str(gim_path))
+
 from extract import NonMaxSuppression, extract_multiscale, load_network
 
 
