@@ -26,25 +26,25 @@ repos:
   rev: v5.0.0
   hooks:
   - id: check-added-large-files
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
   - id: check-case-conflict
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
   - id: check-merge-conflict
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
   - id: check-symlinks
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
   - id: check-yaml
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
   - id: debug-statements
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
   - id: end-of-file-fixer
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
   - id: mixed-line-ending
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
   - id: requirements-txt-fixer
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
   - id: trailing-whitespace
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: "v0.8.4"
@@ -52,7 +52,7 @@ repos:
     - id: ruff
       args: ["--fix", "--show-fixes", "--extend-ignore=E402"]
     - id: ruff-format
-      exclude: ^(docs|third_party/)
+      exclude: ^(docs|imcui/third_party/)
 
 # Checking static types
 - repo: https://github.com/pre-commit/mirrors-mypy
@@ -62,13 +62,13 @@ repos:
       files: "setup.py"
       args: []
       additional_dependencies: [types-setuptools]
-      exclude: ^third_party/
+      exclude: ^imcui/third_party/
 # Changes tabs to spaces
 - repo: https://github.com/Lucas-C/pre-commit-hooks
   rev: v1.5.5
   hooks:
   - id: remove-tabs
-    exclude: ^(docs|third_party/)
+    exclude: ^(docs|imcui/third_party/)
 
 # CMake formatting
 - repo: https://github.com/cheshirekow/cmake-format-precommit
@@ -78,11 +78,11 @@ repos:
     additional_dependencies: [pyyaml]
     types: [file]
     files: (\.cmake|CMakeLists.txt)(.in)?$
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
 
 # Suggested hook if you add a .clang-format file
 - repo: https://github.com/pre-commit/mirrors-clang-format
   rev: v13.0.0
   hooks:
   - id: clang-format
-    exclude: ^third_party/
+    exclude: ^imcui/third_party/
