@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
@@ -7,10 +6,8 @@ import numpy as np
 from easydict import EasyDict as edict
 from omegaconf import OmegaConf
 
-sys.path.append(str(Path(__file__).parents[1]))
-
-from ui.sfm import SfmEngine
-from ui.utils import (
+from imcui.ui.sfm import SfmEngine
+from imcui.ui.utils import (
     GRADIO_VERSION,
     gen_examples,
     generate_warp_images,
