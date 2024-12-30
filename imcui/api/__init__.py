@@ -1,7 +1,5 @@
 import base64
 import io
-import sys
-from pathlib import Path
 from typing import List
 
 import numpy as np
@@ -9,10 +7,7 @@ from fastapi.exceptions import HTTPException
 from PIL import Image
 from pydantic import BaseModel
 
-sys.path.append(str(Path(__file__).parents[1]))
-
-from hloc import logger
-
+from ..hloc import logger
 from .core import ImageMatchingAPI
 
 

@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from torchvision.transforms import ToPILImage
 
-from hloc import DEVICE, MODEL_REPO_ID
+from .. import DEVICE, MODEL_REPO_ID
 
 from ..utils.base_model import BaseModel
 

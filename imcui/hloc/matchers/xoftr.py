@@ -4,7 +4,7 @@ from pathlib import Path
 
 import torch
 
-from hloc import DEVICE, MODEL_REPO_ID
+from .. import DEVICE, MODEL_REPO_ID, logger
 
 tp_path = Path(__file__).parent / "../../third_party"
 sys.path.append(str(tp_path))
@@ -13,7 +13,6 @@ from XoFTR.src.config.default import get_cfg_defaults
 from XoFTR.src.utils.misc import lower_config
 from XoFTR.src.xoftr import XoFTR as XoFTR_
 
-from hloc import logger
 
 from ..utils.base_model import BaseModel
 

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import torchvision.transforms as tvf
 
-from hloc import MODEL_REPO_ID, logger
+from .. import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 

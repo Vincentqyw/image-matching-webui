@@ -3,8 +3,8 @@ from pathlib import Path
 
 import torch
 
-from hloc import MODEL_REPO_ID, logger
-from hloc.utils.base_model import BaseModel
+from .. import MODEL_REPO_ID, logger
+from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
 from ASpanFormer.src.ASpanFormer.aspanformer import ASpanFormer as _ASpanFormer

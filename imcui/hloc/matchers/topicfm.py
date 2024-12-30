@@ -3,7 +3,7 @@ from pathlib import Path
 
 import torch
 
-from hloc import MODEL_REPO_ID
+from .. import MODEL_REPO_ID
 
 from ..utils.base_model import BaseModel
 
