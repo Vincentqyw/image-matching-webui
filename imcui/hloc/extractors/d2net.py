@@ -3,8 +3,7 @@ from pathlib import Path
 
 import torch
 
-from hloc import MODEL_REPO_ID, logger
-
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 d2net_path = Path(__file__).parent / "../../third_party/d2net"
