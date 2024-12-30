@@ -16,7 +16,7 @@ import poselib
 import psutil
 from PIL import Image
 
-from imcui.hloc import (
+from ..hloc import (
     DEVICE,
     extract_features,
     extractors,
@@ -25,8 +25,8 @@ from imcui.hloc import (
     match_features,
     matchers,
 )
-from imcui.hloc.utils.base_model import dynamic_load
-from imcui.ui.viz import display_keypoints, display_matches, fig2im, plot_images
+from ..hloc.utils.base_model import dynamic_load
+from .viz import display_keypoints, display_matches, fig2im, plot_images
 
 warnings.simplefilter("ignore")
 

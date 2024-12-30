@@ -99,12 +99,12 @@ docker run -it -p 7860:7860 vincentqin/image-matching-webui:latest python app.py
 Deploy to [Railway](https://railway.app/), setting up a `Custom Start Command` in `Deploy` section:
 
 ``` bash
-python -m api.server
+python -m imcui.api.server
 ```
 
 ### Run demo
 ``` bash
-python ./app.py
+python ./app.py --config ./config/config.yaml
 ```
 then open http://localhost:7860 in your browser.
 
@@ -112,7 +112,7 @@ then open http://localhost:7860 in your browser.
 
 ### Add your own feature / matcher
 
-I provide an example to add local feature in [hloc/extractors/example.py](imcui/hloc/extractors/example.py). Then add feature settings in `confs` in file [imcui/hloc/extract_features.py](imcui/hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in file [imcui/ui/config.yaml](imcui/ui/config.yaml).
+I provide an example to add local feature in [imcui/hloc/extractors/example.py](imcui/hloc/extractors/example.py). Then add feature settings in `confs` in file [imcui/hloc/extract_features.py](imcui/hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in file [imcui/ui/config.yaml](imcui/ui/config.yaml).
 
 ## Contributions welcome!
 
@@ -137,8 +137,8 @@ git submodule add https://github.com/cvg/GlueStick.git imcui/third_party/GlueSti
 If remote submodule repositories are updated, don't forget to pull submodules with:
 
 ``` bash
-git submodule update --init --recursive
-git submodule update --remote
+git submodule update --init --recursive  # init and download
+git submodule update --remote  # update
 ```
 
 if you only want to update one submodule, use `git submodule update --remote imcui/third_party/GlueStick`.

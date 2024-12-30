@@ -6,8 +6,8 @@ import numpy as np
 from easydict import EasyDict as edict
 from omegaconf import OmegaConf
 
-from imcui.ui.sfm import SfmEngine
-from imcui.ui.utils import (
+from .sfm import SfmEngine
+from .utils import (
     GRADIO_VERSION,
     gen_examples,
     generate_warp_images,
