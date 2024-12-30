@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from imcui.hloc.utils.viz import add_text, plot_keypoints
+from ..hloc.utils.viz import add_text, plot_keypoints
 
 np.random.seed(1995)
 color_map = np.arange(100)

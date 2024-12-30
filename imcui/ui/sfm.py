@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 
-from imcui.hloc import (
+from ..hloc import (
     extract_features,
     logger,
     match_features,
@@ -18,7 +18,7 @@ try:
 except ImportError:
     logger.warning("pycolmap not installed, some features may not work")
 
-from ui.viz import fig2im
+from .viz import fig2im
 
 
 class SfmEngine:

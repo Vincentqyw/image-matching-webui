@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from imcui.hloc import extract_features, logger, match_dense, match_features
-from imcui.hloc.utils.viz import add_text, plot_keypoints
-from imcui.ui.utils import filter_matches, get_feature_model, get_model
-from imcui.ui.viz import display_matches, fig2im, plot_images
+from ..hloc import extract_features, logger, match_dense, match_features
+from ..hloc.utils.viz import add_text, plot_keypoints
+from ..ui.utils import filter_matches, get_feature_model, get_model
+from ..ui.viz import display_matches, fig2im, plot_images
 
 warnings.simplefilter("ignore")
 
