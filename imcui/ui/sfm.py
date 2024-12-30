@@ -1,12 +1,10 @@
 import shutil
-import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, List
 
-sys.path.append(str(Path(__file__).parents[1]))
 
-from hloc import (
+from imcui.hloc import (
     extract_features,
     logger,
     match_features,
