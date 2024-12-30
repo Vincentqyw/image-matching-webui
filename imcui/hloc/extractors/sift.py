@@ -11,7 +11,7 @@ try:
     import pycolmap
 except ImportError:
     pycolmap = None
-from hloc import logger
+from .. import logger
 
 from ..utils.base_model import BaseModel
 

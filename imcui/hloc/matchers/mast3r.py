@@ -18,7 +18,7 @@ from dust3r.inference import inference
 from mast3r.fast_nn import fast_reciprocal_NNs
 from mast3r.model import AsymmetricMASt3R
 
-from hloc.matchers.duster import Duster
+from .duster import Duster
 
 
 class Mast3r(Duster):
