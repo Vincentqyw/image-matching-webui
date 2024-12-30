@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from hloc import MODEL_REPO_ID, logger
+from .. import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 

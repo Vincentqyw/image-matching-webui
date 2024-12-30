@@ -12,9 +12,10 @@ from fastapi.responses import JSONResponse
 from PIL import Image
 from ray import serve
 
-from imcui.api import ImageMatchingAPI, ImagesInput, to_base64_nparray
-from imcui.hloc import DEVICE
-from imcui.ui import get_version
+from . import ImagesInput, to_base64_nparray
+from .core import ImageMatchingAPI
+from ..hloc import DEVICE
+from ..ui import get_version
 
 warnings.simplefilter("ignore")
 app = FastAPI()

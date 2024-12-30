@@ -4,7 +4,7 @@ from pathlib import Path
 import torch
 import torchvision.transforms as transforms
 
-from hloc import MODEL_REPO_ID, logger
+from .. import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 

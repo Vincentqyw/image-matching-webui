@@ -3,8 +3,8 @@ from pathlib import Path
 
 from PIL import Image
 
-from hloc import DEVICE, MODEL_REPO_ID, logger
-from hloc.utils.base_model import BaseModel
+from .. import DEVICE, MODEL_REPO_ID, logger
+from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
 from DKM.dkm import DKMv3_outdoor

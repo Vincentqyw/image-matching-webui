@@ -3,7 +3,7 @@ from pathlib import Path
 
 import torch
 
-from hloc import logger
+from .. import logger
 
 from ..utils.base_model import BaseModel
 

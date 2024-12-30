@@ -5,7 +5,7 @@ from pathlib import Path
 
 import torch
 
-from hloc import MODEL_REPO_ID
+from .. import MODEL_REPO_ID, logger
 
 tp_path = Path(__file__).parent / "../../third_party"
 sys.path.append(str(tp_path))
@@ -17,7 +17,6 @@ from EfficientLoFTR.src.loftr import (
     reparameter,
 )
 
-from hloc import logger
 
 from ..utils.base_model import BaseModel
 
