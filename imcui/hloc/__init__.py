@@ -62,7 +62,7 @@ else:
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# model hub: https://huggingface.co/Realcat/imatchui_checkpoint
-MODEL_REPO_ID = "Realcat/imatchui_checkpoints"
+# model hub: https://huggingface.co/Realcat/imcui_checkpoints
+MODEL_REPO_ID = "Realcat/imcui_checkpoints"
 
 DATASETS_REPO_ID = "Realcat/imcui_datasets"
