@@ -23,4 +23,9 @@ if __name__ == "__main__":
         help="config file",
     )
     args = parser.parse_args()
-    ImageMatchingApp(args.server_name, args.server_port, config=args.config).run()
+    ImageMatchingApp(
+        args.server_name,
+        args.server_port,
+        config=args.config,
+        example_data_root=Path("imcui/datasets"),
+    ).run()

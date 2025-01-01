@@ -44,8 +44,10 @@ class ImageMatchingApp:
         self.cfg = load_config(self.config_path)
         self.matcher_zoo = get_matcher_zoo(self.cfg["matcher_zoo"])
         self.app = None
+        self.example_data_root = kwargs.get(
+            "example_data_root", Path(__file__).parents[1] / "datasets"
+        )
         self.init_interface()
-        # print all the keys
 
     def init_matcher_dropdown(self):
         algos = []
@@ -239,7 +241,7 @@ class ImageMatchingApp:
                             # Example inputs
                             with gr.Accordion("Open for More: Examples", open=True):
                                 gr.Examples(
-                                    examples=gen_examples(),
+                                    examples=gen_examples(self.example_data_root),
                                     inputs=inputs,
                                     outputs=[],
                                     fn=run_matching,
