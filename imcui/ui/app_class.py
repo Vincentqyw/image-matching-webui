@@ -409,6 +409,10 @@ class ImageMatchingApp:
             server_name=self.server_name,
             server_port=self.server_port,
             share=False,
+            allowed_paths=[
+                str(Path(__file__).parents[0]),
+                str(Path(__file__).parents[1]),
+            ],
         )
 
     def ui_change_imagebox(self, choice):
