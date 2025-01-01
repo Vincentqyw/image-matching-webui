@@ -1,3 +1,4 @@
+datasets
 e2cnn
 easydict
 einops

@@ -32,3 +32,4 @@ datasets/South-Building*
 oryx-build-commands.txt
 .ruff_cache*
 dist
+tmp

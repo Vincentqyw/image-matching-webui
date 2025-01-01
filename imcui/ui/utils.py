@@ -7,6 +7,7 @@ import warnings
 from itertools import combinations
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from datasets import load_dataset
 
 import cv2
 import gradio as gr
@@ -24,6 +25,7 @@ from ..hloc import (
     match_dense,
     match_features,
     matchers,
+    DATASETS_REPO_ID,
 )
 from ..hloc.utils.base_model import dynamic_load
 from .viz import display_keypoints, display_matches, fig2im, plot_images
@@ -190,7 +192,21 @@ def get_feature_model(conf: Dict[str, Dict[str, Any]]):
     return model
 
 
-def gen_examples():
+def download_example_images(repo_id, output_dir):
+    logger.info(f"Download example dataset from huggingface: {repo_id}")
+    dataset = load_dataset(repo_id)
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    for example in dataset["train"]:  # Assuming the dataset is in the "train" split
+        file_path = example["path"]
+        image = example["image"]  # Access the PIL.Image object directly
+        full_path = os.path.join(output_dir, file_path)
+        Path(os.path.dirname(full_path)).mkdir(parents=True, exist_ok=True)
+        image.save(full_path)
+    logger.info(f"Images saved to {output_dir} successfully.")
+    return Path(output_dir)
+
+
+def gen_examples(data_root: Path):
     random.seed(1)
     example_matchers = [
         "disk+lightglue",
@@ -208,6 +224,13 @@ def gen_examples():
         "disk",
     ]
 
+    if not Path(data_root).exists():
+        try:
+            download_example_images(DATASETS_REPO_ID, data_root)
+        except Exception as e:
+            logger.error(f"download_example_images error : {e}")
+            data_root = ROOT / "datasets"
+
     def distribute_elements(A, B):
         new_B = np.array(B, copy=True).flatten()
         np.random.shuffle(new_B)
@@ -217,7 +240,7 @@ def gen_examples():
 
     # normal examples
     def gen_images_pairs(count: int = 5):
-        path = str(ROOT / "datasets/sacre_coeur/mapping")
+        path = str(data_root / "sacre_coeur/mapping")
         imgs_list = [
             os.path.join(path, file)
             for file in os.listdir(path)
@@ -231,8 +254,8 @@ def gen_examples():
 
     # rotated examples
     def gen_rot_image_pairs(count: int = 5):
-        path = ROOT / "datasets/sacre_coeur/mapping"
-        path_rot = ROOT / "datasets/sacre_coeur/mapping_rot"
+        path = data_root / "sacre_coeur/mapping"
+        path_rot = data_root / "sacre_coeur/mapping_rot"
         rot_list = [45, 180, 90, 225, 270]
         pairs = []
         for file in os.listdir(path):
@@ -252,8 +275,8 @@ def gen_examples():
         return [pairs[i] for i in selected]
 
     def gen_scale_image_pairs(count: int = 5):
-        path = ROOT / "datasets/sacre_coeur/mapping"
-        path_scale = ROOT / "datasets/sacre_coeur/mapping_scale"
+        path = data_root / "sacre_coeur/mapping"
+        path_scale = data_root / "sacre_coeur/mapping_scale"
         scale_list = [0.3, 0.5]
         pairs = []
         for file in os.listdir(path):
@@ -274,8 +297,8 @@ def gen_examples():
 
     # extramely hard examples
     def gen_image_pairs_wxbs(count: int = None):
-        prefix = "datasets/wxbs_benchmark/.WxBS/v1.1"
-        wxbs_path = ROOT / prefix
+        prefix = "wxbs_benchmark/.WxBS/v1.1"
+        wxbs_path = data_root / prefix
         pairs = []
         for catg in os.listdir(wxbs_path):
             catg_path = wxbs_path / catg
