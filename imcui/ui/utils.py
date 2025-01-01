@@ -223,13 +223,15 @@ def gen_examples(data_root: Path):
         "superpoint+mnn",
         "disk",
     ]
-
+    data_root = Path(data_root)
     if not Path(data_root).exists():
         try:
             download_example_images(DATASETS_REPO_ID, data_root)
         except Exception as e:
             logger.error(f"download_example_images error : {e}")
             data_root = ROOT / "datasets"
+    if not Path(data_root / "sacre_coeur/mapping").exists():
+        download_example_images(DATASETS_REPO_ID, data_root)
 
     def distribute_elements(A, B):
         new_B = np.array(B, copy=True).flatten()
