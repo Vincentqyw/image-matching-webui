@@ -44,11 +44,31 @@ confs = {
         "max_error": 1,  # max error for assigned keypoints (in px)
         "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
     },
+    "minima_loftr": {
+        "output": "matches-minima_loftr",
+        "model": {
+            "name": "loftr",
+            "weights": "outdoor",
+            "model_name": "minima_loftr.ckpt",
+            "max_keypoints": 2000,
+            "match_threshold": 0.2,
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "width": 640,
+            "height": 480,
+            "force_resize": False,
+        },
+        "max_error": 1,  # max error for assigned keypoints (in px)
+        "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
+    },
     "eloftr": {
         "output": "matches-eloftr",
         "model": {
             "name": "eloftr",
-            "weights": "weights/eloftr_outdoor.ckpt",
+            "model_name": "eloftr_outdoor.ckpt",
             "max_keypoints": 2000,
             "match_threshold": 0.2,
         },
@@ -276,6 +296,24 @@ confs = {
         "preprocessing": {
             "grayscale": False,
             "force_resize": True,
+            "resize_max": 1024,
+            "width": 320,
+            "height": 240,
+            "dfactor": 8,
+        },
+    },
+    "minima_roma": {
+        "output": "matches-minima_roma",
+        "model": {
+            "name": "roma",
+            "weights": "outdoor",
+            "model_name": "minima_roma.pth",
+            "max_keypoints": 2000,
+            "match_threshold": 0.2,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": False,
             "resize_max": 1024,
             "width": 320,
             "height": 240,
