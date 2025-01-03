@@ -24,7 +24,6 @@ matcher_zoo:
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
       display: false
-
   minima(RoMa):
     matcher: minima_roma
     skip_ci: true
