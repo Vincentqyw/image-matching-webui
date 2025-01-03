@@ -5,7 +5,7 @@
 
 <p align="center">
   <h1 align="center"><br><ins>$\color{red}{\textnormal{Image\ Matching\ WebUI}}$
-</ins><br>Identify matching points between two images</h1>
+</ins><br>Matching Keypoints between two images</h1>
 </p>
 
 ## Description
@@ -128,6 +128,11 @@ then open http://localhost:7860 in your browser.
 ### Add your own feature / matcher
 
 I provide an example to add local feature in [imcui/hloc/extractors/example.py](imcui/hloc/extractors/example.py). Then add feature settings in `confs` in file [imcui/hloc/extract_features.py](imcui/hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in file [imcui/ui/config.yaml](imcui/ui/config.yaml).
+
+### Upload models
+
+IMCUI hosts all models on [Huggingface](https://huggingface.co/Realcat/imcui_checkpoints).  You can upload your model to Huggingface and add it to the [Realcat/imcui_checkpoints](https://huggingface.co/Realcat/imcui_checkpoints) repository.
+
 
 ## Contributions welcome!
 
