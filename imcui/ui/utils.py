@@ -388,23 +388,33 @@ def _filter_matches_opencv(
         Tuple[np.ndarray, np.ndarray]: Homography matrix and mask.
     """
     if geometry_type == "Homography":
-        M, mask = cv2.findHomography(
-            kp0,
-            kp1,
-            method=method,
-            ransacReprojThreshold=reproj_threshold,
-            confidence=confidence,
-            maxIters=max_iter,
-        )
+        try:
+            M, mask = cv2.findHomography(
+                kp0,
+                kp1,
+                method=method,
+                ransacReprojThreshold=reproj_threshold,
+                confidence=confidence,
+                maxIters=max_iter,
+            )
+        except cv2.error:
+            logger.error("compute findHomography error, len(kp0): {}".format(len(kp0)))
+            return None, None
     elif geometry_type == "Fundamental":
-        M, mask = cv2.findFundamentalMat(
-            kp0,
-            kp1,
-            method=method,
-            ransacReprojThreshold=reproj_threshold,
-            confidence=confidence,
-            maxIters=max_iter,
-        )
+        try:
+            M, mask = cv2.findFundamentalMat(
+                kp0,
+                kp1,
+                method=method,
+                ransacReprojThreshold=reproj_threshold,
+                confidence=confidence,
+                maxIters=max_iter,
+            )
+        except cv2.error:
+            logger.error(
+                "compute findFundamentalMat error, len(kp0): {}".format(len(kp0))
+            )
+            return None, None
     mask = np.array(mask.ravel().astype("bool"), dtype="bool")
     return M, mask
 

@@ -5,7 +5,7 @@
 
 <p align="center">
   <h1 align="center"><br><ins>$\color{red}{\textnormal{Image\ Matching\ WebUI}}$
-</ins><br>Identify matching points between two images</h1>
+</ins><br>Matching Keypoints between two images</h1>
 </p>
 
 ## Description
@@ -23,6 +23,7 @@ Here is a demo of the tool:
 https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c3484d1b-cc00-4fdc-9b31-e5b7af07ecd9
 
 The tool currently supports various popular image matching algorithms, namely:
+- [x] [MINIMA](https://github.com/LSXI7/MINIMA), ARXIV 2024
 - [x] [XoFTR](https://github.com/OnderT/XoFTR), CVPR 2024
 - [x] [EfficientLoFTR](https://github.com/zju3dv/EfficientLoFTR), CVPR 2024
 - [x] [MASt3R](https://github.com/naver/mast3r), CVPR 2024
@@ -80,11 +81,25 @@ Just try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-web
 or deploy it locally following the instructions below.
 
 ### Requirements
+
+- [Python 3.9+](https://www.python.org/downloads/)
+
+#### Install from pip [NEW]
+
+Update: now support install from [pip](https://pypi.org/project/imcui), just run:
+
+```bash
+pip install imcui
+```
+
+#### Install from source
+
 ``` bash
 git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
 conda env create -f environment.yaml
 conda activate imw
+pip install -e .
 ```
 
 or using [docker](https://hub.docker.com/r/vincentqin/image-matching-webui):
@@ -104,7 +119,7 @@ python -m imcui.api.server
 
 ### Run demo
 ``` bash
-python ./app.py --config ./config/config.yaml
+python app.py --config ./config/config.yaml
 ```
 then open http://localhost:7860 in your browser.
 
@@ -114,10 +129,16 @@ then open http://localhost:7860 in your browser.
 
 I provide an example to add local feature in [imcui/hloc/extractors/example.py](imcui/hloc/extractors/example.py). Then add feature settings in `confs` in file [imcui/hloc/extract_features.py](imcui/hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in file [imcui/ui/config.yaml](imcui/ui/config.yaml).
 
+### Upload models
+
+IMCUI hosts all models on [Huggingface](https://huggingface.co/Realcat/imcui_checkpoints).  You can upload your model to Huggingface and add it to the [Realcat/imcui_checkpoints](https://huggingface.co/Realcat/imcui_checkpoints) repository.
+
+
 ## Contributions welcome!
 
 External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using a linter like flake8. This is a non-exhaustive list of features that might be valuable additions:
 
+- [x] support pip install command
 - [x] add [CPU CI](.github/workflows/ci.yml)
 - [x] add webcam support
 - [x] add [line feature matching](https://github.com/Vincentqyw/LineSegmentsDetection) algorithms
@@ -125,8 +146,8 @@ External contributions are very much welcome. Please follow the [PEP8 style guid
 - [x] ransac to filter outliers
 - [ ] add [rotation images](https://github.com/pidahbus/deep-image-orientation-angle-detection) options before matching
 - [ ] support export matches to colmap ([#issue 6](https://github.com/Vincentqyw/image-matching-webui/issues/6))
-- [ ] add config file to set default parameters
-- [ ] dynamically load models and reduce GPU overload
+- [x] add config file to set default parameters
+- [x] dynamically load models and reduce GPU overload
 
 Adding local features / matchers as submodules is very easy. For example, to add the [GlueStick](https://github.com/cvg/GlueStick):
 

@@ -3,8 +3,8 @@ import warnings
 import torch
 from kornia.feature import LoFTR as LoFTR_
 from kornia.feature.loftr.loftr import default_cfg
-
-from .. import logger
+from pathlib import Path
+from .. import logger, MODEL_REPO_ID
 
 from ..utils.base_model import BaseModel
 
@@ -22,8 +22,21 @@ class LoFTR(BaseModel):
         cfg = default_cfg
         cfg["match_coarse"]["thr"] = conf["match_threshold"]
         cfg["match_coarse"]["skh_iters"] = conf["sinkhorn_iterations"]
-        self.net = LoFTR_(pretrained=conf["weights"], config=cfg)
-        logger.info(f"Loaded LoFTR with weights {conf['weights']}")
+
+        model_name = conf.get("model_name", None)
+        if model_name is not None and "minima" in model_name:
+            cfg["coarse"]["temp_bug_fix"] = True
+            model_path = self._download_model(
+                repo_id=MODEL_REPO_ID,
+                filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
+            )
+            state_dict = torch.load(model_path, map_location="cpu")["state_dict"]
+            self.net = LoFTR_(pretrained=conf["weights"], config=cfg)
+            self.net.load_state_dict(state_dict)
+            logger.info(f"ReLoaded LoFTR(minima) with weights {conf['model_name']}")
+        else:
+            self.net = LoFTR_(pretrained=conf["weights"], config=cfg)
+            logger.info(f"Loaded LoFTR with weights {conf['weights']}")
 
     def _forward(self, data):
         # For consistency with hloc pairs, we refine kpts in image0!
