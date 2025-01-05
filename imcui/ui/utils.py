@@ -844,6 +844,32 @@ def run_ransac(
     )
 
 
+def generate_fake_outputs(
+    output_keypoints,
+    output_matches_raw,
+    output_matches_ransac,
+    match_conf,
+    extract_conf,
+    pred,
+):
+    return (
+        output_keypoints,
+        output_matches_raw,
+        output_matches_ransac,
+        {},
+        {
+            "match_conf": match_conf,
+            "extractor_conf": extract_conf,
+        },
+        {
+            "geom_info": pred.get("geom_info", {}),
+        },
+        None,
+        None,
+        None,
+    )
+
+
 def run_matching(
     image0: np.ndarray,
     image1: np.ndarray,
@@ -913,12 +939,6 @@ def run_matching(
     output_matches_raw = None
     output_matches_ransac = None
 
-    # super slow!
-    if "roma" in key.lower() and DEVICE == "cpu":
-        gr.Info(
-            f"Success! Please be patient and allow for about 2-3 minutes."
-            f" Due to CPU inference, {key} is quiet slow."
-        )
     t0 = time.time()
     model = matcher_zoo[key]
     match_conf = model["matcher"]
@@ -945,6 +965,9 @@ def run_matching(
         matcher = get_model(match_conf)
     logger.info(f"Loading model using: {time.time()-t0:.3f}s")
     t1 = time.time()
+    yield generate_fake_outputs(
+        output_keypoints, output_matches_raw, output_matches_ransac, match_conf, {}, {}
+    )
 
     if model["dense"]:
         if not match_conf["preprocessing"].get("force_resize", False):
@@ -1008,6 +1031,14 @@ def run_matching(
         "Image 1 - Keypoints",
     ]
     output_keypoints = display_keypoints(pred, titles=titles)
+    yield generate_fake_outputs(
+        output_keypoints,
+        output_matches_raw,
+        output_matches_ransac,
+        match_conf,
+        extract_conf,
+        pred,
+    )
 
     # plot images with raw matches
     titles = [
@@ -1015,6 +1046,14 @@ def run_matching(
         "Image 1 - Raw matched keypoints",
     ]
     output_matches_raw, num_matches_raw = display_matches(pred, titles=titles)
+    yield generate_fake_outputs(
+        output_keypoints,
+        output_matches_raw,
+        output_matches_ransac,
+        match_conf,
+        extract_conf,
+        pred,
+    )
 
     # if enable_ransac:
     filter_matches(
@@ -1037,9 +1076,17 @@ def run_matching(
     output_matches_ransac, num_matches_ransac = display_matches(
         pred, titles=titles, tag="KPTS_RANSAC"
     )
+    yield generate_fake_outputs(
+        output_keypoints,
+        output_matches_raw,
+        output_matches_ransac,
+        match_conf,
+        extract_conf,
+        pred,
+    )
+
     # gr.Info(f"Display matches done using: {time.time()-t1:.3f}s")
     logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
-
     t1 = time.time()
     # plot wrapped images
     output_wrapped, warped_image = generate_warp_images(
@@ -1062,7 +1109,8 @@ def run_matching(
     with open(tmp_state_cache, "wb") as f:
         pickle.dump(state_cache, f)
     logger.info("Dump results done!")
-    return (
+
+    yield (
         output_keypoints,
         output_matches_raw,
         output_matches_ransac,

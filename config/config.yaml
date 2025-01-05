@@ -16,6 +16,33 @@ defaults:
   setting_geometry: Homography
 
 matcher_zoo:
+  # example config
+  Example:
+    # show in `Matching Model` or not, default: true
+    enable: false
+    # matcher name
+    matcher: example
+    # skip ci or not, default: false
+    skip_ci: true
+    # dense matcher or not, default: true
+    dense: true
+    # info
+    info:
+      # dispaly name in `Matching Model`
+      name: example(example)
+      # conference/journal/workshop Year
+      source: "CVPR XXXX"
+      # github link
+      github: https://github.com/example/example
+      # paper link
+      paper: https://arxiv.org/abs/xxxx.xxxx
+      # project link
+      project: https://example.com
+      # show in `support algos` table
+      display: false
+      # low, medium, high
+      efficiency: low
+
   minima(loftr):
     matcher: minima_loftr
     dense: true
