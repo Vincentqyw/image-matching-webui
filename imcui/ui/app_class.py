@@ -47,6 +47,7 @@ class ImageMatchingApp:
         self.example_data_root = kwargs.get(
             "example_data_root", Path(__file__).parents[1] / "datasets"
         )
+        # final step
         self.init_interface()
 
     def init_matcher_dropdown(self):
@@ -107,6 +108,8 @@ class ImageMatchingApp:
                         with gr.Row():
                             button_reset = gr.Button(value="Reset")
                             button_run = gr.Button(value="Run Match", variant="primary")
+                        with gr.Row():
+                            button_stop = gr.Button(value="Force Stop", variant="stop")
 
                         with gr.Accordion("Advanced Setting", open=False):
                             with gr.Accordion("Image Setting", open=True):
@@ -326,7 +329,14 @@ class ImageMatchingApp:
                         output_pred,
                     ]
                     # button callbacks
-                    button_run.click(fn=run_matching, inputs=inputs, outputs=outputs)
+                    click_event = button_run.click(
+                        fn=run_matching, inputs=inputs, outputs=outputs
+                    )
+                    # stop button
+                    button_stop.click(
+                        fn=None, inputs=None, outputs=None, cancels=[click_event]
+                    )
+
                     # Reset images
                     reset_outputs = [
                         input_image0,
@@ -519,11 +529,11 @@ class ImageMatchingApp:
             markdown_table = "| Algo. | Conference | Code | Project | Paper |\n"
             markdown_table += "| ----- | ---------- | ---- | ------- | ----- |\n"
 
-            for k, v in cfg.items():
-                if not v["info"]["display"]:
+            for _, v in cfg.items():
+                if not v["info"].get("display", True):
                     continue
-                github_link = get_link(v["info"]["github"])
-                project_link = get_link(v["info"]["project"])
+                github_link = get_link(v["info"].get("github", ""))
+                project_link = get_link(v["info"].get("project", ""))
                 paper_link = get_link(
                     v["info"]["paper"],
                     (
@@ -534,8 +544,8 @@ class ImageMatchingApp:
                 )
 
                 markdown_table += "{}|{}|{}|{}|{}\n".format(
-                    v["info"]["name"],  # display name
-                    v["info"]["source"],
+                    v["info"].get("name", ""),
+                    v["info"].get("source", ""),
                     github_link,
                     project_link,
                     paper_link,
@@ -547,11 +557,11 @@ class ImageMatchingApp:
                     continue
                 data.append(
                     [
-                        v["info"]["name"],
-                        v["info"]["source"],
-                        v["info"]["github"],
-                        v["info"]["paper"],
-                        v["info"]["project"],
+                        v["info"].get("name", ""),
+                        v["info"].get("source", ""),
+                        v["info"].get("github", ""),
+                        v["info"].get("paper", ""),
+                        v["info"].get("project", ""),
                     ]
                 )
             tab = gr.Dataframe(
