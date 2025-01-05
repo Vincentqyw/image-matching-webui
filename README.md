@@ -8,10 +8,10 @@
   <br>Matching Keypoints between two images</h1>
 </p>
 <div align="center">
-  <a href="https://github.com/Vincentqyw/image-matching-webui/actions/workflows/release.yml"><img src="https://github.com/Vincentqyw/image-matching-webui/actions/workflows/release.yml/badge.svg" alt="PyPI Release"></a>
-  <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
-  <a href="https://pypi.org/project/imcui"><img alt="PyPI - Version" src="https://img.shields.io/pypi/v/imcui?style=flat&logo=pypi&label=imcui&link=https%3A%2F%2Fpypi.org%2Fproject%2Fimcui"></a>
-  <a href="https://hub.docker.com/r/vincentqin/image-matching-webui"><img alt="Docker Image Version" src="https://img.shields.io/docker/v/vincentqin/image-matching-webui?sort=date&arch=amd64&logo=docker&label=imcui&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fvincentqin%2Fimage-matching-webui"></a>
+  <a target="_blank" href="https://github.com/Vincentqyw/image-matching-webui/actions/workflows/release.yml"><img src="https://github.com/Vincentqyw/image-matching-webui/actions/workflows/release.yml/badge.svg" alt="PyPI Release"></a>
+  <a target="_blank" href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
+  <a target="_blank" href="https://pypi.org/project/imcui"><img alt="PyPI - Version" src="https://img.shields.io/pypi/v/imcui?style=flat&logo=pypi&label=imcui&link=https%3A%2F%2Fpypi.org%2Fproject%2Fimcui"></a>
+  <a target="_blank" href="https://hub.docker.com/r/vincentqin/image-matching-webui"><img alt="Docker Image Version" src="https://img.shields.io/docker/v/vincentqin/image-matching-webui?sort=date&arch=amd64&logo=docker&label=imcui&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fvincentqin%2Fimage-matching-webui"></a>
 
 </div>
 
@@ -20,10 +20,9 @@
 This simple tool efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
 **Note**: the images source can be either local images or webcam images.
 
-Try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
-<a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui">
-  <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/>
-</a>
+Try it on
+<a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
+<a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui"><img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/></a>
 
 Here is a demo of the tool:
 
