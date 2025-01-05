@@ -1,6 +1,6 @@
 server:
   name: "0.0.0.0"
-  port: 7861
+  port: 7860
 
 defaults:
   setting_threshold: 0.1
@@ -9,7 +9,7 @@ defaults:
   enable_ransac: true
   ransac_method: CV2_USAC_MAGSAC
   ransac_reproj_threshold: 8
-  ransac_confidence: 0.999
+  ransac_confidence: 0.9999
   ransac_max_iter: 10000
   ransac_num_samples: 4
   match_threshold: 0.2
@@ -23,7 +23,7 @@ matcher_zoo:
       name: MINIMA(LoFTR) #dispaly name
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
-      display: false
+      display: true
   minima(RoMa):
     matcher: minima_roma
     skip_ci: true
@@ -33,6 +33,7 @@ matcher_zoo:
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
       display: false
+      efficiency: low  # low, medium, high
   omniglue:
     enable: true
     matcher: omniglue
@@ -55,6 +56,7 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2406.09756
       project: https://dust3r.europe.naverlabs.com
       display: true
+      efficiency: low  # low, medium, high
   DUSt3R:
     # TODO: duster is under development
     enable: true
@@ -80,6 +82,7 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2402.11095
       project: https://xuelunshen.com/gim
       display: true
+      efficiency: low  # low, medium, high
   RoMa:
     matcher: roma
     skip_ci: true
@@ -91,6 +94,7 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2305.15404
       project: https://parskatt.github.io/RoMa
       display: true
+      efficiency: low  # low, medium, high
   dkm:
     matcher: dkm
     skip_ci: true
@@ -102,6 +106,7 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2202.00667
       project: https://parskatt.github.io/DKM
       display: true
+      efficiency: low  # low, medium, high
   loftr:
     matcher: loftr
     dense: true
@@ -144,6 +149,7 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2103.14167
       project: null
       display: true
+      efficiency: low  # low, medium, high
   topicfm:
     matcher: topicfm
     dense: true

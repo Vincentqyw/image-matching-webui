@@ -153,12 +153,14 @@ def parse_match_config(conf):
         return {
             "matcher": match_dense.confs.get(conf["matcher"]),
             "dense": True,
+            "info": conf.get("info", {}),
         }
     else:
         return {
             "feature": extract_features.confs.get(conf["feature"]),
             "matcher": match_features.confs.get(conf["matcher"]),
             "dense": False,
+            "info": conf.get("info", {}),
         }
 
 
@@ -924,6 +926,15 @@ def run_matching(
     match_conf["model"]["match_threshold"] = match_threshold
     match_conf["model"]["max_keypoints"] = extract_max_keypoints
     cache_key = "{}_{}".format(key, match_conf["model"]["name"])
+
+    efficiency = model["info"].get("efficiency", "high")
+    if efficiency == "low":
+        gr.Warning(
+            "Matcher {} is time-consuming, please wait for a while".format(
+                model["info"].get("name", "unknown")
+            )
+        )
+
     if use_cached_model:
         # because of the model cache, we need to update the config
         matcher = model_cache.cache_model(cache_key, get_model, match_conf)

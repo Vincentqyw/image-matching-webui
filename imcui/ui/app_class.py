@@ -47,6 +47,7 @@ class ImageMatchingApp:
         self.example_data_root = kwargs.get(
             "example_data_root", Path(__file__).parents[1] / "datasets"
         )
+        # final step
         self.init_interface()
 
     def init_matcher_dropdown(self):
@@ -534,8 +535,8 @@ class ImageMatchingApp:
                 )
 
                 markdown_table += "{}|{}|{}|{}|{}\n".format(
-                    v["info"]["name"],  # display name
-                    v["info"]["source"],
+                    v["info"].get("name", ""),
+                    v["info"].get("source", ""),
                     github_link,
                     project_link,
                     paper_link,
@@ -547,11 +548,11 @@ class ImageMatchingApp:
                     continue
                 data.append(
                     [
-                        v["info"]["name"],
-                        v["info"]["source"],
-                        v["info"]["github"],
-                        v["info"]["paper"],
-                        v["info"]["project"],
+                        v["info"].get("name", ""),
+                        v["info"].get("source", ""),
+                        v["info"].get("github", ""),
+                        v["info"].get("paper", ""),
+                        v["info"].get("project", ""),
                     ]
                 )
             tab = gr.Dataframe(
