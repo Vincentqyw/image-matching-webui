@@ -444,13 +444,12 @@ def display_matches(
             texts=texts,
         )
         fig = fig_mkpts
-    # TODO: draw lines
-    if (
+    elif (
         "line0_orig" in pred
         and "line1_orig" in pred
         and pred["line0_orig"] is not None
         and pred["line1_orig"] is not None
-        and (tag == "LINES_RAW" or tag == "LINES_RANSAC")
+        # and (tag == "LINES_RAW" or tag == "LINES_RANSAC")
     ):
         # lines
         mtlines0 = pred["line0_orig"]
