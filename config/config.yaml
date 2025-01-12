@@ -450,7 +450,7 @@ matcher_zoo:
       project: null
       display: true
   gluestick:
-    enable: false
+    enable: true
     matcher: gluestick
     dense: true
     info:

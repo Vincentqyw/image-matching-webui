@@ -12,12 +12,13 @@
   <a target="_blank" href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
   <a target="_blank" href="https://pypi.org/project/imcui"><img alt="PyPI - Version" src="https://img.shields.io/pypi/v/imcui?style=flat&logo=pypi&label=imcui&link=https%3A%2F%2Fpypi.org%2Fproject%2Fimcui"></a>
   <a target="_blank" href="https://hub.docker.com/r/vincentqin/image-matching-webui"><img alt="Docker Image Version" src="https://img.shields.io/docker/v/vincentqin/image-matching-webui?sort=date&arch=amd64&logo=docker&label=imcui&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fvincentqin%2Fimage-matching-webui"></a>
+   <a target="_blank" href="https://pepy.tech/projects/imcui"><img src="https://static.pepy.tech/badge/imcui" alt="PyPI Downloads"></a>
 
 </div>
 
 ## Description
 
-This simple tool efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
+`Image Matching WebUI (IMCUI)` efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
 **Note**: the images source can be either local images or webcam images.
 
 Try it on
@@ -29,51 +30,55 @@ Here is a demo of the tool:
 https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c3484d1b-cc00-4fdc-9b31-e5b7af07ecd9
 
 The tool currently supports various popular image matching algorithms, namely:
-- [x] [MINIMA](https://github.com/LSXI7/MINIMA), ARXIV 2024
-- [x] [XoFTR](https://github.com/OnderT/XoFTR), CVPR 2024
-- [x] [EfficientLoFTR](https://github.com/zju3dv/EfficientLoFTR), CVPR 2024
-- [x] [MASt3R](https://github.com/naver/mast3r), CVPR 2024
-- [x] [DUSt3R](https://github.com/naver/dust3r), CVPR 2024
-- [x] [OmniGlue](https://github.com/Vincentqyw/omniglue-onnx), CVPR 2024
-- [x] [XFeat](https://github.com/verlab/accelerated_features), CVPR 2024
-- [x] [RoMa](https://github.com/Vincentqyw/RoMa), CVPR 2024
-- [x] [DeDoDe](https://github.com/Parskatt/DeDoDe), 3DV 2024
-- [ ] [Mickey](https://github.com/nianticlabs/mickey), CVPR 2024
-- [x] [GIM](https://github.com/xuelunshen/gim), ICLR 2024
-- [x] [ALIKED](https://github.com/Shiaoming/ALIKED), ICCV 2023
-- [x] [LightGlue](https://github.com/cvg/LightGlue), ICCV 2023
-- [x] [DarkFeat](https://github.com/THU-LYJ-Lab/DarkFeat), AAAI 2023
-- [x] [SFD2](https://github.com/feixue94/sfd2), CVPR 2023
-- [x] [IMP](https://github.com/feixue94/imp-release), CVPR 2023
-- [ ] [ASTR](https://github.com/ASTR2023/ASTR), CVPR 2023
-- [ ] [SEM](https://github.com/SEM2023/SEM), CVPR 2023
-- [ ] [DeepLSD](https://github.com/cvg/DeepLSD), CVPR 2023
-- [x] [GlueStick](https://github.com/cvg/GlueStick), ICCV 2023
-- [ ] [ConvMatch](https://github.com/SuhZhang/ConvMatch), AAAI 2023
-- [x] [LoFTR](https://github.com/zju3dv/LoFTR), CVPR 2021
-- [x] [SOLD2](https://github.com/cvg/SOLD2), CVPR 2021
-- [ ] [LineTR](https://github.com/yosungho/LineTR), RA-L 2021
-- [x] [DKM](https://github.com/Parskatt/DKM), CVPR 2023
-- [ ] [NCMNet](https://github.com/xinliu29/NCMNet), CVPR 2023
-- [x] [TopicFM](https://github.com/Vincentqyw/TopicFM), AAAI 2023
-- [x] [AspanFormer](https://github.com/Vincentqyw/ml-aspanformer), ECCV 2022
-- [x] [LANet](https://github.com/wangch-g/lanet), ACCV 2022
-- [ ] [LISRD](https://github.com/rpautrat/LISRD), ECCV 2022
-- [ ] [REKD](https://github.com/bluedream1121/REKD), CVPR 2022
-- [x] [CoTR](https://github.com/ubc-vision/COTR), ICCV 2021
-- [x] [ALIKE](https://github.com/Shiaoming/ALIKE), TMM 2022
-- [x] [RoRD](https://github.com/UditSinghParihar/RoRD), IROS 2021
-- [x] [SGMNet](https://github.com/vdvchen/SGMNet), ICCV 2021
-- [x] [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork), CVPRW 2018
-- [x] [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork), CVPR 2020
-- [x] [D2Net](https://github.com/Vincentqyw/d2-net), CVPR 2019
-- [x] [R2D2](https://github.com/naver/r2d2), NeurIPS 2019
-- [x] [DISK](https://github.com/cvlab-epfl/disk), NeurIPS 2020
-- [ ] [Key.Net](https://github.com/axelBarroso/Key.Net), ICCV 2019
-- [ ] [OANet](https://github.com/zjhthu/OANet), ICCV 2019
-- [x] [SOSNet](https://github.com/scape-research/SOSNet), CVPR 2019
-- [x] [HardNet](https://github.com/DagnyT/hardnet), NeurIPS 2017
-- [x] [SIFT](https://docs.opencv.org/4.x/da/df5/tutorial_py_sift_intro.html), IJCV 2004
+
+| Algorithm        | Supported | Conference/Journal | Year | GitHub Link |
+|------------------|-----------|--------------------|------|-------------|
+| MINIMA         | ✅ | ARXIV   | 2024 | [Link](https://github.com/LSXI7/MINIMA) |
+| XoFTR          | ✅ | CVPR    | 2024 | [Link](https://github.com/OnderT/XoFTR) |
+| EfficientLoFTR | ✅ | CVPR    | 2024 | [Link](https://github.com/zju3dv/EfficientLoFTR) |
+| MASt3R         | ✅ | CVPR    | 2024 | [Link](https://github.com/naver/mast3r) |
+| DUSt3R         | ✅ | CVPR    | 2024 | [Link](https://github.com/naver/dust3r) |
+| OmniGlue       | ✅ | CVPR    | 2024 | [Link](https://github.com/Vincentqyw/omniglue-onnx) |
+| XFeat          | ✅ | CVPR    | 2024 | [Link](https://github.com/verlab/accelerated_features) |
+| RoMa           | ✅ | CVPR    | 2024 | [Link](https://github.com/Vincentqyw/RoMa) |
+| DeDoDe         | ✅ | 3DV     | 2024 | [Link](https://github.com/Parskatt/DeDoDe) |
+| Mickey         | ❌ | CVPR    | 2024 | [Link](https://github.com/nianticlabs/mickey) |
+| GIM            | ✅ | ICLR    | 2024 | [Link](https://github.com/xuelunshen/gim) |
+| ALIKED         | ✅ | ICCV    | 2023 | [Link](https://github.com/Shiaoming/ALIKED) |
+| LightGlue      | ✅ | ICCV    | 2023 | [Link](https://github.com/cvg/LightGlue) |
+| DarkFeat       | ✅ | AAAI    | 2023 | [Link](https://github.com/THU-LYJ-Lab/DarkFeat) |
+| SFD2           | ✅ | CVPR    | 2023 | [Link](https://github.com/feixue94/sfd2) |
+| IMP            | ✅ | CVPR    | 2023 | [Link](https://github.com/feixue94/imp-release) |
+| ASTR           | ❌ | CVPR    | 2023 | [Link](https://github.com/ASTR2023/ASTR) |
+| SEM            | ❌ | CVPR    | 2023 | [Link](https://github.com/SEM2023/SEM) |
+| DeepLSD        | ❌ | CVPR    | 2023 | [Link](https://github.com/cvg/DeepLSD) |
+| GlueStick      | ✅ | ICCV    | 2023 | [Link](https://github.com/cvg/GlueStick) |
+| ConvMatch      | ❌ | AAAI    | 2023 | [Link](https://github.com/SuhZhang/ConvMatch) |
+| LoFTR          | ✅ | CVPR    | 2021 | [Link](https://github.com/zju3dv/LoFTR) |
+| SOLD2          | ✅ | CVPR    | 2021 | [Link](https://github.com/cvg/SOLD2) |
+| LineTR         | ❌ | RA-L    | 2021 | [Link](https://github.com/yosungho/LineTR) |
+| DKM            | ✅ | CVPR    | 2023 | [Link](https://github.com/Parskatt/DKM) |
+| NCMNet         | ❌ | CVPR    | 2023 | [Link](https://github.com/xinliu29/NCMNet) |
+| TopicFM        | ✅ | AAAI    | 2023 | [Link](https://github.com/Vincentqyw/TopicFM) |
+| AspanFormer    | ✅ | ECCV    | 2022 | [Link](https://github.com/Vincentqyw/ml-aspanformer) |
+| LANet          | ✅ | ACCV    | 2022 | [Link](https://github.com/wangch-g/lanet) |
+| LISRD          | ❌ | ECCV    | 2022 | [Link](https://github.com/rpautrat/LISRD) |
+| REKD           | ❌ | CVPR    | 2022 | [Link](https://github.com/bluedream1121/REKD) |
+| CoTR           | ✅ | ICCV    | 2021 | [Link](https://github.com/ubc-vision/COTR) |
+| ALIKE          | ✅ | TMM     | 2022 | [Link](https://github.com/Shiaoming/ALIKE) |
+| RoRD           | ✅ | IROS    | 2021 | [Link](https://github.com/UditSinghParihar/RoRD) |
+| SGMNet         | ✅ | ICCV    | 2021 | [Link](https://github.com/vdvchen/SGMNet) |
+| SuperPoint     | ✅ | CVPRW   | 2018 | [Link](https://github.com/magicleap/SuperPointPretrainedNetwork) |
+| SuperGlue      | ✅ | CVPR    | 2020 | [Link](https://github.com/magicleap/SuperGluePretrainedNetwork) |
+| D2Net          | ✅ | CVPR    | 2019 | [Link](https://github.com/Vincentqyw/d2-net) |
+| R2D2           | ✅ | NeurIPS | 2019 | [Link](https://github.com/naver/r2d2) |
+| DISK           | ✅ | NeurIPS | 2020 | [Link](https://github.com/cvlab-epfl/disk) |
+| Key.Net        | ❌ | ICCV    | 2019 | [Link](https://github.com/axelBarroso/Key.Net) |
+| OANet          | ❌ | ICCV    | 2019 | [Link](https://github.com/zjhthu/OANet) |
+| SOSNet         | ✅ | CVPR    | 2019 | [Link](https://github.com/scape-research/SOSNet) |
+| HardNet        | ✅ | NeurIPS | 2017 | [Link](https://github.com/DagnyT/hardnet) |
+| SIFT           | ✅ | IJCV    | 2004 | [Link](https://docs.opencv.org/4.x/da/df5/tutorial_py_sift_intro.html) |
+
 
 ## How to use
 
