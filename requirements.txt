@@ -12,6 +12,7 @@ Jinja2
 kornia
 loguru
 matplotlib<3.9
+matplotlib-inline
 numpy~=1.26
 omegaconf
 onnxruntime
@@ -20,7 +21,6 @@ opencv-python
 pandas
 plotly
 poselib
-matplotlib-inline
 protobuf
 psutil
 pycolmap==0.6.1
