@@ -20,6 +20,7 @@ opencv-python
 pandas
 plotly
 poselib
+matplotlib-inline
 protobuf
 psutil
 pycolmap==0.6.1
