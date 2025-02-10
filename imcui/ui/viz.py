@@ -39,6 +39,9 @@ def plot_images(
     n = len(imgs)
     if not isinstance(cmaps, list):
         cmaps = [cmaps] * n
+
+    plt.switch_backend("module://matplotlib_inline.backend_inline")
+
     figsize = (size * n, size * 6 / 5) if size is not None else None
     fig, ax = plt.subplots(1, n, figsize=figsize, dpi=dpi)
 
