@@ -623,8 +623,8 @@ def compute_geometry(
             geo_info["Fundamental"] = F.tolist()
             geo_info["mask_f"] = mask_f
         H, mask_h = proc_ransac_matches(
-            mkpts1,
             mkpts0,
+            mkpts1,
             ransac_method,
             ransac_reproj_threshold,
             ransac_confidence,
@@ -683,7 +683,8 @@ def wrap_images(
 
         title: List[str] = []
         if geom_type == "Homography":
-            rectified_image1 = cv2.warpPerspective(img1, H, (w0, h0))
+            H_inv = np.linalg.inv(H)
+            rectified_image1 = cv2.warpPerspective(img1, H_inv, (w0, h0))
             title = ["Image 0", "Image 1 - warped"]
         elif geom_type == "Fundamental":
             if geom_type not in geo_info:
