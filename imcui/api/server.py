@@ -6,38 +6,61 @@ from typing import Union
 import numpy as np
 import ray
 import torch
-import yaml
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from PIL import Image
 from ray import serve
+import argparse
 
 from . import ImagesInput, to_base64_nparray
 from .core import ImageMatchingAPI
 from ..hloc import DEVICE
+from ..hloc.utils.io import read_yaml
 from ..ui import get_version
 
 warnings.simplefilter("ignore")
 app = FastAPI()
 if ray.is_initialized():
     ray.shutdown()
+
+
+# read some configs
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--config",
+    type=Path,
+    required=False,
+    default=Path(__file__).parent / "config/api.yaml",
+)
+args = parser.parse_args()
+config_path = args.config
+config = read_yaml(config_path)
+num_gpus = 1 if torch.cuda.is_available() else 0
+ray_actor_options = config["service"].get("ray_actor_options", {})
+ray_actor_options.update({"num_gpus": num_gpus})
+dashboard_port = config["service"].get("dashboard_port", 8265)
+http_options = config["service"].get(
+    "http_options",
+    {
+        "host": "0.0.0.0",
+        "port": 8001,
+    },
+)
+num_replicas = config["service"].get("num_replicas", 4)
 ray.init(
-    dashboard_port=8265,
+    dashboard_port=dashboard_port,
     ignore_reinit_error=True,
 )
-serve.start(
-    http_options={"host": "0.0.0.0", "port": 8001},
-)
-
-num_gpus = 1 if torch.cuda.is_available() else 0
+serve.start(http_options=http_options)
 
 
 @serve.deployment(
-    num_replicas=4, ray_actor_options={"num_cpus": 2, "num_gpus": num_gpus}
+    num_replicas=num_replicas,
+    ray_actor_options=ray_actor_options,
 )
 @serve.ingress(app)
 class ImageMatchingService:
-    def __init__(self, conf: dict, device: str):
+    def __init__(self, conf: dict, device: str, **kwargs):
         self.conf = conf
         self.api = ImageMatchingAPI(conf=conf, device=device)
 
@@ -137,7 +160,7 @@ class ImageMatchingService:
             image_array = np.array(img)
         return image_array
 
-    def postprocess(self, output: dict, skip_keys: list, binarize: bool = True) -> dict:
+    def postprocess(self, output: dict, skip_keys: list, **kwargs) -> dict:
         pred = {}
         for key, value in output.items():
             if key in skip_keys:
@@ -152,19 +175,12 @@ class ImageMatchingService:
         uvicorn.run(app, host=host, port=port)
 
 
-def read_config(config_path: Path) -> dict:
-    with open(config_path, "r") as f:
-        conf = yaml.safe_load(f)
-    return conf
-
-
-# api server
-conf = read_config(Path(__file__).parent / "config/api.yaml")
-service = ImageMatchingService.bind(conf=conf["api"], device=DEVICE)
-handle = serve.run(service, route_prefix="/")
+if __name__ == "__main__":
+    # api server
+    service = ImageMatchingService.bind(conf=config["api"], device=DEVICE)
+    handle = serve.run(service, route_prefix="/", blocking=False)
 
 # serve run api.server_ray:service
-
 # build to generate config file
 # serve build api.server_ray:service -o api/config/ray.yaml
 # serve run api/config/ray.yaml

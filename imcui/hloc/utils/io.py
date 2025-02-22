@@ -3,6 +3,7 @@ from pathlib import Path
 import numpy as np
 import cv2
 import h5py
+import yaml
 
 from .parsers import names_to_pair, names_to_pair_old
 
@@ -75,3 +76,9 @@ def get_matches(path: Path, name0: str, name1: str) -> Tuple[np.ndarray]:
         matches = np.flip(matches, -1)
     scores = scores[idx]
     return matches, scores
+
+
+def read_yaml(config_path: Path) -> dict:
+    with open(config_path, "r") as f:
+        conf = yaml.safe_load(f)
+    return conf
