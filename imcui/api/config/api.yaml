@@ -1,31 +1,15 @@
-# This file was generated using the `serve build` command on Ray v2.38.0.
-
-proxy_location: EveryNode
-http_options:
-  host: 0.0.0.0
-  port: 8001
-
-grpc_options:
-  port: 9000
-  grpc_servicer_functions: []
-
-logging_config:
-  encoding: TEXT
-  log_level: INFO
-  logs_dir: null
-  enable_access_log: true
-
-applications:
-- name: app1
-  route_prefix: /
-  import_path: api.server:service
-  runtime_env: {}
-  deployments:
-  - name: ImageMatchingService
-    num_replicas: 4
-    ray_actor_options:
-      num_cpus: 2.0
-      num_gpus: 1.0
+service:
+  num_replicas: 4
+  ray_actor_options:
+    num_cpus: 2.0
+    num_gpus: 1.0
+  host: &default_host
+    "0.0.0.0"
+  http_options:
+    host: *default_host
+    port: 8001
+  route_prefix: "/"
+  dashboard_port: 8265
 
 api:
   feature:
