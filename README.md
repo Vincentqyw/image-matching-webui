@@ -117,8 +117,15 @@ or using [docker](https://hub.docker.com/r/vincentqin/image-matching-webui):
 
 ``` bash
 docker pull vincentqin/image-matching-webui:latest
-docker run -it -p 7860:7860 vincentqin/image-matching-webui:latest python app.py --server_name "0.0.0.0" --server_port=7860
+docker run -it -d \
+  -p 7860:7860 \
+  -p 8000:8000 \
+  -p 8001:8001 \
+  -p 8265:8265 \
+  --name imc-test \
+  vincentqin/image-matching-webui:latest
 ```
+then webui and api server are auto-run.
 
 ### Deploy to Railway
 
