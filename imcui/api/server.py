@@ -47,7 +47,6 @@ http_options = config["service"].get(
     },
 )
 num_replicas = config["service"].get("num_replicas", 4)
-# breakpoint()
 ray.init(
     dashboard_port=dashboard_port,
     ignore_reinit_error=True,
