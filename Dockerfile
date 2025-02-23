@@ -21,12 +21,12 @@ RUN git lfs install
 RUN git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git /code
 
 # Configure conda environment
-RUN conda create -n imw python=3.10.10 && \
-    echo "source activate imw" >> ~/.bashrc
-ENV PATH /opt/conda/envs/imw/bin:$PATH
+RUN conda create -n imcui python=3.10.10 && \
+    echo "source activate imcui" >> ~/.bashrc
+ENV PATH /opt/conda/envs/imcui/bin:$PATH
 
 # Set conda environment as default execution context
-SHELL ["conda", "run", "-n", "imw", "/bin/bash", "-c"]
+SHELL ["conda", "run", "-n", "imcui", "/bin/bash", "-c"]
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \

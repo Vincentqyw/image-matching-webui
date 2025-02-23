@@ -109,7 +109,7 @@ pip install imcui
 git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
 conda env create -f environment.yaml
-conda activate imw
+conda activate imcui
 pip install -e .
 ```
 
