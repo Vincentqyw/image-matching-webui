@@ -240,3 +240,132 @@ class ARCSizeAwareModelCache:
                 for k in list(cache.keys()):
                     if cache[k]["device"] == device:
                         cache.pop(k)
+
+
+class LRUModelCache:
+    def __init__(
+        self,
+        max_gpu_mem: float = 8e9,
+        max_cpu_mem: float = 12e9,
+        device_priority: list = ["cuda", "cpu"],
+    ):
+        self.cache = OrderedDict()
+        self.max_gpu = max_gpu_mem
+        self.max_cpu = max_cpu_mem
+        self.current_gpu = 0
+        self.current_cpu = 0
+        self.lock = threading.Lock()
+        self.device_priority = device_priority
+
+    def generate_key(self, model_key, model_conf: dict) -> str:
+        loader_identifier = f"{model_key}"
+        unique_str = f"{loader_identifier}-{json.dumps(model_conf, sort_keys=True)}"
+        return hashlib.sha256(unique_str.encode()).hexdigest()
+
+    def get_device(self) -> str:
+        for device in self.device_priority:
+            if device == "cuda" and torch.cuda.is_available():
+                if self.current_gpu < self.max_gpu:
+                    return device
+            elif device == "cpu":
+                if self.current_cpu < self.max_cpu:
+                    return device
+        return "cpu"
+
+    def _calculate_model_size(self, model):
+        param_size = sum(p.numel() * p.element_size() for p in model.parameters())
+        buffer_size = sum(b.numel() * b.element_size() for b in model.buffers())
+        return param_size + buffer_size
+
+    def load_model(self, model_key, model_loader_func, model_conf: dict):
+        key = self.generate_key(model_key, model_conf)
+
+        with self.lock:
+            if key in self.cache:
+                self.cache.move_to_end(key)  # update LRU
+                return self.cache[key]["model"]
+
+            device = self.get_device()
+            if device == "cuda":
+                torch.cuda.empty_cache()
+
+            try:
+                raw_model = model_loader_func(model_conf)
+            except Exception as e:
+                raise RuntimeError(f"Model loading failed: {str(e)}")
+
+            try:
+                model = raw_model.to(device)
+            except RuntimeError as e:
+                if "CUDA out of memory" in str(e):
+                    return self._handle_oom(model_key, model_loader_func, model_conf)
+                raise
+
+            model_size = self._calculate_model_size(model)
+
+            while (
+                device == "cuda" and (self.current_gpu + model_size > self.max_gpu)
+            ) or (device == "cpu" and (self.current_cpu + model_size > self.max_cpu)):
+                if not self._free_space(model_size, device):
+                    raise RuntimeError("Insufficient memory even after cache cleanup")
+
+            if device == "cuda":
+                self.current_gpu += model_size
+            else:
+                self.current_cpu += model_size
+
+            self.cache[key] = {
+                "model": model,
+                "size": model_size,
+                "device": device,
+                "timestamp": time.time(),
+            }
+
+            return model
+
+    def _free_space(self, required_size: int, device: str) -> bool:
+        for key in list(self.cache.keys()):
+            if (device == "cuda" and self.cache[key]["device"] == "cuda") or (
+                device == "cpu" and self.cache[key]["device"] == "cpu"
+            ):
+                self.current_gpu -= (
+                    self.cache[key]["size"]
+                    if self.cache[key]["device"] == "cuda"
+                    else 0
+                )
+                self.current_cpu -= (
+                    self.cache[key]["size"] if self.cache[key]["device"] == "cpu" else 0
+                )
+                del self.cache[key]
+
+                if (
+                    device == "cuda"
+                    and self.current_gpu + required_size <= self.max_gpu
+                ) or (
+                    device == "cpu" and self.current_cpu + required_size <= self.max_cpu
+                ):
+                    return True
+        return False
+
+    def _handle_oom(self, model_key, model_loader_func, model_conf: dict):
+        with self.lock:
+            self.clear_device_cache("cuda")
+            torch.cuda.empty_cache()
+
+            try:
+                return self.load_model(model_key, model_loader_func, model_conf)
+            except RuntimeError:
+                original_priority = self.device_priority
+                self.device_priority = ["cpu"]
+                try:
+                    return self.load_model(model_key, model_loader_func, model_conf)
+                finally:
+                    self.device_priority = original_priority
+
+    def clear_device_cache(self, device: str):
+        with self.lock:
+            keys_to_remove = [k for k, v in self.cache.items() if v["device"] == device]
+            for k in keys_to_remove:
+                self.current_gpu -= self.cache[k]["size"] if device == "cuda" else 0
+                self.current_cpu -= self.cache[k]["size"] if device == "cpu" else 0
+                del self.cache[k]
