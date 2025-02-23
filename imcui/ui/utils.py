@@ -1,7 +1,6 @@
 import os
 import pickle
 import random
-import shutil
 import time
 import warnings
 from itertools import combinations
@@ -14,7 +13,6 @@ import gradio as gr
 import matplotlib.pyplot as plt
 import numpy as np
 import poselib
-import psutil
 from PIL import Image
 
 from ..hloc import (
@@ -29,6 +27,7 @@ from ..hloc import (
 )
 from ..hloc.utils.base_model import dynamic_load
 from .viz import display_keypoints, display_matches, fig2im, plot_images
+from .modelcache import ModelCache
 
 warnings.simplefilter("ignore")
 
@@ -47,62 +46,6 @@ DEFAULT_MATCHING_THRESHOLD = 0.2
 DEFAULT_SETTING_GEOMETRY = "Homography"
 GRADIO_VERSION = gr.__version__.split(".")[0]
 MATCHER_ZOO = None
-
-
-class ModelCache:
-    def __init__(self, max_memory_size: int = 8):
-        self.max_memory_size = max_memory_size
-        self.current_memory_size = 0
-        self.model_dict = {}
-        self.model_timestamps = []
-
-    def cache_model(self, model_key, model_loader_func, model_conf):
-        if model_key in self.model_dict:
-            self.model_timestamps.remove(model_key)
-            self.model_timestamps.append(model_key)
-            logger.info(f"Load cached {model_key}")
-            return self.model_dict[model_key]
-
-        model = self._load_model_from_disk(model_loader_func, model_conf)
-        while self._calculate_model_memory() > self.max_memory_size:
-            if len(self.model_timestamps) == 0:
-                logger.warn(
-                    "RAM: {}GB, MAX RAM: {}GB".format(
-                        self._calculate_model_memory(), self.max_memory_size
-                    )
-                )
-                break
-            oldest_model_key = self.model_timestamps.pop(0)
-            self.current_memory_size = self._calculate_model_memory()
-            logger.info(f"Del cached {oldest_model_key}")
-            del self.model_dict[oldest_model_key]
-
-        self.model_dict[model_key] = model
-        self.model_timestamps.append(model_key)
-
-        self.print_memory_usage()
-        logger.info(f"Total cached {list(self.model_dict.keys())}")
-
-        return model
-
-    def _load_model_from_disk(self, model_loader_func, model_conf):
-        return model_loader_func(model_conf)
-
-    def _calculate_model_memory(self, verbose=False):
-        host_colocation = int(os.environ.get("HOST_COLOCATION", "1"))
-        vm = psutil.virtual_memory()
-        du = shutil.disk_usage(".")
-        if verbose:
-            logger.info(
-                f"RAM: {vm.used / 1e9:.1f}/{vm.total / host_colocation / 1e9:.1f}GB"
-            )
-            logger.info(
-                f"DISK: {du.used / 1e9:.1f}/{du.total / host_colocation / 1e9:.1f}GB"
-            )
-        return vm.used / 1e9
-
-    def print_memory_usage(self):
-        self._calculate_model_memory(verbose=True)
 
 
 model_cache = ModelCache()
@@ -887,7 +830,7 @@ def run_matching(
     force_resize: bool = False,
     image_width: int = 640,
     image_height: int = 480,
-    use_cached_model: bool = False,
+    use_cached_model: bool = True,
 ) -> Tuple[
     np.ndarray,
     np.ndarray,
@@ -958,7 +901,7 @@ def run_matching(
 
     if use_cached_model:
         # because of the model cache, we need to update the config
-        matcher = model_cache.cache_model(cache_key, get_model, match_conf)
+        matcher = model_cache.load_model(cache_key, get_model, match_conf)
         matcher.conf["max_keypoints"] = extract_max_keypoints
         matcher.conf["match_threshold"] = match_threshold
         logger.info(f"Loaded cached model {cache_key}")
@@ -993,7 +936,7 @@ def run_matching(
         cache_key = "{}_{}".format(key, extract_conf["model"]["name"])
 
         if use_cached_model:
-            extractor = model_cache.cache_model(
+            extractor = model_cache.load_model(
                 cache_key, get_feature_model, extract_conf
             )
             # because of the model cache, we need to update the config
