@@ -1,4 +1,4 @@
-name: imw
+name: imcui
 channels:
   - pytorch
   - nvidia

@@ -169,11 +169,7 @@ class ImageMatchingApp:
                                             value=0.2,
                                         )
                                     )
-                                # matcher_lists = gr.Radio(
-                                #     ["NN-mutual", "Dual-Softmax"],
-                                #     label="Matcher mode",
-                                #     value="NN-mutual",
-                                # )
+
                             with gr.Accordion("RANSAC Setting", open=True):
                                 with gr.Row(equal_height=False):
                                     ransac_method = gr.Dropdown(
