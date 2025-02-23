@@ -27,7 +27,7 @@ from ..hloc import (
 )
 from ..hloc.utils.base_model import dynamic_load
 from .viz import display_keypoints, display_matches, fig2im, plot_images
-from .modelcache import ModelCache
+from .modelcache import ARCSizeAwareModelCache as ModelCache
 
 warnings.simplefilter("ignore")
 

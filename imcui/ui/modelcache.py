@@ -4,9 +4,10 @@ import time
 import threading
 from collections import OrderedDict
 import torch
+from ..hloc import logger
 
 
-class ModelCache:
+class ARCSizeAwareModelCache:
     def __init__(
         self,
         max_gpu_mem: float = 8e9,
@@ -14,6 +15,16 @@ class ModelCache:
         device_priority: list = ["cuda", "cpu"],
         auto_empty_cache: bool = True,
     ):
+        """
+        Initialize the model cache.
+
+        Args:
+            max_gpu_mem: Maximum GPU memory allowed in bytes.
+            max_cpu_mem: Maximum CPU memory allowed in bytes.
+            device_priority: List of devices to prioritize when evicting models.
+            auto_empty_cache: Whether to call torch.cuda.empty_cache() when out of memory.
+        """
+
         self.t1 = OrderedDict()
         self.t2 = OrderedDict()
         self.b1 = OrderedDict()
@@ -31,7 +42,18 @@ class ModelCache:
         self.lock = threading.Lock()
         self.auto_empty_cache = auto_empty_cache
 
+        logger.info("ARCSizeAwareModelCache initialized.")
+
     def _release_model(self, model_entry):
+        """
+        Release a model from memory.
+
+        Args:
+            model_entry: A dictionary containing the model, device and other information.
+
+        Notes:
+            If the device is CUDA and auto_empty_cache is True, torch.cuda.empty_cache() is called after releasing the model.
+        """
         model = model_entry["model"]
         device = model_entry["device"]
 
@@ -43,9 +65,7 @@ class ModelCache:
 
     def generate_key(self, model_key, model_conf: dict) -> str:
         loader_identifier = f"{model_key}"
-        unique_str = (
-            f"{loader_identifier}-{json.dumps(model_conf, sort_keys=True)}"
-        )
+        unique_str = f"{loader_identifier}-{json.dumps(model_conf, sort_keys=True)}"
         return hashlib.sha256(unique_str.encode()).hexdigest()
 
     def _get_device(self, model_size: int) -> str:
@@ -59,9 +79,9 @@ class ModelCache:
         return "cpu"
 
     def _calculate_model_size(self, model):
-        return sum(
-            p.numel() * p.element_size() for p in model.parameters()
-        ) + sum(b.numel() * b.element_size() for b in model.buffers())
+        return sum(p.numel() * p.element_size() for p in model.parameters()) + sum(
+            b.numel() * b.element_size() for b in model.buffers()
+        )
 
     def _update_access(self, key: str, size: int, device: str):
         if key in self.b1:
@@ -127,9 +147,7 @@ class ModelCache:
             return self._cross_device_evict(required_size, "cuda")
         return False
 
-    def _cross_device_evict(
-        self, required_size: int, target_device: str
-    ) -> bool:
+    def _cross_device_evict(self, required_size: int, target_device: str) -> bool:
         all_entries = []
         for k, v in list(self.t1.items()) + list(self.t2.items()):
             all_entries.append((k, v))
@@ -175,9 +193,7 @@ class ModelCache:
                 torch.cuda.synchronize()
 
             while True:
-                current_mem = (
-                    self.current_gpu if device == "cuda" else self.current_cpu
-                )
+                current_mem = self.current_gpu if device == "cuda" else self.current_cpu
                 max_mem = self.max_gpu if device == "cuda" else self.max_cpu
 
                 if current_mem + model_size <= max_mem:
