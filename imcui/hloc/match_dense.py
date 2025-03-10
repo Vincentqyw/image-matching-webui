@@ -302,6 +302,24 @@ confs = {
             "dfactor": 8,
         },
     },
+    "dad_roma": {
+        "output": "matches-dad_roma",
+        "model": {
+            "name": "roma",
+            "weights": "outdoor",
+            "model_name": "roma_outdoor.pth",
+            "max_keypoints": 2000,
+            "match_threshold": 0.2,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 320,
+            "height": 240,
+            "dfactor": 8,
+        },
+    },
     "minima_roma": {
         "output": "matches-minima_roma",
         "model": {

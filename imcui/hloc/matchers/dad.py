@@ -18,7 +18,7 @@ import dad as dad_detector
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-class Roma(BaseModel):
+class Dad(BaseModel):
     default_conf = {
         "name": "two_view_pipeline",
         "model_name": "roma_outdoor.pth",

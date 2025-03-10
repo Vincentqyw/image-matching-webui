@@ -51,6 +51,18 @@ matcher_zoo:
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
       display: true
+
+  dad(RoMa):
+    matcher: dad_roma
+    skip_ci: true
+    dense: true
+    info:
+      name: Dad(RoMa) #dispaly name
+      source: "ARXIV 2025"
+      paper: https://arxiv.org/abs/2412.19412
+      display: false
+      efficiency: low  # low, medium, high
+
   minima(RoMa):
     matcher: minima_roma
     skip_ci: true
