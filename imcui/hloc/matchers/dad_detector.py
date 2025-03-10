@@ -34,15 +34,15 @@ class Dad(BaseModel):
     def _init(self, conf):
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
+            filename="{}/{}".format("roma", self.conf["model_name"]),
         )
 
         dinov2_weights = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(Path(__file__).stem, self.conf["model_utils_name"]),
+            filename="{}/{}".format("roma", self.conf["model_utils_name"]),
         )
 
-        logger.info("Loading Roma model")
+        logger.info("Loading Dad + Roma model")
         # load the model
         weights = torch.load(model_path, map_location="cpu")
         dinov2_weights = torch.load(dinov2_weights, map_location="cpu")
@@ -56,7 +56,7 @@ class Dad(BaseModel):
             # temp fix issue: https://github.com/Parskatt/RoMa/issues/26
             amp_dtype=torch.float32,
         )
-        self.detector = dad_detector.DaD()
+        self.detector = dad_detector.load_DaD()
         logger.info("Load Dad + Roma model done.")
 
     def _forward(self, data):
@@ -73,12 +73,14 @@ class Dad(BaseModel):
         warp, certainty = self.matcher.match(img0, img1, device=device)
 
         # Sample matches for estimation
-        keypoints_A = self.detector.detect(
-            img0,
+        img0.save("img0.png")
+        img1.save("img1.png")
+        keypoints_A = self.detector.detect_from_path(
+            "img0.png",
             num_keypoints=self.conf["max_keypoints"],
         )["keypoints"][0]
-        keypoints_B = self.detector.detect(
-            img1,
+        keypoints_B = self.detector.detect_from_path(
+            "img1.png",
             num_keypoints=self.conf["max_keypoints"],
         )["keypoints"][0]
         matches = self.matcher.match_keypoints(
@@ -94,6 +96,6 @@ class Dad(BaseModel):
         pred = {
             "keypoints0": kpts1,
             "keypoints1": kpts2,
-            "mconf": certainty,
+            "mconf": torch.ones_like(kpts1[:, 0]),
         }
         return pred

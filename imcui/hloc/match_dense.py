@@ -305,7 +305,7 @@ confs = {
     "dad_roma": {
         "output": "matches-dad_roma",
         "model": {
-            "name": "roma",
+            "name": "dad_detector",
             "weights": "outdoor",
             "model_name": "roma_outdoor.pth",
             "max_keypoints": 2000,
@@ -323,7 +323,7 @@ confs = {
     "minima_roma": {
         "output": "matches-minima_roma",
         "model": {
-            "name": "roma",
+            "name": "minima_roma",
             "weights": "outdoor",
             "model_name": "minima_roma.pth",
             "max_keypoints": 2000,
