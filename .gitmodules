@@ -74,5 +74,5 @@
     path = imcui/third_party/XoFTR
     url = https://github.com/OnderT/XoFTR.git
 [submodule "imcui/third_party/dad"]
-	path = imcui/third_party/dad
-	url = https://github.com/Parskatt/dad
+    path = imcui/third_party/dad
+    url = https://github.com/Parskatt/dad

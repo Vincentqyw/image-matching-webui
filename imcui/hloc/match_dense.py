@@ -295,7 +295,7 @@ confs = {
         },
         "preprocessing": {
             "grayscale": False,
-            "force_resize": True,
+            "force_resize": False,
             "resize_max": 1024,
             "width": 320,
             "height": 240,
@@ -1028,8 +1028,16 @@ def match_images(model, image_0, image_1, conf, device="cpu"):
     # Rescale keypoints and move to cpu
     if "keypoints0" in pred.keys() and "keypoints1" in pred.keys():
         kpts0, kpts1 = pred["keypoints0"], pred["keypoints1"]
+        mkpts0, mkpts1 = pred.get("mkeypoints0"), pred.get("mkeypoints1")
+        if mkpts0 is None or mkpts1 is None:
+            mkpts0 = kpts0
+            mkpts1 = kpts1
+
         kpts0_origin = scale_keypoints(kpts0 + 0.5, s0) - 0.5
         kpts1_origin = scale_keypoints(kpts1 + 0.5, s1) - 0.5
+
+        mkpts0_origin = scale_keypoints(mkpts0 + 0.5, s0) - 0.5
+        mkpts1_origin = scale_keypoints(mkpts1 + 0.5, s1) - 0.5
 
         ret = {
             "image0": image0.squeeze().cpu().numpy(),
@@ -1040,10 +1048,10 @@ def match_images(model, image_0, image_1, conf, device="cpu"):
             "keypoints1": kpts1.cpu().numpy(),
             "keypoints0_orig": kpts0_origin.cpu().numpy(),
             "keypoints1_orig": kpts1_origin.cpu().numpy(),
-            "mkeypoints0": kpts0.cpu().numpy(),
-            "mkeypoints1": kpts1.cpu().numpy(),
-            "mkeypoints0_orig": kpts0_origin.cpu().numpy(),
-            "mkeypoints1_orig": kpts1_origin.cpu().numpy(),
+            "mkeypoints0": mkpts0.cpu().numpy(),
+            "mkeypoints1": mkpts1.cpu().numpy(),
+            "mkeypoints0_orig": mkpts0_origin.cpu().numpy(),
+            "mkeypoints1_orig": mkpts1_origin.cpu().numpy(),
             "original_size0": np.array(image_0.shape[:2][::-1]),
             "original_size1": np.array(image_1.shape[:2][::-1]),
             "new_size0": np.array(image0.shape[-2:][::-1]),

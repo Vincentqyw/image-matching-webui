@@ -41,8 +41,10 @@ class XFeatLightGlue(BaseModel):
         mkpts_0 = torch.from_numpy(mkpts_0)  # n x 2
         mkpts_1 = torch.from_numpy(mkpts_1)  # n x 2
         pred = {
-            "keypoints0": mkpts_0,
-            "keypoints1": mkpts_1,
+            "keypoints0": out0["keypoints"].squeeze(),
+            "keypoints1": out1["keypoints"].squeeze(),
+            "mkeypoints0": mkpts_0,
+            "mkeypoints1": mkpts_1,
             "mconf": torch.ones_like(mkpts_0[:, 0]),
         }
         return pred

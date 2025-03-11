@@ -49,7 +49,7 @@ class Dad(BaseModel):
         weights = torch.load(model_path, map_location="cpu")
         dinov2_weights = torch.load(dinov2_weights, map_location="cpu")
 
-        if str(device) == 'cpu':
+        if str(device) == "cpu":
             amp_dtype = torch.float32
         else:
             amp_dtype = torch.float16
@@ -112,8 +112,10 @@ class Dad(BaseModel):
         offset = self.detector.topleft - 0
         kpts1, kpts2 = kpts1 - offset, kpts2 - offset
         pred = {
-            "keypoints0": kpts1,
-            "keypoints1": kpts2,
+            "keypoints0": self.matcher._to_pixel_coordinates(keypoints_A, H_A, W_A),
+            "keypoints1": self.matcher._to_pixel_coordinates(keypoints_B, H_B, W_B),
+            "mkeypoints0": kpts1,
+            "mkeypoints1": kpts2,
             "mconf": torch.ones_like(kpts1[:, 0]),
         }
         return pred
