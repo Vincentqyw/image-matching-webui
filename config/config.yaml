@@ -43,6 +43,17 @@ matcher_zoo:
       # low, medium, high
       efficiency: low
 
+  dad(RoMa):
+    matcher: dad_roma
+    skip_ci: true
+    dense: true
+    info:
+      name: Dad(RoMa) #dispaly name
+      source: "ARXIV 2025"
+      github: https://github.com/example/example
+      paper: https://arxiv.org/abs/2503.07347
+      display: true
+      efficiency: low  # low, medium, high
   minima(loftr):
     matcher: minima_loftr
     dense: true
@@ -50,6 +61,7 @@ matcher_zoo:
       name: MINIMA(LoFTR) #dispaly name
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
+      github: https://github.com/LSXI7/MINIMA
       display: true
   minima(RoMa):
     matcher: minima_roma
@@ -59,6 +71,7 @@ matcher_zoo:
       name: MINIMA(RoMa) #dispaly name
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
+      github: https://github.com/LSXI7/MINIMA
       display: false
       efficiency: low  # low, medium, high
   omniglue:
