@@ -20,6 +20,8 @@ class Roma(BaseModel):
         "model_name": "roma_outdoor.pth",
         "model_utils_name": "dinov2_vitl14_pretrain.pth",
         "max_keypoints": 3000,
+        "coarse_res": (560, 560),
+        "upsample_res": (864, 1152),
     }
     required_inputs = [
         "image0",
@@ -43,15 +45,19 @@ class Roma(BaseModel):
         weights = torch.load(model_path, map_location="cpu")
         dinov2_weights = torch.load(dinov2_weights, map_location="cpu")
 
+        if str(device) == "cpu":
+            amp_dtype = torch.float32
+        else:
+            amp_dtype = torch.float16
         self.net = roma_model(
-            resolution=(14 * 8 * 6, 14 * 8 * 6),
-            upsample_preds=False,
+            resolution=self.conf["coarse_res"],
+            upsample_preds=True,
             weights=weights,
             dinov2_weights=dinov2_weights,
             device=device,
-            # temp fix issue: https://github.com/Parskatt/RoMa/issues/26
-            amp_dtype=torch.float32,
+            amp_dtype=amp_dtype,
         )
+        self.matcher.upsample_res = self.conf["upsample_res"]
         logger.info("Load Roma model done.")
 
     def _forward(self, data):

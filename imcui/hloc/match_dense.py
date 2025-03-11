@@ -305,7 +305,7 @@ confs = {
     "dad_roma": {
         "output": "matches-dad_roma",
         "model": {
-            "name": "dad_detector",
+            "name": "dad_roma",
             "weights": "outdoor",
             "model_name": "roma_outdoor.pth",
             "max_keypoints": 2000,
@@ -313,7 +313,7 @@ confs = {
         },
         "preprocessing": {
             "grayscale": False,
-            "force_resize": True,
+            "force_resize": False,
             "resize_max": 1024,
             "width": 320,
             "height": 240,
@@ -323,7 +323,7 @@ confs = {
     "minima_roma": {
         "output": "matches-minima_roma",
         "model": {
-            "name": "minima_roma",
+            "name": "roma",
             "weights": "outdoor",
             "model_name": "minima_roma.pth",
             "max_keypoints": 2000,

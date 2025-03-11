@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-
+import tempfile
 import torch
 from PIL import Image
 
@@ -24,6 +24,8 @@ class Dad(BaseModel):
         "model_name": "roma_outdoor.pth",
         "model_utils_name": "dinov2_vitl14_pretrain.pth",
         "max_keypoints": 3000,
+        "coarse_res": (560, 560),
+        "upsample_res": (864, 1152),
     }
     required_inputs = [
         "image0",
@@ -47,15 +49,22 @@ class Dad(BaseModel):
         weights = torch.load(model_path, map_location="cpu")
         dinov2_weights = torch.load(dinov2_weights, map_location="cpu")
 
+        if str(device) == 'cpu':
+            amp_dtype = torch.float32
+        else:
+            amp_dtype = torch.float16
+
         self.matcher = roma_model(
-            resolution=(14 * 8 * 6, 14 * 8 * 6),
-            upsample_preds=False,
+            resolution=self.conf["coarse_res"],
+            upsample_preds=True,
             weights=weights,
             dinov2_weights=dinov2_weights,
             device=device,
-            # temp fix issue: https://github.com/Parskatt/RoMa/issues/26
-            amp_dtype=torch.float32,
+            amp_dtype=amp_dtype,
         )
+        self.matcher.upsample_res = self.conf["upsample_res"]
+        self.matcher.symmetric = False
+
         self.detector = dad_detector.load_DaD()
         logger.info("Load Dad + Roma model done.")
 
@@ -69,18 +78,25 @@ class Dad(BaseModel):
         W_A, H_A = img0.size
         W_B, H_B = img1.size
 
-        # Match
-        warp, certainty = self.matcher.match(img0, img1, device=device)
+        # hack: bad way to save then match
+        with (
+            tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img0,
+            tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img1,
+        ):
+            img0_path = temp_img0.name
+            img1_path = temp_img1.name
+            img0.save(img0_path)
+            img1.save(img1_path)
 
-        # Sample matches for estimation
-        img0.save("img0.png")
-        img1.save("img1.png")
+        # Match
+        warp, certainty = self.matcher.match(img0_path, img1_path, device=device)
+        # Detect
         keypoints_A = self.detector.detect_from_path(
-            "img0.png",
+            img0_path,
             num_keypoints=self.conf["max_keypoints"],
         )["keypoints"][0]
         keypoints_B = self.detector.detect_from_path(
-            "img1.png",
+            img1_path,
             num_keypoints=self.conf["max_keypoints"],
         )["keypoints"][0]
         matches = self.matcher.match_keypoints(
@@ -93,6 +109,8 @@ class Dad(BaseModel):
 
         # Sample matches for estimation
         kpts1, kpts2 = self.matcher.to_pixel_coordinates(matches, H_A, W_A, H_B, W_B)
+        offset = self.detector.topleft - 0
+        kpts1, kpts2 = kpts1 - offset, kpts2 - offset
         pred = {
             "keypoints0": kpts1,
             "keypoints1": kpts2,
