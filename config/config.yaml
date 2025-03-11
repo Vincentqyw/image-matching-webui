@@ -50,8 +50,8 @@ matcher_zoo:
     info:
       name: Dad(RoMa) #dispaly name
       source: "ARXIV 2025"
-      github: https://github.com/example/example
       paper: https://arxiv.org/abs/2503.07347
+      github: https://github.com/Parskatt/dad
       display: true
       efficiency: low  # low, medium, high
   minima(loftr):
