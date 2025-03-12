@@ -57,7 +57,7 @@ class Roma(BaseModel):
             device=device,
             amp_dtype=amp_dtype,
         )
-        self.matcher.upsample_res = self.conf["upsample_res"]
+        self.net.upsample_res = self.conf["upsample_res"]
         logger.info("Load Roma model done.")
 
     def _forward(self, data):
