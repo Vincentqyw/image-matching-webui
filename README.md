@@ -12,8 +12,8 @@
   <a target="_blank" href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
   <a target="_blank" href="https://pypi.org/project/imcui"><img alt="PyPI - Version" src="https://img.shields.io/pypi/v/imcui?style=flat&logo=pypi&label=imcui&link=https%3A%2F%2Fpypi.org%2Fproject%2Fimcui"></a>
   <a target="_blank" href="https://hub.docker.com/r/vincentqin/image-matching-webui"><img alt="Docker Image Version" src="https://img.shields.io/docker/v/vincentqin/image-matching-webui?sort=date&arch=amd64&logo=docker&label=imcui&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fvincentqin%2Fimage-matching-webui"></a>
-   <a target="_blank" href="https://pepy.tech/projects/imcui"><img src="https://static.pepy.tech/badge/imcui" alt="PyPI Downloads"></a>
-
+  <a target="_blank" href="https://pepy.tech/projects/imcui"><img src="https://static.pepy.tech/badge/imcui" alt="PyPI Downloads"></a>
+  <a target="_blank" href="https://deepwiki.com/Vincentqyw/image-matching-webui"><img src="https://img.shields.io/badge/DeepWiki-imcui-blue.svg" alt="DeepWiki"></a>
 </div>
 
 ## Description
