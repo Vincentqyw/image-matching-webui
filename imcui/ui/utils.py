@@ -153,13 +153,15 @@ def download_example_images(repo_id, output_dir):
 
 def gen_examples(data_root: Path):
     random.seed(1)
-    example_matchers = [
+    example_algos = [
         "disk+lightglue",
         "xfeat(sparse)",
         "dedode",
         "loftr",
         "disk",
         "RoMa",
+        "sift",
+        "rord",
         "d2net",
         "aspanformer",
         "topicfm",
@@ -167,6 +169,12 @@ def gen_examples(data_root: Path):
         "superpoint+lightglue",
         "superpoint+mnn",
         "disk",
+    ]
+    example_algos_rotation_robust = [
+        "sift",
+        "rord",
+        "sift+lightglue",
+        # "GIM(dkm)",
     ]
     data_root = Path(data_root)
     if not Path(data_root).exists():
@@ -263,10 +271,16 @@ def gen_examples(data_root: Path):
 
     # image pair path
     pairs = gen_images_pairs()
-    pairs += gen_rot_image_pairs()
+    # pairs += gen_rot_image_pairs()
     pairs += gen_scale_image_pairs()
     pairs += gen_image_pairs_wxbs()
-
+    pairs_rotation = gen_rot_image_pairs()
+    dist_examples = distribute_elements(pairs, example_algos)
+    dist_examples_rotation = distribute_elements(
+        pairs_rotation, example_algos_rotation_robust
+    )
+    pairs = pairs_rotation + pairs
+    dist_examples = dist_examples_rotation + dist_examples
     match_setting_threshold = DEFAULT_SETTING_THRESHOLD
     match_setting_max_features = DEFAULT_SETTING_MAX_FEATURES
     detect_keypoints_threshold = DEFAULT_DEFAULT_KEYPOINT_THRESHOLD
@@ -275,7 +289,7 @@ def gen_examples(data_root: Path):
     ransac_confidence = DEFAULT_RANSAC_CONFIDENCE
     ransac_max_iter = DEFAULT_RANSAC_MAX_ITER
     input_lists = []
-    dist_examples = distribute_elements(pairs, example_matchers)
+
     for pair, mt in zip(pairs, dist_examples):
         input_lists.append(
             [
@@ -285,7 +299,6 @@ def gen_examples(data_root: Path):
                 match_setting_max_features,
                 detect_keypoints_threshold,
                 mt,
-                # enable_ransac,
                 ransac_method,
                 ransac_reproj_threshold,
                 ransac_confidence,
