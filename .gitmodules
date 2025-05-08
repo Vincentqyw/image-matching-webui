@@ -77,5 +77,5 @@
     path = imcui/third_party/dad
     url = https://github.com/Parskatt/dad
 [submodule "imcui/third_party/LiftFeat"]
-	path = imcui/third_party/LiftFeat
-	url = https://github.com/agipro/LiftFeat.git
+    path = imcui/third_party/LiftFeat
+    url = https://github.com/agipro/LiftFeat.git
