@@ -34,6 +34,7 @@ The tool currently supports various popular image matching algorithms, namely:
 | Algorithm        | Supported | Conference/Journal | Year | GitHub Link |
 |------------------|-----------|--------------------|------|-------------|
 | DaD            | ✅ | ARXIV   | 2025 | [Link](https://github.com/Parskatt/dad) |
+| LiftFeat       | ✅ | ICRA    | 2025 | [Link](https://github.com/lyp-deeplearning/LiftFeat) |
 | MINIMA         | ✅ | ARXIV   | 2024 | [Link](https://github.com/LSXI7/MINIMA) |
 | XoFTR          | ✅ | CVPR    | 2024 | [Link](https://github.com/OnderT/XoFTR) |
 | EfficientLoFTR | ✅ | CVPR    | 2024 | [Link](https://github.com/zju3dv/EfficientLoFTR) |
