@@ -1,26 +1,31 @@
 import sys
 from pathlib import Path
 from ..utils.base_model import BaseModel
-from .. import logger
+from .. import logger, MODEL_REPO_ID
 
 fire_path = Path(__file__).parent / "../../third_party/LiftFeat"
 sys.path.append(str(fire_path))
 
-from models.liftfeat_wrapper import LiftFeat, MODEL_PATH
+from models.liftfeat_wrapper import LiftFeat
 
 
 class Liftfeat(BaseModel):
     default_conf = {
         "keypoint_threshold": 0.05,
         "max_keypoints": 5000,
+        "model_name": "LiftFeat.pth",
     }
 
     required_inputs = ["image"]
 
     def _init(self, conf):
         logger.info("Loading LiftFeat model...")
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
+        )
         self.net = LiftFeat(
-            weight=MODEL_PATH,
+            weight=model_path,
             detect_threshold=self.conf["keypoint_threshold"],
             top_k=self.conf["max_keypoints"],
         )
