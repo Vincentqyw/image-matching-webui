@@ -242,6 +242,17 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2404.19174
       project: null
       display: false
+  liftfeat(sparse):
+    matcher: NN-mutual
+    feature: liftfeat
+    dense: false
+    info:
+      name: LiftFeat #dispaly name
+      source: "ICRA 2025"
+      github: https://github.com/lyp-deeplearning/LiftFeat
+      paper: https://arxiv.org/abs/2505.0342
+      project: null
+      display: true
   dedode:
     matcher: Dual-Softmax
     feature: dedode
