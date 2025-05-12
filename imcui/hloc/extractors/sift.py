@@ -132,7 +132,7 @@ class SIFT(BaseModel):
         else:
             backends = {"opencv", "pycolmap", "pycolmap_cpu", "pycolmap_cuda"}
             raise ValueError(
-                f"Unknown backend: {backend} not in " f"{{{','.join(backends)}}}."
+                f"Unknown backend: {backend} not in {{{','.join(backends)}}}."
             )
         logger.info("Load SIFT model done.")
 
