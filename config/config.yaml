@@ -253,6 +253,27 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2505.0342
       project: null
       display: true
+  rdd(sparse):
+    matcher: NN-mutual
+    feature: rdd
+    dense: false
+    info:
+      name: RDD(sparse) #dispaly name
+      source: "CVPR 2025"
+      github: hhttps://github.com/xtcpete/rdd
+      paper: https://arxiv.org/abs/2505.08013
+      project: https://xtcpete.github.io/rdd
+      display: true
+  rdd(dense):
+    matcher: rdd_dense
+    dense: true
+    info:
+      name: RDD(dense) #dispaly name
+      source: "CVPR 2025"
+      github: hhttps://github.com/xtcpete/rdd
+      paper: https://arxiv.org/abs/2505.08013
+      project: https://xtcpete.github.io/rdd
+      display: true
   dedode:
     matcher: Dual-Softmax
     feature: dedode
