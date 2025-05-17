@@ -225,6 +225,17 @@ confs = {
             "resize_max": 1600,
         },
     },
+    "rdd": {
+        "output": "feats-rdd-n5000-r1600",
+        "model": {
+            "name": "rdd",
+            "max_keypoints": 5000,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "resize_max": 1600,
+        },
+    },
     "aliked-n16-rot": {
         "output": "feats-aliked-n16-rot",
         "model": {

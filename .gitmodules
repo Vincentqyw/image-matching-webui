@@ -79,3 +79,6 @@
 [submodule "imcui/third_party/LiftFeat"]
     path = imcui/third_party/LiftFeat
     url = https://github.com/agipro/LiftFeat.git
+[submodule "imcui/third_party/rdd"]
+    path = imcui/third_party/rdd
+    url = https://github.com/agipro/rdd.git
