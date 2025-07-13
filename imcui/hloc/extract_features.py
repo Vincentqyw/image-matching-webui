@@ -236,6 +236,17 @@ confs = {
             "resize_max": 1600,
         },
     },
+    "ripe": {
+        "output": "feats-ripe-n2048-r1600",
+        "model": {
+            "name": "ripe",
+            "max_keypoints": 2048,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "resize_max": 1600,
+        },
+    },
     "aliked-n16-rot": {
         "output": "feats-aliked-n16-rot",
         "model": {

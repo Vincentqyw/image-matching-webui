@@ -33,6 +33,7 @@ The tool currently supports various popular image matching algorithms, namely:
 
 | Algorithm        | Supported | Conference/Journal | Year | GitHub Link |
 |------------------|-----------|--------------------|------|-------------|
+| RIPE           | ✅ | ICCV    | 2025 | [Link](https://github.com/fraunhoferhhi/RIPE)  |
 | RDD            | ✅ | CVPR    | 2025 | [Link](https://github.com/xtcpete/rdd)  |
 | LiftFeat       | ✅ | ICRA    | 2025 | [Link](https://github.com/lyp-deeplearning/LiftFeat) |
 | DaD            | ✅ | ARXIV   | 2025 | [Link](https://github.com/Parskatt/dad) |
