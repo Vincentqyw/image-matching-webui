@@ -82,3 +82,6 @@
 [submodule "imcui/third_party/rdd"]
     path = imcui/third_party/rdd
     url = https://github.com/agipro/rdd.git
+[submodule "imcui/third_party/RIPE"]
+    path = imcui/third_party/RIPE
+    url = https://github.com/fraunhoferhhi/RIPE
