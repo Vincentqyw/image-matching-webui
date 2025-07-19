@@ -41,8 +41,6 @@ repos:
     exclude: ^imcui/third_party/
   - id: mixed-line-ending
     exclude: ^imcui/third_party/
-  - id: requirements-txt-fixer
-    exclude: ^imcui/third_party/
   - id: trailing-whitespace
     exclude: ^imcui/third_party/
 
