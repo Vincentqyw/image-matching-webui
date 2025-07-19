@@ -121,15 +121,47 @@ or using [docker](https://hub.docker.com/r/vincentqin/image-matching-webui):
 
 ``` bash
 docker pull vincentqin/image-matching-webui:latest
-docker run -it -d \
-  -p 7860:7860 \
-  -p 8000:8000 \
-  -p 8001:8001 \
-  -p 8265:8265 \
-  --name imc-test \
-  vincentqin/image-matching-webui:latest
+
+# start single
+docker-compose up webui # or docker compose up -d webui
+docker-compose up api # or docker compose up -d api
+
+# start all
+docker-compose up webui api
+# or
+docker-compose up
+
+# stop
+docker-compose stop webui
+docker-compose stop api
+
 ```
-then webui and api server are auto-run.
+
+Full list of commands:
+
+``` bash
+# 构建并启动单个服务
+docker-compose up --build webui
+
+# 查看单个服务状态
+docker-compose ps webui
+
+# 查看单个服务日志
+docker-compose logs webui
+docker-compose logs -f webui  # 实时跟踪
+
+# 停止单个服务
+docker-compose stop webui
+
+# 重启单个服务
+docker-compose restart webui
+
+# 删除单个服务容器
+docker-compose rm webui
+
+```
+
+
 
 ### Deploy to Railway
 
