@@ -123,8 +123,9 @@ or using [docker](https://hub.docker.com/r/vincentqin/image-matching-webui):
 docker pull vincentqin/image-matching-webui:latest
 
 # start single
-docker-compose up webui # or docker compose up -d webui
-docker-compose up api # or docker compose up -d api
+docker-compose up webui
+# or: in background
+docker compose up -d webui
 
 # start all
 docker-compose up webui api
@@ -134,6 +135,9 @@ docker-compose up
 # stop
 docker-compose stop webui
 docker-compose stop api
+
+# del all
+docker-compose down
 
 ```
 
@@ -160,7 +164,6 @@ docker-compose restart webui
 docker-compose rm webui
 
 ```
-
 
 
 ### Deploy to Railway
