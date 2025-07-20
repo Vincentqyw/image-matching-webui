@@ -119,52 +119,44 @@ pip install -e .
 
 or using [docker](https://hub.docker.com/r/vincentqin/image-matching-webui):
 
-``` bash
+```bash
 docker pull vincentqin/image-matching-webui:latest
 
-# start single
+# Start the WebUI service
 docker-compose up webui
-# or: in background
-docker compose up -d webui
 
-# start all
-docker-compose up webui api
-# or
-docker-compose up
+# Or run in the background
+docker-compose up -d webui
+```
 
-# stop
+<details>
+<summary><strong>More Docker Compose Commands</strong> (click to expand)</summary>
+
+```bash
+# Build and start the WebUI service
+docker-compose up --build webui
+
+# Check the status of the WebUI service
+docker-compose ps webui
+
+# View logs for the WebUI service
+docker-compose logs webui
+docker-compose logs -f webui  # Follow logs in real time
+
+# Stop the WebUI service
 docker-compose stop webui
-docker-compose stop api
 
-# del all
+# Restart the WebUI service
+docker-compose restart webui
+
+# Remove the WebUI service container
+docker-compose rm webui
+
+# Remove all containers
 docker-compose down
 
 ```
-
-Full list of commands:
-
-``` bash
-# 构建并启动单个服务
-docker-compose up --build webui
-
-# 查看单个服务状态
-docker-compose ps webui
-
-# 查看单个服务日志
-docker-compose logs webui
-docker-compose logs -f webui  # 实时跟踪
-
-# 停止单个服务
-docker-compose stop webui
-
-# 重启单个服务
-docker-compose restart webui
-
-# 删除单个服务容器
-docker-compose rm webui
-
-```
-
+</details>
 
 ### Deploy to Railway
 
