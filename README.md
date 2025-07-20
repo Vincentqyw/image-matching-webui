@@ -119,17 +119,44 @@ pip install -e .
 
 or using [docker](https://hub.docker.com/r/vincentqin/image-matching-webui):
 
-``` bash
+```bash
 docker pull vincentqin/image-matching-webui:latest
-docker run -it -d \
-  -p 7860:7860 \
-  -p 8000:8000 \
-  -p 8001:8001 \
-  -p 8265:8265 \
-  --name imc-test \
-  vincentqin/image-matching-webui:latest
+
+# Start the WebUI service
+docker-compose up webui
+
+# Or run in the background
+docker-compose up -d webui
 ```
-then webui and api server are auto-run.
+
+<details>
+<summary><strong>More Docker Compose Commands</strong> (click to expand)</summary>
+
+```bash
+# Build and start the WebUI service
+docker-compose up --build webui
+
+# Check the status of the WebUI service
+docker-compose ps webui
+
+# View logs for the WebUI service
+docker-compose logs webui
+docker-compose logs -f webui  # Follow logs in real time
+
+# Stop the WebUI service
+docker-compose stop webui
+
+# Restart the WebUI service
+docker-compose restart webui
+
+# Remove the WebUI service container
+docker-compose rm webui
+
+# Remove all containers
+docker-compose down
+
+```
+</details>
 
 ### Deploy to Railway
 

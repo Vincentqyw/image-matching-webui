@@ -1,0 +1,41 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # API
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8265:8265"
+    command: python -m imcui.api.server --config imcui/api/config/api.yaml
+    volumes:
+      - ./models:/code/models  # Optinal: models
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CUDA_VISIBLE_DEVICES=0
+
+  # Web UI
+  webui:
+    build: .
+    ports:
+      - "7860:7860"
+    command: python app.py --server_port=7860 --server_name=0.0.0.0
+    volumes:
+      - ./uploads:/code/uploads  # Optinal: some uploads
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CUDA_VISIBLE_DEVICES=0
+
+  # enter debug mode
+  debug:
+    build: .
+    ports:
+      - "7860:7860"
+    command: sleep infinity
+    volumes:
+      - ./uploads:/code/uploads  # Optinal: some uploads
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CUDA_VISIBLE_DEVICES=0

@@ -1,43 +1,16 @@
-# Use official conda base image
 FROM pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
 LABEL maintainer vincentqyw
 
-# Set working directory
 WORKDIR /code
 
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    git-lfs \
-    ffmpeg \
-    libsm6 \
-    libxext6 \
-    && rm -rf /var/lib/apt/lists/*
+# all together
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git-lfs ffmpeg libsm6 libxext6 && \
+    git lfs install && \
+    git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git . && \
+    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    pip cache purge
 
-# Initialize Git LFS
-RUN git lfs install
-
-# Clone repository
-RUN git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git /code
-
-# Configure conda environment
-RUN conda create -n imcui python=3.10.10 && \
-    echo "source activate imcui" >> ~/.bashrc
-ENV PATH /opt/conda/envs/imcui/bin:$PATH
-
-# Set conda environment as default execution context
-SHELL ["conda", "run", "-n", "imcui", "/bin/bash", "-c"]
-
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
-# Copy startup script
-COPY docker/start.sh /code/start.sh
-RUN chmod +x /code/start.sh
-
-# Expose service ports
 EXPOSE 7860 8000 8001 8265
-
-# Launch services
-CMD ["/code/start.sh"]
