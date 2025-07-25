@@ -37,6 +37,9 @@ class Rdd(BaseModel):
 
     def _forward(self, data):
         image = data["image"]
+        self.net.set_softdetect(
+            top_k=self.conf["max_keypoints"], scores_th=self.conf["keypoint_threshold"]
+        )
         pred = self.net.extract(image)[0]
         keypoints = pred["keypoints"]
         descriptors = pred["descriptors"]

@@ -53,7 +53,7 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2503.07347
       github: https://github.com/Parskatt/dad
       display: true
-      efficiency: low  # low, medium, high
+      efficiency: medium  # low, medium, high
   minima(loftr):
     matcher: minima_loftr
     dense: true
@@ -72,7 +72,7 @@ matcher_zoo:
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
       github: https://github.com/LSXI7/MINIMA
-      display: false
+      display: true
       efficiency: low  # low, medium, high
   omniglue:
     enable: true
@@ -86,9 +86,10 @@ matcher_zoo:
       project: https://hwjiang1510.github.io/OmniGlue
       display: true
   Mast3R:
-    enable: false
+    enable: true
     matcher: mast3r
     dense: true
+    skip_ci: true
     info:
       name: Mast3R #dispaly name
       source: "CVPR 2024"
@@ -100,7 +101,6 @@ matcher_zoo:
   DUSt3R:
     # TODO: duster is under development
     enable: true
-    # skip_ci: true
     matcher: duster
     dense: true
     info:
@@ -139,6 +139,7 @@ matcher_zoo:
     matcher: dkm
     skip_ci: true
     dense: true
+    enable: true
     info:
       name: DKM #dispaly name
       source: "CVPR 2023"
@@ -177,6 +178,17 @@ matcher_zoo:
       paper: https://arxiv.org/pdf/2404.09692
       project: null
       display: true
+  jamma:
+    matcher: jamma
+    dense: true
+    enable: false
+    info:
+      name: Jamma #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/OnderT/XoFTR
+      paper: https://arxiv.org/pdf/2404.09692
+      project: null
+      display: false
   cotr:
     enable: false
     skip_ci: true
