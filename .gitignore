@@ -33,3 +33,4 @@ oryx-build-commands.txt
 .ruff_cache*
 dist
 tmp
+**.DS_Store**

@@ -102,6 +102,23 @@ confs = {
         "max_error": 1,  # max error for assigned keypoints (in px)
         "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
     },
+    "jamma": {
+        "output": "matches-jamma",
+        "model": {
+            "name": "jamma",
+            "weights": "jamma_weight.ckpt",
+            "max_keypoints": 2000,
+            "match_threshold": 0.3,
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 16,
+            "width": 832,
+            "height": 832,
+            "force_resize": True,
+        },
+    },
     # "loftr_quadtree": {
     #     "output": "matches-loftr-quadtree",
     #     "model": {
@@ -295,7 +312,7 @@ confs = {
         },
         "preprocessing": {
             "grayscale": False,
-            "force_resize": False,
+            "force_resize": True,
             "resize_max": 1024,
             "width": 320,
             "height": 240,
@@ -313,7 +330,24 @@ confs = {
         },
         "preprocessing": {
             "grayscale": False,
-            "force_resize": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 320,
+            "height": 240,
+            "dfactor": 8,
+        },
+    },
+    "gim_roma": {
+        "output": "matches-gim_roma",
+        "model": {
+            "name": "roma",
+            "model_name": "gim_roma_100h.ckpt",
+            "max_keypoints": 2000,
+            "match_threshold": 0.2,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
             "resize_max": 1024,
             "width": 320,
             "height": 240,
@@ -348,7 +382,7 @@ confs = {
         },
         "preprocessing": {
             "grayscale": False,
-            "force_resize": False,
+            "force_resize": True,
             "resize_max": 1024,
             "width": 320,
             "height": 240,

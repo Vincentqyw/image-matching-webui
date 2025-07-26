@@ -110,6 +110,19 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2312.14132
       project: https://dust3r.europe.naverlabs.com
       display: true
+  GIM(RoMa):
+    matcher: gim_roma
+    skip_ci: true
+    dense: true
+    enable: true
+    info:
+      name: GIM(RoMa) #dispaly name
+      source: "ICLR 2024"
+      github: https://github.com/xuelunshen/gim
+      paper: https://arxiv.org/abs/2402.11095
+      project: https://xuelunshen.com/gim
+      display: true
+      efficiency: low  # low, medium, high
   GIM(dkm):
     enable: true
     # skip_ci: true

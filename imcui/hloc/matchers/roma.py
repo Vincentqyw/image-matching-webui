@@ -43,6 +43,14 @@ class Roma(BaseModel):
         logger.info("Loading Roma model")
         # load the model
         weights = torch.load(model_path, map_location="cpu")
+
+        if self.conf["model_name"] == "gim_roma_100h.ckpt":
+            if "state_dict" in weights.keys():
+                weights = weights["state_dict"]
+            for k in list(weights.keys()):
+                if k.startswith("model."):
+                    weights[k.replace("model.", "", 1)] = weights.pop(k)
+
         dinov2_weights = torch.load(dinov2_weights, map_location="cpu")
 
         if str(device) == "cpu":
