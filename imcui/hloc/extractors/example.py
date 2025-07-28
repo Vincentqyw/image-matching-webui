@@ -26,7 +26,7 @@ class Example(BaseModel):
 
     def _init(self, conf):
         # set checkpoints paths if needed
-        model_path = example_path / "checkpoints" / f'{conf["model_name"]}'
+        model_path = example_path / "checkpoints" / f"{conf['model_name']}"
         if not model_path.exists():
             logger.info(f"No model found at {model_path}")
 
