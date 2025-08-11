@@ -757,7 +757,7 @@ def run_ransac(
         ransac_confidence=ransac_confidence,
         ransac_max_iter=ransac_max_iter,
     )
-    logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"RANSAC matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # plot images with ransac matches
@@ -768,7 +768,7 @@ def run_ransac(
     output_matches_ransac, num_matches_ransac = display_matches(
         state_cache, titles=titles, tag="KPTS_RANSAC"
     )
-    logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"Display matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # compute warp images
@@ -920,7 +920,7 @@ def run_matching(
         logger.info(f"Loaded cached model {cache_key}")
     else:
         matcher = get_model(match_conf)
-    logger.info(f"Loading model using: {time.time()-t0:.3f}s")
+    logger.info(f"Loading model using: {time.time() - t0:.3f}s")
     t1 = time.time()
     yield generate_fake_outputs(
         output_keypoints, output_matches_raw, output_matches_ransac, match_conf, {}, {}
@@ -979,7 +979,7 @@ def run_matching(
     # gr.Info(
     #     f"Matching images done using: {time.time()-t1:.3f}s",
     # )
-    logger.info(f"Matching images done using: {time.time()-t1:.3f}s")
+    logger.info(f"Matching images done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # plot images with keypoints
@@ -1022,7 +1022,7 @@ def run_matching(
     )
 
     # gr.Info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
-    logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"RANSAC matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # plot images with ransac matches
@@ -1043,7 +1043,7 @@ def run_matching(
     )
 
     # gr.Info(f"Display matches done using: {time.time()-t1:.3f}s")
-    logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"Display matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
     # plot wrapped images
     output_wrapped, warped_image = generate_warp_images(
@@ -1054,7 +1054,7 @@ def run_matching(
     )
     plt.close("all")
     # gr.Info(f"In summary, total time: {time.time()-t0:.3f}s")
-    logger.info(f"TOTAL time: {time.time()-t0:.3f}s")
+    logger.info(f"TOTAL time: {time.time() - t0:.3f}s")
 
     state_cache = pred
     state_cache["num_matches_raw"] = num_matches_raw
