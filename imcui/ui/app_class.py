@@ -20,19 +20,29 @@ from .utils import (
 )
 
 DESCRIPTION = """
-# Image Matching WebUI
+<div style="text-align: left;">
+  <h1 style="font-size: 2rem; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem;">
+    Image Matching WebUI
+  </h1>
+</div>
+
 This Space demonstrates [Image Matching WebUI](https://github.com/Vincentqyw/image-matching-webui) by vincent qin. Feel free to play with it, or duplicate to run image matching without a queue!
 <br/>
-🔎 For more details about supported local features and matchers, please refer to https://github.com/Vincentqyw/image-matching-webui
+🚀 **Now GPU-accelerated!** Thanks to HuggingFace's community grant, all algorithms run on GPU for fast, responsive inference.
 
-🚀 All algorithms run on CPU for inference, causing slow speeds and high latency. For faster inference, please download the [source code](https://github.com/Vincentqyw/image-matching-webui) for local deployment.
+🔎 For more details about supported local features and matchers, please refer to https://github.com/Vincentqyw/image-matching-webui
 
 🐛 Your feedback is valuable to me. Please do not hesitate to report any bugs [here](https://github.com/Vincentqyw/image-matching-webui/issues).
 """
 
 CSS = """
 #warning {background-color: #FFCCCB}
-.logs_class textarea {font-size: 12px !important}
+.logs_class textarea {font-size: 10px !important}
+
+.gradio-container {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 """
 
 
@@ -112,30 +122,7 @@ class ImageMatchingApp:
                             button_stop = gr.Button(value="Force Stop", variant="stop")
 
                         with gr.Accordion("Advanced Setting", open=False):
-                            with gr.Accordion("Image Setting", open=True):
-                                with gr.Row():
-                                    image_force_resize_cb = gr.Checkbox(
-                                        label="Force Resize",
-                                        value=False,
-                                        interactive=True,
-                                    )
-                                    image_setting_height = gr.Slider(
-                                        minimum=48,
-                                        maximum=2048,
-                                        step=16,
-                                        label="Image Height",
-                                        value=480,
-                                        visible=False,
-                                    )
-                                    image_setting_width = gr.Slider(
-                                        minimum=64,
-                                        maximum=2048,
-                                        step=16,
-                                        label="Image Width",
-                                        value=640,
-                                        visible=False,
-                                    )
-                            with gr.Accordion("Matching Setting", open=True):
+                            with gr.Tab("Matching Setting"):
                                 with gr.Row():
                                     match_setting_threshold = gr.Slider(
                                         minimum=0.0,
@@ -160,17 +147,15 @@ class ImageMatchingApp:
                                         label="Keypoint threshold",
                                         value=0.015,
                                     )
-                                    detect_line_threshold = (  # noqa: F841
-                                        gr.Slider(
-                                            minimum=0.1,
-                                            maximum=1,
-                                            step=0.01,
-                                            label="Line threshold",
-                                            value=0.2,
-                                        )
+                                    detect_line_threshold = gr.Slider(  # noqa: F841
+                                        minimum=0.1,
+                                        maximum=1,
+                                        step=0.01,
+                                        label="Line threshold",
+                                        value=0.2,
                                     )
 
-                            with gr.Accordion("RANSAC Setting", open=True):
+                            with gr.Tab("RANSAC Setting"):
                                 with gr.Row(equal_height=False):
                                     ransac_method = gr.Dropdown(
                                         choices=ransac_zoo.keys(),
@@ -202,12 +187,35 @@ class ImageMatchingApp:
                                 button_ransac = gr.Button(
                                     value="Rerun RANSAC", variant="primary"
                                 )
-                            with gr.Accordion("Geometry Setting", open=False):
+                            with gr.Tab("Geometry Setting"):
                                 with gr.Row(equal_height=False):
                                     choice_geometry_type = gr.Radio(
                                         ["Fundamental", "Homography"],
                                         label="Reconstruct Geometry",
                                         value=self.cfg["defaults"]["setting_geometry"],
+                                    )
+                            with gr.Tab("Image Setting"):
+                                with gr.Row():
+                                    image_force_resize_cb = gr.Checkbox(
+                                        label="Force Resize",
+                                        value=False,
+                                        interactive=True,
+                                    )
+                                    image_setting_height = gr.Slider(
+                                        minimum=48,
+                                        maximum=2048,
+                                        step=16,
+                                        label="Image Height",
+                                        value=480,
+                                        visible=False,
+                                    )
+                                    image_setting_width = gr.Slider(
+                                        minimum=64,
+                                        maximum=2048,
+                                        step=16,
+                                        label="Image Width",
+                                        value=640,
+                                        visible=False,
                                     )
                         # image resize
                         image_force_resize_cb.select(
