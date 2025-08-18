@@ -34,9 +34,9 @@ scikit-learn
 scipy
 seaborn
 shapely
-tensorboardX==2.6.1
-torchmetrics==0.6.0
-torchvision==0.19.0
+tensorboardX
+torchmetrics
+torchvision
 tqdm
 uvicorn
 yacs
