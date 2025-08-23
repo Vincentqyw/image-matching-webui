@@ -39,7 +39,8 @@ class IMP(BaseModel):
         # self.net = nets.gml(self.conf).eval().to(DEVICE)
         self.net = GML(self.conf).eval().to(DEVICE)
         self.net.load_state_dict(
-            torch.load(model_path, map_location="cpu")["model"], strict=True
+            torch.load(model_path, map_location="cpu", weights_only=False)["model"],
+            strict=True,
         )
         logger.info("Load IMP model done.")
 

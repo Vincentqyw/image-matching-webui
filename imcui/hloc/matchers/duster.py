@@ -22,7 +22,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class Duster(BaseModel):
     default_conf = {
-        "name": "Duster3r",
+        "name": "Dust3r",
         "model_name": "duster_vit_large.pth",
         "max_keypoints": 3000,
         "vit_patch_size": 16,
