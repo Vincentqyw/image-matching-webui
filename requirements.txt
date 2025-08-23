@@ -24,7 +24,7 @@ protobuf
 psutil
 pycolmap
 pytlsd  # gluestick, <3.12
-pytorch-lightning  #==1.4.9
+pytorch-lightning  # ==1.4.9
 PyYAML
 ray
 ray[serve]
@@ -34,9 +34,9 @@ scikit-learn
 scipy
 seaborn
 shapely
-tensorboardX
-torchmetrics
-torchvision
+tensorboardX  #==2.6.1
+torchmetrics  #==0.6.0
+torchvision  #==0.19.0
 tqdm
 uvicorn
 yacs

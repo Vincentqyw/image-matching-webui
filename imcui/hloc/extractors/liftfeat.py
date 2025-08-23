@@ -4,7 +4,7 @@ from ..utils.base_model import BaseModel
 from .. import logger, MODEL_REPO_ID
 
 liftfeat_path = Path(__file__).parent / "../../third_party/LiftFeat"
-sys.path.append(str(liftfeat_path))
+sys.path.insert(0, str(liftfeat_path))
 
 from models.liftfeat_wrapper import LiftFeat
 
