@@ -53,7 +53,9 @@ class ELoFTR(BaseModel):
         cfg = _default_cfg
         cfg["match_coarse"]["thr"] = conf["match_threshold"]
         # cfg["match_coarse"]["skh_iters"] = conf["sinkhorn_iterations"]
-        state_dict = torch.load(model_path, map_location="cpu")["state_dict"]
+        state_dict = torch.load(model_path, map_location="cpu", weights_only=False)[
+            "state_dict"
+        ]
         matcher = ELoFTR_(config=cfg)
         matcher.load_state_dict(state_dict)
         self.net = reparameter(matcher)

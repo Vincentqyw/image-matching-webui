@@ -46,9 +46,6 @@
 [submodule "imcui/third_party/gim"]
     path = imcui/third_party/gim
     url = https://github.com/xuelunshen/gim.git
-[submodule "imcui/third_party/dust3r"]
-    path = imcui/third_party/dust3r
-    url = https://github.com/naver/dust3r.git
 [submodule "imcui/third_party/omniglue"]
     path = imcui/third_party/omniglue
     url = https://github.com/Vincentqyw/omniglue-onnx.git
@@ -85,3 +82,6 @@
 [submodule "imcui/third_party/RIPE"]
     path = imcui/third_party/RIPE
     url = https://github.com/fraunhoferhhi/RIPE
+[submodule "imcui/third_party/dust3r"]
+    path = imcui/third_party/dust3r
+    url = https://github.com/agipro/dust3r.git
