@@ -83,5 +83,5 @@
     path = imcui/third_party/RIPE
     url = https://github.com/fraunhoferhhi/RIPE
 [submodule "imcui/third_party/dust3r"]
-	path = imcui/third_party/dust3r
-	url = https://github.com/agipro/dust3r.git
+    path = imcui/third_party/dust3r
+    url = https://github.com/agipro/dust3r.git
