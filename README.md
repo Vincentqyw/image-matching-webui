@@ -211,7 +211,17 @@ git submodule update --init --recursive  # init and download
 git submodule update --remote  # update
 ```
 
-if you only want to update one submodule, use `git submodule update --remote imcui/third_party/GlueStick`.
+If you only want to update one submodule, use `git submodule update --remote imcui/third_party/GlueStick`.
+
+To remove a submodule, follow these steps:
+
+``` bash
+git submodule deinit -f imcui/third_party/GlueStick
+git rm -f imcui/third_party/GlueStick
+rm -rf .git/modules/imcui/third_party/GlueStick
+git add .gitmodules && \
+git commit -m "Remove submodule imcui/third_party/dust3r"
+```
 
 To format code before committing, run:
 
