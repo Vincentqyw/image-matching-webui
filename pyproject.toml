@@ -32,10 +32,14 @@ dev = ["black", "flake8", "isort"]
 [tool.setuptools]
 packages = { find = { include = ["imcui*"] } }
 include-package-data = true
+package-data = { imcui = ["config/*.yaml"] }
 
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
+
+[project.scripts]
+imcui = "imcui.cli.main:main"
 
 
 [tool.pytest.ini_options]

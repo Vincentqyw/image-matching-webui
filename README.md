@@ -168,15 +168,73 @@ python -m imcui.api.server
 
 ### Run demo
 ``` bash
-python app.py --config ./config/config.yaml
+# Using the package CLI (recommended)
+imcui
+
+# Or using the direct script
+python app.py
 ```
 then open http://localhost:7860 in your browser.
 
 ![](assets/gui.jpg)
 
+### Command Line Interface
+
+The `imcui` package provides a powerful command-line interface with various options:
+
+#### Basic Usage
+
+<details>
+<summary><strong>Basic Usage Commands</strong> (click to expand)</summary>
+
+```bash
+# Install the package
+pip install imcui
+
+# Run with default settings
+imcui
+
+# Run with verbose output
+imcui --verbose
+
+# Run on a specific port
+imcui -p 7860
+
+# Run on a specific host
+imcui -s 127.0.0.1
+
+# Help
+imcui --help
+```
+</details>
+
+
+#### Command Line Options
+
+<details>
+<summary><strong>Basic Usage Commands</strong> (click to expand)</summary>
+
+| Option | Short | Default | Description |
+|--------|-------|---------|-------------|
+| `--server-name` | `-s` | `0.0.0.0` | Hostname or IP address to bind the server to |
+| `--server-port` | `-p` | `7860` | Port number to run the server on |
+| `--config` | `-c` | Auto-detected | Path to custom configuration YAML file |
+| `--example-data-root` | `-d` | `imcui/datasets` | Root directory containing example datasets |
+| `--verbose` | `-v` | `False` | Enable verbose output for debugging |
+| `--version` | | | Show version information and exit |
+
+</details>
+
+
 ### Add your own feature / matcher
 
-I provide an example to add local feature in [imcui/hloc/extractors/example.py](imcui/hloc/extractors/example.py). Then add feature settings in `confs` in file [imcui/hloc/extract_features.py](imcui/hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in file [imcui/ui/config.yaml](imcui/ui/config.yaml).
+I provide an example to add local feature in [imcui/hloc/extractors/example.py](imcui/hloc/extractors/example.py). Then add feature settings in `confs` in file [imcui/hloc/extract_features.py](imcui/hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in your configuration file.
+
+**Configuration file locations (in priority order):**
+1. Custom config file specified with `--config` parameter
+2. `config.yaml` in current directory
+3. `config/config.yaml` in current directory
+4. Package default config (`imcui/config/app.yaml`)
 
 ### Upload models
 
