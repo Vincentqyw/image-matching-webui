@@ -15,6 +15,8 @@ from loguru import logger
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
+TIMEOUT = 10  # seconds
+
 
 def test_cli_help():
     """Test that CLI help command works."""
@@ -23,6 +25,7 @@ def test_cli_help():
         capture_output=True,
         text=True,
         cwd=ROOT,
+        timeout=TIMEOUT,  # Short timeout to prevent hanging
     )
     assert result.returncode == 0
     assert "Launch the Image Matching WebUI application" in result.stdout
@@ -38,6 +41,7 @@ def test_cli_version():
         capture_output=True,
         text=True,
         cwd=ROOT,
+        timeout=TIMEOUT,  # Short timeout to prevent hanging
     )
     assert result.returncode == 0
     assert "Image Matching WebUI Version" in result.stdout
@@ -66,7 +70,11 @@ def test_cli_default_config_loading():
 def test_app_py_help():
     """Test that app.py help command works."""
     result = subprocess.run(
-        [sys.executable, "app.py", "--help"], capture_output=True, text=True, cwd=ROOT
+        [sys.executable, "app.py", "--help"],
+        capture_output=True,
+        text=True,
+        cwd=ROOT,
+        timeout=TIMEOUT,  # Short timeout to prevent hanging
     )
     assert result.returncode == 0
     assert "server_name" in result.stdout
@@ -115,7 +123,7 @@ def test_app_py_default_config():
             capture_output=True,
             text=True,
             cwd=ROOT,
-            timeout=5,  # Short timeout to prevent server from actually starting
+            timeout=TIMEOUT,  # Increase timeout to account for initialization
         )
 
         # We expect the server to start but then timeout when trying to run
@@ -129,12 +137,18 @@ def test_cli_with_custom_config():
         temp_path = Path(temp_dir)
         custom_config = temp_path / "test_config.yaml"
 
-        # Create a minimal valid config
+        # Create a minimal valid config with only basic matchers to avoid slow loading
         config_data = {
             "server": {"name": "127.0.0.1", "port": 9999},
             "defaults": {"max_keypoints": 1000, "match_threshold": 0.1},
             "matcher_zoo": {
-                "test_matcher": {"enable": False, "matcher": "test", "dense": False}
+                "sift": {
+                    "enable": True,
+                    "matcher": "NN-mutual",
+                    "feature": "sift",
+                    "dense": False,
+                    "info": {"name": "SIFT", "source": "IJCV 2004", "display": True},
+                }
             },
         }
 
@@ -154,7 +168,7 @@ def test_cli_with_custom_config():
             capture_output=True,
             text=True,
             cwd=ROOT,
-            timeout=5,  # Short timeout to prevent server from actually starting
+            timeout=TIMEOUT,  # Increase timeout to account for initialization
         )
 
         # CLI should start but then timeout when trying to run the server
