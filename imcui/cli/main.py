@@ -124,7 +124,7 @@ def main(server_name, server_port, config, example_data_root, verbose):
     python -m imcui.cli --verbose
     """
     if verbose:
-        click.echo(f"Starting Image Matching WebUI...")
+        click.echo("Starting Image Matching WebUI...")
         click.echo(f"Server: {server_name}:{server_port}")
         click.echo(f"Config file: {config}")
         click.echo(f"Example data root: {example_data_root}")

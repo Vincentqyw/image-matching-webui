@@ -8,7 +8,7 @@ ROOT = Path(__file__).parents[1]
 
 
 def test_all():
-    config = load_config(ROOT / "config/config.yaml")
+    config = load_config(ROOT / "config/app.yaml")
     img_path1 = ROOT / "tests/data/02928139_3448003521.jpg"
     img_path2 = ROOT / "tests/data/17295357_9106075285.jpg"
     image0 = cv2.imread(str(img_path1))[:, :, ::-1]  # RGB

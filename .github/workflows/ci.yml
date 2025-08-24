@@ -26,6 +26,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        pip install pytest
         pip install -r requirements.txt
         sudo apt-get update && sudo apt-get install ffmpeg libsm6 libxext6 -y
 
@@ -34,4 +35,4 @@ jobs:
 
     - name: Run tests
       # run: python -m pytest
-      run: python tests/test_basic.py
+      run: python -m pytest tests/ -s
