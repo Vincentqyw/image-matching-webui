@@ -60,10 +60,7 @@ def test_cli_default_config_loading():
     assert "port" in config["server"]
     assert "matcher_zoo" in config
     assert "defaults" in config
-<<<<<<< HEAD
-=======
     logger.info("CLI default configuration loaded and validated successfully.")
->>>>>>> 1f98a88 (🔧 Remove GitHub format workflow and improve test structure)
 
 
 def test_app_py_help():
@@ -90,10 +87,7 @@ def test_app_py_default_config():
 
     config_path = Path(args.config)
     assert config_path.exists(), f"Config file not found: {config_path}"
-<<<<<<< HEAD
-=======
     logger.info(f"Default config path: {config_path}")
->>>>>>> 1f98a88 (🔧 Remove GitHub format workflow and improve test structure)
 
     # Load and validate config
     with open(config_path, "r") as f:
@@ -101,14 +95,6 @@ def test_app_py_default_config():
 
     assert "server" in config
     assert "matcher_zoo" in config
-<<<<<<< HEAD
-    subprocess.run(
-        [sys.executable, "app.py", "--config", str(config_path)],
-        capture_output=True,
-        text=True,
-        cwd=ROOT,
-    )
-=======
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
@@ -135,7 +121,6 @@ def test_app_py_default_config():
         # We expect the server to start but then timeout when trying to run
         assert result.returncode != 0 or "Running on" in result.stdout
         logger.info("app.py ran successfully with temporary config.")
->>>>>>> 1f98a88 (🔧 Remove GitHub format workflow and improve test structure)
 
 
 def test_cli_with_custom_config():
@@ -169,11 +154,7 @@ def test_cli_with_custom_config():
             capture_output=True,
             text=True,
             cwd=ROOT,
-<<<<<<< HEAD
-            timeout=10,  # Short timeout to prevent server from actually starting
-=======
             timeout=5,  # Short timeout to prevent server from actually starting
->>>>>>> 1f98a88 (🔧 Remove GitHub format workflow and improve test structure)
         )
 
         # CLI should start but then timeout when trying to run the server
