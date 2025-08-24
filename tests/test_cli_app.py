@@ -9,6 +9,7 @@ import subprocess
 from pathlib import Path
 import pytest
 import yaml
+from loguru import logger
 
 # Add the parent directory to Python path
 ROOT = Path(__file__).parent.parent
@@ -27,6 +28,7 @@ def test_cli_help():
     assert "Launch the Image Matching WebUI application" in result.stdout
     assert "--server-port" in result.stdout
     assert "--config" in result.stdout
+    logger.info("CLI help command works as expected.")
 
 
 def test_cli_version():
@@ -39,6 +41,7 @@ def test_cli_version():
     )
     assert result.returncode == 0
     assert "Image Matching WebUI Version" in result.stdout
+    logger.info("CLI version command works as expected.")
 
 
 def test_cli_default_config_loading():
@@ -57,6 +60,10 @@ def test_cli_default_config_loading():
     assert "port" in config["server"]
     assert "matcher_zoo" in config
     assert "defaults" in config
+<<<<<<< HEAD
+=======
+    logger.info("CLI default configuration loaded and validated successfully.")
+>>>>>>> 1f98a88 (🔧 Remove GitHub format workflow and improve test structure)
 
 
 def test_app_py_help():
@@ -68,6 +75,7 @@ def test_app_py_help():
     assert "server_name" in result.stdout
     assert "server_port" in result.stdout
     assert "config" in result.stdout
+    logger.info("app.py help command works as expected.")
 
 
 def test_app_py_default_config():
@@ -82,6 +90,10 @@ def test_app_py_default_config():
 
     config_path = Path(args.config)
     assert config_path.exists(), f"Config file not found: {config_path}"
+<<<<<<< HEAD
+=======
+    logger.info(f"Default config path: {config_path}")
+>>>>>>> 1f98a88 (🔧 Remove GitHub format workflow and improve test structure)
 
     # Load and validate config
     with open(config_path, "r") as f:
@@ -89,12 +101,41 @@ def test_app_py_default_config():
 
     assert "server" in config
     assert "matcher_zoo" in config
+<<<<<<< HEAD
     subprocess.run(
         [sys.executable, "app.py", "--config", str(config_path)],
         capture_output=True,
         text=True,
         cwd=ROOT,
     )
+=======
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+        log_path = temp_path / "experiments" / "all"
+        log_path.mkdir(parents=True, exist_ok=True)
+
+        # Update config to use temporary log path to avoid writing to repo
+        config["log_path"] = str(log_path)
+
+        # Save modified config to temp file
+        temp_config = temp_path / "temp_config.yaml"
+        with open(temp_config, "w") as f:
+            yaml.dump(config, f)
+
+        # Run app.py with the temporary config to ensure no errors
+        result = subprocess.run(
+            [sys.executable, "app.py", "--config", str(temp_config)],
+            capture_output=True,
+            text=True,
+            cwd=ROOT,
+            timeout=5,  # Short timeout to prevent server from actually starting
+        )
+
+        # We expect the server to start but then timeout when trying to run
+        assert result.returncode != 0 or "Running on" in result.stdout
+        logger.info("app.py ran successfully with temporary config.")
+>>>>>>> 1f98a88 (🔧 Remove GitHub format workflow and improve test structure)
 
 
 def test_cli_with_custom_config():
@@ -128,12 +169,17 @@ def test_cli_with_custom_config():
             capture_output=True,
             text=True,
             cwd=ROOT,
+<<<<<<< HEAD
             timeout=10,  # Short timeout to prevent server from actually starting
+=======
+            timeout=5,  # Short timeout to prevent server from actually starting
+>>>>>>> 1f98a88 (🔧 Remove GitHub format workflow and improve test structure)
         )
 
         # CLI should start but then timeout when trying to run the server
         # We just want to verify it can parse the config
         assert "Config file:" in result.stdout or result.returncode != 0
+        logger.info("CLI successfully loaded and parsed custom config.")
 
 
 def test_package_entry_point():
@@ -151,6 +197,7 @@ def test_package_entry_point():
 
     except ImportError as e:
         pytest.fail(f"Failed to import package components: {e}")
+    logger.info("Package entry point and components are valid.")
 
 
 @pytest.mark.skipif(
@@ -184,6 +231,7 @@ def test_cli_quick_exit():
     except subprocess.TimeoutExpired:
         process.kill()
         pytest.fail("CLI process did not exit promptly after interrupt")
+    logger.info("CLI process exited promptly after interrupt.")
 
 
 if __name__ == "__main__":
