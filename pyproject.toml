@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "imcui"
 description = "Image Matching Webui: A tool for matching images using sota algorithms with a Gradio UI"
-version = "0.0.5"
+version = "0.0.6"
 authors = [
     {name = "vincentqyw"},
 ]
