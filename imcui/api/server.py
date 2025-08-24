@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from PIL import Image
 from ray import serve
 import argparse
+from loguru import logger
 
 from . import ImagesInput, to_base64_nparray
 from .core import ImageMatchingAPI
@@ -30,10 +31,13 @@ parser.add_argument(
     "--config",
     type=Path,
     required=False,
-    default=Path(__file__).parent / "config/api.yaml",
+    default=Path(__file__).parent.parent / "config/api.yaml",
 )
 args = parser.parse_args()
 config_path = args.config
+
+logger.info(f"Using API config file: {config_path}")
+
 config = read_yaml(config_path)
 num_gpus = 1 if torch.cuda.is_available() else 0
 ray_actor_options = config["service"].get("ray_actor_options", {})

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import torch
 
-from .. import logger
+from .. import MODEL_REPO_ID, logger
 
 from ..utils.base_model import BaseModel
 
@@ -33,6 +33,7 @@ def sample_descriptors_fix_sampling(keypoints, descriptors, s: int = 8):
 class SuperPoint(BaseModel):
     default_conf = {
         "nms_radius": 4,
+        "model_name": "superpoint_v1.pth",
         "keypoint_threshold": 0.005,
         "max_keypoints": -1,
         "remove_borders": 4,
@@ -44,6 +45,11 @@ class SuperPoint(BaseModel):
     def _init(self, conf):
         if conf["fix_sampling"]:
             superpoint.sample_descriptors = sample_descriptors_fix_sampling
+        weights_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format("superglue", self.conf["model_name"]),
+        )
+        conf["weights_path"] = str(weights_path)
         self.net = superpoint.SuperPoint(conf)
         logger.info("Load SuperPoint model done.")
 

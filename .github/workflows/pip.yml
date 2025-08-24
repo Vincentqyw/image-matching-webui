@@ -59,4 +59,4 @@ jobs:
       run: pip install .
 
     - name: Test
-      run: python -m pytest
+      run: python -m pytest tests/ -s

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "imcui"
 description = "Image Matching Webui: A tool for matching images using sota algorithms with a Gradio UI"
-version = "0.0.5"
+version = "0.0.6"
 authors = [
     {name = "vincentqyw"},
 ]
@@ -32,10 +32,14 @@ dev = ["black", "flake8", "isort"]
 [tool.setuptools]
 packages = { find = { include = ["imcui*"] } }
 include-package-data = true
+package-data = { imcui = ["config/*.yaml"] }
 
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
+
+[project.scripts]
+imcui = "imcui.cli.main:main"
 
 
 [tool.pytest.ini_options]

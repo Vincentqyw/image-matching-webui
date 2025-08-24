@@ -19,7 +19,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--config",
         type=str,
-        default=Path(__file__).parent / "config/config.yaml",
+        default=Path(__file__).parent / "config/app.yaml",
         help="config file",
     )
     args = parser.parse_args()
