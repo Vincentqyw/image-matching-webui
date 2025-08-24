@@ -1,10 +1,10 @@
-
 """
 A set of standard configurations that can be directly selected from the command
 line using their name. Each is a dictionary with the following entries:
     - output: the name of the match file that will be generated.
     - model: the model configuration, as passed to a feature matcher.
 """
+
 confs = {
     # sparse matching methods below
     "superglue": {

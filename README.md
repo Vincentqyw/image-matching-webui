@@ -215,6 +215,9 @@ If you only want to update one submodule, use `git submodule update --remote imc
 
 To remove a submodule, follow these steps:
 
+<details>
+<summary><strong>More Remove Submodule Commands</strong> (click to expand)</summary>
+
 ``` bash
 git submodule deinit -f imcui/third_party/GlueStick
 git rm -f imcui/third_party/GlueStick
@@ -222,6 +225,8 @@ rm -rf .git/modules/imcui/third_party/GlueStick
 git add .gitmodules && \
 git commit -m "Remove submodule imcui/third_party/dust3r"
 ```
+</details>
+
 
 To format code before committing, run:
 

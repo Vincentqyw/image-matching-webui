@@ -1,4 +1,3 @@
-
 """
 A set of standard configurations that can be directly selected from the command
 line using their name. Each is a dictionary with the following entries:
@@ -6,6 +5,7 @@ line using their name. Each is a dictionary with the following entries:
     - model: the model configuration, as passed to a feature extractor.
     - preprocessing: how to preprocess the images read from disk.
 """
+
 confs = {
     "superpoint_aachen": {
         "output": "feats-superpoint-n4096-r1024",
