@@ -181,7 +181,7 @@ def main(
     overwrite: bool = False,
 ) -> Path:
     logger.info(
-        "Extracting local features with configuration:" f"\n{pprint.pformat(conf)}"
+        f"Extracting local features with configuration:\n{pprint.pformat(conf)}"
     )
 
     dataset = ImageDataset(image_dir, conf["preprocessing"], image_list)
