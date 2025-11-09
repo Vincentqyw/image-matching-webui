@@ -1,4 +1,5 @@
-FROM pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
+# For versions see: https://hub.docker.com/r/pytorch/pytorch/tags
+FROM pytorch/pytorch:2.9.0-cuda12.8-cudnn9-runtime
 LABEL maintainer vincentqyw
 
 WORKDIR /code
