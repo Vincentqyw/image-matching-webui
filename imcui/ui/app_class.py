@@ -68,7 +68,7 @@ class ImageMatchingApp:
         return algos
 
     def init_interface(self):
-        with gr.Blocks(css=CSS) as self.app:
+        with gr.Blocks() as self.app:
             with gr.Tab("Image Matching"):
                 with gr.Row():
                     with gr.Column(scale=1):
@@ -76,8 +76,7 @@ class ImageMatchingApp:
                             str(Path(__file__).parent.parent / "assets/logo.webp"),
                             elem_id="logo-img",
                             show_label=False,
-                            show_share_button=False,
-                            show_download_button=False,
+                            buttons=['fullscreen']
                         )
                     with gr.Column(scale=3):
                         gr.Markdown(DESCRIPTION)
@@ -425,6 +424,7 @@ class ImageMatchingApp:
             server_name=self.server_name,
             server_port=self.server_port,
             share=False,
+            css=CSS,
             allowed_paths=[
                 str(Path(__file__).parents[0]),
                 str(Path(__file__).parents[1]),
@@ -571,7 +571,8 @@ class ImageMatchingApp:
             tab = gr.Dataframe(
                 headers=["Algo.", "Conference", "Code", "Paper", "Project"],
                 datatype=["str", "str", "str", "str", "str"],
-                col_count=(5, "fixed"),
+                column_count=5,
+                column_limits=(5, 5),
                 value=data,
                 # wrap=True,
                 # min_width = 1000,
