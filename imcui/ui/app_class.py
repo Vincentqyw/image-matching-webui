@@ -76,7 +76,7 @@ class ImageMatchingApp:
                             str(Path(__file__).parent.parent / "assets/logo.webp"),
                             elem_id="logo-img",
                             show_label=False,
-                            buttons=['fullscreen']
+                            buttons=["fullscreen"],
                         )
                     with gr.Column(scale=3):
                         gr.Markdown(DESCRIPTION)
