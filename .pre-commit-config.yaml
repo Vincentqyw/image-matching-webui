@@ -23,7 +23,7 @@ ci:
 repos:
 # Standard hooks
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: check-added-large-files
     exclude: ^imcui/third_party/
@@ -47,7 +47,7 @@ repos:
     exclude: ^imcui/third_party/
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: "v0.8.4"
+  rev: "v0.14.11"
   hooks:
     - id: ruff
       args: ["--fix", "--show-fixes", "--extend-ignore=E402"]
@@ -56,7 +56,7 @@ repos:
 
 # Checking static types
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: "v1.14.0"
+  rev: "v1.19.1"
   hooks:
     - id: mypy
       files: "setup.py"
@@ -82,7 +82,7 @@ repos:
 
 # Suggested hook if you add a .clang-format file
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: v13.0.0
+  rev: v21.1.8
   hooks:
   - id: clang-format
     exclude: ^imcui/third_party/
