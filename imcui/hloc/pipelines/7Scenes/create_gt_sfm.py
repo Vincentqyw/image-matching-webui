@@ -111,9 +111,9 @@ def correct_sfm_with_gt_depth(sfm_path, depth_folder_path, output_path):
         new_p3D_ids[new_p3D_ids != -1] = sub_p3D_ids
         img = img._replace(point3D_ids=new_p3D_ids)
 
-        assert len(img.point3D_ids[img.point3D_ids != -1]) == len(
-            scs
-        ), f"{len(scs)}, {len(img.point3D_ids[img.point3D_ids != -1])}"
+        assert len(img.point3D_ids[img.point3D_ids != -1]) == len(scs), (
+            f"{len(scs)}, {len(img.point3D_ids[img.point3D_ids != -1])}"
+        )
         for i, p3did in enumerate(img.point3D_ids[img.point3D_ids != -1]):
             points3D[p3did] = points3D[p3did]._replace(xyz=scs[i])
         images[imgid] = img
