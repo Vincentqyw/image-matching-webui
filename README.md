@@ -97,7 +97,7 @@ or deploy it locally following the instructions below.
 
 ### Requirements
 
-- [Python 3.9+](https://www.python.org/downloads/)
+- [Python 3.10+](https://www.python.org/downloads/)
 
 #### Install from pip [NEW]
 
