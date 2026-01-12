@@ -21,9 +21,16 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Free disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+
     - name: Upgrade setuptools and wheel
       run: |
-        pip install --upgrade setuptools wheel
+        pip install --no-cache-dir --upgrade setuptools wheel
 
     - name: Install dependencies on Ubuntu
       if: runner.os == 'Linux'
@@ -47,8 +54,8 @@ jobs:
 
     - name: Install Python dependencies
       run: |
-        pip install pytest
-        pip install -r requirements.txt
+        pip install --no-cache-dir pytest
+        pip install --no-cache-dir -r requirements.txt
         sudo apt-get update && sudo apt-get install ffmpeg libsm6 libxext6 -y
 
     - name: Build source distribution

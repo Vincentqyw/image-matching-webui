@@ -24,14 +24,21 @@ jobs:
       with:
         python-version: "3.10"
 
+    - name: Free disk space
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+
     - name: Install dependencies
       run: |
-        pip install pytest
-        pip install -r requirements.txt
+        pip install --no-cache-dir pytest
+        pip install --no-cache-dir -r requirements.txt
         sudo apt-get update && sudo apt-get install ffmpeg libsm6 libxext6 -y
 
     - name: Build and install
-      run: pip install .
+      run: pip install --no-cache-dir .
 
     - name: Run tests
       # run: python -m pytest
