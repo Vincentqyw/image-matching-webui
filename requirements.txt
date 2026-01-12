@@ -22,7 +22,7 @@ plotly
 poselib
 protobuf
 psutil
-pycolmap
+pycolmap<3.13
 pytlsd  # gluestick, <3.12
 pytorch-lightning  # ==1.4.9
 PyYAML
