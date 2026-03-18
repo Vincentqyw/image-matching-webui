@@ -1,12 +1,5 @@
 # logo
 include imcui/assets/logo.webp
 
-recursive-include imcui/ui *.yaml
-recursive-include imcui/api *.yaml
-recursive-include imcui/third_party *.yaml *.cfg *.yml
-
-# ui examples
-# recursive-include imcui/datasets *.JPG *.jpg *.png
-
-# model
-recursive-include imcui/third_party/SuperGluePretrainedNetwork *.pth
+# config files
+recursive-include imcui/config *.yaml
