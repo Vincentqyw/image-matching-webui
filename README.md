@@ -228,19 +228,13 @@ imcui --help
 
 ### Add your own feature / matcher
 
-The project now uses [vismatch](https://github.com/Vincentqyw/vismatch) pip package for algorithms. To add new algorithms, install the vismatch package and register them in the configuration file under `matcher_zoo`.
+> **Note:** This WebUI no longer maintains matching algorithms. All matchers are maintained in the [vismatch](https://github.com/gmberton/vismatch) repository. To add new matchers or algorithms, please contribute to the vismatch repository instead.
 
-For custom implementations, add your feature extractor to `imcui/hloc/extractors/` following existing patterns, then register in the config file.
+The project uses [vismatch](https://github.com/gmberton/vismatch) pip package for algorithms. The available matchers are dynamically loaded from vismatch and do not require manual registration in this repository.
 
-**Configuration file locations (in priority order):**
-1. Custom config file specified with `--config` parameter
-2. `config.yaml` in current directory
-3. `config/config.yaml` in current directory
-4. Package default config (`imcui/config/app.yaml`)
-
-### Upload models
-
-IMCUI hosts all models on [Huggingface](https://huggingface.co/Realcat/imcui_checkpoints).  You can upload your model to Huggingface and add it to the [Realcat/imcui_checkpoints](https://huggingface.co/Realcat/imcui_checkpoints) repository.
+**Configuration file locations:**
+1. Custom config file specified with `-c` parameter
+2. Package default config (`imcui/config/app.yaml`)
 
 
 ## Contributions welcome!
@@ -277,6 +271,9 @@ pre-commit run -a  # Auto-checks and fixes
 ## Acknowledgement
 
 This code is built based on [Hierarchical-Localization](https://github.com/cvg/Hierarchical-Localization). We express our gratitude to the authors for their valuable source code.
+
+The matching algorithms are maintained in [vismatch](https://github.com/gmberton/vismatch) by [@gmberton](https://github.com/gmberton). We thank the authors for creating and maintaining this excellent library.
+
 
 [contributors-shield]: https://img.shields.io/github/contributors/Vincentqyw/image-matching-webui.svg?style=for-the-badge
 [contributors-url]: https://github.com/Vincentqyw/image-matching-webui/graphs/contributors

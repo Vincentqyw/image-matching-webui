@@ -77,57 +77,32 @@ docker-compose up api
 ### Directory Structure
 - `imcui/ui/` - Gradio-based web interface (app_class.py, utils.py)
 - `imcui/api/` - Core matching API (ImageMatchingAPI class)
-- `imcui/hloc/` - Feature extraction and matching (adapted from Hierarchical-Localization)
-- `imcui/hloc/extractors/` - Sparse feature extractors (SuperPoint, DISK, ALIKED, etc.)
-- `imcui/hloc/matchers/` - Sparse/dense matchers (LightGlue, LoFTR, RoMa, etc.)
-- `config/app.yaml` - Matcher configuration and defaults
+- `imcui/config/` - Configuration files (app.yaml, api.yaml)
+- `imcui/assets/` - Static assets (logo, etc.)
+- `imcui/datasets/` - Example datasets for testing
 
 ### Key Concepts
 
-**Sparse vs Dense Matching**: Sparse methods extract discrete keypoints and match them (SuperPoint+LightGlue). Dense methods work on full image correlations (LoFTR, RoMa).
+**Sparse vs Dense Matching**: Sparse methods extract discrete keypoints and match them. Dense methods work on full image correlations.
 
-**Matcher Zoo**: All algorithms are configured in `config/app.yaml` under `matcher_zoo`. Each entry specifies:
-- `matcher`: The matching method
-- `feature`: For sparse matchers, the feature extractor
-- `dense`: Boolean indicating sparse (false) or dense (true) approach
-- `enable`: Whether to show in UI
+**Matcher Zoo**: All matchers are dynamically loaded from [vismatch](https://github.com/gmberton/vismatch) package (by [@gmberton](https://github.com/gmberton)). This WebUI no longer maintains matching algorithms.
 
 **API Usage**:
 ```python
 from imcui.api import ImageMatchingAPI
-from imcui.ui.utils import DEVICE, load_config
+from imcui.ui.utils import DEVICE, get_matcher_zoo
 
-config = load_config("config/app.yaml")
-api = ImageMatchingAPI(conf=config["matcher_zoo"]["disk+lightglue"], device=DEVICE)
+matcher_zoo = get_matcher_zoo()  # Dynamically loaded from vismatch
+api = ImageMatchingAPI(conf=matcher_zoo["superpoint-lightglue"], device=DEVICE)
 pred = api(image0, image1)  # RGB numpy arrays
 ```
 
 ### Adding New Algorithms
 
-The project now uses [vismatch](https://github.com/Vincentqyw/vismatch) pip package for algorithms. To add new algorithms:
-
-1. Install the vismatch package with your custom algorithm
-2. Register in config file under `matcher_zoo`:
-3. Or add custom feature extractor to `imcui/hloc/extractors/` following existing patterns
-
-```yaml
-matcher_zoo:
-  my_algorithm:
-    matcher: my-matcher-name
-    feature: my-feature-name  # only for sparse matchers
-    dense: false  # true for dense methods like LoFTR
-    info:
-      name: My Algorithm
-      source: "CVPR 2024"
-      github: https://github.com/example
-      display: true
-      efficiency: high
-```
+> **Note:** This WebUI no longer maintains matching algorithms. All matchers are maintained in the [vismatch](https://github.com/gmberton/vismatch) repository by [@gmberton](https://github.com/gmberton). To add new matchers, please contribute to the vismatch repository.
 
 ## Configuration Precedence
 
 Config files are loaded in this order (first found):
-1. Custom path via `--config` flag
-2. `config.yaml` in current directory
-3. `config/config.yaml` in current directory
-4. Default: `imcui/config/app.yaml`
+1. Custom path via `-c` flag
+2. Default: `imcui/config/app.yaml`
