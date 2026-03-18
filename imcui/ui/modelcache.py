@@ -4,7 +4,17 @@ import time
 import threading
 from collections import OrderedDict
 import torch
-from ..hloc import logger
+import logging
+
+# Simple logger
+logger = logging.getLogger("imcui")
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logging.Formatter("[%(asctime)s %(name)s %(levelname)s] %(message)s")
+    )
+    logger.addHandler(handler)
 
 
 class ARCSizeAwareModelCache:

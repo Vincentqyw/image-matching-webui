@@ -5,14 +5,51 @@ from typing import Dict, List, Optional, Tuple, Union
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as path_effects
 import numpy as np
 import seaborn as sns
-
-from ..hloc.utils.viz import add_text, plot_keypoints
 
 np.random.seed(1995)
 color_map = np.arange(100)
 np.random.shuffle(color_map)
+
+
+# Visualization helper functions
+def plot_keypoints(kpts, colors="lime", ps=4):
+    """Plot keypoints for existing images."""
+    if not isinstance(colors, list):
+        colors = [colors] * len(kpts)
+    axes = plt.gcf().axes
+    try:
+        for a, k, c in zip(axes, kpts, colors):
+            a.scatter(k[:, 0], k[:, 1], c=c, s=ps, linewidths=0)
+    except IndexError:
+        pass
+
+
+def add_text(
+    idx,
+    text,
+    pos=(0.01, 0.99),
+    fs=15,
+    color="w",
+    lcolor="k",
+    lwidth=2,
+    ha="left",
+    va="top",
+):
+    """Add text to a matplotlib figure."""
+    ax = plt.gcf().axes[idx]
+    t = ax.text(
+        *pos, text, fontsize=fs, ha=ha, va=va, color=color, transform=ax.transAxes
+    )
+    if lcolor is not None:
+        t.set_path_effects(
+            [
+                path_effects.Stroke(linewidth=lwidth, foreground=lcolor),
+                path_effects.Normal(),
+            ]
+        )
 
 
 def plot_images(

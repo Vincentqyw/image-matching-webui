@@ -14,18 +14,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 import poselib
 from PIL import Image
+from vismatch import get_matcher
 
-from ..hloc import (
-    DEVICE,
-    extract_features,
-    extractors,
-    logger,
-    match_dense,
-    match_features,
-    matchers,
-    DATASETS_REPO_ID,
-)
-from ..hloc.utils.base_model import dynamic_load
+# Simple logger
+import logging
+
+logger = logging.getLogger("imcui")
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logging.Formatter("[%(asctime)s %(name)s %(levelname)s] %(message)s")
+    )
+    logger.addHandler(handler)
+
+# Constants
+DATASETS_REPO_ID = "Realcat/imcui_datasets"
+DEVICE = "cuda" if __import__("torch").cuda.is_available() else "cpu"
+
 from .viz import display_keypoints, display_matches, fig2im, plot_images
 from .modelcache import ARCSizeAwareModelCache as ModelCache
 
@@ -92,24 +98,20 @@ def get_matcher_zoo(
 
 
 def parse_match_config(conf):
-    if conf["dense"]:
-        return {
-            "matcher": match_dense.confs.get(conf["matcher"]),
-            "dense": True,
-            "info": conf.get("info", {}),
-        }
-    else:
-        return {
-            "feature": extract_features.confs.get(conf["feature"]),
-            "matcher": match_features.confs.get(conf["matcher"]),
-            "dense": False,
-            "info": conf.get("info", {}),
-        }
+    """
+    Parse match config for vismatch.
+
+    For vismatch, we just store the model name directly.
+    """
+    return {
+        "model_name": conf.get("matcher", "superpoint-lightglue"),
+        "info": conf.get("info", {}),
+    }
 
 
 def get_model(match_conf: Dict[str, Any]):
     """
-    Load a matcher model from the provided configuration.
+    Load a matcher model from the provided configuration using vismatch.
 
     Args:
         match_conf: A dictionary containing the model configuration.
@@ -117,24 +119,16 @@ def get_model(match_conf: Dict[str, Any]):
     Returns:
         A matcher model instance.
     """
-    Model = dynamic_load(matchers, match_conf["model"]["name"])
-    model = Model(match_conf["model"]).eval().to(DEVICE)
-    return model
+    model_name = match_conf.get("model_name", "superpoint-lightglue")
+    return get_matcher(model_name, device=DEVICE)
 
 
 def get_feature_model(conf: Dict[str, Dict[str, Any]]):
     """
-    Load a feature extraction model from the provided configuration.
-
-    Args:
-        conf: A dictionary containing the model configuration.
-
-    Returns:
-        A feature extraction model instance.
+    Load a feature extraction model - not needed for vismatch.
+    Kept for compatibility but returns None.
     """
-    Model = dynamic_load(extractors, conf["model"]["name"])
-    model = Model(conf["model"]).eval().to(DEVICE)
-    return model
+    return None
 
 
 def download_example_images(repo_id, output_dir):
@@ -853,7 +847,7 @@ def run_matching(
     Dict[str, Dict[str, float]],
     np.ndarray,
 ]:
-    """Match two images using the given parameters.
+    """Match two images using vismatch.
 
     Args:
         image0 (np.ndarray): RGB image 0.
@@ -883,7 +877,7 @@ def run_matching(
             - geom_info (Dict[str, Dict[str, float]]): geometry information.
             - output_wrapped (np.ndarray): wrapped images.
     """
-    # image0 and image1 is RGB mode
+    # image0 and image1 is RGB mode (H, W, C)
     if image0 is None or image1 is None:
         logger.error(
             "Error: No images found! Please upload two images or select an example."
@@ -898,11 +892,7 @@ def run_matching(
 
     t0 = time.time()
     model = matcher_zoo[key]
-    match_conf = model["matcher"]
-    # update match config
-    match_conf["model"]["match_threshold"] = match_threshold
-    match_conf["model"]["max_keypoints"] = extract_max_keypoints
-    cache_key = "{}_{}".format(key, match_conf["model"]["name"])
+    model_name = model["model_name"]
 
     efficiency = model["info"].get("efficiency", "high")
     if efficiency == "low":
@@ -912,73 +902,42 @@ def run_matching(
             )
         )
 
+    # Get the vismatch model
+    match_conf = {"model_name": model_name}
+    cache_key = key
+
     if use_cached_model:
-        # because of the model cache, we need to update the config
         matcher = model_cache.load_model(cache_key, get_model, match_conf)
-        matcher.conf["max_keypoints"] = extract_max_keypoints
-        matcher.conf["match_threshold"] = match_threshold
         logger.info(f"Loaded cached model {cache_key}")
     else:
         matcher = get_model(match_conf)
     logger.info(f"Loading model using: {time.time()-t0:.3f}s")
     t1 = time.time()
+
+    # Convert images from HWC to CHW format for vismatch
+    # vismatch expects images in [0, 1] range
+    if image0.shape[-1] == 3:
+        # Convert from [0, 255] uint8 to [0, 1] float32
+        if image0.dtype == np.uint8:
+            img0_chw = np.transpose(image0.astype(np.float32) / 255.0, (2, 0, 1))
+            img1_chw = np.transpose(image1.astype(np.float32) / 255.0, (2, 0, 1))
+        else:
+            img0_chw = np.transpose(image0, (2, 0, 1))
+            img1_chw = np.transpose(image1, (2, 0, 1))
+    else:
+        img0_chw = image0
+        img1_chw = image1
+
     yield generate_fake_outputs(
         output_keypoints, output_matches_raw, output_matches_ransac, match_conf, {}, {}
     )
 
-    if model["dense"]:
-        if not match_conf["preprocessing"].get("force_resize", False):
-            match_conf["preprocessing"]["force_resize"] = force_resize
-        else:
-            logger.info("preprocessing is already resized")
-        if force_resize:
-            match_conf["preprocessing"]["height"] = image_height
-            match_conf["preprocessing"]["width"] = image_width
-            logger.info(f"Force resize to {image_width}x{image_height}")
+    # Run matching with vismatch
+    result = matcher(img0_chw, img1_chw)
 
-        pred = match_dense.match_images(
-            matcher, image0, image1, match_conf["preprocessing"], device=DEVICE
-        )
-        del matcher
-        extract_conf = None
-    else:
-        extract_conf = model["feature"]
-        # update extract config
-        extract_conf["model"]["max_keypoints"] = extract_max_keypoints
-        extract_conf["model"]["keypoint_threshold"] = keypoint_threshold
-        cache_key = "{}_{}".format(key, extract_conf["model"]["name"])
+    # Convert result to UI format
+    pred = convert_vismatch_result(result, image0, image1)
 
-        if use_cached_model:
-            extractor = model_cache.load_model(
-                cache_key, get_feature_model, extract_conf
-            )
-            # because of the model cache, we need to update the config
-            extractor.conf["max_keypoints"] = extract_max_keypoints
-            extractor.conf["keypoint_threshold"] = keypoint_threshold
-            logger.info(f"Loaded cached model {cache_key}")
-        else:
-            extractor = get_feature_model(extract_conf)
-
-        if not extract_conf["preprocessing"].get("force_resize", False):
-            extract_conf["preprocessing"]["force_resize"] = force_resize
-        else:
-            logger.info("preprocessing is already resized")
-        if force_resize:
-            extract_conf["preprocessing"]["height"] = image_height
-            extract_conf["preprocessing"]["width"] = image_width
-            logger.info(f"Force resize to {image_width}x{image_height}")
-
-        pred0 = extract_features.extract(
-            extractor, image0, extract_conf["preprocessing"]
-        )
-        pred1 = extract_features.extract(
-            extractor, image1, extract_conf["preprocessing"]
-        )
-        pred = match_features.match_images(matcher, pred0, pred1)
-        del extractor
-    # gr.Info(
-    #     f"Matching images done using: {time.time()-t1:.3f}s",
-    # )
     logger.info(f"Matching images done using: {time.time()-t1:.3f}s")
     t1 = time.time()
 
@@ -993,7 +952,7 @@ def run_matching(
         output_matches_raw,
         output_matches_ransac,
         match_conf,
-        extract_conf,
+        {},
         pred,
     )
 
@@ -1008,11 +967,11 @@ def run_matching(
         output_matches_raw,
         output_matches_ransac,
         match_conf,
-        extract_conf,
+        {},
         pred,
     )
 
-    # if enable_ransac:
+    # RANSAC is already done by vismatch, but we can also run custom RANSAC if needed
     filter_matches(
         pred,
         ransac_method=ransac_method,
@@ -1021,7 +980,6 @@ def run_matching(
         ransac_max_iter=ransac_max_iter,
     )
 
-    # gr.Info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
     logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
     t1 = time.time()
 
@@ -1038,11 +996,10 @@ def run_matching(
         output_matches_raw,
         output_matches_ransac,
         match_conf,
-        extract_conf,
+        {},
         pred,
     )
 
-    # gr.Info(f"Display matches done using: {time.time()-t1:.3f}s")
     logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
     t1 = time.time()
     # plot wrapped images
@@ -1053,7 +1010,6 @@ def run_matching(
         choice_geometry_type,
     )
     plt.close("all")
-    # gr.Info(f"In summary, total time: {time.time()-t0:.3f}s")
     logger.info(f"TOTAL time: {time.time()-t0:.3f}s")
 
     state_cache = pred
@@ -1061,7 +1017,6 @@ def run_matching(
     state_cache["num_matches_ransac"] = num_matches_ransac
     state_cache["wrapped_image"] = warped_image
 
-    # tmp_state_cache = tempfile.NamedTemporaryFile(suffix='.pkl', delete=False)
     tmp_state_cache = "output.pkl"
     with open(tmp_state_cache, "wb") as f:
         pickle.dump(state_cache, f)
@@ -1077,7 +1032,7 @@ def run_matching(
         },
         {
             "match_conf": match_conf,
-            "extractor_conf": extract_conf,
+            "extractor_conf": {},
         },
         {
             "geom_info": pred.get("geom_info", {}),
@@ -1086,6 +1041,75 @@ def run_matching(
         state_cache,
         tmp_state_cache,
     )
+
+
+def convert_vismatch_result(
+    result: Dict[str, Any], img0: np.ndarray, img1: np.ndarray
+) -> Dict[str, np.ndarray]:
+    """
+    Convert vismatch result format to UI expected format.
+
+    vismatch returns:
+    - matched_kpts0, matched_kpts1: raw matches
+    - inlier_kpts0, inlier_kpts1: RANSAC inliers
+    - H: homography matrix
+
+    UI expects:
+    - image0_orig, image1_orig: original images
+    - keypoints0_orig, keypoints1_orig: all detected keypoints
+    - mkeypoints0_orig, mkeypoints1_orig: raw matches
+    - mmkeypoints0_orig, mmkeypoints1_orig: RANSAC inliers
+    - mconf, mmconf: confidence scores
+    """
+    # Convert images to uint8 for visualization
+    img0_uint8 = (
+        (img0 * 255).astype(np.uint8) if img0.max() <= 1.0 else img0.astype(np.uint8)
+    )
+    img1_uint8 = (
+        (img1 * 255).astype(np.uint8) if img1.max() <= 1.0 else img1.astype(np.uint8)
+    )
+
+    ret = {
+        "image0_orig": img0_uint8,
+        "image1_orig": img1_uint8,
+    }
+
+    # All detected keypoints (from vismatch, these might be empty for dense matchers)
+    all_kpts0 = result.get("all_kpts0", np.array([]))
+    all_kpts1 = result.get("all_kpts1", np.array([]))
+
+    if len(all_kpts0) > 0:
+        ret["keypoints0_orig"] = all_kpts0
+    if len(all_kpts1) > 0:
+        ret["keypoints1_orig"] = all_kpts1
+
+    # Raw matches
+    matched_kpts0 = result.get("matched_kpts0", np.array([]))
+    matched_kpts1 = result.get("matched_kpts1", np.array([]))
+
+    if len(matched_kpts0) > 0 and len(matched_kpts1) > 0:
+        ret["mkeypoints0_orig"] = matched_kpts0
+        ret["mkeypoints1_orig"] = matched_kpts1
+        # Use uniform confidence if not provided
+        ret["mconf"] = np.ones(len(matched_kpts0))
+
+    # RANSAC inliers (already computed by vismatch)
+    inlier_kpts0 = result.get("inlier_kpts0", np.array([]))
+    inlier_kpts1 = result.get("inlier_kpts1", np.array([]))
+
+    if len(inlier_kpts0) > 0 and len(inlier_kpts1) > 0:
+        ret["mmkeypoints0_orig"] = inlier_kpts0
+        ret["mmkeypoints1_orig"] = inlier_kpts1
+        ret["mmconf"] = np.ones(len(inlier_kpts0))
+
+    # Homography matrix
+    H = result.get("H")
+    if H is not None:
+        ret["H"] = H
+
+    ret["num_inliers"] = result.get("num_inliers", 0)
+
+    return ret
 
 
 # @ref: https://docs.opencv.org/4.x/d0/d74/md__build_4_x-contrib_docs-lin64_opencv_doc_tutorials_calib3d_usac.html

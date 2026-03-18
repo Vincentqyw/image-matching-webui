@@ -37,6 +37,7 @@ package-data = { imcui = ["config/*.yaml"] }
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
+
 [project.scripts]
 imcui = "imcui.cli.main:main"
 

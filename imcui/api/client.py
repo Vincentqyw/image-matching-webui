@@ -155,8 +155,7 @@ def send_request_extract(
 
     # draw matching, debug only
     if viz:
-        from hloc.utils.viz import plot_keypoints
-        from ui.viz import fig2im, plot_images
+        from imcui.ui.viz import plot_keypoints, fig2im, plot_images
 
         kpts = np.array(response[0]["keypoints_orig"])
         if "image_orig" in response[0].keys():

@@ -7,7 +7,18 @@ from fastapi.exceptions import HTTPException
 from PIL import Image
 from pydantic import BaseModel
 
-from ..hloc import logger
+# Simple logger for compatibility
+import logging
+
+logger = logging.getLogger("imcui")
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logging.Formatter("[%(asctime)s %(name)s %(levelname)s] %(message)s")
+    )
+    logger.addHandler(handler)
+
 from .core import ImageMatchingAPI
 
 
