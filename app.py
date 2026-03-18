@@ -2,6 +2,18 @@ import argparse
 from pathlib import Path
 from imcui.ui.app_class import ImageMatchingApp
 
+
+def get_default_config_path():
+    """Get default config path, same logic as CLI."""
+    # First check if config/app.yaml exists in current working directory
+    current_dir_config = Path.cwd() / "config" / "app.yaml"
+    if current_dir_config.exists():
+        return current_dir_config
+    # Fall back to package's default config
+    default_config_path = Path(__file__).parent / "imcui" / "config" / "app.yaml"
+    return default_config_path
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -22,13 +34,23 @@ if __name__ == "__main__":
         "-c",
         "--config",
         type=str,
-        default=Path(__file__).parent / "config/app.yaml",
-        help="config file",
+        default=None,
+        help="config file (default: check current dir, then use package default)",
     )
     args = parser.parse_args()
+
+    # Resolve config path: use provided path, or find in current dir, or use package default
+    if args.config:
+        config_path = Path(args.config)
+    else:
+        config_path = get_default_config_path()
+
+    # Resolve example data path
+    example_data_root = Path(__file__).parent / "imcui" / "datasets"
+
     ImageMatchingApp(
         args.server_name,
         args.server_port,
-        config=args.config,
-        example_data_root=Path("imcui/datasets"),
+        config=config_path,
+        example_data_root=example_data_root,
     ).run()

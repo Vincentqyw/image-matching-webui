@@ -11,6 +11,7 @@ from .utils import (
     GRADIO_VERSION,
     gen_examples,
     generate_warp_images,
+    get_available_model_names,
     get_matcher_zoo,
     load_config,
     ransac_zoo,
@@ -50,9 +51,12 @@ class ImageMatchingApp:
     def __init__(self, server_name="0.0.0.0", server_port=7860, **kwargs):
         self.server_name = server_name
         self.server_port = server_port
-        self.config_path = kwargs.get("config", Path(__file__).parent / "config.yaml")
+        # Default config path: look for config in package, then current directory
+        default_config = Path(__file__).parents[1] / "config" / "app.yaml"
+        self.config_path = kwargs.get("config", default_config)
         self.cfg = load_config(self.config_path)
-        self.matcher_zoo = get_matcher_zoo(self.cfg["matcher_zoo"])
+        # Dynamically load matcher_zoo from vismatch
+        self.matcher_zoo = get_matcher_zoo(self.cfg.get("matcher_zoo"))
         self.app = None
         self.example_data_root = kwargs.get(
             "example_data_root", Path(__file__).parents[1] / "datasets"
@@ -61,11 +65,8 @@ class ImageMatchingApp:
         self.init_interface()
 
     def init_matcher_dropdown(self):
-        algos = []
-        for k, v in self.cfg["matcher_zoo"].items():
-            if v.get("enable", True):
-                algos.append(k)
-        return algos
+        # Use all available models from vismatch
+        return get_available_model_names()
 
     def init_interface(self):
         with gr.Blocks() as self.app:
@@ -85,7 +86,7 @@ class ImageMatchingApp:
                         with gr.Row():
                             matcher_list = gr.Dropdown(
                                 choices=self.init_matcher_dropdown(),
-                                value="disk+lightglue",
+                                value="disk-lightglue",
                                 label="Matching Model",
                                 interactive=True,
                             )
@@ -529,28 +530,30 @@ class ImageMatchingApp:
             return "[{}]({})".format(tag, link) if link is not None else "None"
 
         data = []
-        cfg = self.cfg["matcher_zoo"]
+        # Use dynamically loaded matcher_zoo from vismatch
+        cfg = self.matcher_zoo
         if style == "md":
             markdown_table = "| Algo. | Conference | Code | Project | Paper |\n"
             markdown_table += "| ----- | ---------- | ---- | ------- | ----- |\n"
 
-            for _, v in cfg.items():
-                if not v["info"].get("display", True):
+            for k, v in cfg.items():
+                info = v.get("info", {})
+                if not info.get("display", True):
                     continue
-                github_link = get_link(v["info"].get("github", ""))
-                project_link = get_link(v["info"].get("project", ""))
+                github_link = get_link(info.get("github", ""))
+                project_link = get_link(info.get("project", ""))
                 paper_link = get_link(
-                    v["info"]["paper"],
+                    info.get("paper"),
                     (
-                        Path(v["info"]["paper"]).name[-10:]
-                        if v["info"]["paper"] is not None
+                        Path(info.get("paper", "")).name[-10:]
+                        if info.get("paper") is not None
                         else "Link"
                     ),
                 )
 
                 markdown_table += "{}|{}|{}|{}|{}\n".format(
-                    v["info"].get("name", ""),
-                    v["info"].get("source", ""),
+                    info.get("name", k),  # Use model name as fallback
+                    info.get("source", ""),
                     github_link,
                     project_link,
                     paper_link,
@@ -558,15 +561,16 @@ class ImageMatchingApp:
             return gr.Markdown(markdown_table)
         elif style == "tab":
             for k, v in cfg.items():
-                if not v["info"].get("display", True):
+                info = v.get("info", {})
+                if not info.get("display", True):
                     continue
                 data.append(
                     [
-                        v["info"].get("name", ""),
-                        v["info"].get("source", ""),
-                        v["info"].get("github", ""),
-                        v["info"].get("paper", ""),
-                        v["info"].get("project", ""),
+                        info.get("name", k),  # Use model name as fallback
+                        info.get("source", ""),
+                        info.get("github", ""),
+                        info.get("paper", ""),
+                        info.get("project", ""),
                     ]
                 )
             tab = gr.Dataframe(
@@ -680,7 +684,7 @@ class AppSfmUI(AppBaseUI):
                         # matcher setting
                         self.inputs.matcher_key = gr.Dropdown(
                             choices=self.matcher_zoo.keys(),
-                            value="disk+lightglue",
+                            value="disk-lightglue",
                             label="Matching Model",
                             interactive=True,
                         )

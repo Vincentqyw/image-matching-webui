@@ -88,9 +88,12 @@ def test_app_py_default_config():
     # Test the config path resolution in app.py
     import argparse
 
-    # Mock the argument parsing to test config path (app.py uses config/app.yaml as default)
+    # Mock the argument parsing to test config path
+    # app.py now checks current dir first, then falls back to package default
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=str, default=str(ROOT / "config/app.yaml"))
+    parser.add_argument(
+        "--config", type=str, default=str(ROOT / "imcui/config/app.yaml")
+    )
     args = parser.parse_args([])
 
     config_path = Path(args.config)
@@ -102,7 +105,7 @@ def test_app_py_default_config():
         config = yaml.safe_load(f)
 
     assert "server" in config
-    assert "matcher_zoo" in config
+    # matcher_zoo is now dynamically loaded from vismatch, not in config
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)

@@ -10,8 +10,8 @@ Image Matching WebUI (IMCUI) is a Gradio-based web interface for matching image 
 
 ### Installation
 ```bash
-# From source (requires recursive clone for submodules)
-git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git
+# From source
+git clone https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
 conda env create -f environment.yaml
 conda activate imcui
@@ -35,9 +35,21 @@ imcui --config /path/to/config.yaml
 # On custom port
 imcui -p 8080
 
+# Custom config and options
+imcui -c config.yaml -s 127.0.0.1 -d ./datasets -v
+
 # Docker
 docker-compose up webui
 ```
+
+### CLI Options
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-s, --server-name` | `0.0.0.0` | Host to bind |
+| `-p, --server-port` | `7860` | Port to run on |
+| `-c, --config` | Auto-detected | Custom config YAML path |
+| `-d, --example-data-root` | `imcui/datasets` | Example datasets directory |
+| `-v, --verbose` | `False` | Enable verbose output |
 
 ### Development
 ```bash
@@ -47,7 +59,7 @@ pytest tests/ -v
 # Run a single test
 pytest tests/test_basic.py::test_one -v
 
-# Run pre-commit checks
+# Run pre-commit checks (uses ruff, ruff-format, mypy, clang-format)
 pre-commit run -a
 ```
 
@@ -68,7 +80,6 @@ docker-compose up api
 - `imcui/hloc/` - Feature extraction and matching (adapted from Hierarchical-Localization)
 - `imcui/hloc/extractors/` - Sparse feature extractors (SuperPoint, DISK, ALIKED, etc.)
 - `imcui/hloc/matchers/` - Sparse/dense matchers (LightGlue, LoFTR, RoMa, etc.)
-- `imcui/third_party/` - Git submodules for external algorithms
 - `config/app.yaml` - Matcher configuration and defaults
 
 ### Key Concepts
@@ -93,9 +104,25 @@ pred = api(image0, image1)  # RGB numpy arrays
 
 ### Adding New Algorithms
 
-1. Add feature extractor to `imcui/hloc/extractors/` following existing patterns
-2. Add matcher to `imcui/hloc/matchers/` (dense) or modify match_features.py (sparse)
-3. Register in `config/app.yaml` under `matcher_zoo`
+The project now uses [vismatch](https://github.com/Vincentqyw/vismatch) pip package for algorithms. To add new algorithms:
+
+1. Install the vismatch package with your custom algorithm
+2. Register in config file under `matcher_zoo`:
+3. Or add custom feature extractor to `imcui/hloc/extractors/` following existing patterns
+
+```yaml
+matcher_zoo:
+  my_algorithm:
+    matcher: my-matcher-name
+    feature: my-feature-name  # only for sparse matchers
+    dense: false  # true for dense methods like LoFTR
+    info:
+      name: My Algorithm
+      source: "CVPR 2024"
+      github: https://github.com/example
+      display: true
+      efficiency: high
+```
 
 ## Configuration Precedence
 

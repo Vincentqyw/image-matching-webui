@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import poselib
 from PIL import Image
-from vismatch import get_matcher
+from vismatch import get_matcher, available_models
 
 # Simple logger
 import logging
@@ -78,23 +78,37 @@ def load_config(config_name: str) -> Dict[str, Any]:
 
 
 def get_matcher_zoo(
-    matcher_zoo: Dict[str, Dict[str, Union[str, bool]]],
+    matcher_zoo: Optional[Dict[str, Dict[str, Union[str, bool]]]] = None,
 ) -> Dict[str, Dict[str, Union[Callable, bool]]]:
     """
-    Restore matcher configurations from a dictionary.
+    Build matcher zoo from vismatch's available_models.
+
+    If matcher_zoo is provided (from config), use it for backward compatibility.
+    Otherwise, dynamically load all available models from vismatch.
 
     Args:
-        matcher_zoo: A dictionary with the matcher configurations,
-            where the configuration is a dictionary as loaded from a YAML file.
+        matcher_zoo: Optional dict from config. If None, use vismatch.available_models.
 
     Returns:
-        A dictionary with the matcher configurations, where the configuration is
-            a function or a function instead of a string.
+        A dictionary mapping model keys to their configurations.
     """
-    matcher_zoo_restored = {}
-    for k, v in matcher_zoo.items():
-        matcher_zoo_restored[k] = parse_match_config(v)
-    return matcher_zoo_restored
+    if matcher_zoo is None:
+        # Dynamically load all available models from vismatch
+        matcher_zoo_restored = {}
+        # available_models is a list, not a function
+        for model_name in available_models:
+            # Use the model name as the key
+            matcher_zoo_restored[model_name] = {
+                "model_name": model_name,
+                "info": {},
+            }
+        return matcher_zoo_restored
+    else:
+        # Backward compatibility: use config-based matcher_zoo
+        matcher_zoo_restored = {}
+        for k, v in matcher_zoo.items():
+            matcher_zoo_restored[k] = parse_match_config(v)
+        return matcher_zoo_restored
 
 
 def parse_match_config(conf):
@@ -109,18 +123,43 @@ def parse_match_config(conf):
     }
 
 
+def get_available_model_names() -> List[str]:
+    """
+    Get list of all available model names from vismatch.
+
+    Returns:
+        List of model names (strings).
+    """
+    return available_models
+
+
 def get_model(match_conf: Dict[str, Any]):
     """
     Load a matcher model from the provided configuration using vismatch.
 
     Args:
         match_conf: A dictionary containing the model configuration.
+            - model_name: str - name of the matcher
+            - max_num_keypoints: int - maximum number of keypoints
+            - threshold: float - match threshold
 
     Returns:
         A matcher model instance.
     """
     model_name = match_conf.get("model_name", "superpoint-lightglue")
-    return get_matcher(model_name, device=DEVICE)
+    max_num_keypoints = match_conf.get("max_num_keypoints", 2048)
+    threshold = match_conf.get("threshold", 0.1)
+
+    # Build kwargs for vismatch
+    kwargs = {
+        "max_num_keypoints": max_num_keypoints,
+    }
+
+    # Some matchers support threshold parameter
+    if threshold is not None:
+        kwargs["threshold"] = threshold
+
+    return get_matcher(model_name, device=DEVICE, **kwargs)
 
 
 def get_feature_model(conf: Dict[str, Dict[str, Any]]):
@@ -147,27 +186,22 @@ def download_example_images(repo_id, output_dir):
 
 def gen_examples(data_root: Path):
     random.seed(1)
+    # Use vismatch available models for examples
     example_algos = [
-        "disk+lightglue",
-        "xfeat(sparse)",
+        "disk-lightglue",
+        "xfeat",
         "dedode",
         "loftr",
-        "disk",
-        "RoMa",
-        "sift",
-        "rord",
+        "roma",
+        "sift-lightglue",
         "d2net",
         "aspanformer",
         "topicfm",
-        "superpoint+superglue",
-        "superpoint+lightglue",
-        "superpoint+mnn",
-        "disk",
+        "superpoint-lightglue",
     ]
     example_algos_rotation_robust = [
-        "sift",
-        "rord",
-        "sift+lightglue",
+        "sift-lightglue",
+        "omniglue",
         # "GIM(dkm)",
     ]
     data_root = Path(data_root)
@@ -894,17 +928,24 @@ def run_matching(
     model = matcher_zoo[key]
     model_name = model["model_name"]
 
-    efficiency = model["info"].get("efficiency", "high")
-    if efficiency == "low":
-        gr.Warning(
-            "Matcher {} is time-consuming, please wait for a while".format(
-                model["info"].get("name", "unknown")
+    # Only show efficiency warning if info is available
+    info = model.get("info", {})
+    if info:
+        efficiency = info.get("efficiency", "high")
+        if efficiency == "low":
+            gr.Warning(
+                "Matcher {} is time-consuming, please wait for a while".format(
+                    info.get("name", "unknown")
+                )
             )
-        )
 
-    # Get the vismatch model
-    match_conf = {"model_name": model_name}
-    cache_key = key
+    # Get the vismatch model with parameters
+    match_conf = {
+        "model_name": model_name,
+        "max_num_keypoints": extract_max_keypoints,
+        "threshold": match_threshold,
+    }
+    cache_key = f"{key}_kp{extract_max_keypoints}_th{match_threshold}"
 
     if use_cached_model:
         matcher = model_cache.load_model(cache_key, get_model, match_conf)

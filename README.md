@@ -109,8 +109,8 @@ pip install imcui
 
 #### Install from source
 
-``` bash
-git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git
+```bash
+git clone https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
 conda env create -f environment.yaml
 conda activate imcui
@@ -228,7 +228,9 @@ imcui --help
 
 ### Add your own feature / matcher
 
-I provide an example to add local feature in [imcui/hloc/extractors/example.py](imcui/hloc/extractors/example.py). Then add feature settings in `confs` in file [imcui/hloc/extract_features.py](imcui/hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in your configuration file.
+The project now uses [vismatch](https://github.com/Vincentqyw/vismatch) pip package for algorithms. To add new algorithms, install the vismatch package and register them in the configuration file under `matcher_zoo`.
+
+For custom implementations, add your feature extractor to `imcui/hloc/extractors/` following existing patterns, then register in the config file.
 
 **Configuration file locations (in priority order):**
 1. Custom config file specified with `--config` parameter
@@ -243,7 +245,7 @@ IMCUI hosts all models on [Huggingface](https://huggingface.co/Realcat/imcui_che
 
 ## Contributions welcome!
 
-External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using a linter like flake8. This is a non-exhaustive list of features that might be valuable additions:
+External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using ruff (included in pre-commit). This is a non-exhaustive list of features that might be valuable additions:
 
 - [x] support pip install command
 - [x] add [CPU CI](.github/workflows/ci.yml)
@@ -255,36 +257,6 @@ External contributions are very much welcome. Please follow the [PEP8 style guid
 - [ ] support export matches to colmap ([#issue 6](https://github.com/Vincentqyw/image-matching-webui/issues/6))
 - [x] add config file to set default parameters
 - [x] dynamically load models and reduce GPU overload
-
-Adding local features / matchers as submodules is very easy. For example, to add the [GlueStick](https://github.com/cvg/GlueStick):
-
-``` bash
-git submodule add https://github.com/cvg/GlueStick.git imcui/third_party/GlueStick
-```
-
-If remote submodule repositories are updated, don't forget to pull submodules with:
-
-``` bash
-git submodule update --init --recursive  # init and download
-git submodule update --remote  # update
-```
-
-If you only want to update one submodule, use `git submodule update --remote imcui/third_party/GlueStick`.
-
-To remove a submodule, follow these steps:
-
-<details>
-<summary><strong>More Remove Submodule Commands</strong> (click to expand)</summary>
-
-``` bash
-git submodule deinit -f imcui/third_party/GlueStick
-git rm -f imcui/third_party/GlueStick
-rm -rf .git/modules/imcui/third_party/GlueStick
-git add .gitmodules && \
-git commit -m "Remove submodule imcui/third_party/dust3r"
-```
-</details>
-
 
 To format code before committing, run:
 
