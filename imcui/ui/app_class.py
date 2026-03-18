@@ -424,6 +424,7 @@ class ImageMatchingApp:
             server_name=self.server_name,
             server_port=self.server_port,
             share=False,
+            inbrowser=False,
             css=CSS,
             allowed_paths=[
                 str(Path(__file__).parents[0]),
