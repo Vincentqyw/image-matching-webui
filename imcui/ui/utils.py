@@ -141,23 +141,31 @@ def get_model(match_conf: Dict[str, Any]):
         match_conf: A dictionary containing the model configuration.
             - model_name: str - name of the matcher
             - max_num_keypoints: int - maximum number of keypoints
-            - threshold: float - match threshold
+            - threshold: float - match threshold (for dense matchers)
+            - keypoint_threshold: float - keypoint detection threshold (for some matchers)
 
     Returns:
         A matcher model instance.
     """
     model_name = match_conf.get("model_name", "superpoint-lightglue")
     max_num_keypoints = match_conf.get("max_num_keypoints", 2048)
-    threshold = match_conf.get("threshold", 0.1)
+    threshold = match_conf.get("threshold", 0.1)  # match threshold
+    keypoint_threshold = match_conf.get(
+        "keypoint_threshold", None
+    )  # keypoint detection threshold
 
     # Build kwargs for vismatch
     kwargs = {
         "max_num_keypoints": max_num_keypoints,
     }
 
-    # Some matchers support threshold parameter
+    # Match threshold (for dense matchers like LoFTR, RoMa)
     if threshold is not None:
         kwargs["threshold"] = threshold
+
+    # Keypoint detection threshold (for some matchers like zippypoint, silk)
+    if keypoint_threshold is not None:
+        kwargs["keypoint_threshold"] = keypoint_threshold
 
     return get_matcher(model_name, device=DEVICE, **kwargs)
 
@@ -200,8 +208,9 @@ def gen_examples(data_root: Path):
         "superpoint-lightglue",
     ]
     example_algos_rotation_robust = [
+        "sift-nn",
+        "orb-nn",
         "sift-lightglue",
-        "omniglue",
         # "GIM(dkm)",
     ]
     data_root = Path(data_root)
@@ -944,8 +953,11 @@ def run_matching(
         "model_name": model_name,
         "max_num_keypoints": extract_max_keypoints,
         "threshold": match_threshold,
+        "keypoint_threshold": keypoint_threshold,
     }
-    cache_key = f"{key}_kp{extract_max_keypoints}_th{match_threshold}"
+    cache_key = (
+        f"{key}_kp{extract_max_keypoints}_th{match_threshold}_kt{keypoint_threshold}"
+    )
 
     if use_cached_model:
         matcher = model_cache.load_model(cache_key, get_model, match_conf)

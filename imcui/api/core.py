@@ -74,14 +74,28 @@ class ImageMatchingAPI(torch.nn.Module):
         self.match_threshold = match_threshold
 
     def _init_models(self):
-        """Initialize the vismatch model."""
-        # Get model name from config
+        """Initialize the vismatch model with parameters."""
         model_name = self.conf.get("model_name", "superpoint-lightglue")
-        self.matcher = get_matcher(model_name, device=self.device)
+        # Build kwargs for vismatch
+        kwargs = {
+            "max_num_keypoints": getattr(self, "max_keypoints", 2048),
+        }
+        # Some matchers support threshold parameter (especially dense matchers)
+        threshold = getattr(self, "match_threshold", None)
+        if threshold is not None:
+            kwargs["threshold"] = threshold
+        self.matcher = get_matcher(model_name, device=self.device, **kwargs)
 
-    def set_model(self, model_name: str):
+    def set_model(
+        self, model_name: str, max_keypoints: int = None, threshold: float = None
+    ):
         """Switch to a different vismatch model."""
-        self.matcher = get_matcher(model_name, device=self.device)
+        kwargs = {
+            "max_num_keypoints": max_keypoints or getattr(self, "max_keypoints", 2048),
+        }
+        if threshold is not None:
+            kwargs["threshold"] = threshold
+        self.matcher = get_matcher(model_name, device=self.device, **kwargs)
 
     def _convert_result_format(
         self, result: Dict[str, Any], img0: np.ndarray, img1: np.ndarray
