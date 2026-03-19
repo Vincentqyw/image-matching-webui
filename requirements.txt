@@ -1,7 +1,7 @@
 datasets
 easydict
 fastapi
-gradio>6.9.0
+gradio>6.0.0
 huggingface_hub
 loguru
 matplotlib
