@@ -2,9 +2,10 @@ datasets
 easydict
 fastapi
 gradio
+huggingface_hub
 loguru
 matplotlib
-numpy
+numpy~=1.24
 omegaconf
 opencv-contrib-python
 opencv-python
@@ -13,6 +14,8 @@ plotly
 poselib
 protobuf
 PyYAML
+ray
+ray[serve]
 tqdm
-uvicorn
+uvicorn>=0.27.0
 vismatch
