@@ -1,5 +1,6 @@
 # api.py - Using vismatch
 import warnings
+from loguru import logger
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -58,8 +59,8 @@ class ImageMatchingAPI(torch.nn.Module):
         if device == "cuda":
             memory_allocated = torch.cuda.memory_allocated(device)
             memory_reserved = torch.cuda.memory_reserved(device)
-            print(f"GPU memory allocated: {memory_allocated / 1024**2:.3f} MB")
-            print(f"GPU memory reserved: {memory_reserved / 1024**2:.3f} MB")
+            logger.info(f"GPU memory allocated: {memory_allocated / 1024**2:.3f} MB")
+            logger.info(f"GPU memory reserved: {memory_reserved / 1024**2:.3f} MB")
         self.pred = None
 
     def _update_config(

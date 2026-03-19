@@ -15,18 +15,7 @@ import numpy as np
 import poselib
 from PIL import Image
 from vismatch import get_matcher, available_models
-
-# Simple logger
-import logging
-
-logger = logging.getLogger("imcui")
-logger.setLevel(logging.INFO)
-if not logger.handlers:
-    handler = logging.StreamHandler()
-    handler.setFormatter(
-        logging.Formatter("[%(asctime)s %(name)s %(levelname)s] %(message)s")
-    )
-    logger.addHandler(handler)
+from loguru import logger
 
 # Constants
 DATASETS_REPO_ID = "Realcat/imcui_datasets"
@@ -689,7 +678,7 @@ def wrap_images(
                 rectified_image1 = cv2.warpPerspective(img1, H2, (w1, h1))
                 title = ["Image 0 - warped", "Image 1 - warped"]
         else:
-            print("Error: Unknown geometry type")
+            logger.error("Unknown geometry type")
         fig = plot_images(
             [rectified_image0.squeeze(), rectified_image1.squeeze()],
             title,

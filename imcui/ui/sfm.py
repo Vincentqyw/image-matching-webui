@@ -2,9 +2,8 @@
 # This module was using hloc which has been removed.
 # SfM functionality will be re-enabled in a future update.
 
-import logging
+from loguru import logger
 
-logger = logging.getLogger("imcui.sfm")
 logger.warning("SfM module is temporarily disabled due to vismatch refactoring")
 
 

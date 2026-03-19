@@ -213,6 +213,8 @@ if __name__ == "__main__":
     test_cli_version()
     test_cli_default_config_loading()
     # Skip test_app_py_default_config when running directly - requires long timeout
-    print("Skipping test_app_py_default_config when running directly (use pytest)")
+    logger.info(
+        "Skipping test_app_py_default_config when running directly (use pytest)"
+    )
     test_package_entry_point()
-    print("All tests passed!")
+    logger.success("All tests passed!")
