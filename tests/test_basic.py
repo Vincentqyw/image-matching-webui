@@ -1,5 +1,6 @@
 import cv2
 import sys
+import numpy as np
 from pathlib import Path
 
 ROOT = Path(__file__).parents[1]
@@ -9,12 +10,21 @@ from imcui.ui.utils import DEVICE, get_matcher_zoo
 from imcui.api import ImageMatchingAPI
 
 
+def load_image_rgb(path):
+    """Load image as RGB float32 in [0, 1] range."""
+    img = cv2.imread(str(path))
+    if img is None:
+        return None
+    img = img[:, :, ::-1].copy()  # BGR to RGB
+    return img.astype(np.float32) / 255.0
+
+
 def test_all():
     # matcher_zoo is dynamically loaded from vismatch
     img_path1 = ROOT / "tests/data/02928139_3448003521.jpg"
     img_path2 = ROOT / "tests/data/17295357_9106075285.jpg"
-    image0 = cv2.imread(str(img_path1))[:, :, ::-1]  # RGB
-    image1 = cv2.imread(str(img_path2))[:, :, ::-1]  # RGB
+    image0 = load_image_rgb(img_path1)
+    image1 = load_image_rgb(img_path2)
 
     # Get matcher zoo dynamically (no config needed)
     matcher_zoo = get_matcher_zoo()
@@ -33,8 +43,8 @@ def test_one():
     img_path1 = ROOT / "tests/data/02928139_3448003521.jpg"
     img_path2 = ROOT / "tests/data/17295357_9106075285.jpg"
 
-    image0 = cv2.imread(str(img_path1))[:, :, ::-1]  # RGB
-    image1 = cv2.imread(str(img_path2))[:, :, ::-1]  # RGB
+    image0 = load_image_rgb(img_path1)
+    image1 = load_image_rgb(img_path2)
     # sparse
     conf = {
         "feature": {

@@ -7,7 +7,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 import numpy as np
-import seaborn as sns
 
 np.random.seed(1995)
 color_map = np.arange(100)
@@ -112,6 +111,8 @@ def plot_color_line_matches(
     Returns:
         The modified matplotlib figure.
     """
+    import seaborn as sns
+
     n_lines = lines[0].shape[0]
     colors = sns.color_palette("husl", n_colors=n_lines)
     np.random.shuffle(colors)
@@ -276,10 +277,16 @@ def fig2im(fig: matplotlib.figure.Figure) -> np.ndarray:
         A numpy array with shape (height, width, 3) and dtype uint8 containing
         the RGB values of the figure.
     """
-    fig.canvas.draw()
-    (width, height) = fig.canvas.get_width_height()
-    buf_ndarray = np.frombuffer(fig.canvas.tostring_rgb(), dtype="u1")
-    return buf_ndarray.reshape(height, width, 3)
+    # Use savefig to buffer for better cross-platform compatibility
+    # This handles high-DPI displays and different backends correctly
+    from io import BytesIO
+    from PIL import Image
+
+    buf = BytesIO()
+    fig.savefig(buf, format="png", dpi=fig.dpi, bbox_inches="tight")
+    buf.seek(0)
+    img = Image.open(buf)
+    return np.array(img)[:, :, :3]
 
 
 def draw_matches_core(
