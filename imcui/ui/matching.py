@@ -15,9 +15,9 @@ from .config import (
     DEFAULT_RANSAC_METHOD,
     DEFAULT_RANSAC_REPROJ_THRESHOLD,
     DEFAULT_SETTING_GEOMETRY,
-    ModelCache,
     get_model,
 )
+from .model_cache import ARCSizeAwareModelCache as ModelCache
 from .geometry import filter_matches
 from .image_utils import generate_warp_images
 from .visualization import display_keypoints, display_matches
