@@ -9,7 +9,7 @@ from PIL import Image
 from loguru import logger
 
 # Import visualization functions
-from .visualization import fig2im, plot_images
+from .visualization import figure_to_numpy_array, plot_images
 
 
 def wrap_images(
@@ -62,7 +62,7 @@ def wrap_images(
             title,
             dpi=300,
         )
-        return fig2im(fig), rectified_image1
+        return figure_to_numpy_array(fig), rectified_image1
     else:
         return None, None
 

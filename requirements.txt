@@ -12,6 +12,7 @@ Pillow
 plotly
 poselib
 protobuf
+pycolmap
 PyYAML
 ray
 ray[serve]

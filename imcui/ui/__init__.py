@@ -66,8 +66,11 @@ from .visualization import (  # noqa: F401
     display_keypoints,
     display_matches,
     plot_images,
-    fig2im,
+    figure_to_numpy_array,
 )
 
 # Import model cache
 from .model_cache import ARCSizeAwareModelCache, LRUModelCache  # noqa: F401
+
+# Import SFM engine
+from .sfm_engine import SfmEngine  # noqa: F401

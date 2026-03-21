@@ -14,7 +14,7 @@ from vismatch import get_matcher
 from ..ui.geometry import filter_matches
 from ..ui.visualization import (
     display_matches,
-    fig2im,
+    figure_to_numpy_array,
     plot_images,
     add_text,
     plot_keypoints,
@@ -279,7 +279,7 @@ class ImageMatchingAPI(torch.nn.Module):
                 + f"# keypoints1: {len(pred['keypoints1_orig'])}"
             )
             add_text(0, text, fs=15)
-        output_keypoints = fig2im(output_keypoints)
+        output_keypoints = figure_to_numpy_array(output_keypoints)
         # plot images with raw matches
         titles = [
             "Image 0 - Raw matched keypoints",

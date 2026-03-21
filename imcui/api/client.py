@@ -156,7 +156,11 @@ def send_request_extract(
 
     # draw matching, debug only
     if viz:
-        from imcui.ui.visualization import plot_keypoints, fig2im, plot_images
+        from imcui.ui.visualization import (
+            plot_keypoints,
+            figure_to_numpy_array,
+            plot_images,
+        )
 
         kpts = np.array(response[0]["keypoints_orig"])
         if "image_orig" in response[0].keys():
@@ -164,7 +168,7 @@ def send_request_extract(
 
             output_keypoints = plot_images([img_orig], titles="titles", dpi=300)
             plot_keypoints([kpts])
-            output_keypoints = fig2im(output_keypoints)
+            output_keypoints = figure_to_numpy_array(output_keypoints)
             cv2.imwrite(
                 "demo_match.jpg",
                 output_keypoints[:, :, ::-1].copy(),  # RGB -> BGR

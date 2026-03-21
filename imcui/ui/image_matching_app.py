@@ -1,7 +1,18 @@
+import os
 from pathlib import Path
+import tempfile
 from typing import Any, Dict, Optional, Tuple
 
 import gradio as gr
+
+try:
+    from gradio_rerun import Rerun
+
+    RERUN_AVAILABLE = True
+except ImportError:
+    Rerun = None
+    RERUN_AVAILABLE = False
+from loguru import logger
 import numpy as np
 from easydict import EasyDict as edict
 from omegaconf import OmegaConf
@@ -416,7 +427,7 @@ class ImageMatchingApp:
                         "outputs": "experiments/sfm",
                     }
                 )
-                sfm_ui.call_empty()
+                sfm_ui.call()
 
     def run(self):
         # Collect all allowed paths for Gradio
@@ -425,11 +436,25 @@ class ImageMatchingApp:
             str(Path(__file__).parents[1]),  # imcui
         ]
 
+        # Add temp directory for SFM point cloud files
+        temp_dir = tempfile.gettempdir()
+        if temp_dir not in allowed_paths:
+            allowed_paths.append(temp_dir)
+
         # Add example data root if it's outside the package (e.g., cache directory)
         if self.example_data_root and not str(self.example_data_root).startswith(
             str(Path(__file__).parents[1])
         ):
-            allowed_paths.append(str(self.example_data_root))
+            if self.example_data_root not in allowed_paths:
+                allowed_paths.append(str(self.example_data_root))
+
+        # Filter out any invalid paths
+        valid_paths = []
+        for path in allowed_paths:
+            if os.path.exists(path) and os.path.isdir(path):
+                valid_paths.append(path)
+
+        logger.info(f"Gradio allowed paths: {valid_paths}")
 
         self.app.queue().launch(
             server_name=self.server_name,
@@ -437,7 +462,7 @@ class ImageMatchingApp:
             share=False,
             inbrowser=False,
             css=CSS,
-            allowed_paths=allowed_paths,
+            allowed_paths=valid_paths,
         )
 
     def ui_change_imagebox(self, choice):
@@ -470,7 +495,7 @@ class ImageMatchingApp:
 
     def ui_reset_state(
         self,
-        *args: Any,
+        *_args: Any,
     ) -> Tuple[
         Optional[np.ndarray],
         Optional[np.ndarray],
@@ -619,11 +644,16 @@ class AppSfmUI(AppBaseUI):
         self._init_ui()
 
     def init_retrieval_dropdown(self):
+        # Get retrieval algorithms from config, with fallback defaults
+        retrieval_zoo = self.cfg.get("retrieval_zoo", {})
+        if not retrieval_zoo:
+            # Use default retrieval options if not in config
+            return ["exhaustive", "retrieval"]
         algos = []
-        for k, v in self.cfg["retrieval_zoo"].items():
+        for k, v in retrieval_zoo.items():
             if v.get("enable", True):
                 algos.append(k)
-        return algos
+        return algos if algos else ["exhaustive"]
 
     def _update_options(self, option):
         if option == "sparse":
@@ -746,6 +776,36 @@ class AppSfmUI(AppBaseUI):
                                         step=1,
                                         interactive=True,
                                     )
+                with gr.Accordion("Video/Image Settings", open=True):
+                    self.inputs.num_frames = gr.Slider(
+                        label="Number of Frames (for video)",
+                        minimum=2,
+                        maximum=50,
+                        value=10,
+                        step=1,
+                        interactive=True,
+                    )
+                    self.inputs.target_width = gr.Slider(
+                        label="Target Width",
+                        minimum=320,
+                        maximum=1920,
+                        value=640,
+                        step=16,
+                        interactive=True,
+                    )
+                    self.inputs.target_height = gr.Slider(
+                        label="Target Height",
+                        minimum=240,
+                        maximum=1080,
+                        value=480,
+                        step=16,
+                        interactive=True,
+                    )
+                    self.inputs.resize_enabled = gr.Checkbox(
+                        label="Resize Images",
+                        value=True,
+                        interactive=True,
+                    )
                 with gr.Accordion("Scene Graph Settings", open=True):
                     # mapping setting
                     self.inputs.scene_graph = gr.Dropdown(
@@ -758,7 +818,7 @@ class AppSfmUI(AppBaseUI):
                     # global feature setting
                     self.inputs.global_feature = gr.Dropdown(
                         choices=self.init_retrieval_dropdown(),
-                        value="netvlad",
+                        value="exhaustive",
                         label="Global features",
                         interactive=True,
                     )
@@ -799,9 +859,34 @@ class AppSfmUI(AppBaseUI):
                             label="Retriangluation Details",
                         )
                     self.ui.button_sfm = gr.Button("Run SFM", variant="primary")
-                self.outputs.model_3d = gr.Model3D(
-                    interactive=True,
+                # Status output for progress
+                self.outputs.sfm_status = gr.Textbox(
+                    label="SFM Status",
+                    interactive=False,
+                    show_label=True,
                 )
+                # Use Rerun component for 3D visualization
+                if RERUN_AVAILABLE:
+                    try:
+                        self.outputs.model_3d = Rerun(
+                            value=None,
+                            label="3D Point Cloud Visualization",
+                        )
+                        logger.info("Using Rerun component for 3D visualization")
+                    except Exception as e:
+                        logger.warning(f"Failed to initialize Rerun component: {e}")
+                        # Fallback to HTML
+                        self.outputs.model_3d = gr.HTML(
+                            label="3D Point Cloud Visualization",
+                            value="<p>Rerun initialization failed. Check installation.</p>",
+                        )
+                else:
+                    # Fallback to HTML if Rerun is not available
+                    self.outputs.model_3d = gr.HTML(
+                        label="3D Point Cloud Visualization (Install gradio_rerun)",
+                        value="<p>Please install gradio_rerun package: pip install gradio_rerun</p>",
+                    )
+                    logger.warning("Rerun component not available, using HTML fallback")
                 self.outputs.output_image = gr.Image(
                     label="SFM Visualize",
                     type="numpy",
@@ -809,12 +894,28 @@ class AppSfmUI(AppBaseUI):
                     interactive=False,
                 )
 
-    def call_empty(self):
-        self.ui.button_sfm.click(fn=self.info, inputs=[], outputs=[])
+    def info(self):
+        gr.Info("SFM is ready. Please upload images and click Run SFM.")
 
     def call(self):
+        # Create a wrapper that adds status updates
+        def run_sfm_with_status(*args):
+            # Show loading status
+            gr.Info("Starting SFM process...")
+            try:
+                result = self.sfm_engine.call(*args)
+                if result[0] is not None:
+                    gr.Info("SFM completed successfully!")
+                else:
+                    gr.Warning("SFM failed. Check input images.")
+                return result
+            except Exception as e:
+                logger.error(f"SFM error: {e}")
+                gr.Error(f"SFM failed: {str(e)}")
+                return (None, None)
+
         self.ui.button_sfm.click(
-            fn=self.sfm_engine.call,
+            fn=run_sfm_with_status,
             inputs=[
                 self.inputs.matcher_key,
                 self.inputs.input_images,  # images
@@ -832,6 +933,11 @@ class AppSfmUI(AppBaseUI):
                 self.inputs.mapper_refine_focal_length,
                 self.inputs.mapper_refine_principle_points,
                 self.inputs.mapper_refine_extra_params,
+                # new parameters
+                self.inputs.num_frames,
+                self.inputs.resize_enabled,
+                self.inputs.target_width,
+                self.inputs.target_height,
             ],
             outputs=[self.outputs.model_3d, self.outputs.output_image],
         )

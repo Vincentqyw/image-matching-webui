@@ -266,7 +266,7 @@ def error_colormap(err: np.ndarray, thr: float, alpha: float = 1.0) -> np.ndarra
     )
 
 
-def fig2im(fig: matplotlib.figure.Figure) -> np.ndarray:
+def figure_to_numpy_array(fig: matplotlib.figure.Figure) -> np.ndarray:
     """
     Convert a matplotlib figure to a numpy array with RGB values.
 
@@ -326,7 +326,7 @@ def draw_matches_core(
         f"#Matches: {len(mkpts0)}",
     ]
     if path:
-        fig2im(
+        figure_to_numpy_array(
             make_matching_figure(
                 img0,
                 img1,
@@ -341,7 +341,7 @@ def draw_matches_core(
             )
         )
     else:
-        return fig2im(
+        return figure_to_numpy_array(
             make_matching_figure(
                 img0,
                 img1,
@@ -410,7 +410,7 @@ def draw_image_pairs(
         plt.savefig(str(path), bbox_inches="tight", pad_inches=0)
         plt.close()
     else:
-        return fig2im(fig)
+        return figure_to_numpy_array(fig)
 
 
 def display_keypoints(pred: dict, titles: List[str] = []):
@@ -424,7 +424,7 @@ def display_keypoints(pred: dict, titles: List[str] = []):
             + f"# keypoints1: {len(pred['keypoints1_orig'])}"
         )
         add_text(0, text, fs=15)
-    output_keypoints = fig2im(output_keypoints)
+    output_keypoints = figure_to_numpy_array(output_keypoints)
     return output_keypoints
 
 
@@ -505,7 +505,7 @@ def display_matches(
             dpi=300,
         )
         fig_lines = plot_color_line_matches([mtlines0, mtlines1], lw=2)
-        fig_lines = fig2im(fig_lines)
+        fig_lines = figure_to_numpy_array(fig_lines)
 
         # keypoints
         mkpts0 = pred.get("line_keypoints0_orig")

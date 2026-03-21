@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 from loguru import logger
 from vismatch import available_models, get_matcher
 
-from .visualization import fig2im, plot_images  # noqa: F401
+from .visualization import figure_to_numpy_array, plot_images  # noqa: F401
 
 # Constants
 DEVICE = "cuda" if __import__("torch").cuda.is_available() else "cpu"
