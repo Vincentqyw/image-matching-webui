@@ -180,14 +180,6 @@ docker-compose down
 ```
 </details>
 
-### Deploy to Railway
-
-Deploy to [Railway](https://railway.app/), setting up a `Custom Start Command` in `Deploy` section:
-
-``` bash
-python -m imcui.api.server
-```
-
 ### Run demo
 ```bash
 # Using the package CLI (recommended)
