@@ -105,7 +105,7 @@ docker-compose up api
 **Matcher Zoo**: All matchers are dynamically loaded from [vismatch](https://github.com/gmberton/vismatch) package (by [@gmberton](https://github.com/gmberton)). This WebUI no longer maintains matching algorithms.
 
 **Entry Points**:
-- `imcui` CLI (recommended) - uses shared utilities from `imcui.ui.config_utils`
+- `imcui` CLI (recommended) - uses shared utilities from `imcui.ui`
 - `python app.py` - HuggingFace Spaces entry point, also uses shared utilities
 - Both entry points share identical configuration loading logic
 
@@ -120,6 +120,23 @@ matcher_zoo = get_matcher_zoo()  # Dynamically loaded from vismatch
 api = ImageMatchingAPI(conf=matcher_zoo["superpoint-lightglue"], device=DEVICE)
 pred = api(image0, image1)  # RGB numpy arrays
 ```
+
+**UI Module Structure** (`imcui/ui/`):
+
+After refactoring, the monolithic `utils.py` was split into focused modules:
+
+| File | Purpose |
+|------|---------|
+| `image_matching_app.py` | Main Gradio application class (`ImageMatchingApp`) |
+| `config.py` | Configuration constants and matching functions |
+| `config_utils.py` | Path resolution, version management, auto-download |
+| `matching.py` | Matching logic, RANSAC filtering, model cache |
+| `geometry.py` | Geometry estimation (Homography, Fundamental matrix) |
+| `image_utils.py` | Image processing utilities (warp, rotate, scale) |
+| `examples.py` | Example dataset generation |
+| `visualization.py` | Visualization utilities (keypoints, matches) |
+| `model_cache.py` | Model caching (ARCSizeAwareModelCache, LRUModelCache) |
+| `sfm_engine.py` | SfM engine (temporarily disabled) |
 
 **Utility Functions** (available from top-level imports):
 ```python
@@ -171,11 +188,21 @@ Dataset path is resolved via `imcui.ui.config_utils.get_example_data_path()` in 
 
 ## Code Quality Notes
 
-**Avoid Code Duplication**: The codebase was refactored to eliminate duplicate logic. All configuration and path management is centralized in `imcui/ui/config_utils.py`.
+**Avoid Code Duplication**: The codebase was refactored to eliminate duplicate logic. All configuration and path management is centralized in `imcui/ui/config_utils.py`. The monolithic `utils.py` was split into modular components.
 
 **Version Management**: Never define version in multiple places. The single source of truth is `pyproject.toml`, and `imcui.__version__` reads it dynamically.
 
 **Entry Points**: Both `app.py` and `imcui/cli/main.py` should import shared utilities from `imcui` rather than implementing their own versions.
+
+**Exports via `imcui.ui`**: After the refactoring, `imcui/ui/__init__.py` exports all commonly used utilities for easy access:
+- `DEVICE`, `GRADIO_VERSION` - Device and version constants
+- `get_matcher_zoo`, `get_available_model_names` - Matcher management
+- `filter_matches`, `compute_geometry` - Geometry utilities
+- `run_matching`, `run_ransac`, `send_to_match` - Matching functions
+- `wrap_images`, `generate_warp_images` - Image processing
+- `display_keypoints`, `display_matches`, `plot_images` - Visualization
+- `ARCSizeAwareModelCache`, `LRUModelCache` - Model caching
+- Path functions from `config_utils`: `get_default_config_path`, `get_example_data_path`, `get_version`
 
 ## Cleanup
 
@@ -193,20 +220,25 @@ The following should NOT be deleted:
 
 ## Important Files
 
-**Configuration Management**:
-- `imcui/ui/config_utils.py` - Centralized utilities for:
-  - Configuration loading (`get_default_config_path()`)
-  - Dataset path resolution with auto-download (`get_example_data_path()`)
-  - Version management (`get_version()`)
-  - Platform-specific cache directories (`_get_cache_dir()`)
-  - HuggingFace download (`_download_example_data()`)
+**UI Modules** (`imcui/ui/`):
+- `image_matching_app.py` - Main Gradio application class (`ImageMatchingApp`)
+- `config.py` - Configuration constants and matching utilities
+- `config_utils.py` - Path resolution, version management, auto-download
+- `matching.py` - Matching logic, RANSAC, model cache
+- `geometry.py` - Geometry estimation (Homography, Fundamental matrix)
+- `image_utils.py` - Image processing utilities
+- `examples.py` - Example dataset generation
+- `visualization.py` - Visualization utilities
+- `model_cache.py` - Model caching classes
+
+**Configuration**:
 - `imcui/config/app.yaml` - Default configuration for the application
 - `imcui/config/api.yaml` - Configuration for API server
 
 **Entry Points**:
-- `imcui/cli/main.py` - Primary CLI entry point (uses `imcui.ui.config_utils`)
-- `app.py` - Secondary entry point for HuggingFace Spaces (uses `imcui.ui.config_utils`)
-- Both share identical configuration loading logic
+- `imcui/cli/main.py` - Primary CLI entry point
+- `app.py` - Secondary entry point for HuggingFace Spaces
+- Both use shared utilities from `imcui.ui`
 
 **Version Management**:
 - `pyproject.toml` - Single source of truth for version (1.0.0)
@@ -215,8 +247,9 @@ The following should NOT be deleted:
 
 **Deprecated Files**:
 - `environment.yaml` - Deprecated, includes deprecation notice. Recommend pip install instead.
+- `imcui/ui/utils.py` - Removed, split into modular components above.
 
 **Gradio Security Configuration**:
-- `imcui/ui/app_class.py:run()` - Dynamically adds external dataset paths to `allowed_paths`
+- `imcui/ui/image_matching_app.py:run()` - Dynamically adds external dataset paths to `allowed_paths`
 - Ensures Gradio can serve images from cache directory (`~/.cache/imcui/datasets/`)
 - Only adds cache directory if it's outside the package root
