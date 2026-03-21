@@ -47,10 +47,7 @@ imcui
 docker-compose up webui
 ```
 
-**Note for PyPI Users**: Example datasets (82MB) are NOT included in the PyPI package. On first run, they will be automatically downloaded from HuggingFace to your user cache directory (`~/.cache/imcui/datasets/` on Linux/macOS, `%LOCALAPPDATA%\imcui\datasets\` on Windows). To use local datasets, either:
-- Clone the repository: `git clone https://github.com/Vincentqyw/image-matching-webui.git`
-- Set `IMCUI_DATA_DIR` environment variable
-- Use `-d` flag to specify custom path
+**Note**: Example datasets (82MB) are **automatically downloaded** from HuggingFace on first run to your user cache directory (`~/.cache/imcui/datasets/` on Linux/macOS, `%LOCALAPPDATA%\imcui\datasets\` on Windows). To use local datasets, set `IMCUI_DATA_DIR` environment variable or use `-d` flag.
 
 ### CLI Options
 | Flag | Default | Description |
@@ -58,8 +55,10 @@ docker-compose up webui
 | `-s, --server-name` | `0.0.0.0` | Host to bind |
 | `-p, --server-port` | `7860` | Port to run on |
 | `-c, --config` | Auto-detected | Custom config YAML path |
-| `-d, --example-data-root` | `imcui/datasets` | Example datasets directory |
+| `-d, --example-data-root` | Auto-resolved | Example datasets directory (auto-download if not found) |
 | `-v, --verbose` | `False` | Enable verbose output |
+
+> **Note:** Both `imcui` CLI and `python app.py` support the same command-line options.
 
 ### Development
 ```bash
@@ -67,7 +66,7 @@ docker-compose up webui
 pytest tests/ -v
 
 # Run a single test
-pytest tests/test_basic.py::test_one -v
+pytest tests/test_image_matching.py::test_one -v
 
 # Run pre-commit checks (uses ruff, ruff-format, mypy, clang-format)
 pre-commit run -a
@@ -89,9 +88,8 @@ docker-compose up api
   - `cli/` - CLI entry point (main.py)
   - `ui/` - Gradio-based web interface (app_class.py, utils.py)
   - `api/` - Core matching API (ImageMatchingAPI class, server.py, client.py)
-  - `utils/` - Shared utilities (config.py - version, paths, configuration)
+  - `utils/` - Shared utilities (config.py - version, paths, configuration, **auto-download support**)
   - `config/` - Configuration files (app.yaml, api.yaml)
-  - `datasets/` - Example datasets for testing
 - `cpp/` - C++ code (independent build system)
   - `test/` - C++ API test client
   - `README.md` - Build instructions
@@ -129,9 +127,18 @@ pred = api(image0, image1)  # RGB numpy arrays
 from imcui import get_default_config_path, get_example_data_path, get_version
 
 config_path = get_default_config_path()  # Auto-detects local or package default
-data_path = get_example_data_path()      # Returns imcui/datasets path
+data_path = get_example_data_path()      # Auto-resolves datasets path with download support
 version = get_version()                  # Returns current version string
 ```
+
+**Example Datasets Management**:
+- **PyPI Package**: Datasets (82MB) are **excluded** from PyPI to keep package size small
+- **Auto-download**: On first run, datasets are automatically downloaded from HuggingFace to user cache:
+  - Linux/macOS: `~/.cache/imcui/datasets/`
+  - Windows: `%LOCALAPPDATA%\imcui\datasets\`
+- **Development Mode**: Git clone includes datasets locally at `imcui/datasets/`
+- **Custom Path**: Use `IMCUI_DATA_DIR` env var or `-d` CLI flag
+- **Resolution Order**: See `imcui/utils/config.py:get_example_data_path()` for details
 
 ### Adding New Algorithms
 
@@ -146,6 +153,22 @@ Config files are loaded in this order (first found):
 4. Package default: `imcui/config/app.yaml`
 
 This logic is shared across all entry points (CLI and app.py) via `imcui.utils.config.get_default_config_path()`.
+
+## Example Datasets Resolution
+
+Dataset path is resolved via `imcui.utils.config.get_example_data_path()` in this order:
+
+1. **Environment Variable**: `IMCUI_DATA_DIR` if set
+2. **User Cache**: Auto-download from HuggingFace on first run
+   - Linux/macOS: `~/.cache/imcui/datasets/`
+   - Windows: `%LOCALAPPDATA%\imcui\datasets\`
+
+**Notes**:
+- **All users** (including developers) use auto-download by default
+- Download requires `datasets` package: `pip install datasets` (or `pip install imcui[datasets]`)
+- Download progress and target directory are logged clearly
+- Gradio `allowed_paths` is automatically configured to include cache directory
+- For offline use, set `IMCUI_DATA_DIR` to a custom directory with pre-downloaded data
 
 ## Code Quality Notes
 
@@ -163,14 +186,21 @@ The following files/directories can be safely deleted to save space:
 - `output.pkl` - Cached output
 
 The following should NOT be deleted:
-- `imcui/datasets/` - Example datasets (required for testing)
 - `cpp/test/` - C++ test code for API
 - `assets/gui.jpg` - Screenshot for README
+- User cache directory (auto-created on first run):
+  - Linux/macOS: `~/.cache/imcui/datasets/`
+  - Windows: `%LOCALAPPDATA%\imcui\datasets\`
 
 ## Important Files
 
 **Configuration Management**:
-- `imcui/utils/config.py` - Centralized utility functions for paths, version, configuration
+- `imcui/utils/config.py` - Centralized utilities for:
+  - Configuration loading (`get_default_config_path()`)
+  - Dataset path resolution with auto-download (`get_example_data_path()`)
+  - Version management (`get_version()`)
+  - Platform-specific cache directories (`_get_cache_dir()`)
+  - HuggingFace download (`_download_example_data()`)
 - `imcui/config/app.yaml` - Default configuration for the application
 - `imcui/config/api.yaml` - Configuration for API server
 
@@ -186,3 +216,8 @@ The following should NOT be deleted:
 
 **Deprecated Files**:
 - `environment.yaml` - Deprecated, includes deprecation notice. Recommend pip install instead.
+
+**Gradio Security Configuration**:
+- `imcui/ui/app_class.py:run()` - Dynamically adds external dataset paths to `allowed_paths`
+- Ensures Gradio can serve images from cache directory (`~/.cache/imcui/datasets/`)
+- Only adds cache directory if it's outside the package root

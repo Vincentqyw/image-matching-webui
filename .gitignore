@@ -27,12 +27,12 @@ output.pkl
 log.txt
 experiments*
 gen_example.py
-datasets/lines/terrace0.JPG
-datasets/lines/terrace1.JPG
-datasets/South-Building*
 *.pkl
 oryx-build-commands.txt
 .ruff_cache*
 dist
 tmp
 **.DS_Store**
+
+# Example datasets are auto-downloaded to user cache, not stored in repo
+# Developers can set IMCUI_DATA_DIR or use -d flag if needed

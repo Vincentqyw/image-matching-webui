@@ -105,21 +105,25 @@ or deploy it locally following the instructions below.
 
 ```bash
 pip install imcui
+# Optional: for auto-download support
+pip install imcui[datasets]
 ```
 
-> **Note**: The PyPI package does NOT include example datasets (82MB) to keep the package size small. On first run, example images will be automatically downloaded from HuggingFace to your user cache directory (`~/.cache/imcui/datasets/` on Linux/macOS, `%LOCALAPPDATA%\imcui\datasets\` on Windows). For offline use or faster startup, see alternatives below.
+> **Note**: Example datasets (82MB) are **automatically downloaded** from HuggingFace on first run to your user cache directory:
+> - **Linux/macOS**: `~/.cache/imcui/datasets/`
+> - **Windows**: `%LOCALAPPDATA%\imcui\datasets\`
 >
-> **Alternative data sources**:
-> - Clone the repo to get datasets locally (recommended for offline use)
-> - Set `IMCUI_DATA_DIR` environment variable to use custom directory
-> - Use `-d` flag: `imcui -d /path/to/datasets`
+> The download happens transparently on first launch. For offline use or custom data paths, use:
+> - Environment variable: `export IMCUI_DATA_DIR=/path/to/datasets`
+> - CLI flag: `imcui -d /path/to/datasets`
 
-**Install from source** (includes example datasets)
+**Install from source**
 
 ```bash
 git clone https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
 pip install -e .
+# Datasets will be auto-downloaded on first run
 ```
 
 <details>
@@ -194,6 +198,8 @@ python app.py
 ```
 then open http://localhost:7860 in your browser.
 
+> **Note:** Both `imcui` CLI and `python app.py` support the same command-line options (see below).
+
 ![](assets/gui.jpg)
 
 ### Command Line Interface
@@ -237,7 +243,7 @@ imcui --help
 | `--server-name` | `-s` | `0.0.0.0` | Hostname or IP address to bind the server to |
 | `--server-port` | `-p` | `7860` | Port number to run the server on |
 | `--config` | `-c` | Auto-detected | Path to custom configuration YAML file |
-| `--example-data-root` | `-d` | `imcui/datasets` | Root directory containing example datasets |
+| `--example-data-root` | `-d` | Auto-download | Root directory containing example datasets (auto-downloads to cache if not specified) |
 | `--verbose` | `-v` | `False` | Enable verbose output for debugging |
 | `--version` | | | Show version information and exit |
 
