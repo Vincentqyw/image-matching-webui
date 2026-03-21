@@ -17,7 +17,7 @@ import yaml
 
 from . import ImagesInput, to_base64_nparray
 from .core import ImageMatchingAPI
-from ..ui import get_version
+from .. import get_version
 
 # Define DEVICE here
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"

@@ -4,7 +4,7 @@
 
 int main() {
     std::string img_path =
-        "../../../datasets/sacre_coeur/mapping_rot/02928139_3448003521_rot45.jpg";
+        "../../imcui/datasets/sacre_coeur/mapping_rot/02928139_3448003521_rot45.jpg";
     cv::Mat original_img = cv::imread(img_path, cv::IMREAD_GRAYSCALE);
 
     if (original_img.empty()) {

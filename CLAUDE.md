@@ -10,15 +10,16 @@ Image Matching WebUI (IMCUI) is a Gradio-based web interface for matching image 
 
 ### Installation
 ```bash
-# From source
+# From PyPI (recommended)
+pip install imcui
+
+# Or from source
 git clone https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
-conda env create -f environment.yaml
-conda activate imcui
 pip install -e .
 
-# Or from pip
-pip install imcui
+# ⚠️ Deprecated: conda environment.yaml
+# Use pip instead for all installations
 ```
 
 ### Running the Application
@@ -75,17 +76,34 @@ docker-compose up api
 ## Architecture
 
 ### Directory Structure
-- `imcui/ui/` - Gradio-based web interface (app_class.py, utils.py)
-- `imcui/api/` - Core matching API (ImageMatchingAPI class)
-- `imcui/config/` - Configuration files (app.yaml, api.yaml)
-- `imcui/assets/` - Static assets (logo, etc.)
-- `imcui/datasets/` - Example datasets for testing
+- `imcui/` - Main package (Python)
+  - `cli/` - CLI entry point (main.py)
+  - `ui/` - Gradio-based web interface (app_class.py, utils.py)
+  - `api/` - Core matching API (ImageMatchingAPI class, server.py, client.py)
+  - `utils/` - Shared utilities (config.py - version, paths, configuration)
+  - `config/` - Configuration files (app.yaml, api.yaml)
+  - `datasets/` - Example datasets for testing
+- `cpp/` - C++ code (independent build system)
+  - `test/` - C++ API test client
+  - `README.md` - Build instructions
+- `tests/` - Python test suite
+- `docker/` - Docker deployment configuration
+- `app.py` - HuggingFace Spaces entry point (backward compatibility)
+- `experiments/` - Debug output (can be safely deleted)
+- `assets/` - Image assets for documentation
 
 ### Key Concepts
 
 **Sparse vs Dense Matching**: Sparse methods extract discrete keypoints and match them. Dense methods work on full image correlations.
 
 **Matcher Zoo**: All matchers are dynamically loaded from [vismatch](https://github.com/gmberton/vismatch) package (by [@gmberton](https://github.com/gmberton)). This WebUI no longer maintains matching algorithms.
+
+**Entry Points**:
+- `imcui` CLI (recommended) - uses shared utilities from `imcui.utils.config`
+- `python app.py` - HuggingFace Spaces entry point, also uses shared utilities
+- Both entry points share identical configuration loading logic
+
+**Version Management**: Single source of truth in `pyproject.toml` (currently 1.0.0). The `imcui.__version__` reads from installed package metadata or falls back to pyproject.toml for development.
 
 **API Usage**:
 ```python
@@ -97,6 +115,15 @@ api = ImageMatchingAPI(conf=matcher_zoo["superpoint-lightglue"], device=DEVICE)
 pred = api(image0, image1)  # RGB numpy arrays
 ```
 
+**Utility Functions** (available from top-level imports):
+```python
+from imcui import get_default_config_path, get_example_data_path, get_version
+
+config_path = get_default_config_path()  # Auto-detects local or package default
+data_path = get_example_data_path()      # Returns imcui/datasets path
+version = get_version()                  # Returns current version string
+```
+
 ### Adding New Algorithms
 
 > **Note:** This WebUI no longer maintains matching algorithms. All matchers are maintained in the [vismatch](https://github.com/gmberton/vismatch) repository by [@gmberton](https://github.com/gmberton). To add new matchers, please contribute to the vismatch repository.
@@ -105,4 +132,48 @@ pred = api(image0, image1)  # RGB numpy arrays
 
 Config files are loaded in this order (first found):
 1. Custom path via `-c` flag
-2. Default: `imcui/config/app.yaml`
+2. `cwd/app.yaml` (current working directory)
+3. `cwd/config/app.yaml` (current working directory config subdirectory)
+4. Package default: `imcui/config/app.yaml`
+
+This logic is shared across all entry points (CLI and app.py) via `imcui.utils.config.get_default_config_path()`.
+
+## Code Quality Notes
+
+**Avoid Code Duplication**: The codebase was refactored to eliminate duplicate logic. All configuration and path management is centralized in `imcui/utils/config.py`.
+
+**Version Management**: Never define version in multiple places. The single source of truth is `pyproject.toml`, and `imcui.__version__` reads it dynamically.
+
+**Entry Points**: Both `app.py` and `imcui/cli/main.py` should import shared utilities from `imcui` rather than implementing their own versions.
+
+## Cleanup
+
+The following files/directories can be safely deleted to save space:
+- `experiments/` - Debug output directory
+- `log.txt` - Runtime logs
+- `output.pkl` - Cached output
+
+The following should NOT be deleted:
+- `imcui/datasets/` - Example datasets (required for testing)
+- `cpp/test/` - C++ test code for API
+- `assets/gui.jpg` - Screenshot for README
+
+## Important Files
+
+**Configuration Management**:
+- `imcui/utils/config.py` - Centralized utility functions for paths, version, configuration
+- `imcui/config/app.yaml` - Default configuration for the application
+- `imcui/config/api.yaml` - Configuration for API server
+
+**Entry Points**:
+- `imcui/cli/main.py` - Primary CLI entry point (uses `imcui.utils.config`)
+- `app.py` - Secondary entry point for HuggingFace Spaces (uses `imcui.utils.config`)
+- Both share identical configuration loading logic
+
+**Version Management**:
+- `pyproject.toml` - Single source of truth for version (1.0.0)
+- `imcui/__init__.py` - Reads version from installed package or pyproject.toml
+- Avoid defining version in `imcui/ui/__init__.py` or elsewhere
+
+**Deprecated Files**:
+- `environment.yaml` - Deprecated, includes deprecation notice. Recommend pip install instead.

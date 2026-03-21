@@ -1,5 +1,24 @@
-__version__ = "1.3.0"
+"""Gradio UI module for Image Matching WebUI."""
 
+# Import version from top-level package for backward compatibility
+from .. import __version__  # noqa: F401
 
-def get_version():
-    return __version__
+# Import main application class (will be updated in Phase 3)
+from .app_class import ImageMatchingApp  # noqa: F401
+
+# Import common utilities for easy access
+from .utils import (  # noqa: F401
+    DEVICE,
+    GRADIO_VERSION,
+    get_matcher_zoo,
+    get_available_model_names,
+)
+
+__all__ = [
+    "__version__",
+    "ImageMatchingApp",
+    "DEVICE",
+    "GRADIO_VERSION",
+    "get_matcher_zoo",
+    "get_available_model_names",
+]

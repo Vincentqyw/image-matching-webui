@@ -4,49 +4,10 @@ This module provides a Click-based CLI to launch the ImageMatchingApp with confi
 """
 
 import click
-from loguru import logger
 from pathlib import Path
+
+from imcui import get_default_config_path, get_example_data_path, get_version
 from imcui.ui.app_class import ImageMatchingApp
-
-
-def get_default_config_path():
-    """
-    Get the default configuration file path.
-
-    Returns:
-        Path: Path to the default configuration file, either from current directory
-              or from the package's internal config directory.
-    """
-    # First check if config.yaml exists in current working directory
-    current_dir_config = Path.cwd() / "app.yaml"
-    if current_dir_config.exists():
-        logger.info(f"Using config file from current directory: {current_dir_config}")
-        return current_dir_config
-
-    # Then check if config/config.yaml exists in current working directory
-    current_config_dir = Path.cwd() / "config" / "app.yaml"
-    if current_config_dir.exists():
-        logger.info(f"Using config file from current directory: {current_config_dir}")
-        return current_config_dir
-
-    # Fall back to the package's default config
-    default_config_path = Path(__file__).parent.parent / "config" / "app.yaml"
-    logger.info(
-        f"No config file found in current directory. Using default: {default_config_path}"
-    )
-    return default_config_path
-
-
-def get_example_data_default_path():
-    """
-    Get the default example data root path.
-
-    Returns:
-        Path: Path to the default example data root directory.
-    """
-    get_example_data_default_path = Path(__file__).parent.parent / "datasets"
-    logger.info(f"Using example data root: {get_example_data_default_path}")
-    return get_example_data_default_path
 
 
 @click.command()
@@ -82,7 +43,7 @@ def get_example_data_default_path():
     "--example-data-root",
     "-d",
     type=click.Path(exists=True, file_okay=False, readable=True),
-    default=lambda: str(get_example_data_default_path()),
+    default=lambda: str(get_example_data_path()),
     show_default=True,
     help="Root directory containing example datasets for demonstration purposes. "
     "Should contain subdirectories with image pairs for matching.",
@@ -95,7 +56,7 @@ def get_example_data_default_path():
     "Shows detailed logs about the application startup and operation.",
 )
 @click.version_option(
-    version="1.0.0", message="Image Matching WebUI Version %(version)s"
+    version=get_version(), message="Image Matching WebUI Version %(version)s"
 )
 def main(server_name, server_port, config, example_data_root, verbose):
     """

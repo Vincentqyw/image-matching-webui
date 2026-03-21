@@ -2,7 +2,9 @@ build/
 
 # lib/
 bin/
-
+.mypy_cache
+.pytest_cache
+.claude/settings.local.json
 cmake_modules/
 cmake-build-debug/
 .idea/

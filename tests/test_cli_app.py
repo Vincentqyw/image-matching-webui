@@ -49,7 +49,7 @@ def test_cli_version():
 
 def test_cli_default_config_loading():
     """Test that CLI can load default configuration."""
-    from imcui.cli.main import get_default_config_path
+    from imcui import get_default_config_path
 
     config_path = get_default_config_path()
     assert config_path.exists(), f"Config file not found: {config_path}"

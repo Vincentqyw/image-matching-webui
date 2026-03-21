@@ -99,23 +99,34 @@ or deploy it locally following the instructions below.
 
 - [Python 3.10+](https://www.python.org/downloads/)
 
-#### Install from pip [NEW]
+#### Installation
 
-Update: now support install from [pip](https://pypi.org/project/imcui), just run:
+**Recommended: Install from PyPI**
 
 ```bash
 pip install imcui
 ```
 
-#### Install from source
+**Install from source**
 
 ```bash
+git clone https://github.com/Vincentqyw/image-matching-webui.git
+cd image-matching-webui
+pip install -e .
+```
+
+<details>
+<summary><strong>Deprecated: Conda installation</strong> (click to expand)</summary>
+
+```bash
+# ⚠️ environment.yaml is deprecated. Use pip instead.
 git clone https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
 conda env create -f environment.yaml
 conda activate imcui
 pip install -e .
 ```
+</details>
 
 or using [docker](https://hub.docker.com/r/vincentqin/image-matching-webui):
 
@@ -167,11 +178,11 @@ python -m imcui.api.server
 ```
 
 ### Run demo
-``` bash
+```bash
 # Using the package CLI (recommended)
 imcui
 
-# Or using the direct script
+# Or using the direct script (for HuggingFace Spaces)
 python app.py
 ```
 then open http://localhost:7860 in your browser.
