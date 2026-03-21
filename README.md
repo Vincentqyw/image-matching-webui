@@ -23,13 +23,15 @@
 
 Try it on
 <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
-<a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui"><img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/></a>
 
 Here is a demo of the tool:
 
 https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c3484d1b-cc00-4fdc-9b31-e5b7af07ecd9
 
-The tool currently supports various popular image matching algorithms, namely:
+> **⚠️ Legacy**: This section contains models from older versions. For the latest supported models, please see [Model Details](https://vismatch.readthedocs.io/en/latest/model_details.html).
+
+<details>
+<summary><strong>Supported Algorithms (Old Version)</strong> (click to expand)</summary>
 
 | Algorithm        | Supported | Conference/Journal | Year | GitHub Link |
 |------------------|-----------|--------------------|------|-------------|
@@ -83,15 +85,13 @@ The tool currently supports various popular image matching algorithms, namely:
 | HardNet        | ✅ | NeurIPS | 2017 | [Link](https://github.com/DagnyT/hardnet) |
 | SIFT           | ✅ | IJCV    | 2004 | [Link](https://docs.opencv.org/4.x/da/df5/tutorial_py_sift_intro.html) |
 
+</details>
 
 ## How to use
 
 ### HuggingFace / Lightning AI
 
 Just try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
-<a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui">
-  <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/>
-</a>
 
 or deploy it locally following the instructions below.
 
@@ -269,8 +269,6 @@ pre-commit run -a  # Auto-checks and fixes
 - [Long-term Visual Localization](https://www.visuallocalization.net)
 
 ## Acknowledgement
-
-This code is built based on [Hierarchical-Localization](https://github.com/cvg/Hierarchical-Localization). We express our gratitude to the authors for their valuable source code.
 
 The matching algorithms are maintained in [vismatch](https://github.com/gmberton/vismatch) by [@gmberton](https://github.com/gmberton). We thank the authors for creating and maintaining this excellent library.
 
