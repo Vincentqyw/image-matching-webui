@@ -17,9 +17,11 @@ except PackageNotFoundError:
         __version__ = "dev"
 
 from .utils.config import get_default_config_path, get_example_data_path, get_version
+from .ui.app_class import ImageMatchingApp
 
 __all__ = [
     "__version__",
+    "ImageMatchingApp",
     "get_default_config_path",
     "get_example_data_path",
     "get_version",

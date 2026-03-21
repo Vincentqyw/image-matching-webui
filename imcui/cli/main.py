@@ -6,8 +6,12 @@ This module provides a Click-based CLI to launch the ImageMatchingApp with confi
 import click
 from pathlib import Path
 
-from imcui import get_default_config_path, get_example_data_path, get_version
-from imcui.ui.app_class import ImageMatchingApp
+from imcui import (
+    ImageMatchingApp,
+    get_default_config_path,
+    get_example_data_path,
+    get_version,
+)
 
 
 @click.command()

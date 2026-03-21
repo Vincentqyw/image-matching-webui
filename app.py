@@ -7,8 +7,7 @@ and users who run 'python app.py' directly.
 import argparse
 from pathlib import Path
 
-from imcui import get_default_config_path, get_example_data_path
-from imcui.ui.app_class import ImageMatchingApp
+from imcui import ImageMatchingApp, get_default_config_path, get_example_data_path
 
 
 if __name__ == "__main__":
