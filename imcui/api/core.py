@@ -11,8 +11,14 @@ import torch
 
 from vismatch import get_matcher
 
-from ..ui.utils import filter_matches
-from ..ui.viz import display_matches, fig2im, plot_images, add_text, plot_keypoints
+from ..ui.geometry import filter_matches
+from ..ui.visualization import (
+    display_matches,
+    fig2im,
+    plot_images,
+    add_text,
+    plot_keypoints,
+)
 
 warnings.simplefilter("ignore")
 

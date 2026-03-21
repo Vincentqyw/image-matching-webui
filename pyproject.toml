@@ -25,7 +25,7 @@ dynamic = ["dependencies"]
 
 
 [project.optional-dependencies]
-dev = ["black", "flake8", "isort"]
+dev = ["black", "flake8", "isort", "tomli"]  # tomli for Python < 3.11
 datasets = ["datasets"]  # Optional: for auto-downloading example images
 
 

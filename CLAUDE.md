@@ -86,9 +86,8 @@ docker-compose up api
 ### Directory Structure
 - `imcui/` - Main package (Python)
   - `cli/` - CLI entry point (main.py)
-  - `ui/` - Gradio-based web interface (app_class.py, utils.py)
+  - `ui/` - Gradio-based web interface (image_matching_app.py, config_utils.py, etc.)
   - `api/` - Core matching API (ImageMatchingAPI class, server.py, client.py)
-  - `utils/` - Shared utilities (config.py - version, paths, configuration, **auto-download support**)
   - `config/` - Configuration files (app.yaml, api.yaml)
 - `cpp/` - C++ code (independent build system)
   - `test/` - C++ API test client
@@ -106,7 +105,7 @@ docker-compose up api
 **Matcher Zoo**: All matchers are dynamically loaded from [vismatch](https://github.com/gmberton/vismatch) package (by [@gmberton](https://github.com/gmberton)). This WebUI no longer maintains matching algorithms.
 
 **Entry Points**:
-- `imcui` CLI (recommended) - uses shared utilities from `imcui.utils.config`
+- `imcui` CLI (recommended) - uses shared utilities from `imcui.ui.config_utils`
 - `python app.py` - HuggingFace Spaces entry point, also uses shared utilities
 - Both entry points share identical configuration loading logic
 
@@ -115,7 +114,7 @@ docker-compose up api
 **API Usage**:
 ```python
 from imcui.api import ImageMatchingAPI
-from imcui.ui.utils import DEVICE, get_matcher_zoo
+from imcui.ui import DEVICE, get_matcher_zoo
 
 matcher_zoo = get_matcher_zoo()  # Dynamically loaded from vismatch
 api = ImageMatchingAPI(conf=matcher_zoo["superpoint-lightglue"], device=DEVICE)
@@ -138,7 +137,7 @@ version = get_version()                  # Returns current version string
   - Windows: `%LOCALAPPDATA%\imcui\datasets\`
 - **Development Mode**: Git clone includes datasets locally at `imcui/datasets/`
 - **Custom Path**: Use `IMCUI_DATA_DIR` env var or `-d` CLI flag
-- **Resolution Order**: See `imcui/utils/config.py:get_example_data_path()` for details
+- **Resolution Order**: See `imcui/ui/config_utils.py:get_example_data_path()` for details
 
 ### Adding New Algorithms
 
@@ -152,11 +151,11 @@ Config files are loaded in this order (first found):
 3. `cwd/config/app.yaml` (current working directory config subdirectory)
 4. Package default: `imcui/config/app.yaml`
 
-This logic is shared across all entry points (CLI and app.py) via `imcui.utils.config.get_default_config_path()`.
+This logic is shared across all entry points (CLI and app.py) via `imcui.ui.config_utils.get_default_config_path()`.
 
 ## Example Datasets Resolution
 
-Dataset path is resolved via `imcui.utils.config.get_example_data_path()` in this order:
+Dataset path is resolved via `imcui.ui.config_utils.get_example_data_path()` in this order:
 
 1. **Environment Variable**: `IMCUI_DATA_DIR` if set
 2. **User Cache**: Auto-download from HuggingFace on first run
@@ -172,7 +171,7 @@ Dataset path is resolved via `imcui.utils.config.get_example_data_path()` in thi
 
 ## Code Quality Notes
 
-**Avoid Code Duplication**: The codebase was refactored to eliminate duplicate logic. All configuration and path management is centralized in `imcui/utils/config.py`.
+**Avoid Code Duplication**: The codebase was refactored to eliminate duplicate logic. All configuration and path management is centralized in `imcui/ui/config_utils.py`.
 
 **Version Management**: Never define version in multiple places. The single source of truth is `pyproject.toml`, and `imcui.__version__` reads it dynamically.
 
@@ -195,7 +194,7 @@ The following should NOT be deleted:
 ## Important Files
 
 **Configuration Management**:
-- `imcui/utils/config.py` - Centralized utilities for:
+- `imcui/ui/config_utils.py` - Centralized utilities for:
   - Configuration loading (`get_default_config_path()`)
   - Dataset path resolution with auto-download (`get_example_data_path()`)
   - Version management (`get_version()`)
@@ -205,8 +204,8 @@ The following should NOT be deleted:
 - `imcui/config/api.yaml` - Configuration for API server
 
 **Entry Points**:
-- `imcui/cli/main.py` - Primary CLI entry point (uses `imcui.utils.config`)
-- `app.py` - Secondary entry point for HuggingFace Spaces (uses `imcui.utils.config`)
+- `imcui/cli/main.py` - Primary CLI entry point (uses `imcui.ui.config_utils`)
+- `app.py` - Secondary entry point for HuggingFace Spaces (uses `imcui.ui.config_utils`)
 - Both share identical configuration loading logic
 
 **Version Management**:

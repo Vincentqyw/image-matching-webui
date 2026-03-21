@@ -161,12 +161,12 @@ def test_package_entry_point():
     try:
         import imcui
         from imcui.cli import main as cli_main
-        from imcui.ui import app_class
+        from imcui.ui import ImageMatchingApp
 
         # Verify key components exist
         assert hasattr(imcui, "__version__") or hasattr(imcui, "__name__")
         assert callable(cli_main.main)
-        assert hasattr(app_class, "ImageMatchingApp")
+        assert hasattr(ImageMatchingApp, "run")
 
     except ImportError as e:
         pytest.fail(f"Failed to import package components: {e}")

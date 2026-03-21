@@ -7,7 +7,7 @@ from loguru import logger
 ROOT = Path(__file__).parents[1]
 sys.path.insert(0, str(ROOT))
 
-from imcui.ui.utils import DEVICE, get_matcher_zoo
+from imcui.ui import DEVICE, get_matcher_zoo
 from imcui.api import ImageMatchingAPI
 
 

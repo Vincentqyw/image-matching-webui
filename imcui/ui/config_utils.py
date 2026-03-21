@@ -146,7 +146,11 @@ def get_version() -> str:
     except PackageNotFoundError:
         # Development mode - read from pyproject.toml
         try:
-            import tomllib
+            try:
+                import tomllib
+            except ImportError:
+                # Python < 3.11 needs tomli as a fallback
+                import tomli as tomllib  # type: ignore[import-not-found]
 
             pyproject = Path(__file__).parent.parent.parent / "pyproject.toml"
             with open(pyproject, "rb") as f:
