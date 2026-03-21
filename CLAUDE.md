@@ -36,12 +36,21 @@ imcui --config /path/to/config.yaml
 # On custom port
 imcui -p 8080
 
-# Custom config and options
-imcui -c config.yaml -s 127.0.0.1 -d ./datasets -v
+# Custom example data directory
+imcui -d /path/to/datasets
+
+# Or use environment variable
+export IMCUI_DATA_DIR=/path/to/datasets
+imcui
 
 # Docker
 docker-compose up webui
 ```
+
+**Note for PyPI Users**: Example datasets (82MB) are NOT included in the PyPI package. On first run, they will be automatically downloaded from HuggingFace to your user cache directory (`~/.cache/imcui/datasets/` on Linux/macOS, `%LOCALAPPDATA%\imcui\datasets\` on Windows). To use local datasets, either:
+- Clone the repository: `git clone https://github.com/Vincentqyw/image-matching-webui.git`
+- Set `IMCUI_DATA_DIR` environment variable
+- Use `-d` flag to specify custom path
 
 ### CLI Options
 | Flag | Default | Description |

@@ -107,7 +107,14 @@ or deploy it locally following the instructions below.
 pip install imcui
 ```
 
-**Install from source**
+> **Note**: The PyPI package does NOT include example datasets (82MB) to keep the package size small. On first run, example images will be automatically downloaded from HuggingFace to your user cache directory (`~/.cache/imcui/datasets/` on Linux/macOS, `%LOCALAPPDATA%\imcui\datasets\` on Windows). For offline use or faster startup, see alternatives below.
+>
+> **Alternative data sources**:
+> - Clone the repo to get datasets locally (recommended for offline use)
+> - Set `IMCUI_DATA_DIR` environment variable to use custom directory
+> - Use `-d` flag: `imcui -d /path/to/datasets`
+
+**Install from source** (includes example datasets)
 
 ```bash
 git clone https://github.com/Vincentqyw/image-matching-webui.git

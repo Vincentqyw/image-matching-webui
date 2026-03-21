@@ -3,3 +3,7 @@ include imcui/assets/logo.webp
 
 # config files
 recursive-include imcui/config *.yaml
+
+# Exclude example datasets from source distribution (82MB)
+# Users can download via auto-download or from git repo
+recursive-exclude imcui/datasets *

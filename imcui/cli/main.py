@@ -42,11 +42,12 @@ from imcui.ui.app_class import ImageMatchingApp
 @click.option(
     "--example-data-root",
     "-d",
-    type=click.Path(exists=True, file_okay=False, readable=True),
-    default=lambda: str(get_example_data_path()),
+    type=click.Path(file_okay=False),
+    default=None,
     show_default=True,
     help="Root directory containing example datasets for demonstration purposes. "
-    "Should contain subdirectories with image pairs for matching.",
+    "If not specified, auto-downloads to user cache directory on first run. "
+    "Developers can also set IMCUI_DATA_DIR environment variable.",
 )
 @click.option(
     "--verbose",
@@ -88,7 +89,14 @@ def main(server_name, server_port, config, example_data_root, verbose):
         click.echo("Starting Image Matching WebUI...")
         click.echo(f"Server: {server_name}:{server_port}")
         click.echo(f"Config file: {config}")
-        click.echo(f"Example data root: {example_data_root}")
+
+    # Resolve example data path (with auto-download support)
+    data_path = (
+        Path(example_data_root) if example_data_root else get_example_data_path()
+    )
+
+    if verbose:
+        click.echo(f"Example data root: {data_path}")
 
     try:
         # Initialize and run the ImageMatchingApp
@@ -96,7 +104,7 @@ def main(server_name, server_port, config, example_data_root, verbose):
             server_name,
             server_port,
             config=Path(config),
-            example_data_root=Path(example_data_root),
+            example_data_root=data_path,
         ).run()
     except Exception as e:
         click.echo(f"Error starting application: {e}", err=True)

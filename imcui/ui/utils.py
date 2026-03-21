@@ -6,7 +6,6 @@ import warnings
 from itertools import combinations
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from datasets import load_dataset
 
 import cv2
 import gradio as gr
@@ -18,7 +17,6 @@ from vismatch import get_matcher, available_models
 from loguru import logger
 
 # Constants
-DATASETS_REPO_ID = "Realcat/imcui_datasets"
 DEVICE = "cuda" if __import__("torch").cuda.is_available() else "cpu"
 
 from .viz import display_keypoints, display_matches, fig2im, plot_images
@@ -168,20 +166,36 @@ def get_feature_model(conf: Dict[str, Dict[str, Any]]):
 
 
 def download_example_images(repo_id, output_dir):
-    logger.info(f"Download example dataset from huggingface: {repo_id}")
-    dataset = load_dataset(repo_id)
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
-    for example in dataset["train"]:  # Assuming the dataset is in the "train" split
-        file_path = example["path"]
-        image = example["image"]  # Access the PIL.Image object directly
-        full_path = os.path.join(output_dir, file_path)
-        Path(os.path.dirname(full_path)).mkdir(parents=True, exist_ok=True)
-        image.save(full_path)
-    logger.info(f"Images saved to {output_dir} successfully.")
+    """
+    Deprecated: Use imcui.utils.config.get_example_data_path() instead.
+
+    Download example dataset from HuggingFace.
+    Kept for backward compatibility.
+    """
+    from imcui.utils.config import _download_example_data
+
+    logger.warning(
+        "download_example_images is deprecated. Use imcui.utils.config.get_example_data_path() instead."
+    )
+    _download_example_data(Path(output_dir))
     return Path(output_dir)
 
 
-def gen_examples(data_root: Path):
+def gen_examples(data_root: Path = None):
+    """Generate example image pairs for the UI.
+
+    Args:
+        data_root: Root directory containing example datasets.
+                   If None, uses imcui.utils.config.get_example_data_path()
+    """
+    # Import here to avoid circular dependency
+    from imcui.utils.config import get_example_data_path
+
+    if data_root is None:
+        data_root = get_example_data_path()
+    else:
+        data_root = Path(data_root)
+
     random.seed(1)
     # Use vismatch available models for examples
     example_algos = [
@@ -202,15 +216,6 @@ def gen_examples(data_root: Path):
         "sift-lightglue",
         # "GIM(dkm)",
     ]
-    data_root = Path(data_root)
-    if not Path(data_root).exists():
-        try:
-            download_example_images(DATASETS_REPO_ID, data_root)
-        except Exception as e:
-            logger.error(f"download_example_images error : {e}")
-            data_root = ROOT / "datasets"
-    if not Path(data_root / "sacre_coeur/mapping").exists():
-        download_example_images(DATASETS_REPO_ID, data_root)
 
     def distribute_elements(A, B):
         new_B = np.array(B, copy=True).flatten()

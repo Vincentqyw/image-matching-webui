@@ -26,12 +26,15 @@ dynamic = ["dependencies"]
 
 [project.optional-dependencies]
 dev = ["black", "flake8", "isort"]
+datasets = ["datasets"]  # Optional: for auto-downloading example images
 
 
 [tool.setuptools]
 packages = { find = { include = ["imcui*"] } }
 include-package-data = true
 package-data = { imcui = ["config/*.yaml"] }
+# Exclude datasets from PyPI package (developers can get from git)
+exclude-package-data = { imcui = ["datasets/*", "datasets/**/*"] }
 
 
 [tool.setuptools.dynamic]

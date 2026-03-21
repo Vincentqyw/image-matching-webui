@@ -421,16 +421,25 @@ class ImageMatchingApp:
                 sfm_ui.call_empty()
 
     def run(self):
+        # Collect all allowed paths for Gradio
+        allowed_paths = [
+            str(Path(__file__).parents[0]),  # imcui/ui
+            str(Path(__file__).parents[1]),  # imcui
+        ]
+
+        # Add example data root if it's outside the package (e.g., cache directory)
+        if self.example_data_root and not str(self.example_data_root).startswith(
+            str(Path(__file__).parents[1])
+        ):
+            allowed_paths.append(str(self.example_data_root))
+
         self.app.queue().launch(
             server_name=self.server_name,
             server_port=self.server_port,
             share=False,
             inbrowser=False,
             css=CSS,
-            allowed_paths=[
-                str(Path(__file__).parents[0]),
-                str(Path(__file__).parents[1]),
-            ],
+            allowed_paths=allowed_paths,
         )
 
     def ui_change_imagebox(self, choice):
