@@ -35,20 +35,6 @@
               "development",
               "troubleshooting"
             ]
-          },
-          {
-            "group": "AI Integration",
-            "pages": [
-              {
-                "group": "Code Editors",
-                "pages": [
-                  {
-                    "label": "Claude Code",
-                    "href": "https://claude.ai/code"
-                  }
-                ]
-              }
-            ]
           }
         ]
       },
