@@ -156,18 +156,6 @@
       "website": "https://huggingface.co/Realcat"
     }
   },
-  "integrations": {
-    "algolia": {
-      "index": "image-matching-webui",
-      "appId": "YOUR_ALGOLIA_APP_ID",
-      "apiKey": "YOUR_ALGOLIA_API_KEY"
-    },
-    "analytics": {
-      "plausible": {
-        "dataDomain": "docs.image-matching-webui.com"
-      }
-    }
-  },
   "api": {
     "baseUrl": "https://github.com/Vincentqyw/image-matching-webui/blob/main",
     "versions": ["main", "1.0.0"],
