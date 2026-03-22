@@ -1,5 +1,5 @@
 ---
-title: "Introduction to Image Matching WebUI"
+title: "Introduction"
 description: "Automated image matching tool with state-of-the-art algorithms"
 ---
 
@@ -7,133 +7,128 @@ description: "Automated image matching tool with state-of-the-art algorithms"
 
 Image Matching WebUI (IMCUI) is a modern tool for matching image pairs using state-of-the-art computer vision algorithms. Built with Gradio, it provides an intuitive interface for both researchers and developers.
 
----
+<Tip>
+<strong>Ready to get started?</strong> Jump directly to our <a href="/docs/quickstart">Quick Start Guide</a> to begin matching images in minutes.
+</Tip>
+
+
+## What It Does
+
+IMCUI matches pairs of images to identify corresponding points and estimate geometric transformations. Built for:
+
+- **Computer Vision Research**: Algorithm comparison and benchmarking
+- **Image Processing**: Feature matching, image stitching, panorama creation
+- **Education**: Learning modern matching algorithms through visualization
+- **Development**: Integrating matching into applications
+
+## Key Capabilities
+
+### 🎯 Algorithm Diversity
+Access 20+ matching algorithms through [vismatch](https://github.com/gmberton/vismatch) integration:
+- **Sparse methods**: Feature-based matching with discrete keypoints
+- **Dense methods**: Pixel-wise correlation matching
+- **Hybrid approaches**: Combining multiple techniques
+
+### 🖥️ User Experience
+- **Modern web interface**: Intuitive Gradio-based UI
+- **Real-time visualization**: See matches as they're computed
+- **Flexible input**: Local files, webcam, or batch processing
+
+### 🔧 Customization
+- **YAML configuration**: Easy setup and sharing
+- **Parameter tuning**: Adjust thresholds, RANSAC settings, more
+- **GPU acceleration**: Support for CUDA-enabled systems
+
+### 🚀 Integration
+- **Complete API**: Programmatic access to all features
+- **CLI tools**: Command-line automation
+- **Extensible**: Add custom matchers and features
+
+## Architecture
+
+<Columns>
+  <Card title="Matcher Zoo" icon="layers">
+    Dynamically loads algorithms from vismatch package
+  </Card>
+  <Card title="Core API" icon="code">
+    Python API for programmatic matching
+  </Card>
+  <Card title="Web Interface" icon="layout">
+    Gradio-based UI for interactive use
+  </Card>
+  <Card title="Configuration" icon="settings">
+    YAML-based setup and parameter management
+  </Card>
+</Columns>
+
 
 ## Getting Started
 
 <Card
-  title="Quick Start"
+  title="Start Matching Images"
   icon="rocket"
-  href="quickstart"
+  href="/docs/quickstart"
 >
-  Follow our three-step quickstart guide to get up and running with Image Matching WebUI in minutes.
+  Follow our three-step guide to install and start using Image Matching WebUI in minutes.
 </Card>
 
+
+## Technical Overview
+
+### Matching Pipeline
+
+1. **Feature Detection**: Identify keypoints in source images
+2. **Feature Description**: Generate descriptors for each keypoint
+3. **Feature Matching**: Find corresponding points between images
+4. **Outlier Removal**: Use RANSAC to filter incorrect matches
+5. **Geometry Estimation**: Compute transformation matrix
+6. **Visualization**: Display matches and estimated geometry
+
+### Supported Geometries
+
+- **Homography**: Projective transformation for planar scenes
+- **Fundamental Matrix**: Epipolar geometry for calibrated cameras
+- **Essential Matrix**: Camera motion for calibrated stereo
+
+### Algorithm Integration
+
+All matching algorithms are maintained in the [vismatch](https://github.com/gmberton/vismatch) repository. New algorithms become automatically available as they're added.
+
+## Performance
+
+<CardGroup>
+  <Card title="Speed" icon="zap">
+    GPU-accelerated matching for large images
+  </Card>
+  <Card title="Accuracy" icon="target">
+    State-of-the-art algorithms with proven results
+  </Card>
+  <Card title="Simplicity" icon="smile">
+    Easy to use for beginners, powerful for experts
+  </Card>
+</CardGroup>
 ---
 
-## Make it Yours
+## Project Resources
 
-<Columns>
-  <Card title="Easy Installation" icon="pen-to-square" href="installation">
-    Install from PyPI, source, or Docker. Multiple installation methods to fit your workflow.
+<CardGroup cols={2}>
+  <Card title="Installation Guide" icon="download" href="/docs/installation">
+    PyPI, Docker, source installation options
   </Card>
-
-  <Card title="Custom Configuration" icon="palette" href="configuration">
-    Customize matchers, thresholds, and processing options through YAML configuration files.
+  <Card title="Configuration" icon="file-code" href="/docs/configuration">
+    Customize matchers and parameters
   </Card>
-
-  <Card title="Comprehensive Models" icon="cpu" href="models">
-    Access 20+ state-of-the-art matching algorithms from sparse to dense methods.
+  <Card title="Algorithm Reference" icon="cpu" href="/docs/models">
+    Available matching algorithms
   </Card>
-  <Card title="Complete API" icon="code" href="api">
-    Use our full-featured API for programmatic access to all matching functions.
+  <Card title="API Documentation" icon="code" href="/docs/api">
+    Programmatic usage guide
   </Card>
-</Columns>
+</CardGroup>
 
----
 
-## Create Your Image Matching Workflows
-
-<Columns>
-  <Card title="Multiple Algorithms" icon="layers" href="models">
-    Choose from sparse, semi-dense, and dense matching methods for different use cases.
-  </Card>
-
-  <Card title="Flexible Input" icon="image" href="quickstart">
-    Support for local images, webcam input, and batch processing.
-  </Card>
-
-  <Card title="RANSAC Filtering" icon="filter" href="configuration">
-    Built-in outlier removal with multiple RANSAC methods and configurable parameters.
-  </Card>
-  <Card title="Real-time Results" icon="zap" href="quickstart">
-    Get instant visual feedback for matching results with customizable visualizations.
-  </Card>
-</Columns>
-
----
-
-## Key Features
-
-### 🎯 User-Friendly Interface
-- **Gradio-based UI**: Intuitive web interface for all users
-- **Real-time visualization**: See matching results instantly
-- **Multiple input methods**: Local files, webcam, or batch processing
-
-### 🔧 Powerful Configuration
-- **YAML-based config**: Easy to customize and share settings
-- **Flexible parameters**: Fine-tune matching thresholds and processing
-- **Multiple backends**: Support for CPU and GPU processing
-
-### 🚀 State-of-the-Art Algorithms
-- **20+ matchers**: From sparse to dense methods
-- **Vismatch integration**: Unified access to latest algorithms
-- **Automatic updates**: Latest algorithms always available
-
-### 🛠️ Developer Tools
-- **Complete API**: Full programmatic access
-- **CLI interface**: Command-line tools for automation
-- **Extensible**: Easy to add custom matchers and features
-
----
-
-## Why Image Matching WebUI?
-
-- **Speed**: Fast matching with GPU acceleration
-- **Accuracy**: State-of-the-art algorithms for precise results
-- **Simplicity**: Easy to use for beginners, powerful for experts
-- **Flexibility**: Customize every aspect of the matching pipeline
-- **Community**: Built on open-source with active development
-
----
-
-<Tip>
-<strong>Pro Tip:</strong> All matching algorithms are maintained in the <a href="https://github.com/gmberton/vismatch">vismatch</a> repository. New algorithms are automatically available as they're added to the collection.
-</Tip>
-
----
-
-## Use Cases
-
-### For Researchers
-- Algorithm comparison and benchmarking
-- Dataset preprocessing and feature extraction
-- Research reproducibility with standardized pipelines
-
-### For Developers
-- Feature matching in computer vision applications
-- Image stitching and panorama creation
-- Visual localization and mapping
-
-### For Students
-- Learn about modern computer vision algorithms
-- Understand matching concepts through visual feedback
-- Experiment with different approaches easily
-
----
-
-## Getting Help
-
-<Card
-  title="Support & Community"
-  icon="life-buoy"
-  href="https://github.com/Vincentqyw/image-matching-webui/discussions"
->
-  Join our community discussions, ask questions, and share your projects with other users.
-</Card>
-
----
+## Community & Support
 
 <Note>
-<strong>Need More Help?</strong> Check out our <a href="troubleshooting">troubleshooting guide</a> for common issues and solutions, or open an issue on <a href="https://github.com/Vincentqyw/image-matching-webui/issues">GitHub</a>.
+<strong>Need Help?</strong> Visit our <a href="https://github.com/Vincentqyw/image-matching-webui/discussions">community discussions</a> or check the <a href="/docs/troubleshooting">troubleshooting guide</a> for common issues.
 </Note>

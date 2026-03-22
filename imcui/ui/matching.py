@@ -22,8 +22,32 @@ from .geometry import filter_matches
 from .image_utils import generate_warp_images
 from .visualization import display_keypoints, display_matches
 
-# Module-level model cache
-model_cache = ModelCache()
+# Module-level model cache (lazy initialization)
+_model_cache = None
+
+
+def get_model_cache():
+    """Get the global model cache instance, creating it on first use."""
+    global _model_cache
+    if _model_cache is None:
+        _model_cache = ModelCache()
+    return _model_cache
+
+
+# For backward compatibility, provide a property-like access
+class ModelCacheWrapper:
+    """Wrapper for lazy model cache initialization."""
+
+    def __getattr__(self, name):
+        cache = get_model_cache()
+        return getattr(cache, name)
+
+    def __call__(self, *args, **kwargs):
+        cache = get_model_cache()
+        return cache(*args, **kwargs)
+
+
+model_cache = ModelCacheWrapper()
 
 
 def send_to_match(
@@ -239,7 +263,7 @@ def run_matching(
     )
 
     if use_cached_model:
-        matcher = model_cache.load_model(cache_key, get_model, match_conf)
+        matcher = get_model_cache().load_model(cache_key, get_model, match_conf)
         logger.info(f"Loaded cached model {cache_key}")
     else:
         matcher = get_model(match_conf)

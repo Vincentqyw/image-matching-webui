@@ -1,0 +1,81 @@
+---
+title: "imcui.ui.config_utils"
+description: "Configuration utilities and path management"
+---
+
+# imcui.ui.config_utils
+
+Configuration utilities and path management functions.
+
+## Functions
+
+### get_default_config_path
+
+Get the default configuration file path.
+
+```python
+from imcui import get_default_config_path
+
+config_path = get_default_config_path()
+print(f"Config path: {config_path}")
+```
+
+**Returns:**
+
+Path string to the configuration file. Searches in priority order:
+1. `cwd/app.yaml`
+2. `cwd/config/app.yaml`
+3. Package default configuration
+
+### get_example_data_path
+
+Get the example datasets path with auto-download support.
+
+```python
+from imcui import get_example_data_path
+
+data_path = get_example_data_path()
+print(f"Datasets path: {data_path}")
+```
+
+**Returns:**
+
+Path string to the example datasets directory. Automatically downloads from HuggingFace on first run if not found.
+
+**Environment Variables:**
+
+- `IMCUI_DATA_DIR`: Override default datasets path
+
+### get_version
+
+Get the current package version.
+
+```python
+from imcui import get_version
+
+version = get_version()
+print(f"IMCUI version: {version}")
+```
+
+**Returns:**
+
+Version string (e.g., "1.0.0").
+
+## Path Resolution
+
+### Configuration Path Priority
+
+1. Custom path via `-c` flag
+2. `cwd/app.yaml`
+3. `cwd/config/app.yaml`
+4. Package default
+
+### Dataset Path Priority
+
+1. Environment variable `IMCUI_DATA_DIR`
+2. User cache directory (auto-download):
+   - Linux/macOS: `~/.cache/imcui/datasets/`
+   - Windows: `%LOCALAPPDATA%\imcui\datasets\`
+3. CLI flag `-d /path/to/datasets`
+
+**Source Code**: [imcui/ui/config_utils.py](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/config_utils.py)

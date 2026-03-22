@@ -2,12 +2,15 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Image Matching WebUI",
+  "topbarCtaButton": {
+    "type": "github",
+    "url": "https://github.com/Vincentqyw/image-matching-webui"
+  },
   "colors": {
     "primary": "#4F46E5",
     "light": "#6366F1",
     "dark": "#4338ca"
   },
-  "favicon": "/favicon.png",
   "navigation": {
     "tabs": [
       {
@@ -16,24 +19,24 @@
           {
             "group": "Getting Started",
             "pages": [
-              "introduction",
-              "quickstart",
-              "installation",
-              "cli"
+              "docs/introduction",
+              "docs/quickstart",
+              "docs/installation",
+              "docs/cli"
             ]
           },
           {
             "group": "Customization",
             "pages": [
-              "configuration",
-              "models"
+              "docs/configuration",
+              "docs/models"
             ]
           },
           {
             "group": "Development",
             "pages": [
-              "development",
-              "troubleshooting"
+              "docs/development",
+              "docs/troubleshooting"
             ]
           }
         ]
@@ -44,36 +47,18 @@
           {
             "group": "Overview",
             "pages": [
-              "api"
+              "docs/api/index"
             ]
           },
           {
             "group": "API Modules",
             "pages": [
-              {
-                "label": "imcui.api.core",
-                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/api/core.py"
-              },
-              {
-                "label": "imcui.ui.geometry",
-                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/geometry.py"
-              },
-              {
-                "label": "imcui.ui.matching",
-                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/matching.py"
-              },
-              {
-                "label": "imcui.ui.visualization",
-                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py"
-              },
-              {
-                "label": "imcui.ui.image_utils",
-                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/image_utils.py"
-              },
-              {
-                "label": "imcui.ui.config_utils",
-                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/config_utils.py"
-              }
+              "docs/api/core",
+              "docs/api/geometry",
+              "docs/api/matching",
+              "docs/api/visualization",
+              "docs/api/image-utils",
+              "docs/api/config-utils"
             ]
           }
         ]
@@ -82,18 +67,18 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Installation",
-          "href": "/installation",
-          "icon": "download"
-        },
-        {
           "anchor": "Quick Start",
-          "href": "/quickstart",
+          "href": "/docs/quickstart",
           "icon": "rocket"
         },
         {
+          "anchor": "Installation",
+          "href": "/docs/installation",
+          "icon": "download"
+        },
+        {
           "anchor": "API Reference",
-          "href": "/api",
+          "href": "/docs/api/index",
           "icon": "code"
         }
       ]
@@ -138,25 +123,22 @@
       "website": "https://huggingface.co/Realcat"
     }
   },
-  "api": {
-    "baseUrl": "https://github.com/Vincentqyw/image-matching-webui/blob/main",
-    "versions": ["main", "1.0.0"],
-    "auth": {
-      "method": "bearer"
-    }
-  },
   "redirects": [
     {
       "source": "/",
-      "destination": "introduction"
+      "destination": "docs/introduction"
     },
     {
       "source": "/home",
-      "destination": "introduction"
+      "destination": "docs/introduction"
     },
     {
       "source": "/docs",
-      "destination": "introduction"
+      "destination": "docs/introduction"
+    },
+    {
+      "source": "/docs/api",
+      "destination": "docs/api/index"
     },
     {
       "source": "/README",

@@ -48,7 +48,10 @@ pip install -e .[dev]  # For development dependencies
 
 If you encounter CUDA out of memory errors:
 
-1. **Use CPU mode**: Set `device: cpu` in your configuration file
+1. **Use CPU mode**: Set environment variable to force CPU mode
+   ```bash
+   CUDA_VISIBLE_DEVICES="" imcui
+   ```
 2. **Reduce image size**: Lower the `max_keypoints` parameter
 3. **Close other GPU applications**: Ensure no other processes are using GPU memory
 4. **Use batch processing**: Process images one at a time
@@ -56,8 +59,6 @@ If you encounter CUDA out of memory errors:
 Example configuration for CUDA memory issues:
 
 ```yaml
-device: cpu
-
 defaults:
   max_keypoints: 1024  # Reduce from default 2000
   setting_threshold: 0.15  # Increase threshold to reduce detections
@@ -156,10 +157,10 @@ If model download fails:
 
 If matching is slower than expected:
 
-1. **Enable GPU**: Ensure you're using CUDA device
-
-   ```yaml
-   device: cuda
+1. **Enable GPU**: Ensure GPU is available and not blocked
+   ```bash
+   # Check GPU availability
+   python -c "import torch; print(torch.cuda.is_available())"
    ```
 
 2. **Reduce image resolution**: Smaller images process faster

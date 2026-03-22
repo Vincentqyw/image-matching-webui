@@ -1,0 +1,41 @@
+---
+title: "imcui.ui.geometry"
+description: "Geometry estimation functions"
+---
+
+# imcui.ui.geometry
+
+Geometry estimation functions for computing transformation matrices between matched points.
+
+## Functions
+
+### compute_geometry
+
+Compute geometric transformation between matched keypoints.
+
+```python
+from imcui.ui import compute_geometry
+
+H, mask = compute_geometry(
+    kp0, kp1, matches,
+    geometry_type="homography",
+    ransac_method="CV2_USAC_MAGSAC"
+)
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `kp0` | np.ndarray | Keypoints from first image, shape (N, 2) |
+| `kp1` | np.ndarray | Keypoints from second image, shape (M, 2) |
+| `matches` | np.ndarray | Matched point pairs, shape (K, 2) |
+| `geometry_type` | str | Geometry type: "homography", "fundamental", "essential" |
+| `ransac_method` | str | RANSAC method: "RANSAC", "CV2_USAC_MAGSAC", "LMEDS" |
+
+**Returns:**
+
+- `H`: Transformation matrix (3x3 for homography/fundamental)
+- `mask`: Boolean mask indicating inliers
+
+**Source Code**: [imcui/ui/geometry.py](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/geometry.py)

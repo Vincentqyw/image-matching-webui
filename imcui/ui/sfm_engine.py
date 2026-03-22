@@ -13,8 +13,32 @@ import rerun as rr
 from .config import get_matcher_zoo, get_model
 from .model_cache import ARCSizeAwareModelCache as ModelCache
 
-# Module-level model cache for SFM feature extractors
-model_cache = ModelCache()
+# Module-level model cache for SFM feature extractors (lazy initialization)
+_sfm_model_cache = None
+
+
+def get_sfm_model_cache():
+    """Get the SFM model cache instance, creating it on first use."""
+    global _sfm_model_cache
+    if _sfm_model_cache is None:
+        _sfm_model_cache = ModelCache()
+    return _sfm_model_cache
+
+
+# For backward compatibility
+class SfmModelCacheWrapper:
+    """Wrapper for lazy SFM model cache initialization."""
+
+    def __getattr__(self, name):
+        cache = get_sfm_model_cache()
+        return getattr(cache, name)
+
+    def __call__(self, *args, **kwargs):
+        cache = get_sfm_model_cache()
+        return cache(*args, **kwargs)
+
+
+model_cache = SfmModelCacheWrapper()
 
 
 def extract_frames_from_video(
@@ -228,7 +252,7 @@ def extract_features(
         "keypoint_threshold": keypoint_threshold,
     }
     cache_key = f"{matcher_key}_sfm_kp{max_keypoints}_kt{keypoint_threshold}"
-    matcher = model_cache.load_model(cache_key, get_model, match_conf)
+    matcher = get_sfm_model_cache().load_model(cache_key, get_model, match_conf)
 
     # Prepare images in CHW format for vismatch
     images_chw = []

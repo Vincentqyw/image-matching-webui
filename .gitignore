@@ -36,3 +36,6 @@ tmp
 
 # Example datasets are auto-downloaded to user cache, not stored in repo
 # Developers can set IMCUI_DATA_DIR or use -d flag if needed
+imcui-skill-workspace
+imcui-skill
+scripts/extract_api_docs.py

@@ -1,122 +1,72 @@
 ---
 title: "Configuration"
-description: "How to configure Image Matching WebUI behavior and parameters"
+description: "Customize Image Matching WebUI behavior with YAML configuration"
 ---
 
 # Configuration
 
 Image Matching WebUI uses YAML configuration files to customize behavior and default parameters.
 
-## Configuration Resolution
 
-Configuration files are loaded in this order (first found):
+## Configuration File Location
 
-1. Custom path via `-c` flag
-2. `cwd/app.yaml` (current working directory)
-3. `cwd/config/app.yaml` (current working directory config subdirectory)
-4. Package default: `imcui/config/app.yaml`
+Configuration files are loaded in priority order (first found):
 
-## Configuration Options
+1. **Custom path**: `-c /path/to/config.yaml`
+2. **Working directory**: `./app.yaml`
+3. **Config subdirectory**: `./config/app.yaml`
+4. **Package default**: `imcui/config/app.yaml`
 
-### Device Configuration
 
-```yaml
-device: cuda  # Options: cuda, cpu, mps (for macOS)
-```
+## Essential Settings
 
-**CUDA Device Selection**: To use a specific GPU, set the `CUDA_VISIBLE_DEVICES` environment variable:
+### Device Selection
 
-```bash
-export CUDA_VISIBLE_DEVICES=0
-imcui
-```
+Device is automatically detected at runtime based on your hardware:
 
-### Matching Configuration
+- **CUDA**: Auto-selected if CUDA GPU is available
+- **CPU**: Default fallback when CUDA is unavailable
+- **MPS**: Auto-selected on macOS with Apple Silicon
 
-```yaml
-# Default matcher to use
-default_matcher: superpoint-lightglue
+<AccordionGroup>
+  <Accordion title="Force CPU Mode">
+    Set environment variable before running:
+    ```bash
+    CUDA_VISIBLE_DEVICES="" imcui
+    ```
+  </Accordion>
+  <Accordion title="Select Specific GPU">
+    Use environment variable:
+    ```bash
+    export CUDA_VISIBLE_DEVICES=0
+    imcui
+    ```
+  </Accordion>
+</AccordionGroup>
 
-# Preprocessing options
-preprocessing:
-  resize: 1024  # Resize images to this size (0 for no resize)
-  grayscale: false  # Convert to grayscale
-```
+### Default Matcher
 
-### Visualization Options
+There is no `default_matcher` configuration. Matchers are loaded dynamically from the [vismatch](https://github.com/gmberton/vismatch) package and selected through the UI dropdown during matching.
 
-Visualization options are configurable through the web interface rather than the YAML configuration file. The following parameters affect visualization output:
+Available matchers: See <a href="/docs/models">algorithm reference</a>
 
-- **setting_threshold**: Detection threshold (default: 0.1)
-- **keypoint_threshold**: Keypoint detection threshold (default: 0.05)
-- **match_threshold**: Matching threshold (default: 0.2)
 
-These can be adjusted in the configuration file under the `defaults` section:
+## Matching Parameters
+
+### Thresholds
 
 ```yaml
 defaults:
-  setting_threshold: 0.1
-  keypoint_threshold: 0.05
-  match_threshold: 0.2
+  setting_threshold: 0.1      # Detection sensitivity
+  keypoint_threshold: 0.05    # Keypoint detection
+  match_threshold: 0.2        # Match confidence
+  max_keypoints: 2000         # Maximum feature points
 ```
 
-### RANSAC Configuration
+### RANSAC Filtering
 
 ```yaml
-# RANSAC method
-ransac_method: CV2_USAC_MAGSAC  # Options: RANSAC, CV2_USAC_MAGSAC, LMEDS
-
-# RANSAC parameters
-ransac_reproj_threshold: 8.0  # Reprojection error threshold in pixels
-ransac_confidence: 0.9999  # Confidence level
-ransac_max_iter: 10000  # Maximum iterations
-ransac_num_samples: 4  # Number of samples to use in RANSAC
-
-# Output options
-enable_ransac: true  # Enable RANSAC filtering
-```
-
-### Geometry Configuration
-
-```yaml
-# Geometry estimation type
-geometry_type: homography  # Options: homography, fundamental, essential
-
-# Essential matrix parameters (for calibrated cameras)
-essential:
-  focal1: 1000.0  # Focal length for image 1
-  focal2: 1000.0  # Focal length for image 2
-  pp1: [640, 480]  # Principal point for image 1 [x, y]
-  pp2: [640, 480]  # Principal point for image 2 [x, y]
-```
-
-## Example Configuration Files
-
-### Minimal Configuration
-
-```yaml
-# Minimal configuration file
-device: cuda
-default_matcher: superpoint-lightglue
-```
-
-### Full Configuration
-
-```yaml
-# Server configuration
-server:
-  name: "0.0.0.0"
-  port: 7860
-
-# Matching defaults
 defaults:
-  setting_threshold: 0.1           # Detection threshold
-  max_keypoints: 2000              # Maximum number of keypoints
-  keypoint_threshold: 0.05         # Keypoint detection threshold
-  match_threshold: 0.2             # Matching threshold
-  setting_geometry: Homography     # Geometry type
-
-  # RANSAC configuration
   enable_ransac: true
   ransac_method: CV2_USAC_MAGSAC
   ransac_reproj_threshold: 8.0
@@ -125,43 +75,104 @@ defaults:
   ransac_num_samples: 4
 ```
 
-## Data Configuration
+Supported RANSAC methods:
+- `RANSAC` - Basic random sampling
+- `CV2_USAC_MAGSAC` - Magnitude-consistent RANSAC (recommended)
+- `LMEDS` - Least Median of Squares
 
-### Example Datasets Path
+### Geometry Estimation
 
-Example datasets can be configured via:
+```yaml
+defaults:
+  setting_geometry: Homography    # Options: Homography, Fundamental, Essential
+```
 
-1. **Environment variable**:
-   ```bash
-   export IMCUI_DATA_DIR=/path/to/datasets
-   ```
+<AccordionGroup>
+  <Accordion title="Essential Matrix Settings">
+    Note: Essential matrix parameters are configured through the UI when selecting Essential matrix geometry type.
+    Requires camera intrinsics (focal length and principal point).
+  </Accordion>
+</AccordionGroup>
 
-2. **CLI flag**:
-   ```bash
-   imcui -d /path/to/datasets
-   ```
 
-3. **Configuration file**:
-   ```yaml
-   example_data_root: /path/to/datasets
-   ```
+## Example Configurations
 
-If not specified, datasets are automatically downloaded to:
+### Minimal Setup
 
-- **Linux/macOS**: `~/.cache/imcui/datasets/`
-- **Windows**: `%LOCALAPPDATA%\imcui\datasets\`
+```yaml
+defaults:
+  setting_threshold: 0.1
+  max_keypoints: 2000
+  enable_ransac: true
+```
 
-## Using Multiple Configurations
+### Production Configuration
 
-You can have multiple configuration files for different use cases:
+```yaml
+defaults:
+  setting_threshold: 0.1
+  keypoint_threshold: 0.05
+  match_threshold: 0.2
+  max_keypoints: 5000
+  enable_ransac: true
+  ransac_method: CV2_USAC_MAGSAC
+  ransac_reproj_threshold: 8.0
+  ransac_confidence: 0.9999
+  ransac_max_iter: 10000
+  setting_geometry: Homography
+```
+
+### Development Configuration
+
+```yaml
+defaults:
+  setting_threshold: 0.2
+  max_keypoints: 500
+  match_threshold: 0.3
+  enable_ransac: false
+```
+
+<Note>
+<strong>Developer note:</strong> Set <code>CUDA_VISIBLE_DEVICES=""</code> before running to force CPU mode.
+</Note>
+
+
+## Advanced Configuration
+
+### Dataset Path
+
+```yaml
+example_data_root: /path/to/custom/datasets
+```
+
+<Note>
+<strong>Tip:</strong> Dataset paths can also be set via environment variable (`IMCUI_DATA_DIR`) or CLI flag (`-d`).
+</Note>
+
+
+## Configuration Profiles
+
+Create multiple configurations for different use cases:
 
 ```bash
-# Development configuration
-imcui -c config_dev.yaml
+# Fast matching for previewing
+imcui -c config_fast.yaml
 
-# Production configuration
-imcui -c config_prod.yaml
+# High-quality matching for production
+imcui -c config_high_quality.yaml
 
-# Testing configuration
-imcui -c config_test.yaml -d /test/data
+# CPU-only matching for testing
+CUDA_VISIBLE_DEVICES="" imcui -c config_cpu.yaml -d /test/data
 ```
+
+
+## Using Matchers
+
+Matchers are selected through the web interface dropdown. The available matchers are automatically loaded from the vismatch package:
+
+- **Sparse matchers**: SuperPoint + LightGlue, ORB, SIFT, etc.
+- **Dense matchers**: LoFTR, RoMa, etc.
+
+<Note>
+<strong>Need help selecting a matcher?</strong> Check our <a href="/docs/models">algorithm guide</a> for performance characteristics and recommendations.
+</Note>

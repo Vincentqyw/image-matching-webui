@@ -1,6 +1,6 @@
 ---
 title: "Installation"
-description: "How to install Image Matching WebUI using different methods"
+description: "Complete installation guide for Image Matching WebUI"
 ---
 
 # Installation
@@ -9,82 +9,170 @@ description: "How to install Image Matching WebUI using different methods"
 
 - [Python 3.10+](https://www.python.org/downloads/)
 
-## Install from PyPI (Recommended)
+<Tip>
+<strong>Just getting started?</strong> Try the <a href="/docs/quickstart">quick start guide</a> for the simplest setup.
+</Tip>
 
-The recommended way to install Image Matching WebUI is via PyPI:
+## Installation Methods
+
+### PyPI (Recommended)
+
+For most users, PyPI is the fastest and easiest way:
 
 ```bash
 pip install imcui
 ```
 
-Optional: Install with auto-download support for example datasets:
+#### With Dataset Support
+
+Include automatic dataset downloading:
 
 ```bash
 pip install imcui[datasets]
 ```
 
-<Alert type="info">
-<strong>Note:</strong> Example datasets (82MB) are <strong>automatically downloaded</strong> from HuggingFace on first run to your user cache directory:
+<AccordionGroup>
+  <Accordion title="System Requirements">
+    Windows, macOS, or Linux with Python 3.10+
+  </Accordion>
+  <Accordion title="GPU Support">
+    CUDA 11.8+ for GPU acceleration (optional)
+  </Accordion>
+</AccordionGroup>
 
-- <strong>Linux/macOS</strong>: <code>~/.cache/imcui/datasets/</code>
-- <strong>Windows</strong>: <code>%LOCALAPPDATA%\imcui\datasets\</code>
+### Docker
 
-The download happens transparently on first launch. For offline use or custom data paths, use:
-
-- Environment variable: <code>export IMCUI_DATA_DIR=/path/to/datasets</code>
-- CLI flag: <code>imcui -d /path/to/datasets</code>
-</Alert>
-
-## Install from Source
-
-To install from source:
-
-```bash
-git clone https://github.com/Vincentqyw/image-matching-webui.git
-cd image-matching-webui
-pip install -e .
-```
-
-Datasets will be auto-downloaded on first run.
-
-## Docker Installation
-
-Using Docker Compose:
+Use Docker for isolated, reproducible environments:
 
 ```bash
 docker pull vincentqin/image-matching-webui:latest
-
-# Start the WebUI service
 docker-compose up webui
-
-# Or run in the background
-docker-compose up -d webui
 ```
 
-## Deprecated: Conda Installation
+<AccordionGroup>
+  <Accordion title="Background Mode">
+    ```bash
+    docker-compose up -d webui
+    ```
+  </Accordion>
+  <Accordion title="Custom Port">
+    ```bash
+    docker run -p 8080:7860 vincentqin/image-matching-webui:latest
+    ```
+  </Accordion>
+</AccordionGroup>
 
-<Alert type="warning">
-<strong>Deprecated:</strong> <code>environment.yaml</code> is deprecated. Please use pip instead.
+### Source Installation
+
+Install from the GitHub repository for development or latest features:
 
 ```bash
 git clone https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
-conda env create -f environment.yaml
-conda activate imcui
 pip install -e .
 ```
-</Alert>
+
+<Note>
+This installs in editable mode, allowing you to make changes to the source code without reinstalling.
+</Note>
+
+## Environment Setup
+
+### Virtual Environment (Recommended)
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install imcui
+```
+
+### GPU Configuration
+
+For CUDA-enabled systems:
+
+```bash
+# Check CUDA availability
+python -c "import torch; print(torch.cuda.is_available())"
+
+# Set specific GPU (optional)
+export CUDA_VISIBLE_DEVICES=0
+```
+
+## Data Management
+
+### Example Datasets
+
+Example datasets (82MB) automatically download on first run:
+
+<AccordionGroup defaultOpenAll>
+  <Accordion title="Linux/macOS">
+    `~/.cache/imcui/datasets/`
+  </Accordion>
+  <Accordion title="Windows">
+    `%LOCALAPPDATA%\imcui\datasets\`
+  </Accordion>
+</AccordionGroup>
+
+### Custom Data Paths
+
+Set a custom location for example datasets:
+
+<AccordionGroup>
+  <Accordion title="Environment Variable">
+    ```bash
+    export IMCUI_DATA_DIR=/path/to/datasets
+    ```
+  </Accordion>
+  <Accordion title="CLI Flag">
+    ```bash
+    imcui -d /path/to/datasets
+    ```
+  </Accordion>
+  <Accordion title="Configuration File">
+    ```yaml
+    example_data_root: /path/to/datasets
+    ```
+  </Accordion>
+</AccordionGroup>
 
 ## Verification
 
-To verify your installation:
+Test your installation:
 
 ```bash
 # Check version
 imcui --version
 
-# Display help
+# Display available options
 imcui --help
 ```
 
-If the installation was successful, you should see the version information and help text.
+Expected output shows version `1.0.0` and CLI options.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Import Errors">
+    Ensure you're using the correct Python environment and all dependencies are installed:
+    ```bash
+    pip install --upgrade imcui
+    ```
+  </Accordion>
+  <Accordion title="CUDA Not Found">
+    Verify CUDA installation:
+    ```bash
+    nvidia-smi
+    ```
+    For CPU-only usage, the application will automatically fallback.
+  </Accordion>
+  <Accordion title="Permission Denied">
+    Use a virtual environment or user installation:
+    ```bash
+    pip install --user imcui
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+<strong>Still having issues?</strong> Check our <a href="/docs/troubleshooting">troubleshooting guide</a> for common problems and solutions.
+</Note>
