@@ -120,10 +120,6 @@
       "destination": "docs/introduction"
     },
     {
-      "source": "/docs/api",
-      "destination": "docs/api"
-    },
-    {
       "source": "/README",
       "destination": "https://github.com/Vincentqyw/image-matching-webui#readme"
     }
