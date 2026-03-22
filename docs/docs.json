@@ -151,10 +151,9 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/realcat",
+      "x": "https://x.com/AlphaRealcat",
       "github": "https://github.com/Vincentqyw/image-matching-webui",
-      "huggingface": "https://huggingface.co/Realcat",
-      "linkedin": "https://linkedin.com/in/vincentqueryw"
+      "website": "https://huggingface.co/Realcat"
     }
   },
   "integrations": {
