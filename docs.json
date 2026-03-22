@@ -47,7 +47,7 @@
           {
             "group": "Overview",
             "pages": [
-              "docs/api/index"
+              "docs/api"
             ]
           },
           {
@@ -65,23 +65,6 @@
       }
     ],
     "global": {
-      "anchors": [
-        {
-          "anchor": "Quick Start",
-          "href": "/docs/quickstart",
-          "icon": "rocket"
-        },
-        {
-          "anchor": "Installation",
-          "href": "/docs/installation",
-          "icon": "download"
-        },
-        {
-          "anchor": "API Reference",
-          "href": "/docs/api/index",
-          "icon": "code"
-        }
-      ]
     }
   },
   "navbar": {
