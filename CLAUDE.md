@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Image Matching WebUI (IMCUI) is a Gradio-based web interface for matching image pairs using various state-of-the-art computer vision algorithms. It supports both sparse (keypoint-based) and dense (learned) matching methods.
 
+**Documentation**: Complete project documentation is maintained at https://imcui.mintlify.app
+
 ## Common Commands
 
 ### Installation
@@ -248,6 +250,11 @@ The following should NOT be deleted:
 **Deprecated Files**:
 - `environment.yaml` - Deprecated, includes deprecation notice. Recommend pip install instead.
 - `imcui/ui/utils.py` - Removed, split into modular components above.
+
+**Documentation**:
+- `docs/` - Mintlify documentation source files
+- `docs.json` - Mintlify site configuration
+- Online documentation: https://imcui.mintlify.app
 
 **Gradio Security Configuration**:
 - `imcui/ui/image_matching_app.py:run()` - Dynamically adds external dataset paths to `allowed_paths`

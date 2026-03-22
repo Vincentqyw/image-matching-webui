@@ -14,16 +14,13 @@
   <a target="_blank" href="https://hub.docker.com/r/vincentqin/image-matching-webui"><img alt="Docker Image Version" src="https://img.shields.io/docker/v/vincentqin/image-matching-webui?sort=date&arch=amd64&logo=docker&label=imcui&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fvincentqin%2Fimage-matching-webui"></a>
   <a target="_blank" href="https://pepy.tech/projects/imcui"><img src="https://static.pepy.tech/badge/imcui" alt="PyPI Downloads"></a>
   <a target="_blank" href="https://deepwiki.com/Vincentqyw/image-matching-webui"><img src="https://img.shields.io/badge/DeepWiki-imcui-blue.svg" alt="DeepWiki"></a>
+  <a target="_blank" href="https://imcui.mintlify.app"><img src="https://img.shields.io/badge/docs-mintlify-32cd32?style=flat&logo=mintlify" alt="Documentation"></a>
 </div>
 
 ## Description
 
 `Image Matching WebUI (IMCUI)` efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
 **Note**: the images source can be either local images or webcam images.
-
-## Documentation
-
-<!-- Complete documentation is available at: https://image-matching-webui.readthedocs.io/. -->
 
 Online Demo
 -----------
