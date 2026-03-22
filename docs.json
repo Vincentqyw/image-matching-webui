@@ -121,7 +121,7 @@
     },
     {
       "source": "/docs/api",
-      "destination": "docs/api/index"
+      "destination": "docs/api"
     },
     {
       "source": "/README",
