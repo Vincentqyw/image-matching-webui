@@ -160,7 +160,91 @@ When reporting issues, include:
 
 ## Architecture
 
+### System Overview
+
+```mermaid
+graph TD
+    User[User] --> CLI[CLI Interface]
+    User --> WebUI[Web Interface]
+
+    CLI --> API[ImageMatchingAPI]
+    WebUI --> API
+
+    API --> MatcherZoo[Matcher Zoo]
+    API --> Matching[Matching Engine]
+    API --> Geometry[Geometry Computation]
+    API --> Visualization[Visualization]
+
+    MatcherZoo --> VismatchExternal[vismatch library]
+    Matching --> ModelCache[Model Cache]
+    Geometry --> RANSAC[RANSAC Filtering]
+
+    Visualization --> ImageUtils[Image Utilities]
+
+    subgraph DataLayer[Data Layer]
+        ModelCache
+        ConfigFiles[Config Files]
+        ExampleData[Example Data]
+    end
+
+    API --> ConfigFiles
+    API --> ExampleData
+
+    style User fill:#4F46E5,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style CLI fill:#8B5CF6,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style WebUI fill:#8B5CF6,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style API fill:#6366F1,stroke:#ffffff,stroke-width:3px,color:#ffffff,font-size:11px
+    style MatcherZoo fill:#10B981,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style Matching fill:#F59E0B,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style Geometry fill:#F59E0B,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style Visualization fill:#EC4899,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style VismatchExternal fill:#059669,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style ModelCache fill:#D97706,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style RANSAC fill:#D97706,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style ImageUtils fill:#DB2777,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style DataLayer fill:#374151,stroke:#6366F1,stroke-width:2px,color:#ffffff,stroke-dasharray: 5 5
+```
+
 ### Project Structure
+
+```mermaid
+graph TD
+    root[image-matching-webui] --> imcui[imcui/ - Python Package]
+    root --> tests[tests/ - Test Suite]
+    root --> cpp[cpp/ - C++ Implementation]
+    root --> docs[docs/ - Documentation]
+    root --> docker[docker/ - Deployment Config]
+
+    imcui --> cli[cli/ - CLI Entry Point]
+    imcui --> ui[ui/ - Web Interface]
+    imcui --> api[api/ - Core API]
+    imcui --> configFiles[config/ - Config Files]
+
+    ui --> app[image_matching_app.py]
+    ui --> config[config.py]
+    ui --> configUtils[config_utils.py]
+    ui --> matching[matching.py]
+    ui --> geometry[geometry.py]
+    ui --> imageUtils[image_utils.py]
+    ui --> visualization[visualization.py]
+    ui --> examples[examples.py]
+    ui --> modelCache[model_cache.py]
+
+    cli --> main[main.py]
+    api --> server[server.py]
+    api --> client[client.py]
+
+    style root fill:#1F2937,stroke:#6366F1,stroke-width:3px,color:#ffffff,font-size:14px
+    style imcui fill:#4F46E5,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:12px
+    style ui fill:#6366F1,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:12px
+    style api fill:#818CF8,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:12px
+    style cli fill:#8B5CF6,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:12px
+    style tests fill:#10B981,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:12px
+    style cpp fill:#F59E0B,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:12px
+    style docs fill:#EC4899,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:12px
+```
+
+### Component Details
 
 - `imcui/` - Main package
   - `cli/` - Command-line interface

@@ -8,7 +8,7 @@ description: "Automated image matching tool with state-of-the-art algorithms"
 Image Matching WebUI (IMCUI) is a modern tool for matching image pairs using state-of-the-art computer vision algorithms. Built with Gradio, it provides an intuitive interface for both researchers and developers.
 
 <Tip>
-<strong>Ready to get started?</strong> Jump directly to our <a href="/docs/quickstart">Quick Start Guide</a> to begin matching images in minutes.
+<strong>Ready to get started?</strong> Jump directly to our <a href="/docs/quickstart">Quick Start</a> to begin matching images in minutes.
 </Tip>
 
 
@@ -46,17 +46,61 @@ Access 20+ matching algorithms through [vismatch](https://github.com/gmberton/vi
 
 ## Architecture
 
+```mermaid
+graph LR
+    UserInput[User Input] --> CLI[CLI Interface]
+    UserInput --> WebUI[Web Interface]
+
+    CLI --> API[ImageMatchingAPI]
+    WebUI --> API
+
+    subgraph CoreFeatures[Core Functions]
+        API --> Matching[Matching Engine]
+        API --> Geometry[Geometry Computation]
+        API --> Visualization[Visualization]
+    end
+
+    subgraph DataSources[Data Sources]
+        MatcherZoo[Matcher Zoo<br/>vismatch integration]
+        ModelCache[Model Cache]
+        Config[Config Files]
+    end
+
+    API --> MatcherZoo
+    API --> ModelCache
+    API --> Config
+
+    Output[Result Output] --> CLI
+    Output --> WebUI
+
+    Visualization --> Output
+
+    style UserInput fill:#4F46E5,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style CLI fill:#8B5CF6,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style WebUI fill:#8B5CF6,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style API fill:#6366F1,stroke:#ffffff,stroke-width:3px,color:#ffffff,font-size:11px
+    style Matching fill:#F59E0B,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style Geometry fill:#F59E0B,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style Visualization fill:#EC4899,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style MatcherZoo fill:#10B981,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style ModelCache fill:#D97706,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style Config fill:#059669,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style Output fill:#818CF8,stroke:#ffffff,stroke-width:2px,color:#ffffff,font-size:11px
+    style CoreFeatures fill:#374151,stroke:#6366F1,stroke-width:2px,color:#ffffff,stroke-dasharray: 5 5
+    style DataSources fill:#374151,stroke:#6366F1,stroke-width:2px,color:#ffffff,stroke-dasharray: 5 5
+```
+
 <Columns>
-  <Card title="Matcher Zoo" icon="layers">
+  <Card title="Matcher Zoo" icon="box">
     Dynamically loads algorithms from vismatch package
   </Card>
   <Card title="Core API" icon="code">
     Python API for programmatic matching
   </Card>
-  <Card title="Web Interface" icon="layout">
+  <Card title="Web Interface" icon="monitor">
     Gradio-based UI for interactive use
   </Card>
-  <Card title="Configuration" icon="settings">
+  <Card title="Configuration" icon="sliders_horizontal">
     YAML-based setup and parameter management
   </Card>
 </Columns>
@@ -100,10 +144,10 @@ All matching algorithms are maintained in the [vismatch](https://github.com/gmbe
   <Card title="Speed" icon="zap">
     GPU-accelerated matching for large images
   </Card>
-  <Card title="Accuracy" icon="target">
+  <Card title="Accuracy" icon="check-circle">
     State-of-the-art algorithms with proven results
   </Card>
-  <Card title="Simplicity" icon="smile">
+  <Card title="Simplicity" icon="heart">
     Easy to use for beginners, powerful for experts
   </Card>
 </CardGroup>
@@ -115,10 +159,10 @@ All matching algorithms are maintained in the [vismatch](https://github.com/gmbe
   <Card title="Installation Guide" icon="download" href="/docs/installation">
     PyPI, Docker, source installation options
   </Card>
-  <Card title="Configuration" icon="file-code" href="/docs/configuration">
+  <Card title="Configuration" icon="file-text" href="/docs/configuration">
     Customize matchers and parameters
   </Card>
-  <Card title="Algorithm Reference" icon="cpu" href="/docs/models">
+  <Card title="Algorithm Reference" icon="list" href="/docs/models">
     Available matching algorithms
   </Card>
   <Card title="API Documentation" icon="code" href="/docs/api">
