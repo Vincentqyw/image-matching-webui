@@ -44,7 +44,7 @@
                 "pages": [
                   {
                     "label": "Claude Code",
-                    "href": "claude-code"
+                    "href": "https://claude.ai/code"
                   }
                 ]
               }
@@ -113,10 +113,6 @@
       ]
     }
   },
-  "logo": {
-    "light": "/assets/logo-light.png",
-    "dark": "/assets/logo-dark.png"
-  },
   "navbar": {
     "links": [
       {
@@ -165,12 +161,16 @@
   },
   "redirects": [
     {
+      "source": "/",
+      "destination": "introduction"
+    },
+    {
       "source": "/home",
-      "destination": "/introduction"
+      "destination": "introduction"
     },
     {
       "source": "/docs",
-      "destination": "/introduction"
+      "destination": "introduction"
     },
     {
       "source": "/README",
