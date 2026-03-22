@@ -84,9 +84,15 @@ Create a custom ``app.yaml`` configuration file to set default parameters:
 .. code-block:: yaml
 
    device: cuda
-   default_matcher: superpoint-lightglue
-   show_keypoints: true
-   ransac_threshold: 1.0
+
+   defaults:
+     setting_threshold: 0.1
+     max_keypoints: 2000
+     match_threshold: 0.2
+     setting_geometry: Homography
+     enable_ransac: true
+     ransac_method: CV2_USAC_MAGSAC
+     ransac_reproj_threshold: 8.0
 
 Then use it:
 

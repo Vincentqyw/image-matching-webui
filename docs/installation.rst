@@ -62,7 +62,7 @@ Using Docker Compose:
 Deprecated: Conda Installation
 -------------------------------
 
-..警告::
+.. warning::
 
    ``environment.yaml`` is deprecated. Please use pip instead.
 

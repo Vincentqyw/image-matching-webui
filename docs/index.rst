@@ -13,6 +13,7 @@ Welcome to Image Matching WebUI (IMCUI) documentation. IMCUI is a Gradio-based w
    api
    configuration
    development
+   troubleshooting
 
 Introduction
 ------------

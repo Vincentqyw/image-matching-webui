@@ -15,15 +15,15 @@ Functions
 Matching Functions
 ~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: imcui.api.run_matching
-.. autofunction:: imcui.api.run_ransac
+.. autofunction:: imcui.ui.run_matching
+.. autofunction:: imcui.ui.run_ransac
 
 Geometry Functions
 ~~~~~~~~~~~~~~~~~~
 
+.. autofunction:: imcui.ui.geometry.filter_matches
 .. autofunction:: imcui.ui.geometry.compute_geometry
-.. autofunction:: imcui.ui.geometry.compute_homography
-.. autofunction:: imcui.ui.geometry.compute_fundamental_matrix
+.. autofunction:: imcui.ui.geometry.process_ransac_matches
 
 Visualization Functions
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -99,8 +99,7 @@ With RANSAC Filtering
 .. code-block:: python
 
    from imcui.api import ImageMatchingAPI
-   from imcui.api import run_ransac
-   from imcui.ui import get_matcher_zoo, DEVICE
+   from imcui.ui import run_ransac, get_matcher_zoo, DEVICE
    import cv2
 
    # Load and process images

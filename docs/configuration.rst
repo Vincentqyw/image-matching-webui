@@ -46,21 +46,20 @@ Matching Configuration
 Visualization Options
 ~~~~~~~~~~~~~~~~~~~~~
 
+Visualization options are configurable through the web interface rather than the YAML configuration file. The following parameters affect visualization output:
+
+* **setting_threshold**: Detection threshold (default: 0.1)
+* **keypoint_threshold**: Keypoint detection threshold (default: 0.05)
+* **match_threshold**: Matching threshold (default: 0.2)
+
+These can be adjusted in the configuration file under the ``defaults`` section:
+
 .. code-block:: yaml
 
-   # Keypoint display
-   show_keypoints: true
-   keypoint_size: 2
-
-   # Match display
-   show_lines: true
-   line_thickness: 1
-
-   # Match confidence threshold
-   match_threshold: 0.5
-
-   # Maximum matches to display
-   max_matches: -1  # -1 for unlimited
+   defaults:
+     setting_threshold: 0.1
+     keypoint_threshold: 0.05
+     match_threshold: 0.2
 
 RANSAC Configuration
 ~~~~~~~~~~~~~~~~~~~~
@@ -68,15 +67,16 @@ RANSAC Configuration
 .. code-block:: yaml
 
    # RANSAC method
-   ransac_method: MAGSAC  # Options: RANSAC, MAGSAC, LMEDS
+   ransac_method: CV2_USAC_MAGSAC  # Options: RANSAC, CV2_USAC_MAGSAC, LMEDS
 
    # RANSAC parameters
-   ransac_reproj_threshold: 1.0  # Reprojection error threshold in pixels
-   ransac_confidence: 0.99  # Confidence level
-   ransac_max_iters: 5000  # Maximum iterations
+   ransac_reproj_threshold: 8.0  # Reprojection error threshold in pixels
+   ransac_confidence: 0.9999  # Confidence level
+   ransac_max_iter: 10000  # Maximum iterations
+   ransac_num_samples: 4  # Number of samples to use in RANSAC
 
    # Output options
-   ransac_enable: true  # Enable RANSAC filtering
+   enable_ransac: true  # Enable RANSAC filtering
 
 Geometry Configuration
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -110,32 +110,26 @@ Full Configuration
 
 .. code-block:: yaml
 
-   # Full configuration file
-   device: cuda
+   # Server configuration
+   server:
+     name: "0.0.0.0"
+     port: 7860
 
-   # Matching
-   default_matcher: superpoint-lightglue
-   preprocessing:
-     resize: 1024
-     grayscale: false
+   # Matching defaults
+   defaults:
+     setting_threshold: 0.1           # Detection threshold
+     max_keypoints: 2000              # Maximum number of keypoints
+     keypoint_threshold: 0.05         # Keypoint detection threshold
+     match_threshold: 0.2             # Matching threshold
+     setting_geometry: Homography     # Geometry type
 
-   # Visualization
-   show_keypoints: true
-   show_lines: true
-   keypoint_size: 2
-   line_thickness: 1
-   match_threshold: 0.5
-   max_matches: -1
-
-   # RANSAC
-   ransac_method: MAGSAC
-   ransac_reproj_threshold: 1.0
-   ransac_confidence: 0.99
-   ransac_max_iters: 5000
-   ransac_enable: true
-
-   # Geometry
-   geometry_type: homography
+     # RANSAC configuration
+     enable_ransac: true
+     ransac_method: CV2_USAC_MAGSAC
+     ransac_reproj_threshold: 8.0
+     ransac_confidence: 0.9999
+     ransac_max_iter: 10000
+     ransac_num_samples: 4
 
 Data Configuration
 ------------------

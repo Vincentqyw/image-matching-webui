@@ -121,11 +121,13 @@ The configuration file uses YAML format. Here's an example:
    show_lines: false
 
    # RANSAC configuration
-   ransac_method: MAGSAC
-   ransac_reproj_threshold: 1.0
-   ransac_confidence: 0.99
+   ransac_method: CV2_USAC_MAGSAC
+   ransac_reproj_threshold: 8.0
+   ransac_confidence: 0.9999
 
-Save this as ``app.yaml`` and use it:
+Save this as ``app.yaml`` and use it.
+
+Note: The actual configuration structure uses a ``defaults`` section. See the :doc:`configuration` page for the complete format.
 
 .. code-block:: bash
 
