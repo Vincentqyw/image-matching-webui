@@ -97,17 +97,17 @@
       "anchors": [
         {
           "anchor": "Installation",
-          "href": "/installation",
+          "href": "installation",
           "icon": "download"
         },
         {
           "anchor": "Quick Start",
-          "href": "/quickstart",
+          "href": "quickstart",
           "icon": "rocket"
         },
         {
           "anchor": "API Reference",
-          "href": "/api",
+          "href": "api",
           "icon": "code"
         }
       ]
