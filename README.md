@@ -246,12 +246,6 @@ imcui --help
 
 > **Note:** This WebUI no longer maintains matching algorithms. All matchers are maintained in the [vismatch](https://github.com/gmberton/vismatch) repository. To add new matchers or algorithms, please contribute to the vismatch repository instead.
 
-The project uses [vismatch](https://github.com/gmberton/vismatch) pip package for algorithms. The available matchers are dynamically loaded from vismatch and do not require manual registration in this repository.
-
-**Configuration file locations:**
-1. Custom config file specified with `-c` parameter
-2. Package default config (`imcui/config/app.yaml`)
-
 
 ## Contributions welcome!
 
