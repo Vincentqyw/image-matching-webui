@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    if: github.event.pull_request.draft == false || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
