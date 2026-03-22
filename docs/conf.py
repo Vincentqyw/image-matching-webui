@@ -48,6 +48,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',  # For Google-style docstrings
+    'sphinx.ext.linkcode',  # Link to GitHub source code
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -179,6 +180,8 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'gradio': ('https://www.gradio.app/docs/', None),
     'numpy': ('https://numpy.org/doc/stable/', None),
+    'cv2': ('https://docs.opencv.org/4.x/', None),
+    'torch': ('https://pytorch.org/docs/stable/', None),
 }
 
 # -- Options for todo extension ----------------------------------------------
@@ -211,3 +214,49 @@ napoleon_use_rtype = True
 napoleon_preprocess_types = False
 napoleon_type_aliases = None
 napoleon_attr_annotations = True
+
+# -- Options for linkcode extension ---------------------------------------
+# Link documentation API references to GitHub source code
+
+def _get_git_revision():
+    """Get the current git revision hash."""
+    try:
+        import subprocess
+        rev = subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD'],
+            stderr=subprocess.DEVNULL,
+            cwd=project_root
+        ).strip().decode()
+        return rev if rev else 'main'
+    except Exception:
+        return 'main'
+
+_commit = _get_git_revision()
+_GITHUB_ROOT = f"https://github.com/Vincentqyw/image-matching-webui/blob/{_commit}"
+
+def linkcode_resolve(domain, info):
+    """Resolve linkcode references to GitHub source."""
+    if domain != 'py' or not info['module']:
+        return None
+    try:
+        import inspect
+        import importlib
+
+        mod = importlib.import_module(info['module'])
+        obj = mod
+        for part in info['fullname'].split('.'):
+            obj = getattr(obj, part)
+
+        src_file = inspect.getfile(obj)
+        lines, start = inspect.getsourcelines(obj)
+
+        marker = os.sep + 'imcui' + os.sep
+        idx = src_file.find(marker)
+        if idx == -1:
+            return None
+
+        rel = 'imcui' + src_file[idx + len(marker):]
+        end = start + len(lines) - 1
+        return f"{_GITHUB_ROOT}/{rel}#L{start}-L{end}"
+    except Exception:
+        return None

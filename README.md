@@ -21,6 +21,13 @@
 `Image Matching WebUI (IMCUI)` efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
 **Note**: the images source can be either local images or webcam images.
 
+## Documentation
+
+Complete documentation is available at: https://image-matching-webui.readthedocs.io/.
+
+Online Demo
+-----------
+
 Try it on
 <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
 
@@ -88,12 +95,6 @@ https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c34
 </details>
 
 ## How to use
-
-### HuggingFace / Lightning AI
-
-Just try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
-
-or deploy it locally following the instructions below.
 
 ### Requirements
 

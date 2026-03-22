@@ -5,13 +5,24 @@ Welcome to Image Matching WebUI (IMCUI) documentation. IMCUI is a Gradio-based w
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Getting Started
 
    installation
    quickstart
    cli
-   api
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Configuration & Models
+
    configuration
+   models
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Development & API
+
+   api
    development
    troubleshooting
 
@@ -30,6 +41,7 @@ Key Features
 * **Flexible Input**: Support for local images and webcam input
 * **Configurable**: Custom configuration via YAML files
 * **Package Installation**: Easy installation via PyPI
+* **Extensible**: Built on top of the `vismatch <https://github.com/gmberton/vismatch>`_ library for unified model access
 
 Quick Start
 -----------
