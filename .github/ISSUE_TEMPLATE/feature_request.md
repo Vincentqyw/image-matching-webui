@@ -8,8 +8,8 @@ assignees:
 
 ## 🚀 Feature Request
 
-<!-- A clear and concise description of the feature proposal. -->
+{/* A clear and concise description of the feature proposal. */}
 
 ## 📎 Additional context
 
-<!-- Add any other context or screenshots about the feature request here. -->
+{/* Add any other context or screenshots about the feature request here. */}
