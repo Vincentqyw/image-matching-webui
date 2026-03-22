@@ -1,0 +1,190 @@
+---
+title: "Quick Start Guide"
+description: "Get started with Image Matching WebUI in 3 simple steps"
+---
+
+# Quick Start Guide
+
+Get up and running with Image Matching WebUI in minutes. This guide will walk you through the essential steps to start matching images.
+
+---
+
+## 1. Install the Package
+
+<AccordionGroup>
+  <Accordion title="Install from PyPI (Recommended)" icon="package">
+    <CodeGroup>
+      ```bash pip
+      pip install imcui
+      ```
+
+      ```bash pip
+      # Optional: for auto-download support
+      pip install imcui[datasets]
+      ```
+    </CodeGroup>
+  </Accordion>
+
+  <Accordion title="Install from Source" icon="database">
+    <Steps>
+      <Step>
+        Clone the repository:
+        <CodeGroup>
+          ```bash git
+          git clone https://github.com/Vincentqyw/image-matching-webui.git
+          cd image-matching-webui
+          ```
+        </CodeGroup>
+      </Step>
+      <Step>
+        Install in development mode:
+        <CodeGroup>
+          ```bash pip
+          pip install -e .
+          ```
+        </CodeGroup>
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Install with Docker" icon="container">
+    <CodeGroup>
+      ```bash docker
+      docker pull vincentqin/image-matching-webui:latest
+      docker-compose up webui
+      ```
+    </CodeGroup>
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+<strong>Note:</strong> Example datasets (82MB) are automatically downloaded on first run to your cache directory. See <a href="/installation">installation guide</a> for details.
+</Tip>
+
+---
+
+## 2. Launch the Application
+
+<AccordionGroup>
+  <Accordion title="Run with Defaults" icon="play-circle">
+    <CodeGroup>
+      ```bash cli
+      imcui
+      ```
+    </CodeGroup>
+    This starts the web interface on <code>http://localhost:7860</code> with default settings.
+  </Accordion>
+
+  <Accordion title="Custom Configuration" icon="settings">
+    <CodeGroup>
+      ```bash cli
+      imcui -c /path/to/config.yaml
+      ```
+    </CodeGroup>
+    Use a custom configuration file for specific settings.
+  </Accordion>
+
+  <Accordion title="Custom Port and Host" icon="network">
+    <CodeGroup>
+      ```bash cli
+      imcui -s 127.0.0.1 -p 8080
+      ```
+    </CodeGroup>
+    Run on specific host and port.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 3. Start Matching Images
+
+Once the interface is running:
+
+<CardGroup>
+  <Card title="Upload Images" icon="upload">
+    Click on the image upload areas and select two images you want to match.
+  </Card>
+  <Card title="Choose Algorithm" icon="git-branch">
+    Select a matching algorithm from the dropdown menu (e.g., superpoint-lightglue).
+  </Card>
+  <Card title="Run Matching" icon="zap">
+    Click the "Match" button to start the matching process.
+  </Card>
+  <Card title="View Results" icon="eye">
+    Review the matching results with visualization of keypoint matches.
+  </Card>
+</CardGroup>
+
+---
+
+## Basic Usage Example
+
+After launching the interface:
+
+1. **Select two images** from your computer using the upload buttons
+2. **Choose a matching algorithm** from the available options
+3. **Adjust parameters** if needed (thresholds, max keypoints, etc.)
+4. **Click "Match"** to run the matching process
+5. **View results** with visualized keypoint matches and RANSAC filtering
+
+<Steps>
+  <Step>
+    <strong>Upload Images</strong>
+    <br/>
+    Select two images you want to match. The system supports JPG, PNG, and other common formats.
+  </Step>
+  <Step>
+    <strong>Choose Algorithm</strong>
+    <br/>
+    Select from 20+ available algorithms ranging from sparse to dense matching methods.
+  </Step>
+  <Step>
+    <strong>Configure Parameters</strong>
+    <br/>
+    Adjust matching thresholds, maximum keypoints, and RANSAC settings as needed.
+  </Step>
+  <Step>
+    <strong>Run and Visualize</strong>
+    <br/>
+    Execute matching and analyze results with interactive visualizations.
+  </Step>
+</Steps>
+
+---
+
+## Common First Tasks
+
+<CardGroup cols={2}>
+  <Card title="Match Local Images" icon="folder" href="/installation">
+    Upload two local images and compare different algorithms on the same pair.
+  </Card>
+
+  <Card title="Try Webcam Matching" icon="camera" href="/installation">
+    Use webcam input to capture images in real-time for dynamic matching.
+  </Card>
+
+  <Card title="Compare Algorithms" icon="git-compare-alt" href="/models">
+    Test the same image pair with different algorithms to compare performance.
+  </Card>
+
+  <Card title="Custom Configuration" icon="file-code" href="/configuration">
+    Create a custom configuration file for your specific use case.
+  </Card>
+</CardGroup>
+
+---
+
+## Next Steps
+
+- **Learn More**: Explore our <a href="/models">complete model reference</a>
+- **Advanced Usage**: Check out <a href="/configuration">configuration options</a>
+- **API Access**: Try the <a href="/api">programmatic API</a>
+- **Get Help**: Visit our <a href="/troubleshooting">troubleshooting guide</a>
+
+<Note>
+<strong>Quick Help:</strong> Need inspiration? Try the <a href="https://huggingface.co/spaces/Realcat/image-matching-webui">HuggingFace demo</a> to see the interface in action before installing.
+</Note>
+
+---
+
+<Feedback title="Quick Start Help?" content="Check our installation guide or view examples in the demo" link="https://huggingface.co/spaces/Realcat/image-matching-webui" />

@@ -1,0 +1,193 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Image Matching WebUI",
+  "colors": {
+    "primary": "#4F46E5",
+    "light": "#6366F1",
+    "dark": "#4338ca"
+  },
+  "favicon": "/favicon.png",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation",
+              "cli"
+            ]
+          },
+          {
+            "group": "Customization",
+            "pages": [
+              "configuration",
+              "models"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "development",
+              "troubleshooting"
+            ]
+          },
+          {
+            "group": "AI Integration",
+            "pages": [
+              {
+                "group": "Code Editors",
+                "pages": [
+                  {
+                    "label": "Claude Code",
+                    "href": "claude-code"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api"
+            ]
+          },
+          {
+            "group": "API Modules",
+            "pages": [
+              {
+                "label": "imcui.api.core",
+                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/api/core.py"
+              },
+              {
+                "label": "imcui.ui.geometry",
+                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/geometry.py"
+              },
+              {
+                "label": "imcui.ui.matching",
+                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/matching.py"
+              },
+              {
+                "label": "imcui.ui.visualization",
+                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py"
+              },
+              {
+                "label": "imcui.ui.image_utils",
+                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/image_utils.py"
+              },
+              {
+                "label": "imcui.ui.config_utils",
+                "href": "https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/config_utils.py"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Installation",
+          "href": "/installation",
+          "icon": "download"
+        },
+        {
+          "anchor": "Quick Start",
+          "href": "/quickstart",
+          "icon": "rocket"
+        },
+        {
+          "anchor": "API Reference",
+          "href": "/api",
+          "icon": "code"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/assets/logo-light.png",
+    "dark": "/assets/logo-dark.png"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/Vincentqyw/image-matching-webui"
+      },
+      {
+        "label": "HuggingFace Demo",
+        "href": "https://huggingface.co/spaces/Realcat/image-matching-webui"
+      },
+      {
+        "label": "Support",
+        "href": "https://github.com/Vincentqyw/image-matching-webui/discussions"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "GitHub",
+      "href": "https://github.com/Vincentqyw/image-matching-webui"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/realcat",
+      "github": "https://github.com/Vincentqyw/image-matching-webui",
+      "huggingface": "https://huggingface.co/Realcat",
+      "linkedin": "https://linkedin.com/in/vincentqueryw"
+    }
+  },
+  "integrations": {
+    "algolia": {
+      "index": "image-matching-webui",
+      "appId": "YOUR_ALGOLIA_APP_ID",
+      "apiKey": "YOUR_ALGOLIA_API_KEY"
+    },
+    "analytics": {
+      "plausible": {
+        "dataDomain": "docs.image-matching-webui.com"
+      }
+    }
+  },
+  "api": {
+    "baseUrl": "https://github.com/Vincentqyw/image-matching-webui/blob/main",
+    "versions": ["main", "1.0.0"],
+    "auth": {
+      "method": "bearer"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/introduction"
+    },
+    {
+      "source": "/docs",
+      "destination": "/introduction"
+    },
+    {
+      "source": "/README",
+      "destination": "https://github.com/Vincentqyw/image-matching-webui#readme"
+    }
+  ]
+}

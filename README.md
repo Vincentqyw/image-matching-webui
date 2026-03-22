@@ -23,7 +23,7 @@
 
 ## Documentation
 
-Complete documentation is available at: https://image-matching-webui.readthedocs.io/.
+<!-- Complete documentation is available at: https://image-matching-webui.readthedocs.io/. -->
 
 Online Demo
 -----------

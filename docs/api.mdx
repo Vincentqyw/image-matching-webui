@@ -1,0 +1,3891 @@
+# API Reference
+
+Complete API documentation for Image Matching WebUI.
+
+**Version:** 1.0.0
+
+**Last Updated:** March 22, 2026 02:10 PM
+
+
+## imcui.api.core
+
+
+No module documentation available.
+
+
+### Classes
+
+
+#### ImageMatchingAPI
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/api/core.py#L26)
+
+
+**Inherits from:** Module
+
+
+Base class for all neural network modules.
+
+Your models should also subclass this class.
+
+Modules can also contain other Modules, allowing them to be nested in
+a tree structure. You can assign the submodules as regular attributes::
+
+    import torch.nn as nn
+    import torch.nn.functional as F
+
+    class Model(nn.Module):
+        def __init__(self) -> None:
+            super().__init__()
+            self.conv1 = nn.Conv2d(1, 20, 5)
+            self.conv2 = nn.Conv2d(20, 20, 5)
+
+        def forward(self, x):
+            x = F.relu(self.conv1(x))
+            return F.relu(self.conv2(x))
+
+Submodules assigned in this way will be registered, and will also have their
+parameters converted when you call :meth:`to`, etc.
+
+.. note::
+    As per the example above, an ``__init__()`` call to the parent class
+    must be made before assignment on the child.
+
+:ivar training: Boolean represents whether this module is in training or
+                evaluation mode.
+:vartype training: bool
+
+
+**Methods:**
+
+
+##### ImageMatchingAPI.add_module
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L634) |
+```python
+(self, name: str, module: Optional[ForwardRef('Module')]) -> None
+```
+
+
+Add a child module to the current module.
+
+The module can be accessed as an attribute using the given name.
+
+Args:
+    name (str): name of the child module. The child module can be
+        accessed from this module using the given name
+    module (Module): child module to be added to the module.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `name` | <class 'str'> | `Required` | |
+
+| `module` | Optional[ForwardRef('Module')] | `Required` | |
+
+
+
+**Returns:** None
+
+
+---
+
+
+##### ImageMatchingAPI.apply
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L995) |
+```python
+(self: ~T, fn: Callable[[ForwardRef('Module')], NoneType]) -> ~T
+```
+
+
+Apply ``fn`` recursively to every submodule (as returned by ``.children()``) as well as self.
+
+Typical use includes initializing the parameters of a model
+(see also :ref:`nn-init-doc`).
+
+Args:
+    fn (:class:`Module` -> None): function to be applied to each submodule
+
+Returns:
+    Module: self
+
+Example::
+
+    >>> @torch.no_grad()
+    >>> def init_weights(m):
+    >>>     print(m)
+    >>>     if type(m) == nn.Linear:
+    >>>         m.weight.fill_(1.0)
+    >>>         print(m.weight)
+    >>> net = nn.Sequential(nn.Linear(2, 2), nn.Linear(2, 2))
+    >>> net.apply(init_weights)
+    Linear(in_features=2, out_features=2, bias=True)
+    Parameter containing:
+    tensor([[1., 1.],
+            [1., 1.]], requires_grad=True)
+    Linear(in_features=2, out_features=2, bias=True)
+    Parameter containing:
+    tensor([[1., 1.],
+            [1., 1.]], requires_grad=True)
+    Sequential(
+      (0): Linear(in_features=2, out_features=2, bias=True)
+      (1): Linear(in_features=2, out_features=2, bias=True)
+    )
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+| `fn` | Callable[[ForwardRef('Module')], NoneType] | `Required` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.bfloat16
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1170) |
+```python
+(self: ~T) -> ~T
+```
+
+
+Casts all floating point parameters and buffers to ``bfloat16`` datatype.
+
+.. note::
+    This method modifies the module in-place.
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.buffers
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2665) |
+```python
+(self, recurse: bool = True) -> Iterator[torch.Tensor]
+```
+
+
+Return an iterator over module buffers.
+
+Args:
+    recurse (bool): if True, then yields buffers of this module
+        and all submodules. Otherwise, yields only buffers that
+        are direct members of this module.
+
+Yields:
+    torch.Tensor: module buffer
+
+Example::
+
+    >>> # xdoctest: +SKIP("undefined vars")
+    >>> for buf in model.buffers():
+    >>>     print(type(buf), buf.size())
+    <class 'torch.Tensor'> (20L,)
+    <class 'torch.Tensor'> (20L, 1L, 5L, 5L)
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `recurse` | <class 'bool'> | `True` | |
+
+
+
+**Returns:** Iterator[Tensor]
+
+
+---
+
+
+##### ImageMatchingAPI.children
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2719) |
+```python
+(self) -> Iterator[ForwardRef('Module')]
+```
+
+
+Return an iterator over immediate children modules.
+
+Yields:
+    Module: a child module
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+
+
+**Returns:** Iterator[ForwardRef('Module')]
+
+
+---
+
+
+##### ImageMatchingAPI.compile
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2982) |
+```python
+(self, *args, **kwargs)
+```
+
+
+Compile this Module's forward using :func:`torch.compile`.
+
+This Module's `__call__` method is compiled and all arguments are passed as-is
+to :func:`torch.compile`.
+
+See :func:`torch.compile` for details on the arguments for this function.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `args` | Any | `Required` | |
+
+| `kwargs` | Any | `Required` | |
+
+
+
+---
+
+
+##### ImageMatchingAPI.cpu
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1112) |
+```python
+(self: ~T) -> ~T
+```
+
+
+Move all model parameters and buffers to the CPU.
+
+.. note::
+    This method modifies the module in-place.
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.cuda
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1036) |
+```python
+(self: ~T, device: Union[int, torch.device, NoneType] = None) -> ~T
+```
+
+
+Move all model parameters and buffers to the GPU.
+
+This also makes associated parameters and buffers different objects. So
+it should be called before constructing the optimizer if the module will
+live on GPU while being optimized.
+
+.. note::
+    This method modifies the module in-place.
+
+Args:
+    device (int, optional): if specified, all parameters will be
+        copied to that device
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+| `device` | Union[int, device, NoneType] | `None` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.double
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1148) |
+```python
+(self: ~T) -> ~T
+```
+
+
+Casts all floating point parameters and buffers to ``double`` datatype.
+
+.. note::
+    This method modifies the module in-place.
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.eval
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2846) |
+```python
+(self: ~T) -> ~T
+```
+
+
+Set the module in evaluation mode.
+
+This has an effect only on certain modules. See the documentation of
+particular modules for details of their behaviors in training/evaluation
+mode, i.e. whether they are affected, e.g. :class:`Dropout`, :class:`BatchNorm`,
+etc.
+
+This is equivalent with :meth:`self.train(False) <torch.nn.Module.train>`.
+
+See :ref:`locally-disable-grad-doc` for a comparison between
+`.eval()` and several similar mechanisms that may be confused with it.
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.extra_repr
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2922) |
+```python
+(self) -> str
+```
+
+
+Return the extra representation of the module.
+
+To print customized extra information, you should re-implement
+this method in your own modules. Both single-line and multi-line
+strings are acceptable.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+
+
+**Returns:** <class 'str'>
+
+
+---
+
+
+##### ImageMatchingAPI.float
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1137) |
+```python
+(self: ~T) -> ~T
+```
+
+
+Casts all floating point parameters and buffers to ``float`` datatype.
+
+.. note::
+    This method modifies the module in-place.
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.forward
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/utils/_contextlib.py#L179) |
+```python
+(self, img0: numpy.ndarray, img1: numpy.ndarray) -> Dict[str, numpy.ndarray]
+```
+
+
+Forward pass of the image matching API using vismatch.
+
+Args:
+    img0: A 3D NumPy array of shape (H, W, C) representing the first image.
+          Values are in the range [0, 1] and are in RGB mode.
+    img1: A 3D NumPy array of shape (H, W, C) representing the second image.
+          Values are in the range [0, 1] and are in RGB mode.
+
+Returns:
+    A dictionary containing the following keys:
+    - image0_orig: The original image 0.
+    - image1_orig: The original image 1.
+    - keypoints0_orig: The keypoints detected in image 0.
+    - keypoints1_orig: The keypoints detected in image 1.
+    - mkeypoints0_orig: The raw matches between image 0 and image 1.
+    - mkeypoints1_orig: The raw matches between image 1 and image 0.
+    - mmkeypoints0_orig: The RANSAC inliers in image 0.
+    - mmkeypoints1_orig: The RANSAC inliers in image 1.
+    - mconf: The confidence scores for the raw matches.
+    - mmconf: The confidence scores for the RANSAC inliers.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `img0` | <class 'ndarray'> | `Required` | |
+
+| `img1` | <class 'ndarray'> | `Required` | |
+
+
+
+**Returns:** Dict[str, ndarray]
+
+
+---
+
+
+##### ImageMatchingAPI.get_buffer
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L826) |
+```python
+(self, target: str) -> 'Tensor'
+```
+
+
+Return the buffer given by ``target`` if it exists, otherwise throw an error.
+
+See the docstring for ``get_submodule`` for a more detailed
+explanation of this method's functionality as well as how to
+correctly specify ``target``.
+
+Args:
+    target: The fully-qualified string name of the buffer
+        to look for. (See ``get_submodule`` for how to specify a
+        fully-qualified string.)
+
+Returns:
+    torch.Tensor: The buffer referenced by ``target``
+
+Raises:
+    AttributeError: If the target string references an invalid
+        path or resolves to something that is not a
+        buffer
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `target` | <class 'str'> | `Required` | |
+
+
+
+**Returns:** Tensor
+
+
+---
+
+
+##### ImageMatchingAPI.get_extra_state
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L862) |
+```python
+(self) -> Any
+```
+
+
+Return any extra state to include in the module's state_dict.
+
+Implement this and a corresponding :func:`set_extra_state` for your module
+if you need to store extra state. This function is called when building the
+module's `state_dict()`.
+
+Note that extra state should be picklable to ensure working serialization
+of the state_dict. We only provide backwards compatibility guarantees
+for serializing Tensors; other objects may break backwards compatibility if
+their serialized pickled form changes.
+
+Returns:
+    object: Any extra state to store in the module's state_dict
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+
+
+**Returns:** Any
+
+
+---
+
+
+##### ImageMatchingAPI.get_parameter
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L790) |
+```python
+(self, target: str) -> 'Parameter'
+```
+
+
+Return the parameter given by ``target`` if it exists, otherwise throw an error.
+
+See the docstring for ``get_submodule`` for a more detailed
+explanation of this method's functionality as well as how to
+correctly specify ``target``.
+
+Args:
+    target: The fully-qualified string name of the Parameter
+        to look for. (See ``get_submodule`` for how to specify a
+        fully-qualified string.)
+
+Returns:
+    torch.nn.Parameter: The Parameter referenced by ``target``
+
+Raises:
+    AttributeError: If the target string references an invalid
+        path or resolves to something that is not an
+        ``nn.Parameter``
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `target` | <class 'str'> | `Required` | |
+
+
+
+**Returns:** Parameter
+
+
+---
+
+
+##### ImageMatchingAPI.get_submodule
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L666) |
+```python
+(self, target: str) -> 'Module'
+```
+
+
+Return the submodule given by ``target`` if it exists, otherwise throw an error.
+
+For example, let's say you have an ``nn.Module`` ``A`` that
+looks like this:
+
+.. code-block:: text
+
+    A(
+        (net_b): Module(
+            (net_c): Module(
+                (conv): Conv2d(16, 33, kernel_size=(3, 3), stride=(2, 2))
+            )
+            (linear): Linear(in_features=100, out_features=200, bias=True)
+        )
+    )
+
+(The diagram shows an ``nn.Module`` ``A``. ``A`` which has a nested
+submodule ``net_b``, which itself has two submodules ``net_c``
+and ``linear``. ``net_c`` then has a submodule ``conv``.)
+
+To check whether or not we have the ``linear`` submodule, we
+would call ``get_submodule("net_b.linear")``. To check whether
+we have the ``conv`` submodule, we would call
+``get_submodule("net_b.net_c.conv")``.
+
+The runtime of ``get_submodule`` is bounded by the degree
+of module nesting in ``target``. A query against
+``named_modules`` achieves the same result, but it is O(N) in
+the number of transitive modules. So, for a simple check to see
+if some submodule exists, ``get_submodule`` should always be
+used.
+
+Args:
+    target: The fully-qualified string name of the submodule
+        to look for. (See above example for how to specify a
+        fully-qualified string.)
+
+Returns:
+    torch.nn.Module: The submodule referenced by ``target``
+
+Raises:
+    AttributeError: If the target string references an invalid
+        path or resolves to something that is not an
+        ``nn.Module``
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `target` | <class 'str'> | `Required` | |
+
+
+
+**Returns:** Module
+
+
+---
+
+
+##### ImageMatchingAPI.half
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1159) |
+```python
+(self: ~T) -> ~T
+```
+
+
+Casts all floating point parameters and buffers to ``half`` datatype.
+
+.. note::
+    This method modifies the module in-place.
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.ipu
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1055) |
+```python
+(self: ~T, device: Union[int, torch.device, NoneType] = None) -> ~T
+```
+
+
+Move all model parameters and buffers to the IPU.
+
+This also makes associated parameters and buffers different objects. So
+it should be called before constructing the optimizer if the module will
+live on IPU while being optimized.
+
+.. note::
+    This method modifies the module in-place.
+
+Arguments:
+    device (int, optional): if specified, all parameters will be
+        copied to that device
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+| `device` | Union[int, device, NoneType] | `None` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.load_state_dict
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2473) |
+```python
+(self, state_dict: Mapping[str, Any], strict: bool = True, assign: bool = False)
+```
+
+
+Copy parameters and buffers from :attr:`state_dict` into this module and its descendants.
+
+If :attr:`strict` is ``True``, then
+the keys of :attr:`state_dict` must exactly match the keys returned
+by this module's :meth:`~torch.nn.Module.state_dict` function.
+
+.. warning::
+    If :attr:`assign` is ``True`` the optimizer must be created after
+    the call to :attr:`load_state_dict` unless
+    :func:`~torch.__future__.get_swap_module_params_on_conversion` is ``True``.
+
+Args:
+    state_dict (dict): a dict containing parameters and
+        persistent buffers.
+    strict (bool, optional): whether to strictly enforce that the keys
+        in :attr:`state_dict` match the keys returned by this module's
+        :meth:`~torch.nn.Module.state_dict` function. Default: ``True``
+    assign (bool, optional): When set to ``False``, the properties of the tensors
+        in the current module are preserved whereas setting it to ``True`` preserves
+        properties of the Tensors in the state dict. The only
+        exception is the ``requires_grad`` field of :class:`~torch.nn.Parameter`s
+        for which the value from the module is preserved.
+        Default: ``False``
+
+Returns:
+    ``NamedTuple`` with ``missing_keys`` and ``unexpected_keys`` fields:
+        * **missing_keys** is a list of str containing any keys that are expected
+            by this module but missing from the provided ``state_dict``.
+        * **unexpected_keys** is a list of str containing the keys that are not
+            expected by this module but present in the provided ``state_dict``.
+
+Note:
+    If a parameter or buffer is registered as ``None`` and its corresponding key
+    exists in :attr:`state_dict`, :meth:`load_state_dict` will raise a
+    ``RuntimeError``.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `state_dict` | Mapping[str, Any] | `Required` | |
+
+| `strict` | <class 'bool'> | `True` | |
+
+| `assign` | <class 'bool'> | `False` | |
+
+
+
+---
+
+
+##### ImageMatchingAPI.modules
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2748) |
+```python
+(self) -> Iterator[ForwardRef('Module')]
+```
+
+
+Return an iterator over all modules in the network.
+
+Yields:
+    Module: a module in the network
+
+Note:
+    Duplicate modules are returned only once. In the following
+    example, ``l`` will be returned only once.
+
+Example::
+
+    >>> l = nn.Linear(2, 2)
+    >>> net = nn.Sequential(l, l)
+    >>> for idx, m in enumerate(net.modules()):
+    ...     print(idx, '->', m)
+
+    0 -> Sequential(
+      (0): Linear(in_features=2, out_features=2, bias=True)
+      (1): Linear(in_features=2, out_features=2, bias=True)
+    )
+    1 -> Linear(in_features=2, out_features=2, bias=True)
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+
+
+**Returns:** Iterator[ForwardRef('Module')]
+
+
+---
+
+
+##### ImageMatchingAPI.mtia
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1093) |
+```python
+(self: ~T, device: Union[int, torch.device, NoneType] = None) -> ~T
+```
+
+
+Move all model parameters and buffers to the MTIA.
+
+This also makes associated parameters and buffers different objects. So
+it should be called before constructing the optimizer if the module will
+live on MTIA while being optimized.
+
+.. note::
+    This method modifies the module in-place.
+
+Arguments:
+    device (int, optional): if specified, all parameters will be
+        copied to that device
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+| `device` | Union[int, device, NoneType] | `None` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.named_buffers
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2688) |
+```python
+(self, prefix: str = '', recurse: bool = True, remove_duplicate: bool = True) -> Iterator[Tuple[str, torch.Tensor]]
+```
+
+
+Return an iterator over module buffers, yielding both the name of the buffer as well as the buffer itself.
+
+Args:
+    prefix (str): prefix to prepend to all buffer names.
+    recurse (bool, optional): if True, then yields buffers of this module
+        and all submodules. Otherwise, yields only buffers that
+        are direct members of this module. Defaults to True.
+    remove_duplicate (bool, optional): whether to remove the duplicated buffers in the result. Defaults to True.
+
+Yields:
+    (str, torch.Tensor): Tuple containing the name and buffer
+
+Example::
+
+    >>> # xdoctest: +SKIP("undefined vars")
+    >>> for name, buf in self.named_buffers():
+    >>>     if name in ['running_var']:
+    >>>         print(buf.size())
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `prefix` | <class 'str'> | `` | |
+
+| `recurse` | <class 'bool'> | `True` | |
+
+| `remove_duplicate` | <class 'bool'> | `True` | |
+
+
+
+**Returns:** Iterator[Tuple[str, Tensor]]
+
+
+---
+
+
+##### ImageMatchingAPI.named_children
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2728) |
+```python
+(self) -> Iterator[Tuple[str, ForwardRef('Module')]]
+```
+
+
+Return an iterator over immediate children modules, yielding both the name of the module as well as the module itself.
+
+Yields:
+    (str, Module): Tuple containing a name and child module
+
+Example::
+
+    >>> # xdoctest: +SKIP("undefined vars")
+    >>> for name, module in model.named_children():
+    >>>     if name in ['conv4', 'conv5']:
+    >>>         print(module)
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+
+
+**Returns:** Iterator[Tuple[str, ForwardRef('Module')]]
+
+
+---
+
+
+##### ImageMatchingAPI.named_modules
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2775) |
+```python
+(self, memo: Optional[Set[ForwardRef('Module')]] = None, prefix: str = '', remove_duplicate: bool = True)
+```
+
+
+Return an iterator over all modules in the network, yielding both the name of the module as well as the module itself.
+
+Args:
+    memo: a memo to store the set of modules already added to the result
+    prefix: a prefix that will be added to the name of the module
+    remove_duplicate: whether to remove the duplicated module instances in the result
+        or not
+
+Yields:
+    (str, Module): Tuple of name and module
+
+Note:
+    Duplicate modules are returned only once. In the following
+    example, ``l`` will be returned only once.
+
+Example::
+
+    >>> l = nn.Linear(2, 2)
+    >>> net = nn.Sequential(l, l)
+    >>> for idx, m in enumerate(net.named_modules()):
+    ...     print(idx, '->', m)
+
+    0 -> ('', Sequential(
+      (0): Linear(in_features=2, out_features=2, bias=True)
+      (1): Linear(in_features=2, out_features=2, bias=True)
+    ))
+    1 -> ('0', Linear(in_features=2, out_features=2, bias=True))
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `memo` | Optional[Set[ForwardRef('Module')]] | `None` | |
+
+| `prefix` | <class 'str'> | `` | |
+
+| `remove_duplicate` | <class 'bool'> | `True` | |
+
+
+
+---
+
+
+##### ImageMatchingAPI.named_parameters
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2633) |
+```python
+(self, prefix: str = '', recurse: bool = True, remove_duplicate: bool = True) -> Iterator[Tuple[str, torch.nn.parameter.Parameter]]
+```
+
+
+Return an iterator over module parameters, yielding both the name of the parameter as well as the parameter itself.
+
+Args:
+    prefix (str): prefix to prepend to all parameter names.
+    recurse (bool): if True, then yields parameters of this module
+        and all submodules. Otherwise, yields only parameters that
+        are direct members of this module.
+    remove_duplicate (bool, optional): whether to remove the duplicated
+        parameters in the result. Defaults to True.
+
+Yields:
+    (str, Parameter): Tuple containing the name and parameter
+
+Example::
+
+    >>> # xdoctest: +SKIP("undefined vars")
+    >>> for name, param in self.named_parameters():
+    >>>     if name in ['bias']:
+    >>>         print(param.size())
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `prefix` | <class 'str'> | `` | |
+
+| `recurse` | <class 'bool'> | `True` | |
+
+| `remove_duplicate` | <class 'bool'> | `True` | |
+
+
+
+**Returns:** Iterator[Tuple[str, nn.parameter.Parameter]]
+
+
+---
+
+
+##### ImageMatchingAPI.parameters
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2608) |
+```python
+(self, recurse: bool = True) -> Iterator[torch.nn.parameter.Parameter]
+```
+
+
+Return an iterator over module parameters.
+
+This is typically passed to an optimizer.
+
+Args:
+    recurse (bool): if True, then yields parameters of this module
+        and all submodules. Otherwise, yields only parameters that
+        are direct members of this module.
+
+Yields:
+    Parameter: module parameter
+
+Example::
+
+    >>> # xdoctest: +SKIP("undefined vars")
+    >>> for param in model.parameters():
+    >>>     print(type(param), param.size())
+    <class 'torch.Tensor'> (20L,)
+    <class 'torch.Tensor'> (20L, 1L, 5L, 5L)
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `recurse` | <class 'bool'> | `True` | |
+
+
+
+**Returns:** Iterator[nn.parameter.Parameter]
+
+
+---
+
+
+##### ImageMatchingAPI.register_backward_hook
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1394) |
+```python
+(self, hook: Callable[[ForwardRef('Module'), Union[Tuple[torch.Tensor, ...], torch.Tensor], Union[Tuple[torch.Tensor, ...], torch.Tensor]], Union[NoneType, Tuple[torch.Tensor, ...], torch.Tensor]]) -> torch.utils.hooks.RemovableHandle
+```
+
+
+Register a backward hook on the module.
+
+This function is deprecated in favor of :meth:`~torch.nn.Module.register_full_backward_hook` and
+the behavior of this function will change in future versions.
+
+Returns:
+    :class:`torch.utils.hooks.RemovableHandle`:
+        a handle that can be used to remove the added hook by calling
+        ``handle.remove()``
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `hook` | Callable[[ForwardRef('Module'), Union[Tuple[Tensor, ...], Tensor], Union[Tuple[Tensor, ...], Tensor]], Union[NoneType, Tuple[Tensor, ...], Tensor]] | `Required` | |
+
+
+
+**Returns:** <class 'utils.hooks.RemovableHandle'>
+
+
+---
+
+
+##### ImageMatchingAPI.register_buffer
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L522) |
+```python
+(self, name: str, tensor: Optional[torch.Tensor], persistent: bool = True) -> None
+```
+
+
+Add a buffer to the module.
+
+This is typically used to register a buffer that should not to be
+considered a model parameter. For example, BatchNorm's ``running_mean``
+is not a parameter, but is part of the module's state. Buffers, by
+default, are persistent and will be saved alongside parameters. This
+behavior can be changed by setting :attr:`persistent` to ``False``. The
+only difference between a persistent buffer and a non-persistent buffer
+is that the latter will not be a part of this module's
+:attr:`state_dict`.
+
+Buffers can be accessed as attributes using given names.
+
+Args:
+    name (str): name of the buffer. The buffer can be accessed
+        from this module using the given name
+    tensor (Tensor or None): buffer to be registered. If ``None``, then operations
+        that run on buffers, such as :attr:`cuda`, are ignored. If ``None``,
+        the buffer is **not** included in the module's :attr:`state_dict`.
+    persistent (bool): whether the buffer is part of this module's
+        :attr:`state_dict`.
+
+Example::
+
+    >>> # xdoctest: +SKIP("undefined vars")
+    >>> self.register_buffer('running_mean', torch.zeros(num_features))
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `name` | <class 'str'> | `Required` | |
+
+| `tensor` | Optional[Tensor] | `Required` | |
+
+| `persistent` | <class 'bool'> | `True` | |
+
+
+
+**Returns:** None
+
+
+---
+
+
+##### ImageMatchingAPI.register_forward_hook
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1646) |
+```python
+(self, hook: Union[Callable[[~T, Tuple[Any, ...], Any], Optional[Any]], Callable[[~T, Tuple[Any, ...], Dict[str, Any], Any], Optional[Any]]], *, prepend: bool = False, with_kwargs: bool = False, always_call: bool = False) -> torch.utils.hooks.RemovableHandle
+```
+
+
+Register a forward hook on the module.
+
+The hook will be called every time after :func:`forward` has computed an output.
+
+If ``with_kwargs`` is ``False`` or not specified, the input contains only
+the positional arguments given to the module. Keyword arguments won't be
+passed to the hooks and only to the ``forward``. The hook can modify the
+output. It can modify the input inplace but it will not have effect on
+forward since this is called after :func:`forward` is called. The hook
+should have the following signature::
+
+    hook(module, args, output) -> None or modified output
+
+If ``with_kwargs`` is ``True``, the forward hook will be passed the
+``kwargs`` given to the forward function and be expected to return the
+output possibly modified. The hook should have the following signature::
+
+    hook(module, args, kwargs, output) -> None or modified output
+
+Args:
+    hook (Callable): The user defined hook to be registered.
+    prepend (bool): If ``True``, the provided ``hook`` will be fired
+        before all existing ``forward`` hooks on this
+        :class:`torch.nn.modules.Module`. Otherwise, the provided
+        ``hook`` will be fired after all existing ``forward`` hooks on
+        this :class:`torch.nn.modules.Module`. Note that global
+        ``forward`` hooks registered with
+        :func:`register_module_forward_hook` will fire before all hooks
+        registered by this method.
+        Default: ``False``
+    with_kwargs (bool): If ``True``, the ``hook`` will be passed the
+        kwargs given to the forward function.
+        Default: ``False``
+    always_call (bool): If ``True`` the ``hook`` will be run regardless of
+        whether an exception is raised while calling the Module.
+        Default: ``False``
+
+Returns:
+    :class:`torch.utils.hooks.RemovableHandle`:
+        a handle that can be used to remove the added hook by calling
+        ``handle.remove()``
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `hook` | Union[Callable[[~T, Tuple[Any, ...], Any], Optional[Any]], Callable[[~T, Tuple[Any, ...], Dict[str, Any], Any], Optional[Any]]] | `Required` | |
+
+| `prepend` | <class 'bool'> | `False` | |
+
+| `with_kwargs` | <class 'bool'> | `False` | |
+
+| `always_call` | <class 'bool'> | `False` | |
+
+
+
+**Returns:** <class 'utils.hooks.RemovableHandle'>
+
+
+---
+
+
+##### ImageMatchingAPI.register_forward_pre_hook
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1580) |
+```python
+(self, hook: Union[Callable[[~T, Tuple[Any, ...]], Optional[Any]], Callable[[~T, Tuple[Any, ...], Dict[str, Any]], Optional[Tuple[Any, Dict[str, Any]]]]], *, prepend: bool = False, with_kwargs: bool = False) -> torch.utils.hooks.RemovableHandle
+```
+
+
+Register a forward pre-hook on the module.
+
+The hook will be called every time before :func:`forward` is invoked.
+
+
+If ``with_kwargs`` is false or not specified, the input contains only
+the positional arguments given to the module. Keyword arguments won't be
+passed to the hooks and only to the ``forward``. The hook can modify the
+input. User can either return a tuple or a single modified value in the
+hook. We will wrap the value into a tuple if a single value is returned
+(unless that value is already a tuple). The hook should have the
+following signature::
+
+    hook(module, args) -> None or modified input
+
+If ``with_kwargs`` is true, the forward pre-hook will be passed the
+kwargs given to the forward function. And if the hook modifies the
+input, both the args and kwargs should be returned. The hook should have
+the following signature::
+
+    hook(module, args, kwargs) -> None or a tuple of modified input and kwargs
+
+Args:
+    hook (Callable): The user defined hook to be registered.
+    prepend (bool): If true, the provided ``hook`` will be fired before
+        all existing ``forward_pre`` hooks on this
+        :class:`torch.nn.modules.Module`. Otherwise, the provided
+        ``hook`` will be fired after all existing ``forward_pre`` hooks
+        on this :class:`torch.nn.modules.Module`. Note that global
+        ``forward_pre`` hooks registered with
+        :func:`register_module_forward_pre_hook` will fire before all
+        hooks registered by this method.
+        Default: ``False``
+    with_kwargs (bool): If true, the ``hook`` will be passed the kwargs
+        given to the forward function.
+        Default: ``False``
+
+Returns:
+    :class:`torch.utils.hooks.RemovableHandle`:
+        a handle that can be used to remove the added hook by calling
+        ``handle.remove()``
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `hook` | Union[Callable[[~T, Tuple[Any, ...]], Optional[Any]], Callable[[~T, Tuple[Any, ...], Dict[str, Any]], Optional[Tuple[Any, Dict[str, Any]]]]] | `Required` | |
+
+| `prepend` | <class 'bool'> | `False` | |
+
+| `with_kwargs` | <class 'bool'> | `False` | |
+
+
+
+**Returns:** <class 'utils.hooks.RemovableHandle'>
+
+
+---
+
+
+##### ImageMatchingAPI.register_full_backward_hook
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1420) |
+```python
+(self, hook: Callable[[ForwardRef('Module'), Union[Tuple[torch.Tensor, ...], torch.Tensor], Union[Tuple[torch.Tensor, ...], torch.Tensor]], Union[NoneType, Tuple[torch.Tensor, ...], torch.Tensor]], prepend: bool = False) -> torch.utils.hooks.RemovableHandle
+```
+
+
+Register a backward hook on the module.
+
+The hook will be called every time the gradients with respect to a module
+are computed, i.e. the hook will execute if and only if the gradients with
+respect to module outputs are computed. The hook should have the following
+signature::
+
+    hook(module, grad_input, grad_output) -> tuple(Tensor) or None
+
+The :attr:`grad_input` and :attr:`grad_output` are tuples that contain the gradients
+with respect to the inputs and outputs respectively. The hook should
+not modify its arguments, but it can optionally return a new gradient with
+respect to the input that will be used in place of :attr:`grad_input` in
+subsequent computations. :attr:`grad_input` will only correspond to the inputs given
+as positional arguments and all kwarg arguments are ignored. Entries
+in :attr:`grad_input` and :attr:`grad_output` will be ``None`` for all non-Tensor
+arguments.
+
+For technical reasons, when this hook is applied to a Module, its forward function will
+receive a view of each Tensor passed to the Module. Similarly the caller will receive a view
+of each Tensor returned by the Module's forward function.
+
+.. warning ::
+    Modifying inputs or outputs inplace is not allowed when using backward hooks and
+    will raise an error.
+
+Args:
+    hook (Callable): The user-defined hook to be registered.
+    prepend (bool): If true, the provided ``hook`` will be fired before
+        all existing ``backward`` hooks on this
+        :class:`torch.nn.modules.Module`. Otherwise, the provided
+        ``hook`` will be fired after all existing ``backward`` hooks on
+        this :class:`torch.nn.modules.Module`. Note that global
+        ``backward`` hooks registered with
+        :func:`register_module_full_backward_hook` will fire before
+        all hooks registered by this method.
+
+Returns:
+    :class:`torch.utils.hooks.RemovableHandle`:
+        a handle that can be used to remove the added hook by calling
+        ``handle.remove()``
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `hook` | Callable[[ForwardRef('Module'), Union[Tuple[Tensor, ...], Tensor], Union[Tuple[Tensor, ...], Tensor]], Union[NoneType, Tuple[Tensor, ...], Tensor]] | `Required` | |
+
+| `prepend` | <class 'bool'> | `False` | |
+
+
+
+**Returns:** <class 'utils.hooks.RemovableHandle'>
+
+
+---
+
+
+##### ImageMatchingAPI.register_full_backward_pre_hook
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1345) |
+```python
+(self, hook: Callable[[ForwardRef('Module'), Union[Tuple[torch.Tensor, ...], torch.Tensor]], Union[NoneType, Tuple[torch.Tensor, ...], torch.Tensor]], prepend: bool = False) -> torch.utils.hooks.RemovableHandle
+```
+
+
+Register a backward pre-hook on the module.
+
+The hook will be called every time the gradients for the module are computed.
+The hook should have the following signature::
+
+    hook(module, grad_output) -> tuple[Tensor] or None
+
+The :attr:`grad_output` is a tuple. The hook should
+not modify its arguments, but it can optionally return a new gradient with
+respect to the output that will be used in place of :attr:`grad_output` in
+subsequent computations. Entries in :attr:`grad_output` will be ``None`` for
+all non-Tensor arguments.
+
+For technical reasons, when this hook is applied to a Module, its forward function will
+receive a view of each Tensor passed to the Module. Similarly the caller will receive a view
+of each Tensor returned by the Module's forward function.
+
+.. warning ::
+    Modifying inputs inplace is not allowed when using backward hooks and
+    will raise an error.
+
+Args:
+    hook (Callable): The user-defined hook to be registered.
+    prepend (bool): If true, the provided ``hook`` will be fired before
+        all existing ``backward_pre`` hooks on this
+        :class:`torch.nn.modules.Module`. Otherwise, the provided
+        ``hook`` will be fired after all existing ``backward_pre`` hooks
+        on this :class:`torch.nn.modules.Module`. Note that global
+        ``backward_pre`` hooks registered with
+        :func:`register_module_full_backward_pre_hook` will fire before
+        all hooks registered by this method.
+
+Returns:
+    :class:`torch.utils.hooks.RemovableHandle`:
+        a handle that can be used to remove the added hook by calling
+        ``handle.remove()``
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `hook` | Callable[[ForwardRef('Module'), Union[Tuple[Tensor, ...], Tensor]], Union[NoneType, Tuple[Tensor, ...], Tensor]] | `Required` | |
+
+| `prepend` | <class 'bool'> | `False` | |
+
+
+
+**Returns:** <class 'utils.hooks.RemovableHandle'>
+
+
+---
+
+
+##### ImageMatchingAPI.register_load_state_dict_post_hook
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2263) |
+```python
+(self, hook)
+```
+
+
+Register a post-hook to be run after module's :meth:`~nn.Module.load_state_dict` is called.
+
+It should have the following signature::
+    hook(module, incompatible_keys) -> None
+
+The ``module`` argument is the current module that this hook is registered
+on, and the ``incompatible_keys`` argument is a ``NamedTuple`` consisting
+of attributes ``missing_keys`` and ``unexpected_keys``. ``missing_keys``
+is a ``list`` of ``str`` containing the missing keys and
+``unexpected_keys`` is a ``list`` of ``str`` containing the unexpected keys.
+
+The given incompatible_keys can be modified inplace if needed.
+
+Note that the checks performed when calling :func:`load_state_dict` with
+``strict=True`` are affected by modifications the hook makes to
+``missing_keys`` or ``unexpected_keys``, as expected. Additions to either
+set of keys will result in an error being thrown when ``strict=True``, and
+clearing out both missing and unexpected keys will avoid an error.
+
+Returns:
+    :class:`torch.utils.hooks.RemovableHandle`:
+        a handle that can be used to remove the added hook by calling
+        ``handle.remove()``
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `hook` | Any | `Required` | |
+
+
+
+---
+
+
+##### ImageMatchingAPI.register_load_state_dict_pre_hook
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2251) |
+```python
+(self, hook)
+```
+
+
+Register a pre-hook to be run before module's :meth:`~nn.Module.load_state_dict` is called.
+
+It should have the following signature::
+    hook(module, state_dict, prefix, local_metadata, strict, missing_keys, unexpected_keys, error_msgs) -> None  # noqa: B950
+
+Arguments:
+    hook (Callable): Callable hook that will be invoked before
+        loading the state dict.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `hook` | Any | `Required` | |
+
+
+
+---
+
+
+##### ImageMatchingAPI.register_module
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L662) |
+```python
+(self, name: str, module: Optional[ForwardRef('Module')]) -> None
+```
+
+
+Alias for :func:`add_module`.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `name` | <class 'str'> | `Required` | |
+
+| `module` | Optional[ForwardRef('Module')] | `Required` | |
+
+
+
+**Returns:** None
+
+
+---
+
+
+##### ImageMatchingAPI.register_parameter
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L584) |
+```python
+(self, name: str, param: Optional[torch.nn.parameter.Parameter]) -> None
+```
+
+
+Add a parameter to the module.
+
+The parameter can be accessed as an attribute using given name.
+
+Args:
+    name (str): name of the parameter. The parameter can be accessed
+        from this module using the given name
+    param (Parameter or None): parameter to be added to the module. If
+        ``None``, then operations that run on parameters, such as :attr:`cuda`,
+        are ignored. If ``None``, the parameter is **not** included in the
+        module's :attr:`state_dict`.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `name` | <class 'str'> | `Required` | |
+
+| `param` | Optional[nn.parameter.Parameter] | `Required` | |
+
+
+
+**Returns:** None
+
+
+---
+
+
+##### ImageMatchingAPI.register_state_dict_post_hook
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2061) |
+```python
+(self, hook)
+```
+
+
+Register a post-hook for the :meth:`~torch.nn.Module.state_dict` method.
+
+It should have the following signature::
+    hook(module, state_dict, prefix, local_metadata) -> None
+
+The registered hooks can modify the ``state_dict`` inplace.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `hook` | Any | `Required` | |
+
+
+
+---
+
+
+##### ImageMatchingAPI.register_state_dict_pre_hook
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2085) |
+```python
+(self, hook)
+```
+
+
+Register a pre-hook for the :meth:`~torch.nn.Module.state_dict` method.
+
+It should have the following signature::
+    hook(module, prefix, keep_vars) -> None
+
+The registered hooks can be used to perform pre-processing before the ``state_dict``
+call is made.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `hook` | Any | `Required` | |
+
+
+
+---
+
+
+##### ImageMatchingAPI.requires_grad_
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2864) |
+```python
+(self: ~T, requires_grad: bool = True) -> ~T
+```
+
+
+Change if autograd should record operations on parameters in this module.
+
+This method sets the parameters' :attr:`requires_grad` attributes
+in-place.
+
+This method is helpful for freezing part of the module for finetuning
+or training parts of a model individually (e.g., GAN training).
+
+See :ref:`locally-disable-grad-doc` for a comparison between
+`.requires_grad_()` and several similar mechanisms that may be confused with it.
+
+Args:
+    requires_grad (bool): whether autograd should record operations on
+                          parameters in this module. Default: ``True``.
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+| `requires_grad` | <class 'bool'> | `True` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.set_extra_state
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L883) |
+```python
+(self, state: Any) -> None
+```
+
+
+Set extra state contained in the loaded `state_dict`.
+
+This function is called from :func:`load_state_dict` to handle any extra state
+found within the `state_dict`. Implement this function and a corresponding
+:func:`get_extra_state` for your module if you need to store extra state within its
+`state_dict`.
+
+Args:
+    state (dict): Extra state from the `state_dict`
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `state` | Any | `Required` | |
+
+
+
+**Returns:** None
+
+
+---
+
+
+##### ImageMatchingAPI.set_model
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/api/core.py#L96) |
+```python
+(self, model_name: str, max_keypoints: int = None, threshold: float = None)
+```
+
+
+Switch to a different vismatch model.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `model_name` | <class 'str'> | `Required` | |
+
+| `max_keypoints` | <class 'int'> | `None` | |
+
+| `threshold` | <class 'float'> | `None` | |
+
+
+
+---
+
+
+##### ImageMatchingAPI.set_submodule
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L731) |
+```python
+(self, target: str, module: 'Module') -> None
+```
+
+
+Set the submodule given by ``target`` if it exists, otherwise throw an error.
+
+For example, let's say you have an ``nn.Module`` ``A`` that
+looks like this:
+
+.. code-block:: text
+
+    A(
+        (net_b): Module(
+            (net_c): Module(
+                (conv): Conv2d(16, 33, kernel_size=(3, 3), stride=(2, 2))
+            )
+            (linear): Linear(in_features=100, out_features=200, bias=True)
+        )
+    )
+
+(The diagram shows an ``nn.Module`` ``A``. ``A`` has a nested
+submodule ``net_b``, which itself has two submodules ``net_c``
+and ``linear``. ``net_c`` then has a submodule ``conv``.)
+
+To overide the ``Conv2d`` with a new submodule ``Linear``, you
+would call
+``set_submodule("net_b.net_c.conv", nn.Linear(33, 16))``.
+
+Args:
+    target: The fully-qualified string name of the submodule
+        to look for. (See above example for how to specify a
+        fully-qualified string.)
+    module: The module to set the submodule to.
+
+Raises:
+    ValueError: If the target string is empty
+    AttributeError: If the target string references an invalid
+        path or resolves to something that is not an
+        ``nn.Module``
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `target` | <class 'str'> | `Required` | |
+
+| `module` | Module | `Required` | |
+
+
+
+**Returns:** None
+
+
+---
+
+
+##### ImageMatchingAPI.share_memory
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2915) |
+```python
+(self: ~T) -> ~T
+```
+
+
+See :meth:`torch.Tensor.share_memory_`.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.state_dict
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2142) |
+```python
+(self, *args, destination=None, prefix='', keep_vars=False)
+```
+
+
+Return a dictionary containing references to the whole state of the module.
+
+Both parameters and persistent buffers (e.g. running averages) are
+included. Keys are corresponding parameter and buffer names.
+Parameters and buffers set to ``None`` are not included.
+
+.. note::
+    The returned object is a shallow copy. It contains references
+    to the module's parameters and buffers.
+
+.. warning::
+    Currently ``state_dict()`` also accepts positional arguments for
+    ``destination``, ``prefix`` and ``keep_vars`` in order. However,
+    this is being deprecated and keyword arguments will be enforced in
+    future releases.
+
+.. warning::
+    Please avoid the use of argument ``destination`` as it is not
+    designed for end-users.
+
+Args:
+    destination (dict, optional): If provided, the state of module will
+        be updated into the dict and the same object is returned.
+        Otherwise, an ``OrderedDict`` will be created and returned.
+        Default: ``None``.
+    prefix (str, optional): a prefix added to parameter and buffer
+        names to compose the keys in state_dict. Default: ``''``.
+    keep_vars (bool, optional): by default the :class:`~torch.Tensor` s
+        returned in the state dict are detached from autograd. If it's
+        set to ``True``, detaching will not be performed.
+        Default: ``False``.
+
+Returns:
+    dict:
+        a dictionary containing a whole state of the module
+
+Example::
+
+    >>> # xdoctest: +SKIP("undefined vars")
+    >>> module.state_dict().keys()
+    ['bias', 'weight']
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `args` | Any | `Required` | |
+
+| `destination` | Any | `None` | |
+
+| `prefix` | Any | `` | |
+
+| `keep_vars` | Any | `False` | |
+
+
+
+---
+
+
+##### ImageMatchingAPI.to
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1216) |
+```python
+(self, *args, **kwargs)
+```
+
+
+Move and/or cast the parameters and buffers.
+
+This can be called as
+
+.. function:: to(device=None, dtype=None, non_blocking=False)
+   :noindex:
+
+.. function:: to(dtype, non_blocking=False)
+   :noindex:
+
+.. function:: to(tensor, non_blocking=False)
+   :noindex:
+
+.. function:: to(memory_format=torch.channels_last)
+   :noindex:
+
+Its signature is similar to :meth:`torch.Tensor.to`, but only accepts
+floating point or complex :attr:`dtype`\ s. In addition, this method will
+only cast the floating point or complex parameters and buffers to :attr:`dtype`
+(if given). The integral parameters and buffers will be moved
+:attr:`device`, if that is given, but with dtypes unchanged. When
+:attr:`non_blocking` is set, it tries to convert/move asynchronously
+with respect to the host if possible, e.g., moving CPU Tensors with
+pinned memory to CUDA devices.
+
+See below for examples.
+
+.. note::
+    This method modifies the module in-place.
+
+Args:
+    device (:class:`torch.device`): the desired device of the parameters
+        and buffers in this module
+    dtype (:class:`torch.dtype`): the desired floating point or complex dtype of
+        the parameters and buffers in this module
+    tensor (torch.Tensor): Tensor whose dtype and device are the desired
+        dtype and device for all parameters and buffers in this module
+    memory_format (:class:`torch.memory_format`): the desired memory
+        format for 4D parameters and buffers in this module (keyword
+        only argument)
+
+Returns:
+    Module: self
+
+Examples::
+
+    >>> # xdoctest: +IGNORE_WANT("non-deterministic")
+    >>> linear = nn.Linear(2, 2)
+    >>> linear.weight
+    Parameter containing:
+    tensor([[ 0.1913, -0.3420],
+            [-0.5113, -0.2325]])
+    >>> linear.to(torch.double)
+    Linear(in_features=2, out_features=2, bias=True)
+    >>> linear.weight
+    Parameter containing:
+    tensor([[ 0.1913, -0.3420],
+            [-0.5113, -0.2325]], dtype=torch.float64)
+    >>> # xdoctest: +REQUIRES(env:TORCH_DOCTEST_CUDA1)
+    >>> gpu1 = torch.device("cuda:1")
+    >>> linear.to(gpu1, dtype=torch.half, non_blocking=True)
+    Linear(in_features=2, out_features=2, bias=True)
+    >>> linear.weight
+    Parameter containing:
+    tensor([[ 0.1914, -0.3420],
+            [-0.5112, -0.2324]], dtype=torch.float16, device='cuda:1')
+    >>> cpu = torch.device("cpu")
+    >>> linear.to(cpu)
+    Linear(in_features=2, out_features=2, bias=True)
+    >>> linear.weight
+    Parameter containing:
+    tensor([[ 0.1914, -0.3420],
+            [-0.5112, -0.2324]], dtype=torch.float16)
+
+    >>> linear = nn.Linear(2, 2, bias=None).to(torch.cdouble)
+    >>> linear.weight
+    Parameter containing:
+    tensor([[ 0.3741+0.j,  0.2382+0.j],
+            [ 0.5593+0.j, -0.4443+0.j]], dtype=torch.complex128)
+    >>> linear(torch.ones(3, 2, dtype=torch.cdouble))
+    tensor([[0.6122+0.j, 0.1150+0.j],
+            [0.6122+0.j, 0.1150+0.j],
+            [0.6122+0.j, 0.1150+0.j]], dtype=torch.complex128)
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `args` | Any | `Required` | |
+
+| `kwargs` | Any | `Required` | |
+
+
+
+---
+
+
+##### ImageMatchingAPI.to_empty
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1181) |
+```python
+(self: ~T, *, device: Union[int, str, torch.device, NoneType], recurse: bool = True) -> ~T
+```
+
+
+Move the parameters and buffers to the specified device without copying storage.
+
+Args:
+    device (:class:`torch.device`): The desired device of the parameters
+        and buffers in this module.
+    recurse (bool): Whether parameters and buffers of submodules should
+        be recursively moved to the specified device.
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+| `device` | Union[int, str, device, NoneType] | `Required` | |
+
+| `recurse` | <class 'bool'> | `True` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.train
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2824) |
+```python
+(self: ~T, mode: bool = True) -> ~T
+```
+
+
+Set the module in training mode.
+
+This has an effect only on certain modules. See the documentation of
+particular modules for details of their behaviors in training/evaluation
+mode, i.e., whether they are affected, e.g. :class:`Dropout`, :class:`BatchNorm`,
+etc.
+
+Args:
+    mode (bool): whether to set training mode (``True``) or evaluation
+                 mode (``False``). Default: ``True``.
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+| `mode` | <class 'bool'> | `True` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.type
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1123) |
+```python
+(self: ~T, dst_type: Union[torch.dtype, str]) -> ~T
+```
+
+
+Casts all parameters and buffers to :attr:`dst_type`.
+
+.. note::
+    This method modifies the module in-place.
+
+Args:
+    dst_type (type or string): the desired type
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+| `dst_type` | Union[dtype, str] | `Required` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.visualize
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/api/core.py#L251) |
+```python
+(self, log_path: Optional[pathlib.Path] = None) -> None
+```
+
+
+Visualize the matches.
+
+Args:
+    log_path (Path, optional): The directory to save the images. Defaults to None.
+
+Returns:
+    None
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `log_path` | Optional[pathlib.Path] | `None` | |
+
+
+
+**Returns:** None
+
+
+---
+
+
+##### ImageMatchingAPI.xpu
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L1074) |
+```python
+(self: ~T, device: Union[int, torch.device, NoneType] = None) -> ~T
+```
+
+
+Move all model parameters and buffers to the XPU.
+
+This also makes associated parameters and buffers different objects. So
+it should be called before constructing optimizer if the module will
+live on XPU while being optimized.
+
+.. note::
+    This method modifies the module in-place.
+
+Arguments:
+    device (int, optional): if specified, all parameters will be
+        copied to that device
+
+Returns:
+    Module: self
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | ~T | `Required` | |
+
+| `device` | Union[int, device, NoneType] | `None` | |
+
+
+
+**Returns:** ~T
+
+
+---
+
+
+##### ImageMatchingAPI.zero_grad
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/opt/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py#L2887) |
+```python
+(self, set_to_none: bool = True) -> None
+```
+
+
+Reset gradients of all model parameters.
+
+See similar function under :class:`torch.optim.Optimizer` for more context.
+
+Args:
+    set_to_none (bool): instead of setting to zero, set the grads to None.
+        See :meth:`torch.optim.Optimizer.zero_grad` for details.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `self` | Any | `Required` | |
+
+| `set_to_none` | <class 'bool'> | `True` | |
+
+
+
+**Returns:** None
+
+
+---
+
+
+---
+
+
+## imcui.ui.geometry
+
+
+Geometry and RANSAC utilities for the UI module.
+
+
+### Variables
+
+
+- **`DEFAULT_MIN_NUM_MATCHES`** (int): `4`
+
+- **`DEFAULT_RANSAC_CONFIDENCE`** (float): `0.9999`
+
+- **`DEFAULT_RANSAC_MAX_ITER`** (int): `10000`
+
+- **`DEFAULT_RANSAC_METHOD`** (str): `CV2_USAC_MAGSAC`
+
+- **`DEFAULT_RANSAC_REPROJ_THRESHOLD`** (int): `8`
+
+
+
+### Functions
+
+
+#### compute_geometry
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/geometry.py#L240) |
+```python
+compute_geometry(pred: Dict[str, Any], ransac_method: str = 'CV2_USAC_MAGSAC', ransac_reproj_threshold: float = 8, ransac_confidence: float = 0.9999, ransac_max_iter: int = 10000) -> Dict[str, List[float]]
+```
+
+
+Compute geometric information of matches, including Fundamental matrix,
+Homography matrix, and rectification matrices (if available).
+
+Args:
+    pred (Dict[str, Any]): dict of matches, including original keypoints.
+    ransac_method (str, optional): RANSAC method. Defaults to DEFAULT_RANSAC_METHOD.
+    ransac_reproj_threshold (float, optional): RANSAC reprojection threshold. Defaults to DEFAULT_RANSAC_REPROJ_THRESHOLD.
+    ransac_confidence (float, optional): RANSAC confidence. Defaults to DEFAULT_RANSAC_CONFIDENCE.
+    ransac_max_iter (int, optional): RANSAC maximum iterations. Defaults to DEFAULT_RANSAC_MAX_ITER.
+
+Returns:
+    Dict[str, List[float]]: geometric information in form of a dict.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `pred` | Dict[str, Any] | `Required` | |
+
+| `ransac_method` | <class 'str'> | `CV2_USAC_MAGSAC` | |
+
+| `ransac_reproj_threshold` | <class 'float'> | `8` | |
+
+| `ransac_confidence` | <class 'float'> | `0.9999` | |
+
+| `ransac_max_iter` | <class 'int'> | `10000` | |
+
+
+
+**Returns:** Dict[str, List[float]]
+
+
+---
+
+
+#### filter_matches
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/geometry.py#L167) |
+```python
+filter_matches(pred: Dict[str, Any], ransac_method: str = 'CV2_USAC_MAGSAC', ransac_reproj_threshold: float = 8, ransac_confidence: float = 0.9999, ransac_max_iter: int = 10000, ransac_estimator: str = None)
+```
+
+
+Filter matches using RANSAC. If keypoints are available, filter by keypoints.
+If lines are available, filter by lines. If both keypoints and lines are
+available, filter by keypoints.
+
+Args:
+    pred (Dict[str, Any]): dict of matches, including original keypoints.
+    ransac_method (str, optional): RANSAC method. Defaults to DEFAULT_RANSAC_METHOD.
+    ransac_reproj_threshold (float, optional): RANSAC reprojection threshold. Defaults to DEFAULT_RANSAC_REPROJ_THRESHOLD.
+    ransac_confidence (float, optional): RANSAC confidence. Defaults to DEFAULT_RANSAC_CONFIDENCE.
+    ransac_max_iter (int, optional): RANSAC maximum iterations. Defaults to DEFAULT_RANSAC_MAX_ITER.
+
+Returns:
+    Dict[str, Any]: filtered matches.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `pred` | Dict[str, Any] | `Required` | |
+
+| `ransac_method` | <class 'str'> | `CV2_USAC_MAGSAC` | |
+
+| `ransac_reproj_threshold` | <class 'float'> | `8` | |
+
+| `ransac_confidence` | <class 'float'> | `0.9999` | |
+
+| `ransac_max_iter` | <class 'int'> | `10000` | |
+
+| `ransac_estimator` | <class 'str'> | `None` | |
+
+
+
+---
+
+
+#### filter_matches_opencv
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/geometry.py#L20) |
+```python
+filter_matches_opencv(kp0: numpy.ndarray, kp1: numpy.ndarray, method: int = 8, reproj_threshold: float = 3.0, confidence: float = 0.99, max_iter: int = 2000, geometry_type: str = 'Homography') -> Tuple[numpy.ndarray, numpy.ndarray]
+```
+
+
+Filters matches between two sets of keypoints using OpenCV's findHomography.
+
+Args:
+    kp0 (np.ndarray): Array of keypoints from the first image.
+    kp1 (np.ndarray): Array of keypoints from the second image.
+    method (int, optional): RANSAC method. Defaults to "cv2.RANSAC".
+    reproj_threshold (float, optional): RANSAC reprojection threshold. Defaults to 3.0.
+    confidence (float, optional): RANSAC confidence. Defaults to 0.99.
+    max_iter (int, optional): RANSAC maximum iterations. Defaults to 2000.
+    geometry_type (str, optional): Type of geometry. Defaults to "Homography".
+
+Returns:
+    Tuple[np.ndarray, np.ndarray]: Homography matrix and mask.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `kp0` | <class 'ndarray'> | `Required` | |
+
+| `kp1` | <class 'ndarray'> | `Required` | |
+
+| `method` | <class 'int'> | `8` | |
+
+| `reproj_threshold` | <class 'float'> | `3.0` | |
+
+| `confidence` | <class 'float'> | `0.99` | |
+
+| `max_iter` | <class 'int'> | `2000` | |
+
+| `geometry_type` | <class 'str'> | `Homography` | |
+
+
+
+**Returns:** Tuple[ndarray, ndarray]
+
+
+---
+
+
+#### filter_matches_poselib
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/geometry.py#L76) |
+```python
+filter_matches_poselib(kp0: numpy.ndarray, kp1: numpy.ndarray, method: int = None, reproj_threshold: float = 3, confidence: float = 0.99, max_iter: int = 2000, geometry_type: str = 'Homography') -> dict
+```
+
+
+Filters matches between two sets of keypoints using the poselib library.
+
+Args:
+    kp0 (np.ndarray): Array of keypoints from the first image.
+    kp1 (np.ndarray): Array of keypoints from the second image.
+    method (str, optional): RANSAC method. Defaults to "RANSAC".
+    reproj_threshold (float, optional): RANSAC reprojection threshold. Defaults to 3.
+    confidence (float, optional): RANSAC confidence. Defaults to 0.99.
+    max_iter (int, optional): RANSAC maximum iterations. Defaults to 2000.
+    geometry_type (str, optional): Type of geometry. Defaults to "Homography".
+
+Returns:
+    dict: Information about the homography estimation.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `kp0` | <class 'ndarray'> | `Required` | |
+
+| `kp1` | <class 'ndarray'> | `Required` | |
+
+| `method` | <class 'int'> | `None` | |
+
+| `reproj_threshold` | <class 'float'> | `3` | |
+
+| `confidence` | <class 'float'> | `0.99` | |
+
+| `max_iter` | <class 'int'> | `2000` | |
+
+| `geometry_type` | <class 'str'> | `Homography` | |
+
+
+
+**Returns:** <class 'dict'>
+
+
+---
+
+
+#### process_ransac_matches
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/geometry.py#L118) |
+```python
+process_ransac_matches(mkpts0: numpy.ndarray, mkpts1: numpy.ndarray, ransac_method: str = 'CV2_USAC_MAGSAC', ransac_reproj_threshold: float = 3.0, ransac_confidence: float = 0.99, ransac_max_iter: int = 2000, geometry_type: str = 'Homography')
+```
+
+
+No documentation available.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `mkpts0` | <class 'ndarray'> | `Required` | |
+
+| `mkpts1` | <class 'ndarray'> | `Required` | |
+
+| `ransac_method` | <class 'str'> | `CV2_USAC_MAGSAC` | |
+
+| `ransac_reproj_threshold` | <class 'float'> | `3.0` | |
+
+| `ransac_confidence` | <class 'float'> | `0.99` | |
+
+| `ransac_max_iter` | <class 'int'> | `2000` | |
+
+| `geometry_type` | <class 'str'> | `Homography` | |
+
+
+
+---
+
+
+#### set_null_pred
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/geometry.py#L153) |
+```python
+set_null_pred(feature_type: str, pred: dict)
+```
+
+
+Set prediction to null values for the given feature type.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `feature_type` | <class 'str'> | `Required` | |
+
+| `pred` | <class 'dict'> | `Required` | |
+
+
+
+---
+
+
+## imcui.ui.matching
+
+
+Matching utilities for the UI module.
+
+
+### Variables
+
+
+- **`DEFAULT_RANSAC_CONFIDENCE`** (float): `0.9999`
+
+- **`DEFAULT_RANSAC_MAX_ITER`** (int): `10000`
+
+- **`DEFAULT_RANSAC_METHOD`** (str): `CV2_USAC_MAGSAC`
+
+- **`DEFAULT_RANSAC_REPROJ_THRESHOLD`** (int): `8`
+
+- **`DEFAULT_SETTING_GEOMETRY`** (str): `Homography`
+
+
+
+### Functions
+
+
+#### convert_vismatch_result
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/matching.py#L50) |
+```python
+convert_vismatch_result(result: Dict[str, Any], img0: numpy.ndarray, img1: numpy.ndarray) -> Dict[str, numpy.ndarray]
+```
+
+
+Convert vismatch result format to UI expected format.
+
+vismatch returns:
+- matched_kpts0, matched_kpts1: raw matches
+- inlier_kpts0, inlier_kpts1: RANSAC inliers
+- H: homography matrix
+
+UI expects:
+- image0_orig, image1_orig: original images
+- keypoints0_orig, keypoints1_orig: all detected keypoints
+- mkeypoints0_orig, mkeypoints1_orig: raw matches
+- mmkeypoints0_orig, mmkeypoints1_orig: RANSAC inliers
+- mconf, mmconf: confidence scores
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `result` | Dict[str, Any] | `Required` | |
+
+| `img0` | <class 'ndarray'> | `Required` | |
+
+| `img1` | <class 'ndarray'> | `Required` | |
+
+
+
+**Returns:** Dict[str, ndarray]
+
+
+---
+
+
+#### generate_fake_outputs
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/matching.py#L119) |
+```python
+generate_fake_outputs(output_keypoints, output_matches_raw, output_matches_ransac, match_conf, extract_conf, pred)
+```
+
+
+Generate placeholder outputs for progressive display during matching.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `output_keypoints` | Any | `Required` | |
+
+| `output_matches_raw` | Any | `Required` | |
+
+| `output_matches_ransac` | Any | `Required` | |
+
+| `match_conf` | Any | `Required` | |
+
+| `extract_conf` | Any | `Required` | |
+
+| `pred` | Any | `Required` | |
+
+
+
+---
+
+
+#### run_matching
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/matching.py#L146) |
+```python
+run_matching(image0: numpy.ndarray, image1: numpy.ndarray, match_threshold: float, extract_max_keypoints: int, keypoint_threshold: float, key: str, ransac_method: str = 'CV2_USAC_MAGSAC', ransac_reproj_threshold: int = 8, ransac_confidence: float = 0.9999, ransac_max_iter: int = 10000, choice_geometry_type: str = 'Homography', matcher_zoo: Dict[str, Any] = None, force_resize: bool = False, image_width: int = 640, image_height: int = 480, use_cached_model: bool = True) -> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, Dict[str, int], Dict[str, Dict[str, Any]], Dict[str, Dict[str, float]], numpy.ndarray]
+```
+
+
+Match two images using vismatch.
+
+Args:
+    image0 (np.ndarray): RGB image 0.
+    image1 (np.ndarray): RGB image 1.
+    match_threshold (float): match threshold.
+    extract_max_keypoints (int): number of keypoints to extract.
+    keypoint_threshold (float): keypoint threshold.
+    key (str): key of the model to use.
+    ransac_method (str, optional): RANSAC method to use.
+    ransac_reproj_threshold (int, optional): RANSAC reprojection threshold.
+    ransac_confidence (float, optional): RANSAC confidence level.
+    ransac_max_iter (int, optional): RANSAC maximum number of iterations.
+    choice_geometry_type (str, optional): setting of geometry estimation.
+    matcher_zoo (Dict[str, Any], optional): matcher zoo. Defaults to None.
+    force_resize (bool, optional): force resize. Defaults to False.
+    image_width (int, optional): image width. Defaults to 640.
+    image_height (int, optional): image height. Defaults to 480.
+    use_cached_model (bool, optional): use cached model. Defaults to True.
+
+Returns:
+    tuple:
+        - output_keypoints (np.ndarray): image with keypoints.
+        - output_matches_raw (np.ndarray): image with raw matches.
+        - output_matches_ransac (np.ndarray): image with RANSAC matches.
+        - num_matches (Dict[str, int]): number of raw and RANSAC matches.
+        - configs (Dict[str, Dict[str, Any]]): match and feature extraction configs.
+        - geom_info (Dict[str, Dict[str, float]]): geometry information.
+        - output_wrapped (np.ndarray): wrapped images.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `image0` | <class 'ndarray'> | `Required` | |
+
+| `image1` | <class 'ndarray'> | `Required` | |
+
+| `match_threshold` | <class 'float'> | `Required` | |
+
+| `extract_max_keypoints` | <class 'int'> | `Required` | |
+
+| `keypoint_threshold` | <class 'float'> | `Required` | |
+
+| `key` | <class 'str'> | `Required` | |
+
+| `ransac_method` | <class 'str'> | `CV2_USAC_MAGSAC` | |
+
+| `ransac_reproj_threshold` | <class 'int'> | `8` | |
+
+| `ransac_confidence` | <class 'float'> | `0.9999` | |
+
+| `ransac_max_iter` | <class 'int'> | `10000` | |
+
+| `choice_geometry_type` | <class 'str'> | `Homography` | |
+
+| `matcher_zoo` | Dict[str, Any] | `None` | |
+
+| `force_resize` | <class 'bool'> | `False` | |
+
+| `image_width` | <class 'int'> | `640` | |
+
+| `image_height` | <class 'int'> | `480` | |
+
+| `use_cached_model` | <class 'bool'> | `True` | |
+
+
+
+**Returns:** Tuple[ndarray, ndarray, ndarray, Dict[str, int], Dict[str, Dict[str, Any]], Dict[str, Dict[str, float]], ndarray]
+
+
+---
+
+
+#### run_ransac
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/matching.py#L378) |
+```python
+run_ransac(state_cache: Dict[str, Any], choice_geometry_type: str, ransac_method: str = 'CV2_USAC_MAGSAC', ransac_reproj_threshold: int = 8, ransac_confidence: float = 0.9999, ransac_max_iter: int = 10000) -> Tuple[Optional[numpy.ndarray], Optional[Dict[str, int]]]
+```
+
+
+Run RANSAC matches and return the output images and the number of matches.
+
+Args:
+    state_cache (Dict[str, Any]): Current state of the app, including the matches.
+    ransac_method (str, optional): RANSAC method. Defaults to DEFAULT_RANSAC_METHOD.
+    ransac_reproj_threshold (int, optional): RANSAC reprojection threshold. Defaults to DEFAULT_RANSAC_REPROJ_THRESHOLD.
+    ransac_confidence (float, optional): RANSAC confidence. Defaults to DEFAULT_RANSAC_CONFIDENCE.
+    ransac_max_iter (int, optional): RANSAC maximum iterations. Defaults to DEFAULT_RANSAC_MAX_ITER.
+
+Returns:
+    Tuple[Optional[np.ndarray], Optional[Dict[str, int]]]: Tuple containing the output images and the number of matches.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `state_cache` | Dict[str, Any] | `Required` | |
+
+| `choice_geometry_type` | <class 'str'> | `Required` | |
+
+| `ransac_method` | <class 'str'> | `CV2_USAC_MAGSAC` | |
+
+| `ransac_reproj_threshold` | <class 'int'> | `8` | |
+
+| `ransac_confidence` | <class 'float'> | `0.9999` | |
+
+| `ransac_max_iter` | <class 'int'> | `10000` | |
+
+
+
+**Returns:** Tuple[Optional[ndarray], Optional[Dict[str, int]]]
+
+
+---
+
+
+#### send_to_match
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/matching.py#L29) |
+```python
+send_to_match(state_cache: Dict[str, Any]) -> Tuple[Optional[numpy.ndarray], Optional[numpy.ndarray]]
+```
+
+
+Send the state cache to the match function.
+
+Args:
+    state_cache (Dict[str, Any]): Current state of the app.
+
+Returns:
+    Tuple of (image0, wrapped_image) or (None, None) if state_cache is empty.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `state_cache` | Dict[str, Any] | `Required` | |
+
+
+
+**Returns:** Tuple[Optional[ndarray], Optional[ndarray]]
+
+
+---
+
+
+## imcui.ui.visualization
+
+
+No module documentation available.
+
+
+### Functions
+
+
+#### add_text
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L29) |
+```python
+add_text(idx, text, pos=(0.01, 0.99), fs=15, color='w', lcolor='k', lwidth=2, ha='left', va='top')
+```
+
+
+Add text to a matplotlib figure.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `idx` | Any | `Required` | |
+
+| `text` | Any | `Required` | |
+
+| `pos` | Any | `(0.01, 0.99)` | |
+
+| `fs` | Any | `15` | |
+
+| `color` | Any | `w` | |
+
+| `lcolor` | Any | `k` | |
+
+| `lwidth` | Any | `2` | |
+
+| `ha` | Any | `left` | |
+
+| `va` | Any | `top` | |
+
+
+
+---
+
+
+#### display_keypoints
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L416) |
+```python
+display_keypoints(pred: dict, titles: List[str] = [])
+```
+
+
+No documentation available.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `pred` | <class 'dict'> | `Required` | |
+
+| `titles` | List[str] | `[]` | |
+
+
+
+---
+
+
+#### display_matches
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L431) |
+```python
+display_matches(pred: Dict[str, numpy.ndarray], titles: List[str] = [], texts: List[str] = [], dpi: int = 300, tag: str = 'KPTS_RAW') -> Tuple[numpy.ndarray, int]
+```
+
+
+Displays the matches between two images.
+
+Args:
+    pred: Dictionary containing the original images and the matches.
+    titles: Optional titles for the plot.
+    dpi: Resolution of the plot.
+
+Returns:
+    The resulting concatenated plot and the number of inliers.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `pred` | Dict[str, ndarray] | `Required` | |
+
+| `titles` | List[str] | `[]` | |
+
+| `texts` | List[str] | `[]` | |
+
+| `dpi` | <class 'int'> | `300` | |
+
+| `tag` | <class 'str'> | `KPTS_RAW` | |
+
+
+
+**Returns:** Tuple[ndarray, int]
+
+
+---
+
+
+#### draw_image_pairs
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L359) |
+```python
+draw_image_pairs(img0: numpy.ndarray, img1: numpy.ndarray, text: List[str] = [], dpi: int = 75, path: Optional[str] = None, pad: float = 0.5) -> numpy.ndarray
+```
+
+
+Draw image pair horizontally.
+
+Args:
+    img0: First image, with shape (H, W, 3)
+    img1: Second image, with shape (H, W, 3)
+    text: List of strings to print. Each string is a new line.
+    dpi: DPI of the figure.
+    path: Path to save the image to. If None, the image is not saved and
+        the function returns the figure as a numpy array with shape
+        (height, width, 3) and dtype uint8 containing the RGB values of the
+        figure.
+    pad: Padding between subplots
+
+Returns:
+    The figure as a numpy array with shape (height, width, 3) and dtype uint8
+    containing the RGB values of the figure, or None if path is not None.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `img0` | <class 'ndarray'> | `Required` | |
+
+| `img1` | <class 'ndarray'> | `Required` | |
+
+| `text` | List[str] | `[]` | |
+
+| `dpi` | <class 'int'> | `75` | |
+
+| `path` | Optional[str] | `None` | |
+
+| `pad` | <class 'float'> | `0.5` | |
+
+
+
+**Returns:** <class 'ndarray'>
+
+
+---
+
+
+#### draw_matches_core
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L292) |
+```python
+draw_matches_core(mkpts0: List[numpy.ndarray], mkpts1: List[numpy.ndarray], img0: numpy.ndarray, img1: numpy.ndarray, conf: numpy.ndarray, titles: Optional[List[str]] = None, texts: Optional[List[str]] = None, dpi: int = 150, path: Optional[str] = None, pad: float = 0.5) -> numpy.ndarray
+```
+
+
+Draw matches between two images.
+
+Args:
+    mkpts0: List of matches from the first image, with shape (N, 2)
+    mkpts1: List of matches from the second image, with shape (N, 2)
+    img0: First image, with shape (H, W, 3)
+    img1: Second image, with shape (H, W, 3)
+    conf: Confidence values for the matches, with shape (N,)
+    titles: Optional list of title strings for the plot
+    dpi: DPI for the saved image
+    path: Optional path to save the image to. If None, the image is not saved.
+    pad: Padding between subplots
+
+Returns:
+    The figure as a numpy array with shape (height, width, 3) and dtype uint8
+    containing the RGB values of the figure.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `mkpts0` | List[ndarray] | `Required` | |
+
+| `mkpts1` | List[ndarray] | `Required` | |
+
+| `img0` | <class 'ndarray'> | `Required` | |
+
+| `img1` | <class 'ndarray'> | `Required` | |
+
+| `conf` | <class 'ndarray'> | `Required` | |
+
+| `titles` | Optional[List[str]] | `None` | |
+
+| `texts` | Optional[List[str]] | `None` | |
+
+| `dpi` | <class 'int'> | `150` | |
+
+| `path` | Optional[str] | `None` | |
+
+| `pad` | <class 'float'> | `0.5` | |
+
+
+
+**Returns:** <class 'ndarray'>
+
+
+---
+
+
+#### error_colormap
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L248) |
+```python
+error_colormap(err: numpy.ndarray, thr: float, alpha: float = 1.0) -> numpy.ndarray
+```
+
+
+Create a colormap based on the error values.
+
+Args:
+    err: Error values as a numpy array of shape (N,).
+    thr: Threshold value for the error.
+    alpha: Alpha value for the colormap, between 0 and 1.
+
+Returns:
+    Colormap as a numpy array of shape (N, 4) with values in [0, 1].
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `err` | <class 'ndarray'> | `Required` | |
+
+| `thr` | <class 'float'> | `Required` | |
+
+| `alpha` | <class 'float'> | `1.0` | |
+
+
+
+**Returns:** <class 'ndarray'>
+
+
+---
+
+
+#### figure_to_numpy_array
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L269) |
+```python
+figure_to_numpy_array(fig: matplotlib.figure.Figure) -> numpy.ndarray
+```
+
+
+Convert a matplotlib figure to a numpy array with RGB values.
+
+Args:
+    fig: A matplotlib figure.
+
+Returns:
+    A numpy array with shape (height, width, 3) and dtype uint8 containing
+    the RGB values of the figure.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `fig` | <class 'matplotlib.figure.Figure'> | `Required` | |
+
+
+
+**Returns:** <class 'ndarray'>
+
+
+---
+
+
+#### make_matching_figure
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L151) |
+```python
+make_matching_figure(img0: numpy.ndarray, img1: numpy.ndarray, mkpts0: numpy.ndarray, mkpts1: numpy.ndarray, color: numpy.ndarray, titles: Optional[List[str]] = None, kpts0: Optional[numpy.ndarray] = None, kpts1: Optional[numpy.ndarray] = None, text: List[str] = [], dpi: int = 75, path: Optional[pathlib.Path] = None, pad: float = 0.0) -> Optional[matplotlib.figure.Figure]
+```
+
+
+Draw image pair with matches.
+
+Args:
+    img0: image0 as HxWx3 numpy array.
+    img1: image1 as HxWx3 numpy array.
+    mkpts0: matched points in image0 as Nx2 numpy array.
+    mkpts1: matched points in image1 as Nx2 numpy array.
+    color: colors for the matches as Nx4 numpy array.
+    titles: titles for the two subplots.
+    kpts0: keypoints in image0 as Kx2 numpy array.
+    kpts1: keypoints in image1 as Kx2 numpy array.
+    text: list of strings to display in the top-left corner of the image.
+    dpi: dots per inch of the saved figure.
+    path: if not None, save the figure to this path.
+    pad: padding around the image as a fraction of the image size.
+
+Returns:
+    The matplotlib Figure object if path is None.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `img0` | <class 'ndarray'> | `Required` | |
+
+| `img1` | <class 'ndarray'> | `Required` | |
+
+| `mkpts0` | <class 'ndarray'> | `Required` | |
+
+| `mkpts1` | <class 'ndarray'> | `Required` | |
+
+| `color` | <class 'ndarray'> | `Required` | |
+
+| `titles` | Optional[List[str]] | `None` | |
+
+| `kpts0` | Optional[ndarray] | `None` | |
+
+| `kpts1` | Optional[ndarray] | `None` | |
+
+| `text` | List[str] | `[]` | |
+
+| `dpi` | <class 'int'> | `75` | |
+
+| `path` | Optional[pathlib.Path] | `None` | |
+
+| `pad` | <class 'float'> | `0.0` | |
+
+
+
+**Returns:** Optional[matplotlib.figure.Figure]
+
+
+---
+
+
+#### plot_color_line_matches
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L96) |
+```python
+plot_color_line_matches(lines: List[numpy.ndarray], correct_matches: Optional[numpy.ndarray] = None, lw: float = 2.0, indices: Tuple[int, int] = (0, 1)) -> matplotlib.figure.Figure
+```
+
+
+Plot line matches for existing images with multiple colors.
+
+Args:
+    lines: List of ndarrays of size (N, 2, 2) representing line segments.
+    correct_matches: Optional bool array of size (N,) indicating correct
+        matches. If not None, display wrong matches with a low alpha.
+    lw: Line width as float pixels.
+    indices: Indices of the images to draw the matches on.
+
+Returns:
+    The modified matplotlib figure.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `lines` | List[ndarray] | `Required` | |
+
+| `correct_matches` | Optional[ndarray] | `None` | |
+
+| `lw` | <class 'float'> | `2.0` | |
+
+| `indices` | Tuple[int, int] | `(0, 1)` | |
+
+
+
+**Returns:** <class 'matplotlib.figure.Figure'>
+
+
+---
+
+
+#### plot_images
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L54) |
+```python
+plot_images(imgs: List[numpy.ndarray], titles: Optional[List[str]] = None, cmaps: Union[str, List[str]] = 'gray', dpi: int = 100, size: Optional[int] = 5, pad: float = 0.5) -> matplotlib.figure.Figure
+```
+
+
+Plot a set of images horizontally.
+Args:
+    imgs: a list of NumPy or PyTorch images, RGB (H, W, 3) or mono (H, W).
+    titles: a list of strings, as titles for each image.
+    cmaps: colormaps for monochrome images. If a single string is given,
+        it is used for all images.
+    dpi: DPI of the figure.
+    size: figure size in inches (width). If not provided, the figure
+        size is determined automatically.
+    pad: padding between subplots, in inches.
+Returns:
+    The created figure.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `imgs` | List[ndarray] | `Required` | |
+
+| `titles` | Optional[List[str]] | `None` | |
+
+| `cmaps` | Union[str, List[str]] | `gray` | |
+
+| `dpi` | <class 'int'> | `100` | |
+
+| `size` | Optional[int] | `5` | |
+
+| `pad` | <class 'float'> | `0.5` | |
+
+
+
+**Returns:** <class 'matplotlib.figure.Figure'>
+
+
+---
+
+
+#### plot_keypoints
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py#L17) |
+```python
+plot_keypoints(kpts, colors='lime', ps=4)
+```
+
+
+Plot keypoints for existing images.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `kpts` | Any | `Required` | |
+
+| `colors` | Any | `lime` | |
+
+| `ps` | Any | `4` | |
+
+
+
+---
+
+
+## imcui.ui.image_utils
+
+
+Image manipulation utilities for the UI.
+
+
+### Functions
+
+
+#### generate_warp_images
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/image_utils.py#L70) |
+```python
+generate_warp_images(input_image0: numpy.ndarray, input_image1: numpy.ndarray, matches_info: Dict[str, Any], choice: str) -> Tuple[Optional[numpy.ndarray], Optional[numpy.ndarray]]
+```
+
+
+Changes the estimate of the geometric transformation used to align the images.
+
+Args:
+    input_image0: First input image.
+    input_image1: Second input image.
+    matches_info: Dictionary containing information about the matches.
+    choice: Type of geometric transformation to use ('Homography' or 'Fundamental') or 'No' to disable.
+
+Returns:
+    A tuple containing the updated images and the warpped images.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `input_image0` | <class 'ndarray'> | `Required` | |
+
+| `input_image1` | <class 'ndarray'> | `Required` | |
+
+| `matches_info` | Dict[str, Any] | `Required` | |
+
+| `choice` | <class 'str'> | `Required` | |
+
+
+
+**Returns:** Tuple[Optional[ndarray], Optional[ndarray]]
+
+
+---
+
+
+#### rotate_image
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/image_utils.py#L105) |
+```python
+rotate_image(input_path: Union[str, pathlib.Path], degrees: float, output_path: Union[str, pathlib.Path])
+```
+
+
+Rotate an image by the specified degrees.
+
+Args:
+    input_path: Path to the input image.
+    degrees: Degrees to rotate (counter-clockwise).
+    output_path: Path to save the rotated image.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `input_path` | Union[str, pathlib.Path] | `Required` | |
+
+| `degrees` | <class 'float'> | `Required` | |
+
+| `output_path` | Union[str, pathlib.Path] | `Required` | |
+
+
+
+---
+
+
+#### scale_image
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/image_utils.py#L120) |
+```python
+scale_image(input_path: Union[str, pathlib.Path], scale_factor: float, output_path: Union[str, pathlib.Path])
+```
+
+
+Scale an image by the specified factor (with padding to maintain aspect ratio).
+
+Args:
+    input_path: Path to the input image.
+    scale_factor: Scale factor (e.g., 0.5 for half size).
+    output_path: Path to save the scaled image.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `input_path` | Union[str, pathlib.Path] | `Required` | |
+
+| `scale_factor` | <class 'float'> | `Required` | |
+
+| `output_path` | Union[str, pathlib.Path] | `Required` | |
+
+
+
+---
+
+
+#### wrap_images
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/image_utils.py#L15) |
+```python
+wrap_images(img0: numpy.ndarray, img1: numpy.ndarray, geo_info: Optional[Dict[str, List[float]]], geom_type: str) -> Tuple[Optional[str], Optional[Dict[str, List[float]]]]
+```
+
+
+Wraps the images based on the geometric transformation used to align them.
+
+Args:
+    img0: numpy array representing the first image.
+    img1: numpy array representing the second image.
+    geo_info: dictionary containing the geometric transformation information.
+    geom_type: type of geometric transformation used to align the images.
+
+Returns:
+    A tuple containing a base64 encoded image string and a dictionary with the transformation matrix.
+
+
+**Parameters:**
+
+
+| Parameter | Type | Default | Description |
+
+|-----------|------|---------|-------------|
+
+| `img0` | <class 'ndarray'> | `Required` | |
+
+| `img1` | <class 'ndarray'> | `Required` | |
+
+| `geo_info` | Optional[Dict[str, List[float]]] | `Required` | |
+
+| `geom_type` | <class 'str'> | `Required` | |
+
+
+
+**Returns:** Tuple[Optional[str], Optional[Dict[str, List[float]]]]
+
+
+---
+
+
+## imcui.ui.config_utils
+
+
+Configuration and path utility functions.
+
+This module provides centralized utilities for configuration management
+and path resolution, eliminating code duplication across entry points.
+
+
+### Functions
+
+
+#### get_default_config_path
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/config_utils.py#L12) |
+```python
+get_default_config_path() -> pathlib.Path
+```
+
+
+Get the default configuration file path.
+
+Search order:
+    1. cwd/app.yaml
+    2. cwd/config/app.yaml
+    3. Package default: imcui/config/app.yaml
+
+Returns:
+    Path: Path to the configuration file to use.
+
+
+**Returns:** <class 'pathlib.Path'>
+
+
+---
+
+
+#### get_example_data_path
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/config_utils.py#L36) |
+```python
+get_example_data_path() -> pathlib.Path
+```
+
+
+Get the example data directory path with auto-download support.
+
+Search order:
+    1. IMCUI_DATA_DIR environment variable
+    2. Package datasets (development mode with git clone)
+    3. User cache directory with auto-download from HuggingFace
+
+Returns:
+    Path: Path to the example datasets directory.
+
+
+**Returns:** <class 'pathlib.Path'>
+
+
+---
+
+
+#### get_version
+
+
+[View Source](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/config_utils.py#L132) |
+```python
+get_version() -> str
+```
+
+
+Get the package version (single source of truth).
+
+Attempts to read from installed package metadata first,
+falls back to reading pyproject.toml for development mode.
+
+Returns:
+    str: Version string (e.g., "1.0.0" or "dev").
+
+
+**Returns:** <class 'str'>
+
+
+---

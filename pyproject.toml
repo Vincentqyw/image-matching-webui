@@ -27,7 +27,6 @@ dynamic = ["dependencies"]
 [project.optional-dependencies]
 dev = ["black", "flake8", "isort", "tomli"]  # tomli for Python < 3.11
 datasets = ["datasets"]  # Optional: for auto-downloading example images
-docs = ["sphinx>=7.0.0,<8.0.0", "sphinx-rtd-theme>=1.3.0,<2.0.0", "myst-parser>=2.0.0,<3.0.0", "autodocsumm>=0.2.0,<1.0.0"]  # Documentation
 
 
 [tool.setuptools]
