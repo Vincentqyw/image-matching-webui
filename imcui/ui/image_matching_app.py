@@ -129,6 +129,9 @@ class ImageMatchingApp:
                             button_run = gr.Button(value="Run Match", variant="primary")
                         with gr.Row():
                             button_stop = gr.Button(value="Force Stop", variant="stop")
+                            button_swap_image = gr.Button(
+                                value="Swap Image", variant="secondary"
+                            )
 
                         with gr.Accordion("Advanced Setting", open=False):
                             with gr.Tab("Matching Setting"):
@@ -408,6 +411,13 @@ class ImageMatchingApp:
                         outputs=[input_image0, input_image1],
                     )
 
+                    # Swap images button action
+                    button_swap_image.click(
+                        fn=self.swap_images,
+                        inputs=[input_image0, input_image1],
+                        outputs=[input_image0, input_image1],
+                    )
+
                     # estimate geo
                     choice_geometry_type.change(
                         fn=generate_warp_images,
@@ -492,6 +502,24 @@ class ImageMatchingApp:
 
     def _on_select_force_resize(self, visible: bool = False):
         return gr.update(visible=visible), gr.update(visible=visible)
+
+    def swap_images(
+        self,
+        image0: Optional[np.ndarray],
+        image1: Optional[np.ndarray],
+    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+        """
+        Swap the two input images.
+
+        Args:
+            image0: The first input image.
+            image1: The second input image.
+
+        Returns:
+            tuple: A tuple containing (image1, image0) - the swapped images.
+        """
+        logger.info("Swapping images...")
+        return image1, image0
 
     def ui_reset_state(
         self,
