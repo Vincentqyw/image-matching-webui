@@ -3,14 +3,14 @@
 import gradio as gr
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Union
-
+import kornia as K
 from loguru import logger
 from vismatch import available_models, get_matcher
 
 from .visualization import figure_to_numpy_array, plot_images  # noqa: F401
 
 # Constants
-DEVICE = "cuda" if __import__("torch").cuda.is_available() else "cpu"
+DEVICE = K.utils.get_cuda_or_mps_device_if_available()
 GRADIO_VERSION = gr.__version__.split(".")[0]
 
 # Default values

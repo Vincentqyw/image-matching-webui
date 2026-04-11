@@ -11,8 +11,9 @@ class ARCSizeAwareModelCache:
     def __init__(
         self,
         max_gpu_mem: float = 8e9,
+        max_mps_mem: float = 8e9,
         max_cpu_mem: float = 12e9,
-        device_priority: list = ["cuda", "cpu"],
+        device_priority: list = ["cuda", "mps", "cpu"],
         auto_empty_cache: bool = True,
     ):
         """
@@ -20,6 +21,7 @@ class ARCSizeAwareModelCache:
 
         Args:
             max_gpu_mem: Maximum GPU memory allowed in bytes.
+            max_mps_mem: Maximum MPS memory allowed in bytes.
             max_cpu_mem: Maximum CPU memory allowed in bytes.
             device_priority: List of devices to prioritize when evicting models.
             auto_empty_cache: Whether to call torch.cuda.empty_cache() when out of memory.
@@ -31,8 +33,10 @@ class ARCSizeAwareModelCache:
         self.b2 = OrderedDict()
 
         self.max_gpu = max_gpu_mem
+        self.max_mps = max_mps_mem
         self.max_cpu = max_cpu_mem
         self.current_gpu = 0
+        self.current_mps = 0
         self.current_cpu = 0
 
         self.p = 0
@@ -73,6 +77,13 @@ class ARCSizeAwareModelCache:
             if device == "cuda" and torch.cuda.is_available():
                 if self.current_gpu + model_size <= self.max_gpu:
                     return "cuda"
+            elif (
+                device == "mps"
+                and hasattr(torch.backends, "mps")
+                and torch.backends.mps.is_available()
+            ):
+                if self.current_mps + model_size <= self.max_mps:
+                    return "mps"
             elif device == "cpu":
                 if self.current_cpu + model_size <= self.max_cpu:
                     return "cpu"
@@ -137,14 +148,16 @@ class ARCSizeAwareModelCache:
 
             if v["device"] == "cuda":
                 self.current_gpu -= v["size"]
+            elif v["device"] == "mps":
+                self.current_mps -= v["size"]
             else:
                 self.current_cpu -= v["size"]
 
             if freed >= required_size:
                 return True
 
-        if target_device == "cuda":
-            return self._cross_device_evict(required_size, "cuda")
+        if target_device in ["cuda", "mps"]:
+            return self._cross_device_evict(required_size, target_device)
         return False
 
     def _cross_device_evict(self, required_size: int, target_device: str) -> bool:
@@ -167,6 +180,8 @@ class ARCSizeAwareModelCache:
 
             if v["device"] == "cuda":
                 self.current_gpu -= v["size"]
+            elif v["device"] == "mps":
+                self.current_mps -= v["size"]
             else:
                 self.current_cpu -= v["size"]
 
@@ -193,14 +208,23 @@ class ARCSizeAwareModelCache:
                 torch.cuda.synchronize()
 
             while True:
-                current_mem = self.current_gpu if device == "cuda" else self.current_cpu
-                max_mem = self.max_gpu if device == "cuda" else self.max_cpu
+                if device == "cuda":
+                    current_mem = self.current_gpu
+                    max_mem = self.max_gpu
+                elif device == "mps":
+                    current_mem = self.current_mps
+                    max_mem = self.max_mps
+                else:
+                    current_mem = self.current_cpu
+                    max_mem = self.max_cpu
 
                 if current_mem + model_size <= max_mem:
                     break
 
                 if not self._evict_models(model_size, device):
                     if device == "cuda":
+                        device = "mps"
+                    elif device == "mps":
                         device = "cpu"
                     else:
                         raise RuntimeError("Out of memory")
@@ -229,6 +253,8 @@ class ARCSizeAwareModelCache:
 
             if device == "cuda":
                 self.current_gpu += model_size
+            elif device == "mps":
+                self.current_mps += model_size
             else:
                 self.current_cpu += model_size
 
@@ -246,13 +272,16 @@ class LRUModelCache:
     def __init__(
         self,
         max_gpu_mem: float = 8e9,
+        max_mps_mem: float = 8e9,
         max_cpu_mem: float = 12e9,
-        device_priority: list = ["cuda", "cpu"],
+        device_priority: list = ["cuda", "mps", "cpu"],
     ):
         self.cache = OrderedDict()
         self.max_gpu = max_gpu_mem
+        self.max_mps = max_mps_mem
         self.max_cpu = max_cpu_mem
         self.current_gpu = 0
+        self.current_mps = 0
         self.current_cpu = 0
         self.lock = threading.Lock()
         self.device_priority = device_priority
@@ -266,6 +295,13 @@ class LRUModelCache:
         for device in self.device_priority:
             if device == "cuda" and torch.cuda.is_available():
                 if self.current_gpu < self.max_gpu:
+                    return device
+            elif (
+                device == "mps"
+                and hasattr(torch.backends, "mps")
+                and torch.backends.mps.is_available()
+            ):
+                if self.current_mps < self.max_mps:
                     return device
             elif device == "cpu":
                 if self.current_cpu < self.max_cpu:
@@ -304,13 +340,17 @@ class LRUModelCache:
             model_size = self._calculate_model_size(model)
 
             while (
-                device == "cuda" and (self.current_gpu + model_size > self.max_gpu)
-            ) or (device == "cpu" and (self.current_cpu + model_size > self.max_cpu)):
+                (device == "cuda" and (self.current_gpu + model_size > self.max_gpu))
+                or (device == "mps" and (self.current_mps + model_size > self.max_mps))
+                or (device == "cpu" and (self.current_cpu + model_size > self.max_cpu))
+            ):
                 if not self._free_space(model_size, device):
                     raise RuntimeError("Insufficient memory even after cache cleanup")
 
             if device == "cuda":
                 self.current_gpu += model_size
+            elif device == "mps":
+                self.current_mps += model_size
             else:
                 self.current_cpu += model_size
 
@@ -325,13 +365,18 @@ class LRUModelCache:
 
     def _free_space(self, required_size: int, device: str) -> bool:
         for key in list(self.cache.keys()):
-            if (device == "cuda" and self.cache[key]["device"] == "cuda") or (
-                device == "cpu" and self.cache[key]["device"] == "cpu"
+            if (
+                (device == "cuda" and self.cache[key]["device"] == "cuda")
+                or (device == "mps" and self.cache[key]["device"] == "mps")
+                or (device == "cpu" and self.cache[key]["device"] == "cpu")
             ):
                 self.current_gpu -= (
                     self.cache[key]["size"]
                     if self.cache[key]["device"] == "cuda"
                     else 0
+                )
+                self.current_mps -= (
+                    self.cache[key]["size"] if self.cache[key]["device"] == "mps" else 0
                 )
                 self.current_cpu -= (
                     self.cache[key]["size"] if self.cache[key]["device"] == "cpu" else 0
@@ -339,10 +384,18 @@ class LRUModelCache:
                 del self.cache[key]
 
                 if (
-                    device == "cuda"
-                    and self.current_gpu + required_size <= self.max_gpu
-                ) or (
-                    device == "cpu" and self.current_cpu + required_size <= self.max_cpu
+                    (
+                        device == "cuda"
+                        and self.current_gpu + required_size <= self.max_gpu
+                    )
+                    or (
+                        device == "mps"
+                        and self.current_mps + required_size <= self.max_mps
+                    )
+                    or (
+                        device == "cpu"
+                        and self.current_cpu + required_size <= self.max_cpu
+                    )
                 ):
                     return True
         return False
@@ -350,6 +403,7 @@ class LRUModelCache:
     def _handle_oom(self, model_key, model_loader_func, model_conf: dict):
         with self.lock:
             self.clear_device_cache("cuda")
+            self.clear_device_cache("mps")
             torch.cuda.empty_cache()
 
             try:
@@ -367,5 +421,6 @@ class LRUModelCache:
             keys_to_remove = [k for k, v in self.cache.items() if v["device"] == device]
             for k in keys_to_remove:
                 self.current_gpu -= self.cache[k]["size"] if device == "cuda" else 0
+                self.current_mps -= self.cache[k]["size"] if device == "mps" else 0
                 self.current_cpu -= self.cache[k]["size"] if device == "cpu" else 0
                 del self.cache[k]
