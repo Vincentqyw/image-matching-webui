@@ -8,7 +8,7 @@ assignees:
 
 ## 🐛 Bug Report
 
-<!-- A clear and concise description of what the bug is. -->
+{/* A clear and concise description of what the bug is. */}
 
 ## 🔬 How To Reproduce
 
@@ -27,4 +27,4 @@ python --version
 
 ## 📎 Additional context
 
-<!-- Add any other context about the problem here. -->
+{/* Add any other context about the problem here. */}

@@ -1,0 +1,178 @@
+---
+title: "Configuration"
+description: "Customize Image Matching WebUI behavior with YAML configuration"
+---
+
+# Configuration
+
+Image Matching WebUI uses YAML configuration files to customize behavior and default parameters.
+
+
+## Configuration File Location
+
+Configuration files are loaded in priority order (first found):
+
+1. **Custom path**: `-c /path/to/config.yaml`
+2. **Working directory**: `./app.yaml`
+3. **Config subdirectory**: `./config/app.yaml`
+4. **Package default**: `imcui/config/app.yaml`
+
+
+## Essential Settings
+
+### Device Selection
+
+Device is automatically detected at runtime based on your hardware:
+
+- **CUDA**: Auto-selected if CUDA GPU is available
+- **CPU**: Default fallback when CUDA is unavailable
+- **MPS**: Auto-selected on macOS with Apple Silicon
+
+<AccordionGroup>
+  <Accordion title="Force CPU Mode">
+    Set environment variable before running:
+    ```bash
+    CUDA_VISIBLE_DEVICES="" imcui
+    ```
+  </Accordion>
+  <Accordion title="Select Specific GPU">
+    Use environment variable:
+    ```bash
+    export CUDA_VISIBLE_DEVICES=0
+    imcui
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Default Matcher
+
+There is no `default_matcher` configuration. Matchers are loaded dynamically from the [vismatch](https://github.com/gmberton/vismatch) package and selected through the UI dropdown during matching.
+
+Available matchers: See <a href="/docs/models">algorithm reference</a>
+
+
+## Matching Parameters
+
+### Thresholds
+
+```yaml
+defaults:
+  setting_threshold: 0.1      # Detection sensitivity
+  keypoint_threshold: 0.05    # Keypoint detection
+  match_threshold: 0.2        # Match confidence
+  max_keypoints: 2000         # Maximum feature points
+```
+
+### RANSAC Filtering
+
+```yaml
+defaults:
+  enable_ransac: true
+  ransac_method: CV2_USAC_MAGSAC
+  ransac_reproj_threshold: 8.0
+  ransac_confidence: 0.9999
+  ransac_max_iter: 10000
+  ransac_num_samples: 4
+```
+
+Supported RANSAC methods:
+- `RANSAC` - Basic random sampling
+- `CV2_USAC_MAGSAC` - Magnitude-consistent RANSAC (recommended)
+- `LMEDS` - Least Median of Squares
+
+### Geometry Estimation
+
+```yaml
+defaults:
+  setting_geometry: Homography    # Options: Homography, Fundamental, Essential
+```
+
+<AccordionGroup>
+  <Accordion title="Essential Matrix Settings">
+    Note: Essential matrix parameters are configured through the UI when selecting Essential matrix geometry type.
+    Requires camera intrinsics (focal length and principal point).
+  </Accordion>
+</AccordionGroup>
+
+
+## Example Configurations
+
+### Minimal Setup
+
+```yaml
+defaults:
+  setting_threshold: 0.1
+  max_keypoints: 2000
+  enable_ransac: true
+```
+
+### Production Configuration
+
+```yaml
+defaults:
+  setting_threshold: 0.1
+  keypoint_threshold: 0.05
+  match_threshold: 0.2
+  max_keypoints: 5000
+  enable_ransac: true
+  ransac_method: CV2_USAC_MAGSAC
+  ransac_reproj_threshold: 8.0
+  ransac_confidence: 0.9999
+  ransac_max_iter: 10000
+  setting_geometry: Homography
+```
+
+### Development Configuration
+
+```yaml
+defaults:
+  setting_threshold: 0.2
+  max_keypoints: 500
+  match_threshold: 0.3
+  enable_ransac: false
+```
+
+<Note>
+<strong>Developer note:</strong> Set <code>CUDA_VISIBLE_DEVICES=""</code> before running to force CPU mode.
+</Note>
+
+
+## Advanced Configuration
+
+### Dataset Path
+
+```yaml
+example_data_root: /path/to/custom/datasets
+```
+
+<Note>
+<strong>Tip:</strong> Dataset paths can also be set via environment variable (`IMCUI_DATA_DIR`) or CLI flag (`-d`).
+</Note>
+
+
+## Configuration Profiles
+
+Create multiple configurations for different use cases:
+
+```bash
+# Fast matching for previewing
+imcui -c config_fast.yaml
+
+# High-quality matching for production
+imcui -c config_high_quality.yaml
+
+# CPU-only matching for testing
+CUDA_VISIBLE_DEVICES="" imcui -c config_cpu.yaml -d /test/data
+```
+
+
+## Using Matchers
+
+Matchers are selected through the web interface dropdown. The available matchers are automatically loaded from the vismatch package:
+
+- **Sparse matchers**: SuperPoint + LightGlue, ORB, SIFT, etc.
+- **Dense matchers**: LoFTR, RoMa, etc.
+
+<Note>
+<strong>Need help selecting a matcher?</strong> Check our <a href="/docs/models">algorithm guide</a> for performance characteristics and recommendations.
+</Note>

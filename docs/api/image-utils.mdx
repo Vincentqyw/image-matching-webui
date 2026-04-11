@@ -1,0 +1,64 @@
+---
+title: "imcui.ui.image_utils"
+description: "Image processing utilities"
+---
+
+# imcui.ui.image_utils
+
+Image processing utilities for geometric transformations and preprocessing.
+
+## Functions
+
+### wrap_images
+
+Wrap two images side-by-side for visualization.
+
+```python
+from imcui.ui import wrap_images
+
+result = wrap_images(image0, image1)
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `image0` | np.ndarray | First image |
+| `image1` | np.ndarray | Second image |
+
+**Returns:**
+
+Concatenated image with both images side-by-side.
+
+### generate_warp_images
+
+Generate warped images for geometric transformation visualization.
+
+```python
+from imcui.ui import generate_warp_images
+
+warped = generate_warp_images(
+    image0, image1,
+    homography_matrix
+)
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `image0` | np.ndarray | Source image |
+| `image1` | np.ndarray | Destination image |
+| `homography_matrix` | np.ndarray | 3x3 homography matrix |
+
+**Returns:**
+
+Warped images aligned according to the homography.
+
+**Additional Functions:**
+
+- `rotate_image`: Rotate image by specified angle
+- `scale_image`: Scale image by factor
+- `crop_image`: Crop image to specified region
+
+**Source Code**: [imcui/ui/image_utils.py](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/image_utils.py)

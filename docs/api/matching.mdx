@@ -1,0 +1,89 @@
+---
+title: "imcui.ui.matching"
+description: "Image matching and RANSAC filtering functions"
+---
+
+# imcui.ui.matching
+
+Core matching functions and RANSAC filtering for robust feature matching.
+
+## Functions
+
+### run_matching
+
+Run image matching with specified matcher.
+
+```python
+from imcui.ui import run_matching
+
+result = run_matching(
+    image0, image1,
+    matcher_name="superpoint-lightglue",
+    device="cuda"
+)
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `image0` | np.ndarray | First image (RGB numpy array) |
+| `image1` | np.ndarray | Second image (RGB numpy array) |
+| `matcher_name` | str | Name of matcher from vismatch |
+| `device` | str | Device: "cuda", "cpu", "mps" |
+
+**Returns:**
+
+Dictionary containing keypoints, matches, and scores.
+
+### run_ransac
+
+Run RANSAC filtering on matched points.
+
+```python
+from imcui.ui import run_ransac
+
+filtered_matches = run_ransac(
+    kp0, kp1, matches,
+    ransac_method="CV2_USAC_MAGSAC",
+    threshold=8.0
+)
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `kp0` | np.ndarray | Keypoints from first image |
+| `kp1` | np.ndarray | Keypoints from second image |
+| `matches` | np.ndarray | Matched point pairs |
+| `ransac_method` | str | RANSAC method for filtering |
+| `threshold` | float | RANSAC reprojection threshold |
+
+**Returns:**
+
+Filtered matches after RANSAC filtering.
+
+### filter_matches
+
+Filter matches by confidence threshold.
+
+```python
+from imcui.ui import filter_matches
+
+clean_matches = filter_matches(matches, scores, threshold=0.2)
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `matches` | np.ndarray | Matched point pairs |
+| `scores` | np.ndarray | Confidence scores |
+| `threshold` | float | Minimum confidence threshold |
+
+**Returns:**
+
+Filtered matches above threshold.
+
+**Source Code**: [imcui/ui/matching.py](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/matching.py)

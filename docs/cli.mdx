@@ -1,0 +1,118 @@
+---
+title: "Command Line Interface"
+description: "CLI options and usage for Image Matching WebUI"
+---
+
+# Command Line Interface
+
+The `imcui` package provides a powerful command-line interface for automation and batch processing.
+
+
+## Basic Usage
+
+```bash
+imcui [OPTIONS]
+```
+
+Start the web interface with default settings:
+
+```bash
+imcui
+```
+
+
+## Options
+
+| Option | Short | Default | Description |
+|--------|-------|---------|-------------|
+| `--server-name` | `-s` | `0.0.0.0` | Server hostname/IP |
+| `--server-port` | `-p` | `7860` | Server port number |
+| `--config` | `-c` | Auto-detect | Configuration file path |
+| `--example-data-root` | `-d` | Auto-download | Example datasets directory |
+| `--verbose` | `-v` | `False` | Enable verbose output |
+| `--version` | | | Show version |
+| `--help` | `-h` | | Show help |
+
+
+## Common Use Cases
+
+### Custom Port
+
+```bash
+imcui -p 8080
+```
+
+### Local Host Only
+
+```bash
+imcui -s 127.0.0.1
+```
+
+### Custom Configuration
+
+```bash
+imcui -c /path/to/config.yaml
+```
+
+### Custom Data Directory
+
+```bash
+imcui -d /path/to/datasets
+```
+
+### Combine Options
+
+```bash
+imcui -s 127.0.0.1 -p 8080 -c my_config.yaml -d /my/data --verbose
+```
+
+
+## Configuration Files
+
+Configuration files use YAML format. Place one of these files in your working directory:
+
+- `app.yaml`
+- `config/app.yaml`
+
+Example configuration:
+
+```yaml
+defaults:
+  setting_threshold: 0.1
+  max_keypoints: 2000
+  enable_ransac: true
+  ransac_method: CV2_USAC_MAGSAC
+  setting_geometry: Homography
+```
+
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Port Already in Use">
+    ```bash
+    imcui -p 8081  # Try different port
+    ```
+  </Accordion>
+  <Accordion title="Permission Denied">
+    ```bash
+    imcui -s 127.0.0.1  # Use local host
+    ```
+  </Accordion>
+  <Accordion title="Configuration Not Found">
+    ```bash
+    imcui -c /absolute/path/to/config.yaml
+    ```
+  </Accordion>
+</AccordionGroup>
+
+
+## Help and Version
+
+```bash
+# Display help
+imcui --help
+
+# Show version
+imcui --version
+```

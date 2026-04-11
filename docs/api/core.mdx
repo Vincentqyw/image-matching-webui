@@ -1,0 +1,63 @@
+---
+title: "imcui.api.core"
+description: "Core API module for image matching operations"
+---
+
+# imcui.api.core
+
+Core API module for programmatic image matching operations.
+
+## ImageMatchingAPI
+
+Main API class for image matching operations.
+
+### Import
+
+```python
+from imcui.api import ImageMatchingAPI
+```
+
+### Constructor
+
+```python
+ImageMatchingAPI(conf, device="cuda")
+```
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `conf` | dict | Yes | - | Matcher configuration from get_matcher_zoo() |
+| `device` | str | No | "cuda" | Device: "cuda", "cpu", "mps" |
+
+### Usage
+
+```python
+from imcui.api import ImageMatchingAPI
+from imcui.ui import get_matcher_zoo
+
+# Get matcher configuration
+matchers = get_matcher_zoo()
+
+# Initialize API
+api = ImageMatchingAPI(conf=matchers["superpoint-lightglue"], device="cuda")
+
+# Match two images (RGB numpy arrays)
+result = api(image0, image1)
+```
+
+### Return Value
+
+Dictionary containing:
+
+```python
+{
+    "keypoints0": np.ndarray,  # Shape: (N, 2)
+    "keypoints1": np.ndarray,  # Shape: (M, 2)
+    "matches": np.ndarray,     # Shape: (K, 2)
+    "scores": np.ndarray,      # Shape: (K,)
+    "H": np.ndarray            # Optional: Homography matrix (3x3)
+}
+```
+
+**Source Code**: [imcui/api/core.py](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/api/core.py)

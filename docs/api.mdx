@@ -1,0 +1,252 @@
+---
+title: "API Reference"
+description: "Programmatic access to Image Matching WebUI functions"
+---
+
+# API Reference
+
+Complete programmatic access to Image Matching WebUI functionality.
+
+
+
+## Quick Start
+
+```python
+from imcui.api import ImageMatchingAPI
+from imcui.ui import get_matcher_zoo
+
+# Get available matchers
+matchers = get_matcher_zoo()
+
+# Initialize API
+api = ImageMatchingAPI(conf=matchers["superpoint-lightglue"])
+
+# Match two images
+result = api(image0, image1)
+```
+
+
+
+## Core API
+
+### ImageMatchingAPI
+
+Main API class for image matching operations.
+
+```python
+from imcui.api import ImageMatchingAPI
+
+api = ImageMatchingAPI(conf=matcher_config, device="cuda")
+result = api(image0, image1)
+```
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `conf` | dict | Yes | - | Matcher configuration |
+| `device` | str | No | "cuda" | Device: "cuda", "cpu", "mps" |
+
+**Returns:**
+
+Dictionary containing:
+- `keypoints0`, `keypoints1`: Detected keypoints
+- `matches`: Pairwise matches
+- `scores`: Confidence scores
+- `H` (optional): Homography matrix (if RANSAC enabled)
+
+
+## Matcher Utilities
+
+### Get Available Matchers
+
+```python
+from imcui.ui import get_matcher_zoo
+
+matchers = get_matcher_zoo()
+print(f"Available: {list(matchers.keys())}")
+```
+
+### Get Model Names
+
+```python
+from imcui.ui import get_available_model_names
+
+models = get_available_model_names()
+```
+
+
+## Matching Functions
+
+### Run Matching
+
+```python
+from imcui.ui import run_matching
+
+result = run_matching(
+    image0, image1,
+    matcher_name="superpoint-lightglue",
+    device="cuda"
+)
+```
+
+### Run RANSAC
+
+```python
+from imcui.ui import run_ransac
+
+filtered_matches = run_ransac(
+    kp0, kp1, matches,
+    ransac_method="CV2_USAC_MAGSAC",
+    threshold=8.0
+)
+```
+
+### Filter Matches
+
+```python
+from imcui.ui import filter_matches
+
+clean_matches = filter_matches(matches, scores, threshold=0.2)
+```
+
+## Geometry Functions
+
+### Compute Geometry
+
+```python
+from imcui.ui import compute_geometry
+
+H, mask = compute_geometry(
+    kp0, kp1, matches,
+    geometry_type="homography",
+    ransac_method="CV2_USAC_MAGSAC"
+)
+```
+
+**Geometry Types:**
+- `homography` - Planar scenes
+- `fundamental` - Calibrated cameras
+- `essential` - Stereo vision
+
+
+## Visualization Functions
+
+### Display Keypoints
+
+```python
+from imcui.ui import display_keypoints
+
+result = display_keypoints(
+    image, keypoints,
+    color=(0, 255, 0)
+)
+```
+
+### Display Matches
+
+```python
+from imcui.ui import display_matches
+
+result = display_matches(
+    image0, image1,
+    kp0, kp1, matches,
+    color=(0, 255, 0)
+)
+```
+
+### Plot Images
+
+```python
+from imcui.ui import plot_images
+
+plot_images([img0, img1], titles=["Image 0", "Image 1"])
+```
+
+## Utility Functions
+
+### Get Configuration Path
+
+```python
+from imcui import get_default_config_path
+
+config_path = get_default_config_path()
+```
+
+### Get Data Path
+
+```python
+from imcui import get_example_data_path
+
+data_path = get_example_data_path()
+```
+
+### Get Version
+
+```python
+from imcui import get_version
+
+version = get_version()
+```
+
+## Model Caching
+
+### ARC Size-Aware Cache
+
+```python
+from imcui.ui import ARCSizeAwareModelCache
+
+cache = ARCSizeAwareModelCache()
+model = cache.get_model("superpoint-lightglue")
+```
+
+### LRU Cache
+
+```python
+from imcui.ui import LRUModelCache
+
+cache = LRUModelCache(max_size=10)
+model = cache.get_model("loftr")
+```
+
+## Complete Example
+
+```python
+from imcui.api import ImageMatchingAPI
+from imcui.ui import (
+    DEVICE,
+    get_matcher_zoo,
+    display_matches
+)
+import cv2
+
+# Load images
+img0 = cv2.imread("image0.jpg")
+img1 = cv2.imread("image1.jpg")
+
+# Get available matchers
+matchers = get_matcher_zoo()
+
+# Initialize API
+api = ImageMatchingAPI(
+    conf=matchers["superpoint-lightglue"],
+    device=DEVICE
+)
+
+# Run matching
+result = api(img0, img1)
+
+# Visualize results
+result_image = display_matches(
+    img0, img1,
+    result["keypoints0"],
+    result["keypoints1"],
+    result["matches"]
+)
+
+cv2.imwrite("matches.jpg", result_image)
+```
+
+<Note>
+<strong>API Updates:</strong> All matching algorithms are maintained in the <a href="https://github.com/gmberton/vismatch">vismatch</a> repository. Check their documentation for the latest algorithms and features.
+</Note>

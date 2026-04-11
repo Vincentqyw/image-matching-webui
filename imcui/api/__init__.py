@@ -6,8 +6,8 @@ import numpy as np
 from fastapi.exceptions import HTTPException
 from PIL import Image
 from pydantic import BaseModel
+from loguru import logger
 
-from ..hloc import logger
 from .core import ImageMatchingAPI
 
 

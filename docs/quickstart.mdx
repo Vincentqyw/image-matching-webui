@@ -1,0 +1,92 @@
+---
+title: "Quick Start"
+description: "Get started with Image Matching WebUI in 3 simple steps"
+---
+
+# Quick Start
+
+Get up and running with Image Matching WebUI in minutes. This guide covers the fastest way to start matching images.
+
+<Tip>
+<strong>Need other installation methods?</strong> See the <a href="/docs/installation">installation guide</a> for Docker, source installation, and more.
+</Tip>
+
+
+## 1. Install (PyPI)
+
+The fastest way to install Image Matching WebUI:
+
+```bash
+pip install imcui
+```
+
+Or with dataset support:
+
+```bash
+pip install imcui[datasets]
+```
+
+## 2. Launch
+
+Start the web interface:
+
+```bash
+imcui -s 127.0.0.1
+```
+
+This opens <code>http://localhost:7860</code> in your browser.
+
+
+## 3. Match Images
+
+The interface provides four simple steps:
+
+<CardGroup>
+  <Card title="1. Upload" icon="upload">
+    Select two images you want to match
+  </Card>
+  <Card title="2. Choose Algorithm" icon="search">
+    Pick from 20+ matching algorithms
+  </Card>
+  <Card title="3. Configure" icon="option">
+    Adjust thresholds and parameters
+  </Card>
+  <Card title="4. Match" icon="check">
+    Click "Match" and view results
+  </Card>
+</CardGroup>
+
+
+## What's Next?
+
+Now that you're running, explore these resources:
+
+<CardGroup cols={2}>
+  <Card title="Compare Algorithms" icon="search" href="/docs/models">
+    Test different algorithms on your images
+  </Card>
+
+  <Card title="Custom Configuration" icon="file-text" href="/docs/configuration">
+    Tune parameters for your use case
+  </Card>
+
+  <Card title="Use the API" icon="code" href="/docs/api">
+    Automate matching programmatically
+  </Card>
+
+  <Card title="Troubleshoot Issues" icon="alert-triangle" href="/docs/troubleshooting">
+    Get help with common problems
+  </Card>
+</CardGroup>
+
+
+## Try Without Installation
+
+Not ready to install? Try the demo first:
+
+<Card title="Try HuggingFace Demo" icon="play" href="https://huggingface.co/spaces/Realcat/image-matching-webui">
+  Test the interface without installation
+</Card>
+
+
+<Feedback title="Quick Start Help?" content="Check our installation guide or view examples in the demo" link="https://huggingface.co/spaces/Realcat/image-matching-webui" />

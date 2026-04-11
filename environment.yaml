@@ -1,3 +1,14 @@
+# DEPRECATED: This file is deprecated and will be removed in a future version.
+# Please use pip install instead:
+#   pip install -e .
+# Or for development:
+#   pip install -e ".[dev]"
+#
+# For conda users, we recommend installing Python via conda and then using pip:
+#   conda create -n imcui python=3.10
+#   conda activate imcui
+#   pip install -e .
+#
 name: imcui
 channels:
   - pytorch

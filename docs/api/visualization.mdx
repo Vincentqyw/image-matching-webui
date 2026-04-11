@@ -1,0 +1,83 @@
+---
+title: "imcui.ui.visualization"
+description: "Visualization utilities for keypoints and matches"
+---
+
+# imcui.ui.visualization
+
+Visualization utilities for displaying keypoints, matches, and images.
+
+## Functions
+
+### display_keypoints
+
+Display keypoints on an image.
+
+```python
+from imcui.ui import display_keypoints
+
+result = display_keypoints(
+    image, keypoints,
+    color=(0, 255, 0)
+)
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `image` | np.ndarray | Input image (RGB numpy array) |
+| `keypoints` | np.ndarray | Keypoints coordinates, shape (N, 2) |
+| `color` | tuple | RGB color for keypoint markers |
+
+**Returns:**
+
+Image with keypoints drawn as colored circles.
+
+### display_matches
+
+Display matches between two images.
+
+```python
+from imcui.ui import display_matches
+
+result = display_matches(
+    image0, image1,
+    kp0, kp1, matches,
+    color=(0, 255, 0)
+)
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `image0` | np.ndarray | First image |
+| `image1` | np.ndarray | Second image |
+| `kp0` | np.ndarray | Keypoints from first image |
+| `kp1` | np.ndarray | Keypoints from second image |
+| `matches` | np.ndarray | Matched point pairs |
+| `color` | tuple | RGB color for match lines |
+
+**Returns:**
+
+Side-by-side image with match lines drawn between corresponding points.
+
+### plot_images
+
+Display multiple images in a grid.
+
+```python
+from imcui.ui import plot_images
+
+plot_images([img0, img1], titles=["Image 0", "Image 1"])
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `images` | list | List of images to display |
+| `titles` | list | Optional titles for each image |
+
+**Source Code**: [imcui/ui/visualization.py](https://github.com/Vincentqyw/image-matching-webui/blob/main/imcui/ui/visualization.py)

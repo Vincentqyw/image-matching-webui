@@ -8,12 +8,13 @@ from typing import Dict, List
 import cv2
 import numpy as np
 import requests
+from loguru import logger
 
 ENDPOINT = "http://127.0.0.1:8001"
 if "REMOTE_URL_RAILWAY" in os.environ:
     ENDPOINT = os.environ["REMOTE_URL_RAILWAY"]
 
-print(f"API ENDPOINT: {ENDPOINT}")
+logger.info(f"API ENDPOINT: {ENDPOINT}")
 
 API_VERSION = f"{ENDPOINT}/version"
 API_URL_MATCH = f"{ENDPOINT}/v1/match"
@@ -90,10 +91,10 @@ def do_api_requests(url=API_URL_EXTRACT, **kwargs):
             return r.json()
         else:
             # Print an error message if the response code is not 200
-            print(f"Error: Response code {r.status_code} - {r.text}")
+            logger.error(f"Response code {r.status_code} - {r.text}")
     except Exception as e:
         # Print an error message if an exception occurs
-        print(f"An error occurred: {e}")
+        logger.error(f"An error occurred: {e}")
 
 
 def send_request_match(path0: str, path1: str) -> Dict[str, np.ndarray]:
@@ -120,7 +121,7 @@ def send_request_match(path0: str, path1: str) -> Dict[str, np.ndarray]:
             for key in list(pred.keys()):
                 pred[key] = np.array(pred[key])
         else:
-            print(f"Error: Response code {response.status_code} - {response.text}")
+            logger.error(f"Response code {response.status_code} - {response.text}")
     finally:
         files["image0"].close()
         files["image1"].close()
@@ -155,8 +156,11 @@ def send_request_extract(
 
     # draw matching, debug only
     if viz:
-        from hloc.utils.viz import plot_keypoints
-        from ui.viz import fig2im, plot_images
+        from imcui.ui.visualization import (
+            plot_keypoints,
+            figure_to_numpy_array,
+            plot_images,
+        )
 
         kpts = np.array(response[0]["keypoints_orig"])
         if "image_orig" in response[0].keys():
@@ -164,7 +168,7 @@ def send_request_extract(
 
             output_keypoints = plot_images([img_orig], titles="titles", dpi=300)
             plot_keypoints([kpts])
-            output_keypoints = fig2im(output_keypoints)
+            output_keypoints = figure_to_numpy_array(output_keypoints)
             cv2.imwrite(
                 "demo_match.jpg",
                 output_keypoints[:, :, ::-1].copy(),  # RGB -> BGR
@@ -175,9 +179,9 @@ def send_request_extract(
 def get_api_version():
     try:
         response = requests.get(API_VERSION).json()
-        print("API VERSION: {}".format(response["version"]))
+        logger.info("API VERSION: {}".format(response["version"]))
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logger.error(f"An error occurred: {e}")
 
 
 if __name__ == "__main__":
@@ -225,7 +229,7 @@ if __name__ == "__main__":
         t1 = time.time()
         preds = send_request_extract(args.image0)
         t2 = time.time()
-        print(f"Time cost2: {(t2 - t1)} seconds")
+        logger.info(f"Time cost2: {(t2 - t1)} seconds")
 
     # dump preds
     with open("preds.pkl", "wb") as f:

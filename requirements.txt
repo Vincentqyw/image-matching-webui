@@ -1,42 +1,21 @@
 datasets
-e2cnn
 easydict
-einops
 fastapi
-gdown
-gradio
-h5py
+gradio>6.0.0
 huggingface_hub
-imageio
-Jinja2
-kornia
 loguru
-matplotlib<3.9
+matplotlib
 numpy~=1.24
 omegaconf
-onnxruntime
-opencv-contrib-python
 opencv-python
-pandas
+Pillow
 plotly
 poselib
 protobuf
-psutil
-pycolmap<3.13
-pytlsd  # gluestick, <3.12
-pytorch-lightning  # ==1.4.9
+pycolmap
 PyYAML
 ray
 ray[serve]
-roma #dust3r
-scikit-image
-scikit-learn
-scipy
-seaborn
-shapely
-tensorboardX  #==2.6.1
-torchmetrics  #==0.6.0
-torchvision  #==0.19.0
 tqdm
-uvicorn
-yacs
+uvicorn>=0.27.0
+vismatch

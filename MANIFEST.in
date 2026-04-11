@@ -1,12 +1,9 @@
 # logo
 include imcui/assets/logo.webp
 
-recursive-include imcui/ui *.yaml
-recursive-include imcui/api *.yaml
-recursive-include imcui/third_party *.yaml *.cfg *.yml
+# config files
+recursive-include imcui/config *.yaml
 
-# ui examples
-# recursive-include imcui/datasets *.JPG *.jpg *.png
-
-# model
-recursive-include imcui/third_party/SuperGluePretrainedNetwork *.pth
+# Exclude example datasets from source distribution (82MB)
+# Users can download via auto-download or from git repo
+recursive-exclude imcui/datasets *

@@ -1,0 +1,169 @@
+---
+title: "Matching Algorithms"
+description: "Choose the right algorithm for your image matching needs"
+---
+
+# Matching Algorithms
+
+Image Matching WebUI supports 20+ state-of-the-art algorithms through the [vismatch](https://github.com/gmberton/vismatch) library. Each algorithm is designed for specific use cases and image types.
+
+<Tip>
+<strong>Recommendation:</strong> Start with <code>superpoint-lightglue</code> for general-purpose matching. It's fast, accurate, and works well on most image types.
+</Tip>
+
+
+## Algorithm Categories
+
+### 🎯 Sparse Matching (Recommended)
+
+Best for: Feature matching, object detection, real-time applications
+
+| Algorithm | Speed | Accuracy | Best For |
+|-----------|-------|----------|----------|
+| **superpoint-lightglue** | Fast | High | General purpose |
+| **sift-lightglue** | Medium | Very High | High-quality features |
+| **disk-lightglue** | Fast | High | Efficient matching |
+| **omniglue** | Medium | High | Cross-domain images |
+| **aliked** | Very Fast | Medium | Real-time applications |
+
+### 🌊 Dense Matching
+
+Best for: Depth estimation, 3D reconstruction, photogrammetry
+
+| Algorithm | Speed | Accuracy | Memory |
+|-----------|-------|----------|--------|
+| **roma** | Slow | Very High | High |
+| **tiny-roma** | Medium | High | Medium |
+| **loftr** | Medium | Very High | High |
+| **xoftr** | Slow | Very High | Very High |
+| **duster** | Fast | Medium | Low |
+
+### ⚡ Semi-Dense
+
+Best for: Balance between speed and accuracy
+
+| Algorithm | Speed | Accuracy | Use Case |
+|-----------|-------|----------|----------|
+| **aspanformer** | Slow | Very High | Large baselines |
+| **matchformer** | Medium | High | General matching |
+| **eloftr** | Fast | High | Real-time matching |
+
+
+## Algorithm Selection Guide
+
+<CardGroup cols={2}>
+  <Card title="Speed Priority" icon="zap">
+    **aliked** or **disk-lightglue** for fastest results
+  </Card>
+  <Card title="Accuracy Priority" icon="check-square">
+    **roma** or **superpoint-lightglue** for best quality
+  </Card>
+  <Card title="Low Memory" icon="hard-drive">
+    **duster** or **aliked** for limited GPU memory
+  </Card>
+  <Card title="General Purpose" icon="star">
+    **superpoint-lightglue** works well on most tasks
+  </Card>
+</CardGroup>
+
+
+## Popular Algorithms
+
+### SuperPoint + LightGlue
+
+**Best for**: General-purpose image matching
+
+Select `superpoint-lightglue` from the matcher dropdown in the web interface.
+
+**Advantages**:
+- Fast and accurate
+- Works with various image types
+- Robust to scale and rotation changes
+
+### LoFTR
+
+**Best for**: Wide-baseline matching, texture-poor images
+
+Select `loftr` from the matcher dropdown in the web interface.
+
+**Advantages**:
+- Excellent for large viewpoint changes
+- Works well with low-texture images
+- Dense matching for comprehensive coverage
+
+### ROMA
+
+**Best for**: High-precision geometric tasks
+
+Select `roma` from the matcher dropdown in the web interface.
+
+**Advantages**:
+- Highest accuracy
+- Good for 3D reconstruction
+- Robust to extreme viewpoint changes
+
+
+## Performance Tips
+
+### Speed Optimization
+
+1. **Choose faster algorithms**: `aliked`, `disk-lightglue`
+2. **Reduce image resolution**: Set lower resize values
+3. **Limit keypoints**: Decrease `max_keypoints`
+4. **Use CPU for testing**: Fallback to CPU when GPU unavailable
+
+### Accuracy Optimization
+
+1. **Use state-of-the-art**: `roma`, `superpoint-lightglue`
+2. **Enable RANSAC**: Set high confidence levels
+3. **Higher thresholds**: Adjust `setting_threshold`
+4. **Preprocessing**: Grayscale conversion often improves results
+
+### Memory Management
+
+1. **Use semi-dense algorithms**: `loftr`, `aspanformer`
+2. **Reduce batch size**: Process images sequentially
+3. **Lower resolution**: Resize images before matching
+
+
+## Algorithm Comparison
+
+<AccordionGroup defaultOpenAll>
+  <Accordion title="Sparse vs Dense vs Semi-Dense">
+    <div class="space-y-4">
+      <div>
+        <div class="font-semibold">Sparse</div>
+        <div class="">Fast, memory-efficient, good for feature-based tasks</div>
+      </div>
+      <div>
+        <div class="font-semibold">Dense</div>
+        <div class="">Comprehensive matching, high accuracy, memory-intensive</div>
+      </div>
+      <div>
+        <div class="font-semibold">Semi-Dense</div>
+        <div class="">Balanced speed and accuracy, good for most applications</div>
+      </div>
+    </div>
+  </Accordion>
+  <Accordion title="When to Use Each Category">
+    <div class="space-y-2">
+      <div><strong>Sparse:</strong> Feature matching, object detection, real-time</div>
+      <div><strong>Dense:</strong> 3D reconstruction, depth estimation, photogrammetry</div>
+      <div><strong>Semi-Dense:</strong> General matching, medical imaging, document processing</div>
+    </div>
+  </Accordion>
+</AccordionGroup>
+
+
+## Getting Available Algorithms
+
+List all available algorithms via Python:
+
+```python
+from imcui.ui import get_available_model_names
+print(get_available_model_names())
+```
+
+<Note>
+<strong>New algorithms:</strong> All matching algorithms are maintained in the <a href="https://github.com/gmberton/vismatch">vismatch</a> repository. New algorithms become automatically available when added to the collection.
+</Note>

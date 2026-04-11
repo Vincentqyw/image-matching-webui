@@ -13,11 +13,21 @@ from ray import serve
 import argparse
 from loguru import logger
 
+import yaml
+
 from . import ImagesInput, to_base64_nparray
 from .core import ImageMatchingAPI
-from ..hloc import DEVICE
-from ..hloc.utils.io import read_yaml
-from ..ui import get_version
+from .. import get_version
+
+# Define DEVICE here
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def read_yaml(path):
+    """Read YAML file."""
+    with open(path, "r") as f:
+        return yaml.safe_load(f)
+
 
 warnings.simplefilter("ignore")
 app = FastAPI()

@@ -1,5 +1,6 @@
-# api.py
+# api.py - Using vismatch
 import warnings
+from loguru import logger
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -8,10 +9,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from ..hloc import extract_features, logger, match_dense, match_features
-from ..hloc.utils.viz import add_text, plot_keypoints
-from ..ui.utils import filter_matches, get_feature_model, get_model
-from ..ui.viz import display_matches, fig2im, plot_images
+from vismatch import get_matcher
+
+from ..ui.geometry import filter_matches
+from ..ui.visualization import (
+    display_matches,
+    figure_to_numpy_array,
+    plot_images,
+    add_text,
+    plot_keypoints,
+)
 
 warnings.simplefilter("ignore")
 
@@ -38,7 +45,7 @@ class ImageMatchingAPI(torch.nn.Module):
         match_threshold: float = 0.2,
     ) -> None:
         """
-        Initializes an instance of the ImageMatchingAPI class.
+        Initializes an instance of the ImageMatchingAPI class using vismatch.
 
         Args:
             conf (dict): A dictionary containing the configuration parameters.
@@ -53,7 +60,7 @@ class ImageMatchingAPI(torch.nn.Module):
         super().__init__()
         self.device = device
         self.conf = {**self.default_conf, **conf}
-        self._updata_config(detect_threshold, max_keypoints, match_threshold)
+        self._update_config(detect_threshold, max_keypoints, match_threshold)
         self._init_models()
         if device == "cuda":
             memory_allocated = torch.cuda.memory_allocated(device)
@@ -62,115 +69,112 @@ class ImageMatchingAPI(torch.nn.Module):
             logger.info(f"GPU memory reserved: {memory_reserved / 1024**2:.3f} MB")
         self.pred = None
 
-    def parse_match_config(self, conf):
-        if conf["dense"]:
-            return {
-                **conf,
-                "matcher": match_dense.confs.get(conf["matcher"]["model"]["name"]),
-                "dense": True,
-            }
-        else:
-            return {
-                **conf,
-                "feature": extract_features.confs.get(conf["feature"]["model"]["name"]),
-                "matcher": match_features.confs.get(conf["matcher"]["model"]["name"]),
-                "dense": False,
-            }
-
-    def _updata_config(
+    def _update_config(
         self,
         detect_threshold: float = 0.015,
         max_keypoints: int = 1024,
         match_threshold: float = 0.2,
     ):
-        self.dense = self.conf["dense"]
-        if self.conf["dense"]:
-            try:
-                self.conf["matcher"]["model"]["match_threshold"] = match_threshold
-            except TypeError as e:
-                logger.error(e)
-        else:
-            self.conf["feature"]["model"]["max_keypoints"] = max_keypoints
-            self.conf["feature"]["model"]["keypoint_threshold"] = detect_threshold
-            self.extract_conf = self.conf["feature"]
-
-        self.match_conf = self.conf["matcher"]
+        """Update configuration parameters."""
+        self.max_keypoints = max_keypoints
+        self.detect_threshold = detect_threshold
+        self.match_threshold = match_threshold
 
     def _init_models(self):
-        # initialize matcher
-        self.matcher = get_model(self.match_conf)
-        # initialize extractor
-        if self.dense:
-            self.extractor = None
-        else:
-            self.extractor = get_feature_model(self.conf["feature"])
-
-    def _forward(self, img0, img1):
-        if self.dense:
-            pred = match_dense.match_images(
-                self.matcher,
-                img0,
-                img1,
-                self.match_conf["preprocessing"],
-                device=self.device,
-            )
-            last_fixed = "{}".format(  # noqa: F841
-                self.match_conf["model"]["name"]
-            )
-        else:
-            pred0 = extract_features.extract(
-                self.extractor, img0, self.extract_conf["preprocessing"]
-            )
-            pred1 = extract_features.extract(
-                self.extractor, img1, self.extract_conf["preprocessing"]
-            )
-            pred = match_features.match_images(self.matcher, pred0, pred1)
-        return pred
-
-    def _convert_pred(self, pred):
-        ret = {
-            k: v.cpu().detach()[0].numpy() if isinstance(v, torch.Tensor) else v
-            for k, v in pred.items()
+        """Initialize the vismatch model with parameters."""
+        model_name = self.conf.get("model_name", "superpoint-lightglue")
+        # Build kwargs for vismatch
+        kwargs = {
+            "max_num_keypoints": getattr(self, "max_keypoints", 2048),
         }
-        ret = {
-            k: v[0].cpu().detach().numpy() if isinstance(v, list) else v
-            for k, v in ret.items()
+        # Some matchers support threshold parameter (especially dense matchers)
+        threshold = getattr(self, "match_threshold", None)
+        if threshold is not None:
+            kwargs["threshold"] = threshold
+        self.matcher = get_matcher(model_name, device=self.device, **kwargs)
+
+    def set_model(
+        self, model_name: str, max_keypoints: int = None, threshold: float = None
+    ):
+        """Switch to a different vismatch model."""
+        kwargs = {
+            "max_num_keypoints": max_keypoints or getattr(self, "max_keypoints", 2048),
         }
-        return ret
+        if threshold is not None:
+            kwargs["threshold"] = threshold
+        self.matcher = get_matcher(model_name, device=self.device, **kwargs)
 
-    @torch.inference_mode()
-    def extract(self, img0: np.ndarray, **kwargs) -> Dict[str, np.ndarray]:
-        """Extract features from a single image.
-
-        Args:
-            img0 (np.ndarray): image
-
-        Returns:
-            Dict[str, np.ndarray]: feature dict
+    def _convert_result_format(
+        self, result: Dict[str, Any], img0: np.ndarray, img1: np.ndarray
+    ) -> Dict[str, np.ndarray]:
         """
+        Convert vismatch result format to UI expected format.
 
-        # setting prams
-        self.extractor.conf["max_keypoints"] = kwargs.get("max_keypoints", 512)
-        self.extractor.conf["keypoint_threshold"] = kwargs.get(
-            "keypoint_threshold", 0.0
+        vismatch returns:
+        - matched_kpts0, matched_kpts1: raw matches
+        - inlier_kpts0, inlier_kpts1: RANSAC inliers
+        - H: homography matrix
+
+        UI expects:
+        - image0_orig, image1_orig: original images
+        - keypoints0_orig, keypoints1_orig: all detected keypoints
+        - mkeypoints0_orig, mkeypoints1_orig: raw matches
+        - mmkeypoints0_orig, mmkeypoints1_orig: RANSAC inliers
+        - mconf, mmconf: confidence scores
+        """
+        # Convert images to uint8 for visualization
+        img0_uint8 = (
+            (img0 * 255).astype(np.uint8)
+            if img0.max() <= 1.0
+            else img0.astype(np.uint8)
+        )
+        img1_uint8 = (
+            (img1 * 255).astype(np.uint8)
+            if img1.max() <= 1.0
+            else img1.astype(np.uint8)
         )
 
-        pred = extract_features.extract(
-            self.extractor, img0, self.extract_conf["preprocessing"]
-        )
-        pred = self._convert_pred(pred)
-        # back to origin scale
-        s0 = pred["original_size"] / pred["size"]
-        pred["keypoints_orig"] = (
-            match_features.scale_keypoints(pred["keypoints"] + 0.5, s0) - 0.5
-        )
-        # TODO: rotate back
-        binarize = kwargs.get("binarize", False)
-        if binarize:
-            assert "descriptors" in pred
-            pred["descriptors"] = (pred["descriptors"] > 0).astype(np.uint8)
-            pred["descriptors"] = pred["descriptors"].T  # N x DIM
-        return pred
+        ret = {
+            "image0_orig": img0_uint8,
+            "image1_orig": img1_uint8,
+        }
+
+        # All detected keypoints (from vismatch, these might be empty for dense matchers)
+        all_kpts0 = result.get("all_kpts0", np.array([]))
+        all_kpts1 = result.get("all_kpts1", np.array([]))
+
+        if len(all_kpts0) > 0:
+            ret["keypoints0_orig"] = all_kpts0
+        if len(all_kpts1) > 0:
+            ret["keypoints1_orig"] = all_kpts1
+
+        # Raw matches
+        matched_kpts0 = result.get("matched_kpts0", np.array([]))
+        matched_kpts1 = result.get("matched_kpts1", np.array([]))
+
+        if len(matched_kpts0) > 0 and len(matched_kpts1) > 0:
+            ret["mkeypoints0_orig"] = matched_kpts0
+            ret["mkeypoints1_orig"] = matched_kpts1
+            # Use uniform confidence if not provided
+            ret["mconf"] = np.ones(len(matched_kpts0))
+
+        # RANSAC inliers (already computed by vismatch)
+        inlier_kpts0 = result.get("inlier_kpts0", np.array([]))
+        inlier_kpts1 = result.get("inlier_kpts1", np.array([]))
+
+        if len(inlier_kpts0) > 0 and len(inlier_kpts1) > 0:
+            ret["mmkeypoints0_orig"] = inlier_kpts0
+            ret["mmkeypoints1_orig"] = inlier_kpts1
+            ret["mmconf"] = np.ones(len(inlier_kpts0))
+
+        # Homography matrix
+        H = result.get("H")
+        if H is not None:
+            ret["H"] = H
+
+        ret["num_inliers"] = result.get("num_inliers", 0)
+
+        return ret
 
     @torch.inference_mode()
     def forward(
@@ -179,7 +183,7 @@ class ImageMatchingAPI(torch.nn.Module):
         img1: np.ndarray,
     ) -> Dict[str, np.ndarray]:
         """
-        Forward pass of the image matching API.
+        Forward pass of the image matching API using vismatch.
 
         Args:
             img0: A 3D NumPy array of shape (H, W, C) representing the first image.
@@ -203,9 +207,21 @@ class ImageMatchingAPI(torch.nn.Module):
         # Take as input a pair of images (not a batch)
         assert isinstance(img0, np.ndarray)
         assert isinstance(img1, np.ndarray)
-        self.pred = self._forward(img0, img1)
-        if self.conf["ransac"]["enable"]:
-            self.pred = self._geometry_check(self.pred)
+
+        # Convert HWC to CHW format for vismatch
+        if img0.shape[-1] == 3:
+            img0_chw = np.transpose(img0, (2, 0, 1))
+            img1_chw = np.transpose(img1, (2, 0, 1))
+        else:
+            img0_chw = img0
+            img1_chw = img1
+
+        # Run vismatch
+        result = self.matcher(img0_chw, img1_chw)
+
+        # Convert to UI format
+        self.pred = self._convert_result_format(result, img0, img1)
+
         return self.pred
 
     def _geometry_check(
@@ -213,17 +229,16 @@ class ImageMatchingAPI(torch.nn.Module):
         pred: Dict[str, Any],
     ) -> Dict[str, Any]:
         """
-        Filter matches using RANSAC. If keypoints are available, filter by keypoints.
-        If lines are available, filter by lines. If both keypoints and lines are
-        available, filter by keypoints.
+        Filter matches using RANSAC. Note: vismatch already does RANSAC internally,
+        but we keep this for consistency with the UI.
 
         Args:
             pred (Dict[str, Any]): dict of matches, including original keypoints.
-                                  See :func:`filter_matches` for the expected keys.
 
         Returns:
             Dict[str, Any]: filtered matches
         """
+        # vismatch already provides inliers, but we can re-run RANSAC if needed
         pred = filter_matches(
             pred,
             ransac_method=self.conf["ransac"]["method"],
@@ -246,13 +261,7 @@ class ImageMatchingAPI(torch.nn.Module):
         Returns:
             None
         """
-        if self.conf["dense"]:
-            postfix = str(self.conf["matcher"]["model"]["name"])
-        else:
-            postfix = "{}_{}".format(
-                str(self.conf["feature"]["model"]["name"]),
-                str(self.conf["matcher"]["model"]["name"]),
-            )
+        postfix = self.conf.get("model_name", "vismatch")
         titles = [
             "Image 0 - Keypoints",
             "Image 1 - Keypoints",
@@ -270,7 +279,7 @@ class ImageMatchingAPI(torch.nn.Module):
                 + f"# keypoints1: {len(pred['keypoints1_orig'])}"
             )
             add_text(0, text, fs=15)
-        output_keypoints = fig2im(output_keypoints)
+        output_keypoints = figure_to_numpy_array(output_keypoints)
         # plot images with raw matches
         titles = [
             "Image 0 - Raw matched keypoints",

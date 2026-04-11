@@ -14,6 +14,7 @@
   <a target="_blank" href="https://hub.docker.com/r/vincentqin/image-matching-webui"><img alt="Docker Image Version" src="https://img.shields.io/docker/v/vincentqin/image-matching-webui?sort=date&arch=amd64&logo=docker&label=imcui&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fvincentqin%2Fimage-matching-webui"></a>
   <a target="_blank" href="https://pepy.tech/projects/imcui"><img src="https://static.pepy.tech/badge/imcui" alt="PyPI Downloads"></a>
   <a target="_blank" href="https://deepwiki.com/Vincentqyw/image-matching-webui"><img src="https://img.shields.io/badge/DeepWiki-imcui-blue.svg" alt="DeepWiki"></a>
+  <a target="_blank" href="https://imcui.mintlify.app"><img src="https://img.shields.io/badge/docs-mintlify-32cd32?style=flat&logo=mintlify" alt="Documentation"></a>
 </div>
 
 ## Description
@@ -21,15 +22,20 @@
 `Image Matching WebUI (IMCUI)` efficiently matches image pairs using multiple famous image matching algorithms. The tool features a Graphical User Interface (GUI) designed using [gradio](https://gradio.app/). You can effortlessly select two images and a matching algorithm and obtain a precise matching result.
 **Note**: the images source can be either local images or webcam images.
 
+Online Demo
+-----------
+
 Try it on
 <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
-<a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui"><img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/></a>
 
 Here is a demo of the tool:
 
 https://github.com/Vincentqyw/image-matching-webui/assets/18531182/263534692-c3484d1b-cc00-4fdc-9b31-e5b7af07ecd9
 
-The tool currently supports various popular image matching algorithms, namely:
+> **⚠️ Legacy**: This section contains models from older versions. For the latest supported models, please see [Model Details](https://vismatch.readthedocs.io/en/latest/model_details.html).
+
+<details>
+<summary><strong>Supported Algorithms (Old Version)</strong> (click to expand)</summary>
 
 | Algorithm        | Supported | Conference/Journal | Year | GitHub Link |
 |------------------|-----------|--------------------|------|-------------|
@@ -83,39 +89,53 @@ The tool currently supports various popular image matching algorithms, namely:
 | HardNet        | ✅ | NeurIPS | 2017 | [Link](https://github.com/DagnyT/hardnet) |
 | SIFT           | ✅ | IJCV    | 2004 | [Link](https://docs.opencv.org/4.x/da/df5/tutorial_py_sift_intro.html) |
 
+</details>
 
 ## How to use
-
-### HuggingFace / Lightning AI
-
-Just try it on <a href='https://huggingface.co/spaces/Realcat/image-matching-webui'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue'></a>
-<a target="_blank" href="https://lightning.ai/realcat/studios/image-matching-webui">
-  <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/>
-</a>
-
-or deploy it locally following the instructions below.
 
 ### Requirements
 
 - [Python 3.10+](https://www.python.org/downloads/)
 
-#### Install from pip [NEW]
+#### Installation
 
-Update: now support install from [pip](https://pypi.org/project/imcui), just run:
+**Recommended: Install from PyPI**
 
 ```bash
 pip install imcui
+# Optional: for auto-download support
+pip install imcui[datasets]
 ```
 
-#### Install from source
+> **Note**: Example datasets (82MB) are **automatically downloaded** from HuggingFace on first run to your user cache directory:
+> - **Linux/macOS**: `~/.cache/imcui/datasets/`
+> - **Windows**: `%LOCALAPPDATA%\imcui\datasets\`
+>
+> The download happens transparently on first launch. For offline use or custom data paths, use:
+> - Environment variable: `export IMCUI_DATA_DIR=/path/to/datasets`
+> - CLI flag: `imcui -d /path/to/datasets`
 
-``` bash
-git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git
+**Install from source**
+
+```bash
+git clone https://github.com/Vincentqyw/image-matching-webui.git
+cd image-matching-webui
+pip install -e .
+# Datasets will be auto-downloaded on first run
+```
+
+<details>
+<summary><strong>Deprecated: Conda installation</strong> (click to expand)</summary>
+
+```bash
+# ⚠️ environment.yaml is deprecated. Use pip instead.
+git clone https://github.com/Vincentqyw/image-matching-webui.git
 cd image-matching-webui
 conda env create -f environment.yaml
 conda activate imcui
 pip install -e .
 ```
+</details>
 
 or using [docker](https://hub.docker.com/r/vincentqin/image-matching-webui):
 
@@ -158,23 +178,17 @@ docker-compose down
 ```
 </details>
 
-### Deploy to Railway
-
-Deploy to [Railway](https://railway.app/), setting up a `Custom Start Command` in `Deploy` section:
-
-``` bash
-python -m imcui.api.server
-```
-
 ### Run demo
-``` bash
+```bash
 # Using the package CLI (recommended)
 imcui
 
-# Or using the direct script
+# Or using the direct script (for HuggingFace Spaces)
 python app.py
 ```
 then open http://localhost:7860 in your browser.
+
+> **Note:** Both `imcui` CLI and `python app.py` support the same command-line options (see below).
 
 ![](assets/gui.jpg)
 
@@ -219,7 +233,7 @@ imcui --help
 | `--server-name` | `-s` | `0.0.0.0` | Hostname or IP address to bind the server to |
 | `--server-port` | `-p` | `7860` | Port number to run the server on |
 | `--config` | `-c` | Auto-detected | Path to custom configuration YAML file |
-| `--example-data-root` | `-d` | `imcui/datasets` | Root directory containing example datasets |
+| `--example-data-root` | `-d` | Auto-download | Root directory containing example datasets (auto-downloads to cache if not specified) |
 | `--verbose` | `-v` | `False` | Enable verbose output for debugging |
 | `--version` | | | Show version information and exit |
 
@@ -228,22 +242,12 @@ imcui --help
 
 ### Add your own feature / matcher
 
-I provide an example to add local feature in [imcui/hloc/extractors/example.py](imcui/hloc/extractors/example.py). Then add feature settings in `confs` in file [imcui/hloc/extract_features.py](imcui/hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in your configuration file.
-
-**Configuration file locations (in priority order):**
-1. Custom config file specified with `--config` parameter
-2. `config.yaml` in current directory
-3. `config/config.yaml` in current directory
-4. Package default config (`imcui/config/app.yaml`)
-
-### Upload models
-
-IMCUI hosts all models on [Huggingface](https://huggingface.co/Realcat/imcui_checkpoints).  You can upload your model to Huggingface and add it to the [Realcat/imcui_checkpoints](https://huggingface.co/Realcat/imcui_checkpoints) repository.
+> **Note:** This WebUI no longer maintains matching algorithms. All matchers are maintained in the [vismatch](https://github.com/gmberton/vismatch) repository. To add new matchers or algorithms, please contribute to the vismatch repository instead.
 
 
 ## Contributions welcome!
 
-External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using a linter like flake8. This is a non-exhaustive list of features that might be valuable additions:
+External contributions are very much welcome. Please follow the [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/) using ruff (included in pre-commit). This is a non-exhaustive list of features that might be valuable additions:
 
 - [x] support pip install command
 - [x] add [CPU CI](.github/workflows/ci.yml)
@@ -255,36 +259,6 @@ External contributions are very much welcome. Please follow the [PEP8 style guid
 - [ ] support export matches to colmap ([#issue 6](https://github.com/Vincentqyw/image-matching-webui/issues/6))
 - [x] add config file to set default parameters
 - [x] dynamically load models and reduce GPU overload
-
-Adding local features / matchers as submodules is very easy. For example, to add the [GlueStick](https://github.com/cvg/GlueStick):
-
-``` bash
-git submodule add https://github.com/cvg/GlueStick.git imcui/third_party/GlueStick
-```
-
-If remote submodule repositories are updated, don't forget to pull submodules with:
-
-``` bash
-git submodule update --init --recursive  # init and download
-git submodule update --remote  # update
-```
-
-If you only want to update one submodule, use `git submodule update --remote imcui/third_party/GlueStick`.
-
-To remove a submodule, follow these steps:
-
-<details>
-<summary><strong>More Remove Submodule Commands</strong> (click to expand)</summary>
-
-``` bash
-git submodule deinit -f imcui/third_party/GlueStick
-git rm -f imcui/third_party/GlueStick
-rm -rf .git/modules/imcui/third_party/GlueStick
-git add .gitmodules && \
-git commit -m "Remove submodule imcui/third_party/dust3r"
-```
-</details>
-
 
 To format code before committing, run:
 
@@ -304,7 +278,8 @@ pre-commit run -a  # Auto-checks and fixes
 
 ## Acknowledgement
 
-This code is built based on [Hierarchical-Localization](https://github.com/cvg/Hierarchical-Localization). We express our gratitude to the authors for their valuable source code.
+The matching algorithms are maintained in [vismatch](https://github.com/gmberton/vismatch) by [@gmberton](https://github.com/gmberton). We thank the authors for creating and maintaining this excellent library.
+
 
 [contributors-shield]: https://img.shields.io/github/contributors/Vincentqyw/image-matching-webui.svg?style=for-the-badge
 [contributors-url]: https://github.com/Vincentqyw/image-matching-webui/graphs/contributors
