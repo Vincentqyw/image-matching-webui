@@ -227,5 +227,5 @@ def evaluate_submission(submission_dir, relocs, ths=[0.1, 0.2, 0.5]):
         recall = [np.mean(error <= th) for th in ths]
         s = f"Relocalization evaluation {submission_dir.name}/{reloc.name}\n"
         s += " / ".join([f"{th:>7}m" for th in ths]) + "\n"
-        s += " / ".join([f"{100*r:>7.3f}%" for r in recall])
+        s += " / ".join([f"{100 * r:>7.3f}%" for r in recall])
         logger.info(s)
