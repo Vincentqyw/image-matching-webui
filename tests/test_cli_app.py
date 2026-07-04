@@ -146,7 +146,7 @@ def test_cli_with_custom_config():
                     "enable": True,
                     "matcher": "NN-mutual",
                     "feature": "sift",
-                    "dense": False,
+                    "standalone": False,
                     "info": {"name": "SIFT", "source": "IJCV 2004", "display": True},
                 }
             },
