@@ -16,123 +16,141 @@ defaults:
   setting_geometry: Homography
 
 matcher_zoo:
-  superpoint+lightglue:
-    matcher: superpoint-lightglue
-    feature: superpoint_max
-    standalone: false
-    info:
-      name: LightGlue
-      source: "ICCV 2023"
-      github: https://github.com/cvg/LightGlue
-      paper: https://arxiv.org/pdf/2306.13643
-      display: true
-
-  disk+lightglue:
-    matcher: disk-lightglue
-    feature: disk
-    standalone: false
-    info:
-      name: LightGlue
-      source: "ICCV 2023"
-      github: https://github.com/cvg/LightGlue
-      paper: https://arxiv.org/pdf/2306.13643
-      display: true
-
-  aliked+lightglue:
-    matcher: aliked-lightglue
-    feature: aliked-n16
-    standalone: false
-    info:
-      name: ALIKED
-      source: "ICCV 2023"
-      github: https://github.com/Shiaoming/ALIKED
-      paper: https://arxiv.org/pdf/2304.03608.pdf
-      display: true
-
-  superpoint+superglue:
-    matcher: superglue
-    feature: superpoint_max
-    standalone: false
-    info:
-      name: SuperGlue
-      source: "CVPR 2020"
-      github: https://github.com/magicleap/SuperGluePretrainedNetwork
-      paper: https://arxiv.org/abs/1911.11763
-      display: true
-
-  loftr:
-    matcher: loftr
-    standalone: true
-    info:
-      name: LoFTR
-      source: "CVPR 2021"
-      github: https://github.com/zju3dv/LoFTR
-      paper: https://arxiv.org/pdf/2104.00680
-      project: https://zju3dv.github.io/loftr
-      display: true
-
-  eloftr:
-    matcher: eloftr
-    standalone: true
-    info:
-      name: Efficient LoFTR
-      source: "CVPR 2024"
-      github: https://github.com/zju3dv/efficientloftr
-      paper: https://zju3dv.github.io/efficientloftr/files/EfficientLoFTR.pdf
-      project: https://zju3dv.github.io/efficientloftr
-      display: true
-
-  se2loftr:
-    matcher: se2loftr
-    standalone: true
+  # example config
+  Example:
+    # show in `Matching Model` or not, default: true
+    enable: false
+    # matcher name
+    matcher: example
+    # skip ci or not, default: false
     skip_ci: true
-    info:
-      name: SE2-LoFTR
-      source: "3DV 2025"
-      github: https://github.com/abharadwaj-1234/SE2-LoFTR
-      paper: https://arxiv.org/abs/2503.10814
-      display: true
-      efficiency: medium
-
-  RoMa:
-    matcher: roma
+    # dense matcher or not, default: true
     standalone: true
-    skip_ci: true
+    # info
     info:
-      name: RoMa
-      source: "CVPR 2024"
-      github: https://github.com/Parskatt/RoMa
-      paper: https://arxiv.org/abs/2305.15404
-      project: https://parskatt.github.io/RoMa
-      display: true
+      # dispaly name in `Matching Model`
+      name: example(example)
+      # conference/journal/workshop Year
+      source: "CVPR XXXX"
+      # github link
+      github: https://github.com/example/example
+      # paper link
+      paper: https://arxiv.org/abs/xxxx.xxxx
+      # project link
+      project: https://example.com
+      # show in `support algos` table
+      display: false
+      # low, medium, high
       efficiency: low
 
-  RoMaV2:
-    matcher: romav2
-    standalone: true
+  dad(RoMa):
+    matcher: dad_roma
     skip_ci: true
+    standalone: true
     info:
-      name: RoMaV2
+      name: Dad(RoMa) #dispaly name
       source: "ARXIV 2025"
-      github: https://github.com/Parskatt/RoMaV2
-      paper: https://arxiv.org/abs/2412.12906
+      paper: https://arxiv.org/abs/2503.07347
+      github: https://github.com/Parskatt/dad
       display: true
-      efficiency: low
-
-  dkm:
-    matcher: dkm
+      efficiency: medium  # low, medium, high
+  LoMa-B:
+    matcher: loma-b
+    standalone: true
+    info:
+      name: LoMa-B
+      source: "ECCV 2026"
+      paper: https://arxiv.org/abs/2504.03028
+      github: https://github.com/davnords/LoMa
+      display: true
+      efficiency: medium  # low, medium, high
+  LoMa-L:
+    matcher: loma-l
     standalone: true
     skip_ci: true
-    enable: true
     info:
-      name: DKM
-      source: "CVPR 2023"
-      github: https://github.com/Parskatt/DKM
-      paper: https://arxiv.org/abs/2202.00667
-      project: https://parskatt.github.io/DKM
+      name: LoMa-L
+      source: "ECCV 2026"
+      paper: https://arxiv.org/abs/2504.03028
+      github: https://github.com/davnords/LoMa
       display: true
-      efficiency: low
-
+      efficiency: low  # low, medium, high
+  LoMa-G:
+    enable: false
+    matcher: loma-g
+    standalone: true
+    skip_ci: true
+    info:
+      name: LoMa-G
+      source: "ECCV 2026"
+      paper: https://arxiv.org/abs/2504.03028
+      github: https://github.com/davnords/LoMa
+      display: true
+      efficiency: low  # low, medium, high
+  LoMa-R:
+    matcher: loma-r
+    standalone: true
+    skip_ci: true
+    info:
+      name: LoMa-R
+      source: "CVPRW 2026"
+      paper: https://arxiv.org/abs/2504.03028
+      github: https://github.com/davnords/LoMa
+      display: true
+      efficiency: medium  # low, medium, high
+  minima(loftr):
+    matcher: minima_loftr
+    standalone: true
+    info:
+      name: MINIMA(LoFTR) #dispaly name
+      source: "ARXIV 2024"
+      paper: https://arxiv.org/abs/2412.19412
+      github: https://github.com/LSXI7/MINIMA
+      display: true
+  minima(RoMa):
+    matcher: minima_roma
+    skip_ci: true
+    standalone: true
+    info:
+      name: MINIMA(RoMa) #dispaly name
+      source: "ARXIV 2024"
+      paper: https://arxiv.org/abs/2412.19412
+      github: https://github.com/LSXI7/MINIMA
+      display: true
+      efficiency: low  # low, medium, high
+  minima(lightglue):
+    matcher: minima_lightglue
+    feature: superpoint_max
+    standalone: false
+    info:
+      name: MINIMA(LightGlue) #dispaly name
+      source: "ARXIV 2024"
+      paper: https://arxiv.org/abs/2412.19412
+      github: https://github.com/LSXI7/MINIMA
+      display: true
+      efficiency: high  # low, medium, high
+  minima(eloftr):
+    matcher: minima_eloftr
+    standalone: true
+    skip_ci: true
+    info:
+      name: MINIMA(ELoFTR) #dispaly name
+      source: "ARXIV 2024"
+      paper: https://arxiv.org/abs/2412.19412
+      github: https://github.com/LSXI7/MINIMA
+      display: true
+      efficiency: medium  # low, medium, high
+  minima(xoftr):
+    matcher: minima_xoftr
+    standalone: true
+    skip_ci: true
+    info:
+      name: MINIMA(XoFTR) #dispaly name
+      source: "ARXIV 2024"
+      paper: https://arxiv.org/abs/2412.19412
+      github: https://github.com/LSXI7/MINIMA
+      display: true
+      efficiency: medium  # low, medium, high
   omniglue:
     enable: true
     matcher: omniglue
@@ -144,7 +162,189 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2405.12979
       project: https://hwjiang1510.github.io/OmniGlue
       display: true
-
+  Mast3R:
+    enable: true
+    matcher: mast3r
+    standalone: true
+    skip_ci: true
+    info:
+      name: Mast3R #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/naver/mast3r
+      paper: https://arxiv.org/abs/2406.09756
+      project: https://dust3r.europe.naverlabs.com
+      display: true
+      efficiency: low  # low, medium, high
+  DUSt3R:
+    # TODO: duster is under development
+    enable: true
+    matcher: duster
+    standalone: true
+    info:
+      name: DUSt3R #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/naver/dust3r
+      paper: https://arxiv.org/abs/2312.14132
+      project: https://dust3r.europe.naverlabs.com
+      display: true
+  GIM(RoMa):
+    matcher: gim_roma
+    skip_ci: true
+    standalone: true
+    enable: true
+    info:
+      name: GIM(RoMa) #dispaly name
+      source: "ICLR 2024"
+      github: https://github.com/xuelunshen/gim
+      paper: https://arxiv.org/abs/2402.11095
+      project: https://xuelunshen.com/gim
+      display: true
+      efficiency: low  # low, medium, high
+  GIM(dkm):
+    enable: true
+    skip_ci: true
+    matcher: gim(dkm)
+    standalone: true
+    info:
+      name: GIM(DKM) #dispaly name
+      source: "ICLR 2024"
+      github: https://github.com/xuelunshen/gim
+      paper: https://arxiv.org/abs/2402.11095
+      project: https://xuelunshen.com/gim
+      display: true
+      efficiency: low  # low, medium, high
+  RoMa:
+    matcher: roma
+    skip_ci: true
+    standalone: true
+    info:
+      name: RoMa #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/Parskatt/RoMa
+      paper: https://arxiv.org/abs/2305.15404
+      project: https://parskatt.github.io/RoMa
+      display: true
+      efficiency: low  # low, medium, high
+  RoMaV2:
+    matcher: romav2
+    skip_ci: true
+    standalone: true
+    info:
+      name: RoMaV2 #dispaly name
+      source: "ARXIV 2025"
+      github: https://github.com/Parskatt/RoMaV2
+      paper: https://arxiv.org/abs/2412.12906
+      display: true
+      efficiency: low  # low, medium, high
+  dkm:
+    matcher: dkm
+    skip_ci: true
+    standalone: true
+    enable: true
+    info:
+      name: DKM #dispaly name
+      source: "CVPR 2023"
+      github: https://github.com/Parskatt/DKM
+      paper: https://arxiv.org/abs/2202.00667
+      project: https://parskatt.github.io/DKM
+      display: true
+      efficiency: low  # low, medium, high
+  loftr:
+    matcher: loftr
+    standalone: true
+    info:
+      name: LoFTR #dispaly name
+      source: "CVPR 2021"
+      github: https://github.com/zju3dv/LoFTR
+      paper: https://arxiv.org/pdf/2104.00680
+      project: https://zju3dv.github.io/loftr
+      display: true
+  eloftr:
+    matcher: eloftr
+    standalone: true
+    info:
+      name: Efficient LoFTR #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/zju3dv/efficientloftr
+      paper: https://zju3dv.github.io/efficientloftr/files/EfficientLoFTR.pdf
+      project: https://zju3dv.github.io/efficientloftr
+      display: true
+  se2loftr:
+    matcher: se2loftr
+    skip_ci: true
+    standalone: true
+    info:
+      name: SE2-LoFTR #dispaly name
+      source: "3DV 2025"
+      github: https://github.com/abharadwaj-1234/SE2-LoFTR
+      paper: https://arxiv.org/abs/2503.10814
+      display: true
+      efficiency: medium  # low, medium, high
+  xoftr:
+    matcher: xoftr
+    standalone: true
+    info:
+      name: XoFTR #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/OnderT/XoFTR
+      paper: https://arxiv.org/pdf/2404.09692
+      project: null
+      display: true
+  jamma:
+    matcher: jamma
+    standalone: true
+    enable: false
+    info:
+      name: Jamma #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/OnderT/XoFTR
+      paper: https://arxiv.org/pdf/2404.09692
+      project: null
+      display: false
+  cotr:
+    enable: false
+    skip_ci: true
+    matcher: cotr
+    standalone: true
+    info:
+      name: CoTR #dispaly name
+      source: "ICCV 2021"
+      github: https://github.com/ubc-vision/COTR
+      paper: https://arxiv.org/abs/2103.14167
+      project: null
+      display: true
+      efficiency: low  # low, medium, high
+  topicfm:
+    matcher: topicfm
+    standalone: true
+    info:
+      name: TopicFM #dispaly name
+      source: "AAAI 2023"
+      github: https://github.com/TruongKhang/TopicFM
+      paper: https://arxiv.org/abs/2307.00485
+      project: null
+      display: true
+  aspanformer:
+    matcher: aspanformer
+    standalone: true
+    info:
+      name: ASpanformer #dispaly name
+      source: "ECCV 2022"
+      github: https://github.com/Vincentqyw/ml-aspanformer
+      paper: https://arxiv.org/abs/2208.14201
+      project: null
+      display: true
+  matchformer:
+    matcher: matchformer
+    skip_ci: true
+    standalone: true
+    info:
+      name: MatchFormer #dispaly name
+      source: "ARXIV 2023"
+      github: https://github.com/jamycheung/MatchFormer
+      paper: https://arxiv.org/abs/2303.14507
+      display: true
+      efficiency: medium  # low, medium, high
   xfeat+lightglue:
     enable: true
     matcher: xfeat_lightglue
@@ -156,115 +356,103 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2405.12979
       project: https://hwjiang1510.github.io/OmniGlue
       display: true
-
-  gluestick:
-    enable: true
-    matcher: gluestick
-    standalone: true
-    info:
-      name: GlueStick
-      source: "ICCV 2023"
-      github: https://github.com/cvg/GlueStick
-      paper: https://arxiv.org/abs/2304.02008
-      project: https://iago-suarez.com/gluestick
-      display: true
-
-  topicfm:
-    matcher: topicfm
-    standalone: true
-    info:
-      name: TopicFM
-      source: "AAAI 2023"
-      github: https://github.com/TruongKhang/TopicFM
-      paper: https://arxiv.org/abs/2307.00485
-      display: true
-
-  aspanformer:
-    matcher: aspanformer
-    standalone: true
-    info:
-      name: ASpanformer
-      source: "ECCV 2022"
-      github: https://github.com/Vincentqyw/ml-aspanformer
-      paper: https://arxiv.org/abs/2208.14201
-      display: true
-
-  Mast3R:
-    enable: true
-    matcher: mast3r
-    standalone: true
-    skip_ci: true
-    info:
-      name: Mast3R
-      source: "CVPR 2024"
-      github: https://github.com/naver/mast3r
-      paper: https://arxiv.org/abs/2406.09756
-      project: https://dust3r.europe.naverlabs.com
-      display: true
-      efficiency: low
-
-  DUSt3R:
-    enable: true
-    matcher: duster
-    standalone: true
-    info:
-      name: DUSt3R
-      source: "CVPR 2024"
-      github: https://github.com/naver/dust3r
-      paper: https://arxiv.org/abs/2312.14132
-      project: https://dust3r.europe.naverlabs.com
-      display: true
-
-  GIM(RoMa):
-    matcher: gim_roma
-    standalone: true
-    enable: true
-    skip_ci: true
-    info:
-      name: GIM(RoMa)
-      source: "ICLR 2024"
-      github: https://github.com/xuelunshen/gim
-      paper: https://arxiv.org/abs/2402.11095
-      project: https://xuelunshen.com/gim
-      display: true
-      efficiency: low
-
-  GIM(dkm):
-    enable: true
-    skip_ci: true
-    matcher: gim(dkm)
-    standalone: true
-    info:
-      name: GIM(DKM)
-      source: "ICLR 2024"
-      github: https://github.com/xuelunshen/gim
-      paper: https://arxiv.org/abs/2402.11095
-      project: https://xuelunshen.com/gim
-      display: true
-      efficiency: low
-
-  sift+lightglue:
-    matcher: sift-lightglue
-    feature: sift
+  xfeat(sparse):
+    matcher: NN-mutual
+    feature: xfeat
     standalone: false
     info:
-      name: LightGlue
-      source: "ICCV 2023"
-      github: https://github.com/cvg/LightGlue
-      paper: https://arxiv.org/pdf/2306.13643
+      name: XFeat #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/verlab/accelerated_features
+      paper: https://arxiv.org/abs/2404.19174
+      project: null
       display: true
-
-  superpoint+mnn:
+  xfeat(dense):
+    matcher: xfeat_dense
+    standalone: true
+    info:
+      name: XFeat #dispaly name
+      source: "CVPR 2024"
+      github: https://github.com/verlab/accelerated_features
+      paper: https://arxiv.org/abs/2404.19174
+      project: null
+      display: false
+  liftfeat(sparse):
     matcher: NN-mutual
+    feature: liftfeat
+    standalone: false
+    info:
+      name: LiftFeat #dispaly name
+      source: "ICRA 2025"
+      github: https://github.com/lyp-deeplearning/LiftFeat
+      paper: https://arxiv.org/abs/2505.0342
+      project: null
+      display: true
+  ripe(+mnn):
+    matcher: NN-mutual
+    feature: ripe
+    standalone: false
+    info:
+      name: RIPE #dispaly name
+      source: "ICCV 2025"
+      github: https://github.com/fraunhoferhhi/RIPE
+      paper: https://arxiv.org/abs/2507.04839
+      project: https://fraunhoferhhi.github.io/RIPE
+      display: true
+  rdd(sparse):
+    matcher: NN-mutual
+    feature: rdd
+    standalone: false
+    info:
+      name: RDD(sparse) #dispaly name
+      source: "CVPR 2025"
+      github: https://github.com/xtcpete/rdd
+      paper: https://arxiv.org/abs/2505.08013
+      project: https://xtcpete.github.io/rdd
+      display: true
+  rdd(dense):
+    matcher: rdd_dense
+    standalone: true
+    info:
+      name: RDD(dense) #dispaly name
+      source: "CVPR 2025"
+      github: https://github.com/xtcpete/rdd
+      paper: https://arxiv.org/abs/2505.08013
+      project: https://xtcpete.github.io/rdd
+      display: true
+  dedode:
+    matcher: Dual-Softmax
+    feature: dedode
+    standalone: false
+    info:
+      name: DeDoDe #dispaly name
+      source: "3DV 2024"
+      github: https://github.com/Parskatt/DeDoDe
+      paper: https://arxiv.org/abs/2308.08479
+      project: null
+      display: true
+  superpoint+superglue:
+    matcher: superglue
     feature: superpoint_max
     standalone: false
     info:
-      name: SuperPoint
-      source: "CVPRW 2018"
-      github: https://github.com/magicleap/SuperPointPretrainedNetwork
-      paper: https://arxiv.org/abs/1712.07629
+      name: SuperGlue #dispaly name
+      source: "CVPR 2020"
+      github: https://github.com/magicleap/SuperGluePretrainedNetwork
+      paper: https://arxiv.org/abs/1911.11763
+      project: null
       display: true
-
+  superpoint+lightglue:
+    matcher: superpoint-lightglue
+    feature: superpoint_max
+    standalone: false
+    info:
+      name: LightGlue #dispaly name
+      source: "ICCV 2023"
+      github: https://github.com/cvg/LightGlue
+      paper: https://arxiv.org/pdf/2306.13643
+      project: null
+      display: true
   disk:
     matcher: NN-mutual
     feature: disk
@@ -274,142 +462,63 @@ matcher_zoo:
       source: "NeurIPS 2020"
       github: https://github.com/cvlab-epfl/disk
       paper: https://arxiv.org/abs/2006.13566
+      project: null
       display: true
-
-  dedode:
+  disk+dualsoftmax:
     matcher: Dual-Softmax
-    feature: dedode
+    feature: disk
     standalone: false
     info:
-      name: DeDoDe
-      source: "3DV 2024"
-      github: https://github.com/Parskatt/DeDoDe
-      paper: https://arxiv.org/abs/2308.08479
-      display: true
-
-  alike:
-    matcher: NN-mutual
-    feature: alike
-    standalone: false
-    info:
-      name: ALIKE
-      source: "TMM 2022"
-      github: https://github.com/Shiaoming/ALIKE
-      paper: https://arxiv.org/abs/2112.02906
-      display: true
-
-  sift:
-    matcher: NN-mutual
-    feature: sift
-    standalone: false
-    info:
-      name: SIFT
-      source: "IJCV 2004"
-      github: null
-      paper: https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf
-      display: true
-
-  r2d2:
-    matcher: NN-mutual
-    feature: r2d2
-    standalone: false
-    info:
-      name: R2D2
-      source: "NeurIPS 2019"
-      github: https://github.com/naver/r2d2
-      paper: https://arxiv.org/abs/1906.06195
-      display: true
-
-  d2net:
-    matcher: NN-mutual
-    feature: d2net-ss
-    standalone: false
-    info:
-      name: D2Net
-      source: "CVPR 2019"
-      github: https://github.com/Vincentqyw/d2-net
-      paper: https://arxiv.org/abs/1905.03561
-      project: https://dusmanu.com/publications/d2-net.html
-      display: true
-
-  xfeat(sparse):
-    matcher: NN-mutual
-    feature: xfeat
-    standalone: false
-    info:
-      name: XFeat
-      source: "CVPR 2024"
-      github: https://github.com/verlab/accelerated_features
-      paper: https://arxiv.org/abs/2404.19174
-      display: true
-
-  xfeat(dense):
-    matcher: xfeat_dense
-    standalone: true
-    info:
-      name: XFeat
-      source: "CVPR 2024"
-      github: https://github.com/verlab/accelerated_features
-      paper: https://arxiv.org/abs/2404.19174
+      name: DISK
+      source: "NeurIPS 2020"
+      github: https://github.com/cvlab-epfl/disk
+      paper: https://arxiv.org/abs/2006.13566
+      project: null
       display: false
-
-  LoMa-B:
-    matcher: loma-b
-    standalone: true
-    info:
-      name: LoMa-B
-      source: "ECCV 2026"
-      paper: https://arxiv.org/abs/2504.03028
-      github: https://github.com/davnords/LoMa
-      display: true
-      efficiency: medium
-
-  LoMa-L:
-    matcher: loma-l
-    standalone: true
-    skip_ci: true
-    info:
-      name: LoMa-L
-      source: "ECCV 2026"
-      paper: https://arxiv.org/abs/2504.03028
-      github: https://github.com/davnords/LoMa
-      display: true
-      efficiency: low
-
-  minima(loftr):
-    matcher: minima_loftr
-    standalone: true
-    info:
-      name: MINIMA(LoFTR)
-      source: "ARXIV 2024"
-      paper: https://arxiv.org/abs/2412.19412
-      github: https://github.com/LSXI7/MINIMA
-      display: true
-
-  minima(RoMa):
-    matcher: minima_roma
-    standalone: true
-    skip_ci: true
-    info:
-      name: MINIMA(RoMa)
-      source: "ARXIV 2024"
-      paper: https://arxiv.org/abs/2412.19412
-      github: https://github.com/LSXI7/MINIMA
-      display: true
-      efficiency: low
-
-  minima(lightglue):
-    matcher: minima_lightglue
+  superpoint+dualsoftmax:
+    matcher: Dual-Softmax
     feature: superpoint_max
     standalone: false
     info:
-      name: MINIMA(LightGlue)
-      source: "ARXIV 2024"
-      paper: https://arxiv.org/abs/2412.19412
-      github: https://github.com/LSXI7/MINIMA
+      name: SuperPoint
+      source: "CVPRW 2018"
+      github: https://github.com/magicleap/SuperPointPretrainedNetwork
+      paper: https://arxiv.org/abs/1712.07629
+      project: null
+      display: false
+  sift+lightglue:
+    matcher: sift-lightglue
+    feature: sift
+    standalone: false
+    info:
+      name: LightGlue #dispaly name
+      source: "ICCV 2023"
+      github: https://github.com/cvg/LightGlue
+      paper: https://arxiv.org/pdf/2306.13643
+      project: null
       display: true
-      efficiency: high
-
+  disk+lightglue:
+    matcher: disk-lightglue
+    feature: disk
+    standalone: false
+    info:
+      name: LightGlue
+      source: "ICCV 2023"
+      github: https://github.com/cvg/LightGlue
+      paper: https://arxiv.org/pdf/2306.13643
+      project: null
+      display: true
+  aliked+lightglue:
+    matcher: aliked-lightglue
+    feature: aliked-n16
+    standalone: false
+    info:
+      name: ALIKED
+      source: "ICCV 2023"
+      github: https://github.com/Shiaoming/ALIKED
+      paper: https://arxiv.org/pdf/2304.03608.pdf
+      project: null
+      display: true
   raco+lightglue:
     matcher: raco-lightglue
     feature: raco
@@ -419,64 +528,150 @@ matcher_zoo:
       source: "3DV 2026"
       github: https://github.com/cvg/RaCo
       paper: https://arxiv.org/pdf/2602.15755
+      project: null
       display: true
-
-  dad(RoMa):
-    matcher: dad_roma
+  superpoint+mnn:
+    matcher: NN-mutual
+    feature: superpoint_max
+    standalone: false
+    info:
+      name: SuperPoint #dispaly name
+      source: "CVPRW 2018"
+      github: https://github.com/magicleap/SuperPointPretrainedNetwork
+      paper: https://arxiv.org/abs/1712.07629
+      project: null
+      display: true
+  sift+sgmnet:
+    matcher: sgmnet
+    feature: sift
+    standalone: false
+    info:
+      name: SGMNet #dispaly name
+      source: "ICCV 2021"
+      github: https://github.com/vdvchen/SGMNet
+      paper: https://arxiv.org/abs/2108.08771
+      project: null
+      display: true
+  sosnet:
+    matcher: NN-mutual
+    feature: sosnet
+    standalone: false
+    info:
+      name: SOSNet #dispaly name
+      source: "CVPR 2019"
+      github: https://github.com/scape-research/SOSNet
+      paper: https://arxiv.org/abs/1904.05019
+      project: https://research.scape.io/sosnet
+      display: true
+  hardnet:
+    matcher: NN-mutual
+    feature: hardnet
+    standalone: false
+    info:
+      name: HardNet #dispaly name
+      source: "NeurIPS 2017"
+      github: https://github.com/DagnyT/hardnet
+      paper: https://arxiv.org/abs/1705.10872
+      project: null
+      display: true
+  d2net:
+    matcher: NN-mutual
+    feature: d2net-ss
+    standalone: false
+    info:
+      name: D2Net #dispaly name
+      source: "CVPR 2019"
+      github: https://github.com/Vincentqyw/d2-net
+      paper: https://arxiv.org/abs/1905.03561
+      project: https://dusmanu.com/publications/d2-net.html
+      display: true
+  rord:
+    matcher: NN-mutual
+    feature: rord
+    standalone: false
+    info:
+      name: RoRD #dispaly name
+      source: "IROS 2021"
+      github: https://github.com/UditSinghParihar/RoRD
+      paper: https://arxiv.org/abs/2103.08573
+      project: https://uditsinghparihar.github.io/RoRD
+      display: true
+  alike:
+    matcher: NN-mutual
+    feature: alike
+    standalone: false
+    info:
+      name: ALIKE #dispaly name
+      source: "TMM 2022"
+      github: https://github.com/Shiaoming/ALIKE
+      paper: https://arxiv.org/abs/2112.02906
+      project: null
+      display: true
+  lanet:
+    matcher: NN-mutual
+    feature: lanet
+    standalone: false
+    info:
+      name: LANet #dispaly name
+      source: "ACCV 2022"
+      github: https://github.com/wangch-g/lanet
+      paper: https://openaccess.thecvf.com/content/ACCV2022/papers/Wang_Rethinking_Low-level_Features_for_Interest_Point_Detection_and_Description_ACCV_2022_paper.pdf
+      project: null
+      display: true
+  r2d2:
+    matcher: NN-mutual
+    feature: r2d2
+    standalone: false
+    info:
+      name: R2D2 #dispaly name
+      source: "NeurIPS 2019"
+      github: https://github.com/naver/r2d2
+      paper: https://arxiv.org/abs/1906.06195
+      project: null
+      display: true
+  darkfeat:
+    matcher: NN-mutual
+    feature: darkfeat
+    standalone: false
+    info:
+      name: DarkFeat #dispaly name
+      source: "AAAI 2023"
+      github: https://github.com/THU-LYJ-Lab/DarkFeat
+      paper: null
+      project: null
+      display: true
+  sift:
+    matcher: NN-mutual
+    feature: sift
+    standalone: false
+    info:
+      name: SIFT #dispaly name
+      source: "IJCV 2004"
+      github: null
+      paper: https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf
+      project: null
+      display: true
+  gluestick:
+    enable: true
+    matcher: gluestick
     standalone: true
-    skip_ci: true
     info:
-      name: Dad(RoMa)
-      source: "ARXIV 2025"
-      paper: https://arxiv.org/abs/2503.07347
-      github: https://github.com/Parskatt/dad
+      name: GlueStick #dispaly name
+      source: "ICCV 2023"
+      github: https://github.com/cvg/GlueStick
+      paper: https://arxiv.org/abs/2304.02008
+      project: https://iago-suarez.com/gluestick
       display: true
-      efficiency: medium
-
-  rdd(sparse):
-    matcher: NN-mutual
-    feature: rdd
-    standalone: false
-    info:
-      name: RDD(sparse)
-      source: "CVPR 2025"
-      github: https://github.com/xtcpete/rdd
-      paper: https://arxiv.org/abs/2505.08013
-      project: https://xtcpete.github.io/rdd
-      display: true
-
-  rdd(dense):
-    matcher: rdd_dense
+  sold2:
+    enable: false
+    matcher: sold2
     standalone: true
     info:
-      name: RDD(dense)
-      source: "CVPR 2025"
-      github: https://github.com/xtcpete/rdd
-      paper: https://arxiv.org/abs/2505.08013
-      project: https://xtcpete.github.io/rdd
-      display: true
-
-  liftfeat(sparse):
-    matcher: NN-mutual
-    feature: liftfeat
-    standalone: false
-    info:
-      name: LiftFeat
-      source: "ICRA 2025"
-      github: https://github.com/lyp-deeplearning/LiftFeat
-      paper: https://arxiv.org/abs/2505.0342
-      display: true
-
-  ripe(+mnn):
-    matcher: NN-mutual
-    feature: ripe
-    standalone: false
-    info:
-      name: RIPE
-      source: "ICCV 2025"
-      github: https://github.com/fraunhoferhhi/RIPE
-      paper: https://arxiv.org/abs/2507.04839
-      project: https://fraunhoferhhi.github.io/RIPE
+      name: SOLD2 #dispaly name
+      source: "CVPR 2021"
+      github: https://github.com/cvg/SOLD2
+      paper: https://arxiv.org/abs/2104.03362
+      project: null
       display: true
 
   sfd2+imp:
@@ -485,7 +680,7 @@ matcher_zoo:
     feature: sfd2
     standalone: false
     info:
-      name: SFD2+IMP
+      name: SFD2+IMP #dispaly name
       source: "CVPR 2023"
       github: https://github.com/feixue94/imp-release
       paper: https://arxiv.org/pdf/2304.14837
@@ -498,24 +693,12 @@ matcher_zoo:
     feature: sfd2
     standalone: false
     info:
-      name: SFD2+MNN
+      name: SFD2+MNN #dispaly name
       source: "CVPR 2023"
       github: https://github.com/feixue94/sfd2
       paper: https://arxiv.org/abs/2304.14845
       project: https://feixue94.github.io/
       display: true
-
-  minima(eloftr):
-    matcher: minima_eloftr
-    standalone: true
-    skip_ci: true
-    info:
-      name: MINIMA(ELoFTR)
-      source: "ARXIV 2024"
-      paper: https://arxiv.org/abs/2412.19412
-      github: https://github.com/LSXI7/MINIMA
-      display: true
-      efficiency: medium
 
 retrieval_zoo:
   netvlad:
