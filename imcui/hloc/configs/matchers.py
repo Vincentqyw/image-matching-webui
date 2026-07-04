@@ -82,6 +82,23 @@ confs = {
             "force_resize": False,
         },
     },
+    "raco-lightglue": {
+        "output": "matches-raco-lightglue",
+        "model": {
+            "name": "lightglue",
+            "match_threshold": 0.2,
+            "width_confidence": 0.99,
+            "depth_confidence": 0.95,
+            "features": "raco-aliked",
+            "model_name": "raco_aliked_lightglue.pth",
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "resize_max": 1024,
+            "dfactor": 32,
+            "force_resize": False,
+        },
+    },
     "sift-lightglue": {
         "output": "matches-sift-lightglue",
         "model": {
@@ -599,6 +616,74 @@ confs = {
         },
         "preprocessing": {
             "grayscale": True,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
+    "loma-b": {
+        "output": "matches-loma-b",
+        "model": {
+            "name": "loma",
+            "model_name": "loma_b",
+            "max_keypoints": 2048,
+            "filter_threshold": 0.1,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
+    "loma-l": {
+        "output": "matches-loma-l",
+        "model": {
+            "name": "loma",
+            "model_name": "loma_l",
+            "max_keypoints": 2048,
+            "filter_threshold": 0.1,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
+    "loma-g": {
+        "output": "matches-loma-g",
+        "model": {
+            "name": "loma",
+            "model_name": "loma_g",
+            "max_keypoints": 2048,
+            "filter_threshold": 0.1,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
+    "loma-r": {
+        "output": "matches-loma-r",
+        "model": {
+            "name": "loma",
+            "model_name": "loma_r",
+            "max_keypoints": 2048,
+            "filter_threshold": 0.1,
+        },
+        "preprocessing": {
+            "grayscale": False,
             "force_resize": True,
             "resize_max": 1024,
             "width": 640,

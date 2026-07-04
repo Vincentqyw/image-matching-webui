@@ -54,6 +54,50 @@ matcher_zoo:
       github: https://github.com/Parskatt/dad
       display: true
       efficiency: medium  # low, medium, high
+  LoMa-B:
+    matcher: loma-b
+    dense: true
+    info:
+      name: LoMa-B
+      source: "ECCV 2026"
+      paper: https://arxiv.org/abs/2504.03028
+      github: https://github.com/davnords/LoMa
+      display: true
+      efficiency: medium  # low, medium, high
+  LoMa-L:
+    matcher: loma-l
+    dense: true
+    skip_ci: true
+    info:
+      name: LoMa-L
+      source: "ECCV 2026"
+      paper: https://arxiv.org/abs/2504.03028
+      github: https://github.com/davnords/LoMa
+      display: true
+      efficiency: low  # low, medium, high
+  LoMa-G:
+    enable: false
+    matcher: loma-g
+    dense: true
+    skip_ci: true
+    info:
+      name: LoMa-G
+      source: "ECCV 2026"
+      paper: https://arxiv.org/abs/2504.03028
+      github: https://github.com/davnords/LoMa
+      display: true
+      efficiency: low  # low, medium, high
+  LoMa-R:
+    matcher: loma-r
+    dense: true
+    skip_ci: true
+    info:
+      name: LoMa-R
+      source: "CVPRW 2026"
+      paper: https://arxiv.org/abs/2504.03028
+      github: https://github.com/davnords/LoMa
+      display: true
+      efficiency: medium  # low, medium, high
   minima(loftr):
     matcher: minima_loftr
     dense: true
@@ -125,7 +169,7 @@ matcher_zoo:
       efficiency: low  # low, medium, high
   GIM(dkm):
     enable: true
-    # skip_ci: true
+    skip_ci: true
     matcher: gim(dkm)
     dense: true
     info:
@@ -407,6 +451,17 @@ matcher_zoo:
       source: "ICCV 2023"
       github: https://github.com/Shiaoming/ALIKED
       paper: https://arxiv.org/pdf/2304.03608.pdf
+      project: null
+      display: true
+  raco+lightglue:
+    matcher: raco-lightglue
+    feature: raco
+    dense: false
+    info:
+      name: RaCo
+      source: "3DV 2026"
+      github: https://github.com/cvg/RaCo
+      paper: https://arxiv.org/pdf/2602.15755
       project: null
       display: true
   superpoint+mnn:

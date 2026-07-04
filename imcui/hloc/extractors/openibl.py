@@ -12,7 +12,7 @@ class OpenIBL(BaseModel):
 
     def _init(self, conf):
         self.net = torch.hub.load(
-            "yxgeee/OpenIBL", conf["model_name"], pretrained=True
+            "yxgeee/OpenIBL", conf["model_name"], pretrained=True, trust_repo=True
         ).eval()
         mean = [0.48501960784313836, 0.4579568627450961, 0.4076039215686255]
         std = [0.00392156862745098, 0.00392156862745098, 0.00392156862745098]

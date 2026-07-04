@@ -30,6 +30,7 @@ class CosPlace(BaseModel):
             "get_trained_model",
             backbone=conf["backbone"],
             fc_output_dim=conf["fc_output_dim"],
+            trust_repo=True,
         ).eval()
 
         mean = [0.485, 0.456, 0.406]

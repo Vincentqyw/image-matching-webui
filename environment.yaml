@@ -6,8 +6,8 @@ channels:
   - defaults
 dependencies:
   - python=3.10.10
-  - pytorch-cuda=12.1
-  - pytorch=2.4.0
+  - pytorch-cuda=12.6
+  - pytorch=2.12.1
   - pip
   - pip:
       - -r requirements.txt

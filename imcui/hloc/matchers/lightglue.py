@@ -1,4 +1,6 @@
+import os
 import sys
+import tempfile
 from pathlib import Path
 
 from .. import MODEL_REPO_ID, logger
@@ -34,10 +36,16 @@ class LightGlue(BaseModel):
 
     def _init(self, conf):
         logger.info("Loading lightglue model, {}".format(conf["model_name"]))
-        model_path = self._download_model(
-            repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
-        )
+        try:
+            model_path = self._download_model(
+                repo_id=MODEL_REPO_ID,
+                filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
+            )
+        except Exception:
+            logger.info(
+                "Model not found on HuggingFace, will download from official release."
+            )
+            model_path = os.path.join(tempfile.gettempdir(), self.conf["model_name"])
         conf["weights"] = str(model_path)
         conf["filter_threshold"] = conf["match_threshold"]
         self.net = LG(**conf)

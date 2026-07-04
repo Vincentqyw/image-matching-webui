@@ -256,6 +256,19 @@ confs = {
             "resize_max": 1024,
         },
     },
+    "raco": {
+        "output": "feats-raco",
+        "model": {
+            "name": "raco",
+            "model_name": "raco",
+            "max_num_keypoints": 1024,
+            "nms_radius": 3,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "resize_max": 1024,
+        },
+    },
     "alike": {
         "output": "feats-alike-n5000-r1600",
         "model": {

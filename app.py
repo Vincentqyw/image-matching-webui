@@ -5,18 +5,21 @@ from imcui.ui.app_class import ImageMatchingApp
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "-n",
         "--server_name",
         type=str,
         default="0.0.0.0",
         help="server name",
     )
     parser.add_argument(
+        "-p",
         "--server_port",
         type=int,
         default=7860,
         help="server port",
     )
     parser.add_argument(
+        "-c",
         "--config",
         type=str,
         default=Path(__file__).parent / "config/app.yaml",
