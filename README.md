@@ -33,6 +33,8 @@ The tool currently supports various popular image matching algorithms, namely:
 
 | Algorithm        | Supported | Conference/Journal | Year | GitHub Link |
 |------------------|-----------|--------------------|------|-------------|
+| LoMa           | ✅ | ECCV    | 2026 | [Link](https://github.com/davnords/LoMa) |
+| RaCo           | ✅ | 3DV     | 2026 | [Link](https://github.com/cvg/RaCo) |
 | RIPE           | ✅ | ICCV    | 2025 | [Link](https://github.com/fraunhoferhhi/RIPE)  |
 | RDD            | ✅ | CVPR    | 2025 | [Link](https://github.com/xtcpete/rdd)  |
 | LiftFeat       | ✅ | ICRA    | 2025 | [Link](https://github.com/lyp-deeplearning/LiftFeat) |
@@ -229,6 +231,8 @@ imcui --help
 ### Add your own feature / matcher
 
 I provide an example to add local feature in [imcui/hloc/extractors/example.py](imcui/hloc/extractors/example.py). Then add feature settings in `confs` in file [imcui/hloc/extract_features.py](imcui/hloc/extract_features.py). Last step is adding some settings to `matcher_zoo` in your configuration file.
+
+For a detailed step-by-step guide, see [CLAUDE.md](CLAUDE.md) and the integrate-matcher skill at `.claude/skills/integrate-matcher/SKILL.md`.
 
 **Configuration file locations (in priority order):**
 1. Custom config file specified with `--config` parameter

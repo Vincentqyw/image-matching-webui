@@ -25,7 +25,7 @@ matcher_zoo:
     # skip ci or not, default: false
     skip_ci: true
     # dense matcher or not, default: true
-    dense: true
+    standalone: true
     # info
     info:
       # dispaly name in `Matching Model`
@@ -46,7 +46,7 @@ matcher_zoo:
   dad(RoMa):
     matcher: dad_roma
     skip_ci: true
-    dense: true
+    standalone: true
     info:
       name: Dad(RoMa) #dispaly name
       source: "ARXIV 2025"
@@ -56,7 +56,7 @@ matcher_zoo:
       efficiency: medium  # low, medium, high
   LoMa-B:
     matcher: loma-b
-    dense: true
+    standalone: true
     info:
       name: LoMa-B
       source: "ECCV 2026"
@@ -66,7 +66,7 @@ matcher_zoo:
       efficiency: medium  # low, medium, high
   LoMa-L:
     matcher: loma-l
-    dense: true
+    standalone: true
     skip_ci: true
     info:
       name: LoMa-L
@@ -78,7 +78,7 @@ matcher_zoo:
   LoMa-G:
     enable: false
     matcher: loma-g
-    dense: true
+    standalone: true
     skip_ci: true
     info:
       name: LoMa-G
@@ -89,7 +89,7 @@ matcher_zoo:
       efficiency: low  # low, medium, high
   LoMa-R:
     matcher: loma-r
-    dense: true
+    standalone: true
     skip_ci: true
     info:
       name: LoMa-R
@@ -100,7 +100,7 @@ matcher_zoo:
       efficiency: medium  # low, medium, high
   minima(loftr):
     matcher: minima_loftr
-    dense: true
+    standalone: true
     info:
       name: MINIMA(LoFTR) #dispaly name
       source: "ARXIV 2024"
@@ -110,7 +110,7 @@ matcher_zoo:
   minima(RoMa):
     matcher: minima_roma
     skip_ci: true
-    dense: true
+    standalone: true
     info:
       name: MINIMA(RoMa) #dispaly name
       source: "ARXIV 2024"
@@ -121,7 +121,7 @@ matcher_zoo:
   omniglue:
     enable: true
     matcher: omniglue
-    dense: true
+    standalone: true
     info:
       name: OmniGlue
       source: "CVPR 2024"
@@ -132,7 +132,7 @@ matcher_zoo:
   Mast3R:
     enable: true
     matcher: mast3r
-    dense: true
+    standalone: true
     skip_ci: true
     info:
       name: Mast3R #dispaly name
@@ -146,7 +146,7 @@ matcher_zoo:
     # TODO: duster is under development
     enable: true
     matcher: duster
-    dense: true
+    standalone: true
     info:
       name: DUSt3R #dispaly name
       source: "CVPR 2024"
@@ -157,7 +157,7 @@ matcher_zoo:
   GIM(RoMa):
     matcher: gim_roma
     skip_ci: true
-    dense: true
+    standalone: true
     enable: true
     info:
       name: GIM(RoMa) #dispaly name
@@ -171,7 +171,7 @@ matcher_zoo:
     enable: true
     skip_ci: true
     matcher: gim(dkm)
-    dense: true
+    standalone: true
     info:
       name: GIM(DKM) #dispaly name
       source: "ICLR 2024"
@@ -183,7 +183,7 @@ matcher_zoo:
   RoMa:
     matcher: roma
     skip_ci: true
-    dense: true
+    standalone: true
     info:
       name: RoMa #dispaly name
       source: "CVPR 2024"
@@ -195,7 +195,7 @@ matcher_zoo:
   dkm:
     matcher: dkm
     skip_ci: true
-    dense: true
+    standalone: true
     enable: true
     info:
       name: DKM #dispaly name
@@ -207,7 +207,7 @@ matcher_zoo:
       efficiency: low  # low, medium, high
   loftr:
     matcher: loftr
-    dense: true
+    standalone: true
     info:
       name: LoFTR #dispaly name
       source: "CVPR 2021"
@@ -217,7 +217,7 @@ matcher_zoo:
       display: true
   eloftr:
     matcher: eloftr
-    dense: true
+    standalone: true
     info:
       name: Efficient LoFTR #dispaly name
       source: "CVPR 2024"
@@ -227,7 +227,7 @@ matcher_zoo:
       display: true
   xoftr:
     matcher: xoftr
-    dense: true
+    standalone: true
     info:
       name: XoFTR #dispaly name
       source: "CVPR 2024"
@@ -237,7 +237,7 @@ matcher_zoo:
       display: true
   jamma:
     matcher: jamma
-    dense: true
+    standalone: true
     enable: false
     info:
       name: Jamma #dispaly name
@@ -250,7 +250,7 @@ matcher_zoo:
     enable: false
     skip_ci: true
     matcher: cotr
-    dense: true
+    standalone: true
     info:
       name: CoTR #dispaly name
       source: "ICCV 2021"
@@ -261,7 +261,7 @@ matcher_zoo:
       efficiency: low  # low, medium, high
   topicfm:
     matcher: topicfm
-    dense: true
+    standalone: true
     info:
       name: TopicFM #dispaly name
       source: "AAAI 2023"
@@ -271,7 +271,7 @@ matcher_zoo:
       display: true
   aspanformer:
     matcher: aspanformer
-    dense: true
+    standalone: true
     info:
       name: ASpanformer #dispaly name
       source: "ECCV 2022"
@@ -282,7 +282,7 @@ matcher_zoo:
   xfeat+lightglue:
     enable: true
     matcher: xfeat_lightglue
-    dense: true
+    standalone: true
     info:
       name: xfeat+lightglue
       source: "CVPR 2024"
@@ -293,7 +293,7 @@ matcher_zoo:
   xfeat(sparse):
     matcher: NN-mutual
     feature: xfeat
-    dense: false
+    standalone: false
     info:
       name: XFeat #dispaly name
       source: "CVPR 2024"
@@ -303,7 +303,7 @@ matcher_zoo:
       display: true
   xfeat(dense):
     matcher: xfeat_dense
-    dense: true
+    standalone: true
     info:
       name: XFeat #dispaly name
       source: "CVPR 2024"
@@ -314,7 +314,7 @@ matcher_zoo:
   liftfeat(sparse):
     matcher: NN-mutual
     feature: liftfeat
-    dense: false
+    standalone: false
     info:
       name: LiftFeat #dispaly name
       source: "ICRA 2025"
@@ -325,7 +325,7 @@ matcher_zoo:
   ripe(+mnn):
     matcher: NN-mutual
     feature: ripe
-    dense: false
+    standalone: false
     info:
       name: RIPE #dispaly name
       source: "ICCV 2025"
@@ -336,7 +336,7 @@ matcher_zoo:
   rdd(sparse):
     matcher: NN-mutual
     feature: rdd
-    dense: false
+    standalone: false
     info:
       name: RDD(sparse) #dispaly name
       source: "CVPR 2025"
@@ -346,7 +346,7 @@ matcher_zoo:
       display: true
   rdd(dense):
     matcher: rdd_dense
-    dense: true
+    standalone: true
     info:
       name: RDD(dense) #dispaly name
       source: "CVPR 2025"
@@ -357,7 +357,7 @@ matcher_zoo:
   dedode:
     matcher: Dual-Softmax
     feature: dedode
-    dense: false
+    standalone: false
     info:
       name: DeDoDe #dispaly name
       source: "3DV 2024"
@@ -368,7 +368,7 @@ matcher_zoo:
   superpoint+superglue:
     matcher: superglue
     feature: superpoint_max
-    dense: false
+    standalone: false
     info:
       name: SuperGlue #dispaly name
       source: "CVPR 2020"
@@ -379,7 +379,7 @@ matcher_zoo:
   superpoint+lightglue:
     matcher: superpoint-lightglue
     feature: superpoint_max
-    dense: false
+    standalone: false
     info:
       name: LightGlue #dispaly name
       source: "ICCV 2023"
@@ -390,7 +390,7 @@ matcher_zoo:
   disk:
     matcher: NN-mutual
     feature: disk
-    dense: false
+    standalone: false
     info:
       name: DISK
       source: "NeurIPS 2020"
@@ -401,7 +401,7 @@ matcher_zoo:
   disk+dualsoftmax:
     matcher: Dual-Softmax
     feature: disk
-    dense: false
+    standalone: false
     info:
       name: DISK
       source: "NeurIPS 2020"
@@ -412,7 +412,7 @@ matcher_zoo:
   superpoint+dualsoftmax:
     matcher: Dual-Softmax
     feature: superpoint_max
-    dense: false
+    standalone: false
     info:
       name: SuperPoint
       source: "CVPRW 2018"
@@ -423,7 +423,7 @@ matcher_zoo:
   sift+lightglue:
     matcher: sift-lightglue
     feature: sift
-    dense: false
+    standalone: false
     info:
       name: LightGlue #dispaly name
       source: "ICCV 2023"
@@ -434,7 +434,7 @@ matcher_zoo:
   disk+lightglue:
     matcher: disk-lightglue
     feature: disk
-    dense: false
+    standalone: false
     info:
       name: LightGlue
       source: "ICCV 2023"
@@ -445,7 +445,7 @@ matcher_zoo:
   aliked+lightglue:
     matcher: aliked-lightglue
     feature: aliked-n16
-    dense: false
+    standalone: false
     info:
       name: ALIKED
       source: "ICCV 2023"
@@ -456,7 +456,7 @@ matcher_zoo:
   raco+lightglue:
     matcher: raco-lightglue
     feature: raco
-    dense: false
+    standalone: false
     info:
       name: RaCo
       source: "3DV 2026"
@@ -467,7 +467,7 @@ matcher_zoo:
   superpoint+mnn:
     matcher: NN-mutual
     feature: superpoint_max
-    dense: false
+    standalone: false
     info:
       name: SuperPoint #dispaly name
       source: "CVPRW 2018"
@@ -478,7 +478,7 @@ matcher_zoo:
   sift+sgmnet:
     matcher: sgmnet
     feature: sift
-    dense: false
+    standalone: false
     info:
       name: SGMNet #dispaly name
       source: "ICCV 2021"
@@ -489,7 +489,7 @@ matcher_zoo:
   sosnet:
     matcher: NN-mutual
     feature: sosnet
-    dense: false
+    standalone: false
     info:
       name: SOSNet #dispaly name
       source: "CVPR 2019"
@@ -500,7 +500,7 @@ matcher_zoo:
   hardnet:
     matcher: NN-mutual
     feature: hardnet
-    dense: false
+    standalone: false
     info:
       name: HardNet #dispaly name
       source: "NeurIPS 2017"
@@ -511,7 +511,7 @@ matcher_zoo:
   d2net:
     matcher: NN-mutual
     feature: d2net-ss
-    dense: false
+    standalone: false
     info:
       name: D2Net #dispaly name
       source: "CVPR 2019"
@@ -522,7 +522,7 @@ matcher_zoo:
   rord:
     matcher: NN-mutual
     feature: rord
-    dense: false
+    standalone: false
     info:
       name: RoRD #dispaly name
       source: "IROS 2021"
@@ -533,7 +533,7 @@ matcher_zoo:
   alike:
     matcher: NN-mutual
     feature: alike
-    dense: false
+    standalone: false
     info:
       name: ALIKE #dispaly name
       source: "TMM 2022"
@@ -544,7 +544,7 @@ matcher_zoo:
   lanet:
     matcher: NN-mutual
     feature: lanet
-    dense: false
+    standalone: false
     info:
       name: LANet #dispaly name
       source: "ACCV 2022"
@@ -555,7 +555,7 @@ matcher_zoo:
   r2d2:
     matcher: NN-mutual
     feature: r2d2
-    dense: false
+    standalone: false
     info:
       name: R2D2 #dispaly name
       source: "NeurIPS 2019"
@@ -566,7 +566,7 @@ matcher_zoo:
   darkfeat:
     matcher: NN-mutual
     feature: darkfeat
-    dense: false
+    standalone: false
     info:
       name: DarkFeat #dispaly name
       source: "AAAI 2023"
@@ -577,7 +577,7 @@ matcher_zoo:
   sift:
     matcher: NN-mutual
     feature: sift
-    dense: false
+    standalone: false
     info:
       name: SIFT #dispaly name
       source: "IJCV 2004"
@@ -588,7 +588,7 @@ matcher_zoo:
   gluestick:
     enable: true
     matcher: gluestick
-    dense: true
+    standalone: true
     info:
       name: GlueStick #dispaly name
       source: "ICCV 2023"
@@ -599,7 +599,7 @@ matcher_zoo:
   sold2:
     enable: false
     matcher: sold2
-    dense: true
+    standalone: true
     info:
       name: SOLD2 #dispaly name
       source: "CVPR 2021"
@@ -612,7 +612,7 @@ matcher_zoo:
     enable: true
     matcher: imp
     feature: sfd2
-    dense: false
+    standalone: false
     info:
       name: SFD2+IMP #dispaly name
       source: "CVPR 2023"
@@ -625,7 +625,7 @@ matcher_zoo:
     enable: true
     matcher: NN-mutual
     feature: sfd2
-    dense: false
+    standalone: false
     info:
       name: SFD2+MNN #dispaly name
       source: "CVPR 2023"
