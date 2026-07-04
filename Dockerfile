@@ -7,6 +7,7 @@ WORKDIR /code
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git-lfs ffmpeg libsm6 libxext6 && \
     git lfs install && \
+    git config --global url."https://github.com/".insteadOf git@github.com: && \
     git clone --recursive https://github.com/Vincentqyw/image-matching-webui.git . && \
     pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
