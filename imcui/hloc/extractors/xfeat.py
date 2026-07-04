@@ -18,6 +18,7 @@ class XFeat(BaseModel):
             "XFeat",
             pretrained=True,
             top_k=self.conf["max_keypoints"],
+            trust_repo=True,
         )
         logger.info("Load XFeat(sparse) model done.")
 

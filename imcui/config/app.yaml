@@ -450,6 +450,17 @@ matcher_zoo:
       paper: https://arxiv.org/pdf/2304.03608.pdf
       project: null
       display: true
+  raco+lightglue:
+    matcher: raco-lightglue
+    feature: raco
+    dense: false
+    info:
+      name: RaCo
+      source: "3DV 2026"
+      github: https://github.com/cvg/RaCo
+      paper: https://arxiv.org/pdf/2602.15755
+      project: null
+      display: true
   superpoint+mnn:
     matcher: NN-mutual
     feature: superpoint_max

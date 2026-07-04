@@ -88,3 +88,6 @@
 [submodule "imcui/third_party/LoMa"]
     path = imcui/third_party/LoMa
     url = https://github.com/davnords/LoMa.git
+[submodule "imcui/third_party/RaCo"]
+    path = imcui/third_party/RaCo
+    url = https://github.com/cvg/RaCo.git

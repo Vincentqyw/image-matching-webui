@@ -82,6 +82,23 @@ confs = {
             "force_resize": False,
         },
     },
+    "raco-lightglue": {
+        "output": "matches-raco-lightglue",
+        "model": {
+            "name": "lightglue",
+            "match_threshold": 0.2,
+            "width_confidence": 0.99,
+            "depth_confidence": 0.95,
+            "features": "raco-aliked",
+            "model_name": "raco_aliked_lightglue.pth",
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "resize_max": 1024,
+            "dfactor": 32,
+            "force_resize": False,
+        },
+    },
     "sift-lightglue": {
         "output": "matches-sift-lightglue",
         "model": {

@@ -21,6 +21,7 @@ class XFeatLightGlue(BaseModel):
             "XFeat",
             pretrained=True,
             top_k=self.conf["max_keypoints"],
+            trust_repo=True,
         )
         logger.info("Load XFeat(dense) model done.")
 
