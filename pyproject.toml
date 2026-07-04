@@ -52,3 +52,6 @@ filterwarnings = [
     "ignore::FutureWarning",
     "ignore::RuntimeWarning",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"imcui/ui/app_class.py" = ["F401", "F811"]  # ZeroGPU import spaces

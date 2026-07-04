@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
+import spaces  # noqa: F401  # ZeroGPU
 
 import gradio as gr
 import numpy as np
