@@ -225,6 +225,17 @@ matcher_zoo:
       project: https://parskatt.github.io/RoMa
       display: true
       efficiency: low  # low, medium, high
+  RoMaV2:
+    matcher: romav2
+    skip_ci: true
+    standalone: true
+    info:
+      name: RoMaV2 #dispaly name
+      source: "ARXIV 2025"
+      github: https://github.com/Parskatt/RoMaV2
+      paper: https://arxiv.org/abs/2412.12906
+      display: true
+      efficiency: low  # low, medium, high
   dkm:
     matcher: dkm
     skip_ci: true
@@ -258,6 +269,17 @@ matcher_zoo:
       paper: https://zju3dv.github.io/efficientloftr/files/EfficientLoFTR.pdf
       project: https://zju3dv.github.io/efficientloftr
       display: true
+  se2loftr:
+    matcher: se2loftr
+    skip_ci: true
+    standalone: true
+    info:
+      name: SE2-LoFTR #dispaly name
+      source: "3DV 2025"
+      github: https://github.com/abharadwaj-1234/SE2-LoFTR
+      paper: https://arxiv.org/abs/2503.10814
+      display: true
+      efficiency: medium  # low, medium, high
   xoftr:
     matcher: xoftr
     standalone: true
@@ -312,6 +334,17 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2208.14201
       project: null
       display: true
+  matchformer:
+    matcher: matchformer
+    skip_ci: true
+    standalone: true
+    info:
+      name: MatchFormer #dispaly name
+      source: "ARXIV 2023"
+      github: https://github.com/jamycheung/MatchFormer
+      paper: https://arxiv.org/abs/2303.14507
+      display: true
+      efficiency: medium  # low, medium, high
   xfeat+lightglue:
     enable: true
     matcher: xfeat_lightglue
