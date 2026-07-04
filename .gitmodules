@@ -43,9 +43,6 @@
 [submodule "imcui/third_party/COTR"]
     path = imcui/third_party/COTR
     url = https://github.com/Vincentqyw/COTR.git
-[submodule "imcui/third_party/gim"]
-    path = imcui/third_party/gim
-    url = https://github.com/xuelunshen/gim.git
 [submodule "imcui/third_party/omniglue"]
     path = imcui/third_party/omniglue
     url = https://github.com/Vincentqyw/omniglue-onnx.git
@@ -91,3 +88,6 @@
 [submodule "imcui/third_party/EfficientLoFTR"]
     path = imcui/third_party/EfficientLoFTR
     url = https://github.com/agipro/EfficientLoFTR.git
+[submodule "imcui/third_party/gim"]
+    path = imcui/third_party/gim
+    url = https://github.com/agipro/gim.git
