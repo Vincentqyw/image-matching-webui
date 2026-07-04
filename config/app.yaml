@@ -516,3 +516,11 @@ matcher_zoo:
       github: https://github.com/LSXI7/MINIMA
       display: true
       efficiency: medium
+
+retrieval_zoo:
+  netvlad:
+    enable: true
+  openibl:
+    enable: true
+  cosplace:
+    enable: true
