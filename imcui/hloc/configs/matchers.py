@@ -285,6 +285,24 @@ confs = {
         "max_error": 1,
         "cell_size": 1,
     },
+    "se2loftr": {
+        "output": "matches-se2loftr",
+        "model": {
+            "name": "se2loftr",
+            "max_keypoints": 2048,
+            "match_threshold": 0.2,
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 32,
+            "width": 640,
+            "height": 480,
+            "force_resize": True,
+        },
+        "max_error": 1,
+        "cell_size": 1,
+    },
     "xoftr": {
         "output": "matches-xoftr",
         "model": {
@@ -447,6 +465,24 @@ confs = {
             "dfactor": 8,
         },
     },
+    "matchformer": {
+        "output": "matches-matchformer",
+        "model": {
+            "name": "matchformer",
+            "max_keypoints": 2048,
+            "match_threshold": 0.2,
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 32,
+        },
+        "max_error": 1,
+        "cell_size": 1,
+    },
     "duster": {
         "output": "matches-duster",
         "model": {
@@ -537,6 +573,22 @@ confs = {
             "resize_max": 1024,
             "width": 320,
             "height": 240,
+            "dfactor": 8,
+        },
+    },
+    "romav2": {
+        "output": "matches-romav2",
+        "model": {
+            "name": "romav2",
+            "max_keypoints": 2048,
+            "match_threshold": 0.2,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 560,
+            "height": 560,
             "dfactor": 8,
         },
     },
