@@ -7,6 +7,7 @@ from itertools import combinations
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from datasets import load_dataset
+import spaces
 
 import cv2
 import gradio as gr
@@ -828,6 +829,7 @@ def generate_fake_outputs(
     )
 
 
+@spaces.GPU(duration=35)
 def run_matching(
     image0: np.ndarray,
     image1: np.ndarray,
