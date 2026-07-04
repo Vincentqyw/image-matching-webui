@@ -39,7 +39,24 @@ git submodule add <repo-url> imcui/third_party/<RepoName>
 ```
 
 - Use the original repo name (PascalCase) as the submodule directory name
-- If the repo has a fork in the project's org (e.g., `Vincentqyw/xxx`), prefer the fork
+- If the repo has a fork in the project's org (e.g., `Vincentqyw/xxx` or `agipro/xxx`), prefer the fork
+
+#### ⚠️ CRITICAL: Never modify third_party code directly
+
+`imcui/third_party/` contains **pinned third-party submodules** — you are NOT the owner of this code. If a dependency needs a compatibility fix (e.g., API changes in PyTorch/kornia, import path changes):
+
+1. **Fork** the original repo to the `agipro` GitHub account
+2. **Apply the fix** in the fork and push
+3. **Replace** the submodule URL in the main repo to point to the fork:
+   ```bash
+   git submodule deinit -f imcui/third_party/<RepoName>
+   git rm -f imcui/third_party/<RepoName>
+   rm -rf .git/modules/imcui/third_party/<RepoName>
+   git submodule add https://github.com/agipro/<RepoName>.git imcui/third_party/<RepoName>
+   ```
+4. **Update `.gitmodules`** — the URL must point to the fork
+
+Example: `EfficientLoFTR` was forked to `agipro/EfficientLoFTR` to fix a `kornia.utils.grid` → `kornia.utils` import change required by kornia 0.8+.
 
 ### Step 3: Create Matcher Implementation
 

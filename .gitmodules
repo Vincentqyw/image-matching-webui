@@ -64,9 +64,6 @@
 [submodule "imcui/third_party/pram"]
     path = imcui/third_party/pram
     url = https://github.com/agipro/pram.git
-[submodule "imcui/third_party/EfficientLoFTR"]
-    path = imcui/third_party/EfficientLoFTR
-    url = https://github.com/zju3dv/EfficientLoFTR.git
 [submodule "imcui/third_party/XoFTR"]
     path = imcui/third_party/XoFTR
     url = https://github.com/OnderT/XoFTR.git
@@ -91,3 +88,6 @@
 [submodule "imcui/third_party/RaCo"]
     path = imcui/third_party/RaCo
     url = https://github.com/cvg/RaCo.git
+[submodule "imcui/third_party/EfficientLoFTR"]
+    path = imcui/third_party/EfficientLoFTR
+    url = https://github.com/agipro/EfficientLoFTR.git
