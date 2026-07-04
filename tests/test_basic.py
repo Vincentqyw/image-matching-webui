@@ -68,7 +68,7 @@ def test_one():
                 "match_threshold": 0.2,
             },
         },
-        "dense": False,
+        "standalone": False,
     }
     api = ImageMatchingAPI(conf=conf, device=DEVICE)
     pred = api(image0, image1)
@@ -98,7 +98,7 @@ def test_one():
             "max_error": 1,
             "cell_size": 1,
         },
-        "dense": True,
+        "standalone": True,
     }
 
     api = ImageMatchingAPI(conf=conf, device=DEVICE)

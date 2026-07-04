@@ -9,7 +9,7 @@ This skill automates the integration of a new local feature matching method into
 
 ## Prerequisites
 
-- The target repository must be a local feature matching method (sparse or dense)
+- The target repository must be a local feature matching method (sparse or standalone)
 - You must be working inside the `image-matching-webui` project root
 
 ## Step-by-Step Integration Guide
@@ -123,7 +123,7 @@ class MatcherName(BaseModel):
 
 #### 3.4 `_forward` Method
 
-**For dense/standalone matchers** (input: raw images):
+**For standalone matchers** (input: raw images):
 
 The `data` dict contains preprocessed tensors:
 - `data["image0"]`: shape `(1, C, H, W)`, float32, range [0, 1]
@@ -222,7 +222,7 @@ BOTH files must be updated identically. Add an entry under `matcher_zoo`:
 ```yaml
 <DisplayName>:
   matcher: <matcher-config-name>    # Must match key in matchers.py
-  dense: true                        # true = standalone (no separate extractor needed)
+  standalone: true                   # true = takes two images directly (no separate extractor needed)
   info:
     name: <DisplayName>              # Display name in WebUI dropdown
     source: "Venue Year"             # e.g., "ECCV 2026", "ICCV 2023"
@@ -233,8 +233,8 @@ BOTH files must be updated identically. Add an entry under `matcher_zoo`:
 ```
 
 Key rules:
-- `dense: true` means the matcher is standalone (takes raw images, no separate feature extractor needed)
-- `dense: false` means the matcher requires a feature extractor (e.g., SuperPoint+LightGlue)
+- `standalone: true` means the matcher takes two raw images directly (no separate feature extractor needed)
+- `standalone: false` means the matcher requires a feature extractor (e.g., SuperPoint+LightGlue)
 - For feature+matcher combos, use `<extractor>+<matcher>` format (e.g., `superpoint+lightglue`)
 - Set `enable: false` for very heavy models that most users won't use by default
 - **CRITICAL**: Both `config/app.yaml` and `imcui/config/app.yaml` must be kept in sync
@@ -316,6 +316,42 @@ For each integration, these files are typically modified:
 
 ## Reference Implementations
 
-- **Dense standalone matcher**: `imcui/hloc/matchers/roma.py` (RoMa — takes raw images, outputs matched keypoints)
-- **Dense standalone with detected+matched keypoints**: `imcui/hloc/matchers/loma.py` (LoMa — separates detected keypoints from matched keypoints)
-- **Sparse matcher**: `imcui/hloc/matchers/lightglue.py` (LightGlue — takes keypoints+descriptors, outputs matches)
+| Pattern | File | Description |
+|---------|------|-------------|
+| Dense standalone | `imcui/hloc/matchers/roma.py` | RoMa — raw images → matched keypoints |
+| Dense standalone + separate detected/matched kpts | `imcui/hloc/matchers/loma.py` | LoMa — separates all detected from matched keypoints |
+| Sparse matcher | `imcui/hloc/matchers/lightglue.py` | LightGlue — keypoints+descriptors → matches |
+| Detector-only + external descriptor | `imcui/hloc/extractors/raco.py` | RaCo — detects keypoints, delegates descriptor to ALIKED |
+
+### RaCo pattern: detector that needs a descriptor extractor
+
+Some models are **keypoint detectors only** — they output keypoints/scores but no descriptors. The RaCo integration demonstrates chaining RaCo detection with ALIKED description:
+
+1. Create an **extractor** (not matcher) in `imcui/hloc/extractors/raco.py`
+2. In `_forward`, first run RaCo detection → keypoints, then run ALIKED descriptor on those keypoints
+3. Register in `configs/extractors.py` with `max_num_keypoints` / `nms_radius` parameters
+4. Register a matcher config in `configs/matchers.py` with `features: "raco-aliked"` — a custom LightGlue+ checkpoint trained for RaCo+ALIKED features
+5. In `app.yaml`, the entry uses `feature: raco` (the extractor) + `matcher: raco-lightglue` (the LightGlue variant)
+
+### Fork priority for third-party fixes
+
+When a submodule needs a compatibility fix:
+
+| Repo owner | Action |
+|------------|--------|
+| `Vincentqyw/*` | Push fix directly to the Vincentqyw fork |
+| `agipro/*` | Push fix directly to the agipro fork |
+| Anyone else | Fork to `agipro`, apply fix, switch submodule URL |
+
+Always verify push succeeded with `git log --oneline -1` in the submodule directory.
+
+### Kornia compatibility (kornia >= 0.8)
+
+Kornia 0.8.0 removed the `kornia.utils.grid` submodule. `create_meshgrid` moved to `kornia.utils` (0.8.0-0.8.2), then to `kornia.geometry` (0.8.3+). When fixing submodule imports, use this future-proof pattern:
+
+```python
+try:
+    from kornia.geometry import create_meshgrid  # kornia >= 0.8.3
+except ImportError:
+    from kornia.utils import create_meshgrid  # kornia < 0.8.3
+```

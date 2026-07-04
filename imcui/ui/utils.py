@@ -13,6 +13,7 @@ import gradio as gr
 import matplotlib.pyplot as plt
 import numpy as np
 import poselib
+import torch
 from PIL import Image
 
 from ..hloc import (
@@ -92,17 +93,17 @@ def get_matcher_zoo(
 
 
 def parse_match_config(conf):
-    if conf["dense"]:
+    if conf["standalone"]:
         return {
             "matcher": match_dense.confs.get(conf["matcher"]),
-            "dense": True,
+            "standalone": True,
             "info": conf.get("info", {}),
         }
     else:
         return {
             "feature": extract_features.confs.get(conf["feature"]),
             "matcher": match_features.confs.get(conf["matcher"]),
-            "dense": False,
+            "standalone": False,
             "info": conf.get("info", {}),
         }
 
@@ -926,7 +927,7 @@ def run_matching(
         output_keypoints, output_matches_raw, output_matches_ransac, match_conf, {}, {}
     )
 
-    if model["dense"]:
+    if model["standalone"]:
         if not match_conf["preprocessing"].get("force_resize", False):
             match_conf["preprocessing"]["force_resize"] = force_resize
         else:
@@ -940,6 +941,8 @@ def run_matching(
             matcher, image0, image1, match_conf["preprocessing"], device=DEVICE
         )
         del matcher
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         extract_conf = None
     else:
         extract_conf = model["feature"]
@@ -976,6 +979,8 @@ def run_matching(
         )
         pred = match_features.match_images(matcher, pred0, pred1)
         del extractor
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
     # gr.Info(
     #     f"Matching images done using: {time.time()-t1:.3f}s",
     # )

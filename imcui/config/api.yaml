@@ -32,4 +32,4 @@ api:
       name: nearest_neighbor
       do_mutual_check: True
       match_threshold: 0.2
-  dense: False
+  standalone: False

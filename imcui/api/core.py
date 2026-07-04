@@ -63,18 +63,18 @@ class ImageMatchingAPI(torch.nn.Module):
         self.pred = None
 
     def parse_match_config(self, conf):
-        if conf["dense"]:
+        if conf["standalone"]:
             return {
                 **conf,
                 "matcher": match_dense.confs.get(conf["matcher"]["model"]["name"]),
-                "dense": True,
+                "standalone": True,
             }
         else:
             return {
                 **conf,
                 "feature": extract_features.confs.get(conf["feature"]["model"]["name"]),
                 "matcher": match_features.confs.get(conf["matcher"]["model"]["name"]),
-                "dense": False,
+                "standalone": False,
             }
 
     def _updata_config(
@@ -83,8 +83,8 @@ class ImageMatchingAPI(torch.nn.Module):
         max_keypoints: int = 1024,
         match_threshold: float = 0.2,
     ):
-        self.dense = self.conf["dense"]
-        if self.conf["dense"]:
+        self.standalone = self.conf["standalone"]
+        if self.conf["standalone"]:
             try:
                 self.conf["matcher"]["model"]["match_threshold"] = match_threshold
             except TypeError as e:
@@ -100,13 +100,13 @@ class ImageMatchingAPI(torch.nn.Module):
         # initialize matcher
         self.matcher = get_model(self.match_conf)
         # initialize extractor
-        if self.dense:
+        if self.standalone:
             self.extractor = None
         else:
             self.extractor = get_feature_model(self.conf["feature"])
 
     def _forward(self, img0, img1):
-        if self.dense:
+        if self.standalone:
             pred = match_dense.match_images(
                 self.matcher,
                 img0,
@@ -246,7 +246,7 @@ class ImageMatchingAPI(torch.nn.Module):
         Returns:
             None
         """
-        if self.conf["dense"]:
+        if self.conf["standalone"]:
             postfix = str(self.conf["matcher"]["model"]["name"])
         else:
             postfix = "{}_{}".format(

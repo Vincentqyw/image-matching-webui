@@ -12,6 +12,7 @@ class ARCSizeAwareModelCache:
         self,
         max_gpu_mem: float = 8e9,
         max_cpu_mem: float = 12e9,
+        max_gpu_models: int = 1,
         device_priority: list = ["cuda", "cpu"],
         auto_empty_cache: bool = True,
     ):
@@ -21,6 +22,7 @@ class ARCSizeAwareModelCache:
         Args:
             max_gpu_mem: Maximum GPU memory allowed in bytes.
             max_cpu_mem: Maximum CPU memory allowed in bytes.
+            max_gpu_models: Maximum number of models to cache on GPU (limit to 1 for interactive WebUI).
             device_priority: List of devices to prioritize when evicting models.
             auto_empty_cache: Whether to call torch.cuda.empty_cache() when out of memory.
         """
@@ -32,6 +34,7 @@ class ARCSizeAwareModelCache:
 
         self.max_gpu = max_gpu_mem
         self.max_cpu = max_cpu_mem
+        self.max_gpu_models = max_gpu_models
         self.current_gpu = 0
         self.current_cpu = 0
 
@@ -191,6 +194,39 @@ class ARCSizeAwareModelCache:
             if device == "cuda" and self.auto_empty_cache:
                 torch.cuda.empty_cache()
                 torch.cuda.synchronize()
+
+            # Enforce max GPU model count: evict LRU GPU models before loading new one
+            if device == "cuda":
+                gpu_entries = [
+                    (k, v)
+                    for k, v in list(self.t1.items()) + list(self.t2.items())
+                    if v["device"] == "cuda"
+                ]
+                while len(gpu_entries) >= self.max_gpu_models:
+                    # Evict the LRU GPU model (first in t1, then t2)
+                    evicted = False
+                    for k, v in self.t1.items():
+                        if v["device"] == "cuda":
+                            self._release_model(v)
+                            self.current_gpu -= v["size"]
+                            self.t1.pop(k)
+                            evicted = True
+                            break
+                    if not evicted:
+                        for k, v in self.t2.items():
+                            if v["device"] == "cuda":
+                                self._release_model(v)
+                                self.current_gpu -= v["size"]
+                                self.t2.pop(k)
+                                evicted = True
+                                break
+                    if not evicted:
+                        break
+                    gpu_entries = [
+                        (k, v)
+                        for k, v in list(self.t1.items()) + list(self.t2.items())
+                        if v["device"] == "cuda"
+                    ]
 
             while True:
                 current_mem = self.current_gpu if device == "cuda" else self.current_cpu
