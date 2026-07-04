@@ -606,4 +606,72 @@ confs = {
             "dfactor": 8,
         },
     },
+    "loma-b": {
+        "output": "matches-loma-b",
+        "model": {
+            "name": "loma",
+            "model_name": "loma_b",
+            "max_keypoints": 2048,
+            "filter_threshold": 0.1,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
+    "loma-l": {
+        "output": "matches-loma-l",
+        "model": {
+            "name": "loma",
+            "model_name": "loma_l",
+            "max_keypoints": 2048,
+            "filter_threshold": 0.1,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
+    "loma-g": {
+        "output": "matches-loma-g",
+        "model": {
+            "name": "loma",
+            "model_name": "loma_g",
+            "max_keypoints": 2048,
+            "filter_threshold": 0.1,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
+    "loma-r": {
+        "output": "matches-loma-r",
+        "model": {
+            "name": "loma",
+            "model_name": "loma_r",
+            "max_keypoints": 2048,
+            "filter_threshold": 0.1,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
 }

@@ -85,3 +85,6 @@
 [submodule "imcui/third_party/dust3r"]
     path = imcui/third_party/dust3r
     url = https://github.com/agipro/dust3r.git
+[submodule "imcui/third_party/LoMa"]
+    path = imcui/third_party/LoMa
+    url = https://github.com/davnords/LoMa.git
