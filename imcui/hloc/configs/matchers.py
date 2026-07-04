@@ -82,6 +82,23 @@ confs = {
             "force_resize": False,
         },
     },
+    "minima_lightglue": {
+        "output": "matches-minima_lightglue",
+        "model": {
+            "name": "lightglue",
+            "match_threshold": 0.2,
+            "width_confidence": 0.99,
+            "depth_confidence": 0.95,
+            "features": "superpoint",
+            "model_name": "minima_lightglue.pth",
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "force_resize": False,
+        },
+    },
     "raco-lightglue": {
         "output": "matches-raco-lightglue",
         "model": {
@@ -249,6 +266,25 @@ confs = {
         "max_error": 1,  # max error for assigned keypoints (in px)
         "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
     },
+    "minima_eloftr": {
+        "output": "matches-minima_eloftr",
+        "model": {
+            "name": "eloftr",
+            "model_name": "minima_eloftr.ckpt",
+            "max_keypoints": 2000,
+            "match_threshold": 0.2,
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 32,
+            "width": 640,
+            "height": 480,
+            "force_resize": True,
+        },
+        "max_error": 1,
+        "cell_size": 1,
+    },
     "xoftr": {
         "output": "matches-xoftr",
         "model": {
@@ -267,6 +303,25 @@ confs = {
         },
         "max_error": 1,  # max error for assigned keypoints (in px)
         "cell_size": 1,  # size of quantization patch (max 1 kp/patch)
+    },
+    "minima_xoftr": {
+        "output": "matches-minima_xoftr",
+        "model": {
+            "name": "xoftr",
+            "weights": "minima_xoftr.ckpt",
+            "max_keypoints": 2000,
+            "match_threshold": 0.3,
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "width": 640,
+            "height": 480,
+            "force_resize": True,
+        },
+        "max_error": 1,
+        "cell_size": 1,
     },
     "jamma": {
         "output": "matches-jamma",

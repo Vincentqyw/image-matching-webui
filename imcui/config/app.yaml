@@ -118,6 +118,39 @@ matcher_zoo:
       github: https://github.com/LSXI7/MINIMA
       display: true
       efficiency: low  # low, medium, high
+  minima(lightglue):
+    matcher: minima_lightglue
+    feature: superpoint_max
+    standalone: false
+    info:
+      name: MINIMA(LightGlue) #dispaly name
+      source: "ARXIV 2024"
+      paper: https://arxiv.org/abs/2412.19412
+      github: https://github.com/LSXI7/MINIMA
+      display: true
+      efficiency: high  # low, medium, high
+  minima(eloftr):
+    matcher: minima_eloftr
+    standalone: true
+    skip_ci: true
+    info:
+      name: MINIMA(ELoFTR) #dispaly name
+      source: "ARXIV 2024"
+      paper: https://arxiv.org/abs/2412.19412
+      github: https://github.com/LSXI7/MINIMA
+      display: true
+      efficiency: medium  # low, medium, high
+  minima(xoftr):
+    matcher: minima_xoftr
+    standalone: true
+    skip_ci: true
+    info:
+      name: MINIMA(XoFTR) #dispaly name
+      source: "ARXIV 2024"
+      paper: https://arxiv.org/abs/2412.19412
+      github: https://github.com/LSXI7/MINIMA
+      display: true
+      efficiency: medium  # low, medium, high
   omniglue:
     enable: true
     matcher: omniglue
