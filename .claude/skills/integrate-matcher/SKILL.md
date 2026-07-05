@@ -289,7 +289,38 @@ with torch.no_grad():
     output = output.clone()  # Detach from inference mode graph
 ```
 
-### Step 6: Verification Checklist
+### Step 6: Update README.md Algorithm Table
+
+The README.md contains a "The tool currently supports..." table listing all algorithms with their support status.
+
+#### 6.1 Table Format
+
+```markdown
+| Algorithm        | Supported | Conference/Journal | Year | GitHub Link |
+|------------------|-----------|--------------------|------|-------------|
+| LoMa             | ✅ | ECCV    | 2026 | [Link](https://github.com/davnords/LoMa) |
+| RIPE             | ✅ | ICCV    | 2025 | [Link](https://github.com/fraunhoferhhi/RIPE) |
+```
+
+Rows are sorted by **year descending**, then **alphabetically by algorithm name** within the same year.
+
+#### 6.2 Rules
+
+| Scenario | Action |
+|----------|--------|
+| Algorithm exists with `❌` | Change to `✅` |
+| Algorithm not in table | Add new row, maintaining sort order |
+| Algorithm already has `✅` | Skip (no change needed) |
+
+#### 6.3 Example
+
+After integrating "DaD" published at ARXIV 2025:
+```markdown
+| DaD            | ✅ | ARXIV   | 2025 | [Link](https://github.com/Parskatt/dad) |
+```
+Insert between RIPE (ICCV 2025) and MINIMA (ARXIV 2024).
+
+### Step 7: Verification Checklist
 
 After integration, verify:
 
@@ -313,6 +344,7 @@ For each integration, these files are typically modified:
 | `imcui/hloc/configs/matchers.py` | Modify | Add matcher config entries |
 | `config/app.yaml` | Modify | Add WebUI display config |
 | `imcui/config/app.yaml` | Modify | Add WebUI display config (must match config/app.yaml) |
+| `README.md` | Modify | Update supported algorithms table (add row or flip ❌→✅) |
 
 ## Reference Implementations
 

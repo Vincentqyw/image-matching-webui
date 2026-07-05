@@ -68,7 +68,7 @@ The tool currently supports various popular image matching algorithms, namely:
 | TopicFM        | ✅ | AAAI    | 2023 | [Link](https://github.com/Vincentqyw/TopicFM) |
 | AspanFormer    | ✅ | ECCV    | 2022 | [Link](https://github.com/Vincentqyw/ml-aspanformer) |
 | LANet          | ✅ | ACCV    | 2022 | [Link](https://github.com/wangch-g/lanet) |
-| LISRD          | ❌ | ECCV    | 2022 | [Link](https://github.com/rpautrat/LISRD) |
+| LISRD          | ✅ | ECCV    | 2022 | [Link](https://github.com/rpautrat/LISRD) |
 | REKD           | ❌ | CVPR    | 2022 | [Link](https://github.com/bluedream1121/REKD) |
 | CoTR           | ✅ | ICCV    | 2021 | [Link](https://github.com/ubc-vision/COTR) |
 | ALIKE          | ✅ | TMM     | 2022 | [Link](https://github.com/Shiaoming/ALIKE) |
