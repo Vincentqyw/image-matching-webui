@@ -126,3 +126,56 @@ GitHub Actions run `pip install .` then `pytest tests/ -s --timeout=1200` on Pyt
 ### Python version constraint
 
 `requires-python = ">=3.10,<3.13"` — Python 3.13 is not yet supported.
+
+## Branching & Deployment
+
+Three-branch strategy for multi-target deployment:
+
+```
+main           ← development, CI, PyPI releases (imcui whl)
+huggingface    ← lightweight HF Space deployment (pip install imcui + config)
+```
+
+### Remotes
+
+| Remote | URL | Purpose |
+|--------|-----|---------|
+| `origin` | `github.com/Vincentqyw/image-matching-webui` | Source code + releases |
+| `hf-test` | `huggingface.co/spaces/Realcat/imcui` | Staging Space |
+| `hf-prod` | `huggingface.co/spaces/Realcat/image-matching-webui` | Production Space (ZeroGPU) |
+
+### Release workflow
+
+1. **Develop** on `main`, merge features, run tests
+2. **Bump version** in `pyproject.toml` + update `requirements.txt` if new deps
+3. **Tag & release**: `git tag vX.Y.Z && git push origin vX.Y.Z` then `gh release create vX.Y.Z`
+   - Tag triggers `docker-publish.yml` → Docker Hub
+   - Release triggers `release.yml` → PyPI whl
+4. **Update huggingface branch**: `git checkout huggingface`, bump `imcui==X.Y.Z` in `requirements.txt`, commit, push
+5. **Deploy to test**: `git push hf-test huggingface:main --force`
+6. **Verify** at https://huggingface.co/spaces/Realcat/imcui
+7. **Deploy to prod**: `git push hf-prod huggingface:main --force`
+
+### HuggingFace branch layout
+
+Lightweight — no source code, just deployment files:
+
+```
+app.py              # Launcher: from imcui.ui.app_class import ImageMatchingApp
+requirements.txt    # Single line: imcui==X.Y.Z
+packages.txt        # System deps: build-essential, ffmpeg, libsm6, libxext6, ...
+config/app.yaml     # Full matcher zoo config (copy from imcui/config/app.yaml)
+README.md           # HF Space metadata (sdk: gradio, python_version: 3.12, pinned: true)
+```
+
+Key README metadata for ZeroGPU Spaces:
+```yaml
+sdk: gradio
+sdk_version: "6.19.0"
+python_version: "3.12"   # MUST pin — imcui doesn't support 3.13 yet
+pinned: true              # Prevent auto-upgrade by HF
+```
+
+### ZeroGPU integration
+
+The `spaces` package (PyPI: `spaces`) provides `@spaces.GPU(duration=N)` decorator. Applied to `run_matching()` in `imcui/ui/utils.py`. Also imported (side-effect) in `imcui/ui/app_class.py` with `# noqa: F401` — ruff per-file-ignored in `pyproject.toml`.
