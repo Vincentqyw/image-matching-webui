@@ -798,12 +798,13 @@ confs = {
             "dfactor": 8,
         },
     },
-    "lisrd-vidit": {
-        "output": "matches-lisrd-vidit",
+    "lisrd-superpoint": {
+        "output": "matches-lisrd-superpoint",
         "model": {
             "name": "lisrd",
-            "model_name": "lisrd_vidit",
+            "model_name": "lisrd_aachen",
             "max_keypoints": 2048,
+            "detector": "superpoint",
         },
         "preprocessing": {
             "grayscale": False,
@@ -814,12 +815,30 @@ confs = {
             "dfactor": 8,
         },
     },
-    "lisrd-aachen": {
-        "output": "matches-lisrd-aachen",
+    "lisrd-aliked": {
+        "output": "matches-lisrd-aliked",
         "model": {
             "name": "lisrd",
             "model_name": "lisrd_aachen",
             "max_keypoints": 2048,
+            "detector": "aliked",
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
+    "lisrd-sift": {
+        "output": "matches-lisrd-sift",
+        "model": {
+            "name": "lisrd",
+            "model_name": "lisrd_aachen",
+            "max_keypoints": 2048,
+            "detector": "sift",
         },
         "preprocessing": {
             "grayscale": False,

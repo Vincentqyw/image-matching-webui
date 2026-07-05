@@ -1,9 +1,11 @@
 import typing
+import io
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 import cv2
 import matplotlib
+import matplotlib.patheffects as path_effects
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -14,33 +16,86 @@ np.random.seed(1995)
 color_map = np.arange(100)
 np.random.shuffle(color_map)
 
+# Fixed top margin for titles (inches) so text never gets clipped
+_TITLE_MARGIN_INCHES = 0.25
+# Small gap between subplots
+_WSPACE = 0.005
+
+
+def _figure_size_for_images(
+    images: List[np.ndarray],
+    dpi: int,
+    ncols: int = 1,
+    title_margin_inches: float = _TITLE_MARGIN_INCHES,
+) -> Tuple[Tuple[float, float], float, List[float]]:
+    """Compute figure size, axes ``top`` fraction, and width ratios.
+
+    Each subplot's width is proportional to its image's aspect ratio so
+    every image fills its subplot without side-whitespace, even when the
+    two images have different dimensions.
+
+    A minimum figure width ensures high-PPI output.
+    """
+    MIN_FIG_WIDTH = 14.0  # inches — at 300 dpi → 4200 px wide output
+
+    heights = [img.shape[0] for img in images]
+    widths = [img.shape[1] for img in images]
+    max_h = max(heights)
+
+    # Subplot width ratios = individual image W/H (aspect ratios).
+    width_ratios = [w / h for w, h in zip(widths, heights)]
+
+    # Natural size — images at 1:1 pixel mapping.
+    axes_h = max_h / dpi
+    natural_fig_w = axes_h * sum(width_ratios)
+    if natural_fig_w < MIN_FIG_WIDTH:
+        scale = MIN_FIG_WIDTH / natural_fig_w
+        axes_h *= scale  # keep subplot AR == image AR
+
+    fig_w = max(natural_fig_w, MIN_FIG_WIDTH)
+    fig_h = axes_h + title_margin_inches
+    top = axes_h / fig_h
+
+    return (fig_w, fig_h), top, width_ratios
+
+
+def _stroked_text(ax, x, y, text, fontsize=12, color="w", lw=2, **kwargs):
+    """Add text with a dark outline so it is readable on any background."""
+    t = ax.text(
+        x, y, text, fontsize=fontsize, color=color, transform=ax.transAxes, **kwargs
+    )
+    t.set_path_effects(
+        [
+            path_effects.Stroke(linewidth=lw, foreground="k"),
+            path_effects.Normal(),
+        ]
+    )
+    return t
+
 
 def plot_images(
     imgs: List[np.ndarray],
     titles: Optional[List[str]] = None,
     cmaps: Union[str, List[str]] = "gray",
     dpi: int = 100,
-    size: Optional[int] = 5,
-    pad: float = 0.5,
+    size: Optional[int] = None,
+    pad: float = 0.0,
 ) -> plt.Figure:
-    """Plot a set of images horizontally.
-    Args:
-        imgs: a list of NumPy or PyTorch images, RGB (H, W, 3) or mono (H, W).
-        titles: a list of strings, as titles for each image.
-        cmaps: colormaps for monochrome images. If a single string is given,
-            it is used for all images.
-        dpi: DPI of the figure.
-        size: figure size in inches (width). If not provided, the figure
-            size is determined automatically.
-        pad: padding between subplots, in inches.
-    Returns:
-        The created figure.
+    """Plot a set of images horizontally with minimal whitespace (paper-style).
+
+    Figure size is computed from image pixel dimensions.  A fixed top margin
+    (0.25") is reserved for titles so they never obscure image content.
     """
     n = len(imgs)
     if not isinstance(cmaps, list):
         cmaps = [cmaps] * n
-    figsize = (size * n, size * 6 / 5) if size is not None else None
-    fig, ax = plt.subplots(1, n, figsize=figsize, dpi=dpi)
+    if isinstance(titles, str):
+        titles = [titles]
+
+    figsize, top, width_ratios = _figure_size_for_images(imgs, dpi, ncols=n)
+    fig, ax = plt.subplots(
+        1, n, figsize=figsize, dpi=dpi, gridspec_kw={"width_ratios": width_ratios}
+    )
 
     if n == 1:
         ax = [ax]
@@ -49,11 +104,15 @@ def plot_images(
         ax[i].get_yaxis().set_ticks([])
         ax[i].get_xaxis().set_ticks([])
         ax[i].set_axis_off()
-        for spine in ax[i].spines.values():  # remove frame
+        ax[i].margins(0, 0)
+        for spine in ax[i].spines.values():
             spine.set_visible(False)
         if titles:
-            ax[i].set_title(titles[i])
-    fig.tight_layout(pad=pad)
+            ax[i].set_title(titles[i], pad=2, fontsize=12)
+
+    plt.subplots_adjust(
+        left=0.005, right=0.995, bottom=0, top=top, wspace=_WSPACE, hspace=0
+    )
     return fig
 
 
@@ -124,45 +183,40 @@ def make_matching_figure(
     path: Optional[Path] = None,
     pad: float = 0.0,
 ) -> Optional[plt.Figure]:
-    """Draw image pair with matches.
+    """Draw image pair with matches (paper-style, minimal whitespace).
 
-    Args:
-        img0: image0 as HxWx3 numpy array.
-        img1: image1 as HxWx3 numpy array.
-        mkpts0: matched points in image0 as Nx2 numpy array.
-        mkpts1: matched points in image1 as Nx2 numpy array.
-        color: colors for the matches as Nx4 numpy array.
-        titles: titles for the two subplots.
-        kpts0: keypoints in image0 as Kx2 numpy array.
-        kpts1: keypoints in image1 as Kx2 numpy array.
-        text: list of strings to display in the top-left corner of the image.
-        dpi: dots per inch of the saved figure.
-        path: if not None, save the figure to this path.
-        pad: padding around the image as a fraction of the image size.
-
-    Returns:
-        The matplotlib Figure object if path is None.
+    Figure size is computed from image pixel dimensions.  A fixed top margin
+    is reserved for titles.  Overlay text has a dark outline for readability.
     """
+    figsize, top, width_ratios = _figure_size_for_images([img0, img1], dpi, ncols=2)
+
     # draw image pair
-    fig, axes = plt.subplots(1, 2, figsize=(10, 6), dpi=dpi)
-    axes[0].imshow(img0)  # , cmap='gray')
-    axes[1].imshow(img1)  # , cmap='gray')
-    for i in range(2):  # clear all frames
+    fig, axes = plt.subplots(
+        1, 2, figsize=figsize, dpi=dpi, gridspec_kw={"width_ratios": width_ratios}
+    )
+    axes[0].imshow(img0)
+    axes[1].imshow(img1)
+    for i in range(2):
         axes[i].get_yaxis().set_ticks([])
         axes[i].get_xaxis().set_ticks([])
+        axes[i].set_axis_off()
+        axes[i].margins(0, 0)
         for spine in axes[i].spines.values():
             spine.set_visible(False)
         if titles is not None:
-            axes[i].set_title(titles[i])
+            axes[i].set_title(titles[i], pad=2, fontsize=12)
 
-    plt.tight_layout(pad=pad)
+    plt.subplots_adjust(
+        left=0.005, right=0.995, bottom=0, top=top, wspace=_WSPACE, hspace=0
+    )
 
+    # Draw all keypoints (small white dots)
     if kpts0 is not None:
         assert kpts1 is not None
-        axes[0].scatter(kpts0[:, 0], kpts0[:, 1], c="w", s=5)
-        axes[1].scatter(kpts1[:, 0], kpts1[:, 1], c="w", s=5)
+        axes[0].scatter(kpts0[:, 0], kpts0[:, 1], c="w", s=4, edgecolors="none")
+        axes[1].scatter(kpts1[:, 0], kpts1[:, 1], c="w", s=4, edgecolors="none")
 
-    # draw matches
+    # Draw match lines + matched-keypoint scatter
     if mkpts0.shape[0] != 0 and mkpts1.shape[0] != 0 and mkpts0.shape == mkpts1.shape:
         fig.canvas.draw()
         transFigure = fig.transFigure.inverted()
@@ -174,30 +228,27 @@ def make_matching_figure(
                 (fkpts0[i, 1], fkpts1[i, 1]),
                 transform=fig.transFigure,
                 c=color[i],
-                linewidth=2,
+                linewidth=1.5,
             )
             for i in range(len(mkpts0))
         ]
 
-        # freeze the axes to prevent the transform to change
         axes[0].autoscale(enable=False)
         axes[1].autoscale(enable=False)
 
-        axes[0].scatter(mkpts0[:, 0], mkpts0[:, 1], c=color[..., :3], s=4)
-        axes[1].scatter(mkpts1[:, 0], mkpts1[:, 1], c=color[..., :3], s=4)
+        # Matched keypoints — small colored dots
+        axes[0].scatter(
+            mkpts0[:, 0], mkpts0[:, 1], c=color[..., :3], s=5, edgecolors="none"
+        )
+        axes[1].scatter(
+            mkpts1[:, 0], mkpts1[:, 1], c=color[..., :3], s=5, edgecolors="none"
+        )
 
-    # put txts
-    txt_color = "k" if img0[:100, :200].mean() > 200 else "w"
-    fig.text(
-        0.01,
-        0.99,
-        "\n".join(text),
-        transform=fig.axes[0].transAxes,
-        fontsize=15,
-        va="top",
-        ha="left",
-        color=txt_color,
-    )
+    # Overlay match count with stroke so it's readable on any background
+    if text:
+        _stroked_text(
+            axes[0], 0.01, 0.99, "\n".join(text), fontsize=12, va="top", ha="left"
+        )
 
     # save or return figure
     if path:
@@ -229,20 +280,27 @@ def error_colormap(err: np.ndarray, thr: float, alpha: float = 1.0) -> np.ndarra
 
 
 def fig2im(fig: matplotlib.figure.Figure) -> np.ndarray:
-    """
-    Convert a matplotlib figure to a numpy array with RGB values.
+    """Convert a matplotlib figure to a numpy RGB array.
 
-    Args:
-        fig: A matplotlib figure.
-
-    Returns:
-        A numpy array with shape (height, width, 3) and dtype uint8 containing
-        the RGB values of the figure.
+    Uses an in-memory PNG buffer so the output is immune to HiDPI
+    (Retina) canvas-vs-buffer mismatches.  ``bbox_inches=None`` keeps the
+    exact figure size so that figures with different title lengths stay
+    pixel-identical in width.
     """
-    fig.canvas.draw()
-    (width, height) = fig.canvas.get_width_height()
-    buf_ndarray = np.frombuffer(fig.canvas.tostring_rgb(), dtype="u1")
-    return buf_ndarray.reshape(height, width, 3)
+    buf = io.BytesIO()
+    fig.savefig(
+        buf,
+        format="png",
+        bbox_inches=None,
+        pad_inches=0,
+        dpi=fig.dpi,
+        facecolor=fig.get_facecolor(),
+    )
+    buf.seek(0)
+    rgba = plt.imread(buf)
+    if rgba.shape[-1] == 4:
+        return (rgba[:, :, :3] * 255).astype(np.uint8)
+    return (rgba * 255).astype(np.uint8)
 
 
 def draw_matches_core(
@@ -255,32 +313,15 @@ def draw_matches_core(
     texts: Optional[List[str]] = None,
     dpi: int = 150,
     path: Optional[str] = None,
-    pad: float = 0.5,
+    pad: float = 0.0,
 ) -> np.ndarray:
-    """
-    Draw matches between two images.
-
-    Args:
-        mkpts0: List of matches from the first image, with shape (N, 2)
-        mkpts1: List of matches from the second image, with shape (N, 2)
-        img0: First image, with shape (H, W, 3)
-        img1: Second image, with shape (H, W, 3)
-        conf: Confidence values for the matches, with shape (N,)
-        titles: Optional list of title strings for the plot
-        dpi: DPI for the saved image
-        path: Optional path to save the image to. If None, the image is not saved.
-        pad: Padding between subplots
-
-    Returns:
-        The figure as a numpy array with shape (height, width, 3) and dtype uint8
-        containing the RGB values of the figure.
-    """
+    """Draw matches between two images."""
     thr = 0.5
     color = error_colormap(1 - conf, thr, alpha=0.1)
-    text = [
-        # "image name",
-        f"#Matches: {len(mkpts0)}",
-    ]
+    if texts:
+        text = list(texts)
+    else:
+        text = [f"#Matches: {len(mkpts0)}"]
     if path:
         fig2im(
             make_matching_figure(
@@ -293,7 +334,6 @@ def draw_matches_core(
                 text=text,
                 path=path,
                 dpi=dpi,
-                pad=pad,
             )
         )
     else:
@@ -306,7 +346,6 @@ def draw_matches_core(
                 color,
                 titles=titles,
                 text=text,
-                pad=pad,
                 dpi=dpi,
             )
         )
@@ -318,50 +357,38 @@ def draw_image_pairs(
     text: List[str] = [],
     dpi: int = 75,
     path: Optional[str] = None,
-    pad: float = 0.5,
+    pad: float = 0.0,
 ) -> np.ndarray:
-    """Draw image pair horizontally.
+    """Draw image pair horizontally with minimal whitespace (paper-style).
 
-    Args:
-        img0: First image, with shape (H, W, 3)
-        img1: Second image, with shape (H, W, 3)
-        text: List of strings to print. Each string is a new line.
-        dpi: DPI of the figure.
-        path: Path to save the image to. If None, the image is not saved and
-            the function returns the figure as a numpy array with shape
-            (height, width, 3) and dtype uint8 containing the RGB values of the
-            figure.
-        pad: Padding between subplots
-
-    Returns:
-        The figure as a numpy array with shape (height, width, 3) and dtype uint8
-        containing the RGB values of the figure, or None if path is not None.
+    Figure size is computed from image pixel dimensions.  A fixed top margin
+    is reserved for overlay text.
     """
-    # draw image pair
-    fig, axes = plt.subplots(1, 2, figsize=(10, 6), dpi=dpi)
-    axes[0].imshow(img0)  # , cmap='gray')
-    axes[1].imshow(img1)  # , cmap='gray')
-    for i in range(2):  # clear all frames
+    figsize, top, width_ratios = _figure_size_for_images([img0, img1], dpi, ncols=2)
+
+    fig, axes = plt.subplots(
+        1, 2, figsize=figsize, dpi=dpi, gridspec_kw={"width_ratios": width_ratios}
+    )
+    axes[0].imshow(img0)
+    axes[1].imshow(img1)
+    for i in range(2):
         axes[i].get_yaxis().set_ticks([])
         axes[i].get_xaxis().set_ticks([])
+        axes[i].set_axis_off()
+        axes[i].margins(0, 0)
         for spine in axes[i].spines.values():
             spine.set_visible(False)
-    plt.tight_layout(pad=pad)
 
-    # put txts
-    txt_color = "k" if img0[:100, :200].mean() > 200 else "w"
-    fig.text(
-        0.01,
-        0.99,
-        "\n".join(text),
-        transform=fig.axes[0].transAxes,
-        fontsize=15,
-        va="top",
-        ha="left",
-        color=txt_color,
+    plt.subplots_adjust(
+        left=0.005, right=0.995, bottom=0, top=top, wspace=_WSPACE, hspace=0
     )
 
-    # save or return figure
+    # Stroked overlay text so it's readable on any background
+    if text:
+        _stroked_text(
+            axes[0], 0.01, 0.99, "\n".join(text), fontsize=12, va="top", ha="left"
+        )
+
     if path:
         plt.savefig(str(path), bbox_inches="tight", pad_inches=0)
         plt.close()
@@ -374,12 +401,12 @@ def display_keypoints(pred: dict, titles: List[str] = []):
     img1 = pred["image1_orig"]
     output_keypoints = plot_images([img0, img1], titles=titles, dpi=300)
     if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
-        plot_keypoints([pred["keypoints0_orig"], pred["keypoints1_orig"]])
+        plot_keypoints([pred["keypoints0_orig"], pred["keypoints1_orig"]], ps=4)
         text = (
             f"# keypoints0: {len(pred['keypoints0_orig'])} \n"
             + f"# keypoints1: {len(pred['keypoints1_orig'])}"
         )
-        add_text(0, text, fs=15)
+        add_text(0, text, fs=12)
     output_keypoints = fig2im(output_keypoints)
     return output_keypoints
 

@@ -7,6 +7,7 @@ cmake_modules/
 cmake-build-debug/
 .idea/
 .vscode/
+.venv
 *.pyc
 flagged
 .ipynb_checkpoints
@@ -31,6 +32,10 @@ datasets/South-Building*
 *.pkl
 oryx-build-commands.txt
 .ruff_cache*
+.pytest_cache*
+.ruff_cache*
+.mypy_cache*
+*_cache*
 dist
 tmp
 **.DS_Store**
