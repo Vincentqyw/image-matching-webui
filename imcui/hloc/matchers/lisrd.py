@@ -46,13 +46,17 @@ LISRD_CONFIG: dict = {
 # homographies → keypoint_detectors → super_point_magic_leap (unused here).
 # ---------------------------------------------------------------------------
 
+
 def _keypoints_to_grid(keypoints, img_size):
     """Convert (N, 2) keypoints in (row, col) to grid_sample grid [-1, 1]."""
     n_points = keypoints.size(-2)
     device = keypoints.device
-    grid = keypoints.float() * 2.0 / torch.tensor(
-        img_size, dtype=torch.float, device=device
-    ) - 1.0
+    grid = (
+        keypoints.float()
+        * 2.0
+        / torch.tensor(img_size, dtype=torch.float, device=device)
+        - 1.0
+    )
     return grid[..., [1, 0]].view(-1, n_points, 1, 2)
 
 
@@ -142,9 +146,7 @@ class Lisrd(BaseModel):
         )
 
         logger.info(f"Loading LISRD model ({model_name})")
-        self.device = torch.device(
-            "cuda:0" if torch.cuda.is_available() else "cpu"
-        )
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.net = get_lisrd_model("lisrd")(None, LISRD_CONFIG, self.device)
         self.net.load(weight_file, Mode.EXPORT)
         self.net._net.eval()
@@ -176,12 +178,8 @@ class Lisrd(BaseModel):
             meta_desc1 = outputs1["meta_descriptors"]
 
             # -- 3. Sample descriptors at keypoint locations -----------------
-            gpu_kp0 = torch.tensor(
-                kp0[:, :2], dtype=torch.float, device=self.device
-            )
-            gpu_kp1 = torch.tensor(
-                kp1[:, :2], dtype=torch.float, device=self.device
-            )
+            gpu_kp0 = torch.tensor(kp0[:, :2], dtype=torch.float, device=self.device)
+            gpu_kp1 = torch.tensor(kp1[:, :2], dtype=torch.float, device=self.device)
 
             sampled_desc0, sampled_meta0 = _extract_descriptors(
                 gpu_kp0, desc0, meta_desc0, (h0, w0)
@@ -206,12 +204,8 @@ class Lisrd(BaseModel):
 
         # -- 6. Pack outputs (coordinates in pixel space, (x,y) = (col,row))
         # kp is (row, col, response); swap to (x, y).
-        all_kpts0 = torch.tensor(
-            kp0[:, [1, 0]], dtype=torch.float, device=self.device
-        )
-        all_kpts1 = torch.tensor(
-            kp1[:, [1, 0]], dtype=torch.float, device=self.device
-        )
+        all_kpts0 = torch.tensor(kp0[:, [1, 0]], dtype=torch.float, device=self.device)
+        all_kpts1 = torch.tensor(kp1[:, [1, 0]], dtype=torch.float, device=self.device)
 
         matched_kpts0 = all_kpts0[idx0]
         matched_kpts1 = all_kpts1[idx1]
@@ -239,9 +233,7 @@ class Lisrd(BaseModel):
         img_np = np.uint8(img_np)
         gray = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
 
-        sift = cv2.SIFT_create(
-            nfeatures=num_keypoints, contrastThreshold=0.01
-        )
+        sift = cv2.SIFT_create(nfeatures=num_keypoints, contrastThreshold=0.01)
         keypoints = sift.detect(gray, None)
 
         if len(keypoints) == 0:

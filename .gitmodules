@@ -101,5 +101,5 @@
     path = imcui/third_party/SE2LoFTR
     url = https://github.com/agipro/se2-loftr.git
 [submodule "imcui/third_party/LISRD"]
-	path = imcui/third_party/LISRD
-	url = https://github.com/agipro/LISRD
+    path = imcui/third_party/LISRD
+    url = https://github.com/agipro/LISRD
