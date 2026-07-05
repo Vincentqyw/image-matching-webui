@@ -64,10 +64,14 @@ jobs:
           echo "Extracted: $REPO_URL"
 
       - name: Run matcher integration
+        env:
+          FORCE_COLOR: "1"
+          NODE_OPTIONS: "--no-warnings"
         run: |
           echo "Integrating: ${{ steps.extract.outputs.repo_name }}"
           echo "From: ${{ steps.extract.outputs.repo_url }}"
-          claude --print "/integrate-matcher ${{ steps.extract.outputs.repo_url }}"
+          # Use script to force line-buffered output in GitHub Actions
+          script -q /dev/null claude --print "/integrate-matcher ${{ steps.extract.outputs.repo_url }}"
 
       - name: Create PR
         env:
