@@ -1,0 +1,86 @@
+name: Matcher Integration Bot
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  integrate:
+    if: github.event.label.name == 'new-matcher'
+    runs-on: self-hosted
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Extract repo URL from issue
+        id: extract
+        run: |
+          ISSUE_BODY=$(cat << 'EOF'
+          ${{ github.event.issue.body }}
+          EOF
+          )
+          # Extract GitHub repo URL from issue body
+          REPO_URL=$(echo "$ISSUE_BODY" | grep -oP 'https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+' | head -1)
+          REPO_NAME=$(basename "$REPO_URL")
+          echo "repo_url=$REPO_URL" >> $GITHUB_OUTPUT
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+          echo "Extracted: $REPO_URL"
+
+      - name: Run matcher integration
+        run: |
+          echo "Integrating: ${{ steps.extract.outputs.repo_name }}"
+          echo "From: ${{ steps.extract.outputs.repo_url }}"
+
+          # Use your local Claude Code CLI with deepseek backend
+          claude --print "Integrate a new matcher from ${{ steps.extract.outputs.repo_url }}. Follow the /integrate-matcher procedure: add submodule, create extractor/matcher module, register configs, update app.yaml."
+
+      - name: Create PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NAME="${{ steps.extract.outputs.repo_name }}"
+          REPO_URL="${{ steps.extract.outputs.repo_url }}"
+
+          git config user.name "matcher-bot"
+          git config user.email "bot@vincentqyw.dev"
+
+          BRANCH="feat/add-$NAME-$(date +%s)"
+          git checkout -b "$BRANCH"
+          git add .
+          git diff --cached --quiet || git commit -m "feat: integrate $NAME ($REPO_URL)"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "feat: integrate $NAME" \
+            --body "Auto-integrated from #${{ github.event.issue.number }}.\n\nSource: $REPO_URL"
+
+      - name: Comment success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Integration complete! PR has been created for review.'
+            })
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'new-matcher'
+            })
+
+      - name: Comment failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Integration failed. Please check the [workflow logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+            })
