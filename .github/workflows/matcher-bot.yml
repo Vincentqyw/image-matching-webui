@@ -70,11 +70,11 @@ jobs:
         run: |
           echo "Integrating: ${{ steps.extract.outputs.repo_name }}"
           echo "From: ${{ steps.extract.outputs.repo_url }}"
-          # stream-json = real-time output (not batch), pipefail = preserve exit code
+          # stream-json = real-time output; fromjson? silently skips non-JSON lines
           set -o pipefail
           claude --print --output-format stream-json \
             "/integrate-matcher ${{ steps.extract.outputs.repo_url }}" \
-            2>&1 | jq -r 'select(.type=="assistant") | .message.content[].text // .text // empty'
+            2>&1 | jq -R 'fromjson? | select(type=="object" and .type=="assistant") | .message.content[].text // .text // empty'
 
       - name: Create PR
         env:
