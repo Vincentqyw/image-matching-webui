@@ -10,9 +10,34 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      - name: Setup workspace (incremental checkout from cache)
+        run: |
+          CACHE="$HOME/actions-runner/_cache/imcui"
+          GH_REPO="https://github.com/Vincentqyw/image-matching-webui.git"
+
+          if [ -d "$CACHE/.git" ]; then
+            # Cache exists — incremental update
+            echo "Using cached repo, fetching latest..."
+            cd "$CACHE"
+            git fetch origin main --depth=1
+            git reset --hard origin/main
+            # Only update submodules if .gitmodules changed
+            if ! git diff --quiet HEAD~1 -- .gitmodules 2>/dev/null; then
+              echo "Submodules changed, updating..."
+              git submodule update --init --recursive --depth=1 --jobs=8
+            fi
+          else
+            # First run — full clone
+            echo "First run, cloning repo..."
+            mkdir -p "$(dirname "$CACHE")"
+            git clone --depth=1 --recurse-submodules --shallow-submodules --jobs=8 \
+              "$GH_REPO" "$CACHE"
+          fi
+
+          # Copy to workspace
+          rm -rf "$GITHUB_WORKSPACE"/*
+          cp -a "$CACHE"/. "$GITHUB_WORKSPACE"/
+          echo "Workspace ready: $GITHUB_WORKSPACE"
 
       - name: Extract repo URL from issue
         id: extract
@@ -21,9 +46,16 @@ jobs:
           ${{ github.event.issue.body }}
           EOF
           )
-          # Extract GitHub repo URL from issue body
-          REPO_URL=$(echo "$ISSUE_BODY" | grep -oP 'https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+' | head -1)
-          REPO_NAME=$(basename "$REPO_URL")
+          # macOS-compatible: use perl instead of grep -P
+          REPO_URL=$(echo "$ISSUE_BODY" | perl -ne 'print "$1" if m{(https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)}' | head -1 | tr -d '\n\r')
+          REPO_NAME=$(basename "$REPO_URL" .git 2>/dev/null)
+
+          if [ -z "$REPO_URL" ]; then
+            echo "❌ No GitHub repository URL found in issue body."
+            echo "Expected format: https://github.com/owner/repo"
+            exit 1
+          fi
+
           echo "repo_url=$REPO_URL" >> $GITHUB_OUTPUT
           echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
           echo "Extracted: $REPO_URL"
@@ -32,9 +64,7 @@ jobs:
         run: |
           echo "Integrating: ${{ steps.extract.outputs.repo_name }}"
           echo "From: ${{ steps.extract.outputs.repo_url }}"
-
-          # Use your local Claude Code CLI with deepseek backend
-          claude --print "Integrate a new matcher from ${{ steps.extract.outputs.repo_url }}. Follow the /integrate-matcher procedure: add submodule, create extractor/matcher module, register configs, update app.yaml."
+          claude --print "/integrate-matcher ${{ steps.extract.outputs.repo_url }}"
 
       - name: Create PR
         env:
@@ -46,14 +76,25 @@ jobs:
           git config user.name "matcher-bot"
           git config user.email "bot@vincentqyw.dev"
 
-          BRANCH="feat/add-$NAME-$(date +%s)"
+          BRANCH="feat/add-${NAME}-$(date +%s)"
           git checkout -b "$BRANCH"
           git add .
-          git diff --cached --quiet || git commit -m "feat: integrate $NAME ($REPO_URL)"
+
+          if git diff --cached --quiet; then
+            echo "❌ No changes detected after integration. The skill may have failed to produce output."
+            exit 1
+          fi
+
+          git commit -m "feat: integrate $NAME
+
+
+          Source: $REPO_URL"
           git push origin "$BRANCH"
           gh pr create \
             --title "feat: integrate $NAME" \
-            --body "Auto-integrated from #${{ github.event.issue.number }}.\n\nSource: $REPO_URL"
+            --body "Auto-integrated from #${{ github.event.issue.number }}.
+
+          Source: $REPO_URL"
 
       - name: Comment success
         if: success()
