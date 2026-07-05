@@ -798,4 +798,36 @@ confs = {
             "dfactor": 8,
         },
     },
+    "lisrd-vidit": {
+        "output": "matches-lisrd-vidit",
+        "model": {
+            "name": "lisrd",
+            "model_name": "lisrd_vidit",
+            "max_keypoints": 2048,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
+    "lisrd-aachen": {
+        "output": "matches-lisrd-aachen",
+        "model": {
+            "name": "lisrd",
+            "model_name": "lisrd_aachen",
+            "max_keypoints": 2048,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 8,
+        },
+    },
 }

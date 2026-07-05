@@ -700,6 +700,30 @@ matcher_zoo:
       project: https://feixue94.github.io/
       display: true
 
+  LISRD(ViDiT):
+    matcher: lisrd-vidit
+    standalone: true
+    skip_ci: true
+    info:
+      name: LISRD(ViDiT)
+      source: "ECCV 2020"
+      github: https://github.com/rpautrat/LISRD
+      paper: https://arxiv.org/abs/2007.08988
+      display: true
+      efficiency: medium
+
+  LISRD(Aachen):
+    matcher: lisrd-aachen
+    standalone: true
+    skip_ci: true
+    info:
+      name: LISRD(Aachen)
+      source: "ECCV 2020"
+      github: https://github.com/rpautrat/LISRD
+      paper: https://arxiv.org/abs/2007.08988
+      display: true
+      efficiency: medium
+
 retrieval_zoo:
   netvlad:
     enable: true
