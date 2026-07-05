@@ -1,13 +1,13 @@
 ---
 title: Image Matching WebUI
-emoji: 👀
-colorFrom: blue
-colorTo: green
+emoji: 🤗
+colorFrom: red
+colorTo: yellow
 sdk: gradio
-sdk_version: "6.19.0"
-python_version: "3.12"
+sdk_version: 6.19.0
+python_version: '3.12'
 app_file: app.py
-pinned: false
+pinned: true
 license: apache-2.0
 ---
 

@@ -4,3 +4,7 @@ __pycache__/
 .venv/
 .idea/
 .vscode/
+*.__pycache__
+.DS_Store
+output.pkl
+log.txt
