@@ -20,26 +20,55 @@ def cm_RdGn(x):
 
 
 def plot_images(
-    imgs, titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True, figsize=4.5
+    imgs, titles=None, cmaps="gray", dpi=100, pad=0.0, adaptive=True, figsize=4.5
 ):
-    """Plot a set of images horizontally.
+    """Plot a set of images horizontally with minimal whitespace (paper-style).
+
+    Figure size is computed from image pixel dimensions.  A fixed top margin
+    (0.25") is reserved for titles so they never get clipped.
+
     Args:
         imgs: a list of NumPy or PyTorch images, RGB (H, W, 3) or mono (H, W).
-        titles: a list of strings, as titles for each image.
+        titles: a list of strings, placed in the top margin above each image.
         cmaps: colormaps for monochrome images.
         adaptive: whether the figure size should fit the image aspect ratios.
+        pad: deprecated (ignored).
+        figsize: figure height in inches (used as base when adaptive=False).
     """
     n = len(imgs)
     if not isinstance(cmaps, (list, tuple)):
         cmaps = [cmaps] * n
+    if isinstance(titles, str):
+        titles = [titles]
+
+    # Fixed top margin in inches so titles are never clipped
+    TITLE_MARGIN_INCHES = 0.25
+    heights = [img.shape[0] for img in imgs]
+    widths = [img.shape[1] for img in imgs]
+    max_h = max(heights)
+    total_w = sum(widths)
 
     if adaptive:
         ratios = [i.shape[1] / i.shape[0] for i in imgs]  # W / H
     else:
         ratios = [4 / 3] * n
-    figsize = [sum(ratios) * figsize, figsize]
+
+    axes_h = max_h / dpi
+    fig_h = axes_h + TITLE_MARGIN_INCHES
+    top = axes_h / fig_h
+    figsize_computed = (total_w / dpi, fig_h)
+
+    if not adaptive:
+        # Use user-supplied figsize as base height
+        figsize_computed = (sum(ratios) * figsize, figsize + TITLE_MARGIN_INCHES)
+        top = figsize / figsize_computed[1]
+
     fig, axs = plt.subplots(
-        1, n, figsize=figsize, dpi=dpi, gridspec_kw={"width_ratios": ratios}
+        1,
+        n,
+        figsize=figsize_computed,
+        dpi=dpi,
+        gridspec_kw={"width_ratios": ratios},
     )
     if n == 1:
         axs = [axs]
@@ -47,8 +76,9 @@ def plot_images(
         ax.imshow(img, cmap=plt.get_cmap(cmaps[i]))
         ax.set_axis_off()
         if titles:
-            ax.set_title(titles[i])
-    fig.tight_layout(pad=pad)
+            ax.set_title(titles[i], pad=2, fontsize=9)
+
+    plt.subplots_adjust(left=0, right=1, bottom=0, top=top, wspace=0.005, hspace=0)
     return fig
 
 

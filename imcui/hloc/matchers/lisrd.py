@@ -12,12 +12,14 @@ References:
 import sys
 from pathlib import Path
 
-import cv2
-import numpy as np
 import torch
 import torch.nn.functional as F
+from kornia.color import rgb_to_grayscale
 
 from .. import logger
+from ..extractors.aliked import ALIKED as ALIKEDExtractor
+from ..extractors.sift import SIFT as SIFTExtractor
+from ..extractors.superpoint import SuperPoint as SuperPointExtractor
 from ..utils.base_model import BaseModel
 
 lisrd_path = Path(__file__).parent / "../../third_party/LISRD"
@@ -39,11 +41,36 @@ LISRD_CONFIG: dict = {
     "freeze_local_desc": False,
 }
 
+# Available keypoint detectors with their default configs.
+_DETECTOR_BUILDERS = {
+    "superpoint": lambda max_kpts: SuperPointExtractor(
+        {
+            "nms_radius": 4,
+            "model_name": "superpoint_v1.pth",
+            "keypoint_threshold": 0.005,
+            "max_keypoints": max_kpts,
+            "remove_borders": 4,
+        }
+    ),
+    "aliked": lambda max_kpts: ALIKEDExtractor(
+        {
+            "name": "aliked",
+            "model_name": "aliked-n16",
+            "max_num_keypoints": max_kpts,
+            "detection_threshold": 0.2,
+        }
+    ),
+    "sift": lambda max_kpts: SIFTExtractor(
+        {
+            "max_keypoints": max_kpts,
+            "backend": "opencv",
+        }
+    ),
+}
+
 
 # ---------------------------------------------------------------------------
 # Inlined helpers from LISRD's geometry_utils and pytorch_utils.
-# We inline these to avoid importing lisrd.utils.geometry_utils, which pulls in
-# homographies → keypoint_detectors → super_point_magic_leap (unused here).
 # ---------------------------------------------------------------------------
 
 
@@ -62,8 +89,6 @@ def _keypoints_to_grid(keypoints, img_size):
 
 def _extract_descriptors(keypoints, descriptors, meta_descriptors, img_size):
     """Sample dense descriptor maps at keypoint locations.
-
-    Adapted from ``lisrd.utils.geometry_utils.extract_descriptors``.
 
     Args:
         keypoints: ``(N, 2)`` tensor in (row, col) pixel coordinates.
@@ -95,15 +120,10 @@ def _extract_descriptors(keypoints, descriptors, meta_descriptors, img_size):
 
 
 def _lisrd_matcher(desc1, desc2, meta_desc1, meta_desc2):
-    """Mutual nearest neighbour matching via meta-weighted descriptor similarity.
-
-    Adapted from ``lisrd.utils.geometry_utils.lisrd_matcher``.
-    """
+    """Mutual nearest neighbour matching via meta-weighted descriptor similarity."""
     device = desc1.device
-    # (N1, N2, 4) — per-variance meta similarity
     desc_weights = torch.einsum("nid,mid->nim", meta_desc1, meta_desc2)
     desc_weights = F.softmax(desc_weights, dim=1)
-    # (N1, N2, 4) — per-variance descriptor similarity
     desc_sims = torch.einsum("nid,mid->nim", desc1, desc2) * desc_weights
     desc_sims = torch.sum(desc_sims, dim=1)  # (N1, N2)
 
@@ -114,6 +134,21 @@ def _lisrd_matcher(desc1, desc2, meta_desc1, meta_desc2):
     return torch.stack([ids1[mask], nn12[mask]], dim=1)
 
 
+def _compute_confidence(desc0, desc1, meta0, meta1):
+    """Meta-descriptor weighted cosine similarity for matched pairs."""
+    desc0 = F.normalize(desc0, dim=2)
+    desc1 = F.normalize(desc1, dim=2)
+    meta0 = F.normalize(meta0, dim=2)
+    meta1 = F.normalize(meta1, dim=2)
+
+    desc_sim = torch.sum(desc0 * desc1, dim=2)  # (M, 4)
+    meta_sim = torch.sum(meta0 * meta1, dim=2)  # (M, 4)
+
+    weights = F.softmax(meta_sim, dim=1)
+    confidence = torch.sum(desc_sim * weights, dim=1)  # (M,)
+    return confidence
+
+
 # ---------------------------------------------------------------------------
 # Matcher class
 # ---------------------------------------------------------------------------
@@ -122,15 +157,17 @@ def _lisrd_matcher(desc1, desc2, meta_desc1, meta_desc2):
 class Lisrd(BaseModel):
     """LISRD standalone matcher.
 
-    Internally detects SIFT keypoints, extracts LISRD descriptors with four
-    invariance combinations, and matches them via mutual nearest neighbour
-    weighted by meta-descriptor similarity.
+    Detects keypoints with a configurable detector (SuperPoint, ALIKED, or
+    SIFT), extracts LISRD descriptors with four invariance combinations, and
+    matches them via mutual nearest neighbour weighted by meta-descriptor
+    similarity.
     """
 
     default_conf = {
         "name": "two_view_pipeline",
-        "model_name": "lisrd_vidit",
+        "model_name": "lisrd_aachen",
         "max_keypoints": 2048,
+        "detector": "superpoint",  # "superpoint", "aliked", or "sift"
     }
     required_inputs = [
         "image0",
@@ -152,21 +189,74 @@ class Lisrd(BaseModel):
         self.net._net.eval()
         logger.info("Load LISRD model done.")
 
-    def _forward(self, data):
-        num_keypoints = self.conf["max_keypoints"]
+        # ---- Keypoint detector -----------------------------------------------
+        detector_name = self.conf.get("detector", "superpoint")
+        if detector_name not in _DETECTOR_BUILDERS:
+            raise ValueError(
+                f"Unknown LISRD detector: {detector_name}. "
+                f"Choose from {list(_DETECTOR_BUILDERS.keys())}."
+            )
+        self.detector = _DETECTOR_BUILDERS[detector_name](self.conf["max_keypoints"])
+        # GPU-capable detectors run on the LISRD device; SIFT stays on CPU.
+        if detector_name != "sift":
+            self.detector.to(self.device)
+        logger.info(f"LISRD detector: {detector_name}")
 
-        # WebUI delivers images as float32 [0, 1]; LISRD expects [0, 255].
+    def _forward(self, data):
+        detector_name = self.conf.get("detector", "superpoint")
+
+        # LISRD expects [0, 255]; WebUI delivers [0, 1].
         img0 = data["image0"] * 255.0
         img1 = data["image1"] * 255.0
         h0, w0 = img0.shape[2], img0.shape[3]
         h1, w1 = img1.shape[2], img1.shape[3]
 
-        with torch.no_grad():
-            # -- 1. Detect keypoints with OpenCV SIFT ------------------------
-            kp0 = self._detect_sift_keypoints(img0, num_keypoints)
-            kp1 = self._detect_sift_keypoints(img1, num_keypoints)
+        # Detector images stay in [0, 1].
+        det_img0 = data["image0"]
+        det_img1 = data["image1"]
 
-            # -- 2. Extract LISRD descriptors --------------------------------
+        with torch.no_grad():
+            # -- 1. Detect keypoints -------------------------------------------
+            if detector_name in ("superpoint", "aliked"):
+                # SuperPoint needs grayscale; ALIKED handles RGB natively.
+                if detector_name == "superpoint":
+                    if det_img0.shape[1] == 3:
+                        det_img0 = rgb_to_grayscale(det_img0)
+                    if det_img1.shape[1] == 3:
+                        det_img1 = rgb_to_grayscale(det_img1)
+
+                kp_out0 = self.detector({"image": det_img0.to(self.device)})
+                kp_out1 = self.detector({"image": det_img1.to(self.device)})
+                kps0 = kp_out0["keypoints"]
+                kps1 = kp_out1["keypoints"]
+
+                # ALIKED returns a list of per-image tensors.
+                if isinstance(kps0, list):
+                    kps0, kps1 = kps0[0], kps1[0]
+
+                # Guard against zero keypoints.
+                if kps0.numel() == 0:
+                    kps0 = torch.zeros(0, 2, device=self.device)
+                if kps1.numel() == 0:
+                    kps1 = torch.zeros(0, 2, device=self.device)
+                if kps0.dim() == 1:
+                    kps0 = kps0.view(-1, 2)
+                if kps1.dim() == 1:
+                    kps1 = kps1.view(-1, 2)
+            else:
+                # SIFT (CPU-based OpenCV).
+                kp_out0 = self.detector({"image": det_img0})
+                kp_out1 = self.detector({"image": det_img1})
+                # SIFT extractor returns (B, N, 2); B=1 here.
+                kps0 = kp_out0["keypoints"][0].to(self.device)
+                kps1 = kp_out1["keypoints"][0].to(self.device)
+
+            # All detectors return keypoints in (x, y).  Convert to (row, col)
+            # for _extract_descriptors, which matches the original LISRD API.
+            gpu_kp0 = kps0[:, [1, 0]]
+            gpu_kp1 = kps1[:, [1, 0]]
+
+            # -- 2. Extract LISRD descriptors -----------------------------------
             inputs0 = {"image0": img0.to(self.device)}
             outputs0 = self.net._forward(inputs0, Mode.EXPORT, LISRD_CONFIG)
             desc0 = outputs0["descriptors"]
@@ -177,10 +267,7 @@ class Lisrd(BaseModel):
             desc1 = outputs1["descriptors"]
             meta_desc1 = outputs1["meta_descriptors"]
 
-            # -- 3. Sample descriptors at keypoint locations -----------------
-            gpu_kp0 = torch.tensor(kp0[:, :2], dtype=torch.float, device=self.device)
-            gpu_kp1 = torch.tensor(kp1[:, :2], dtype=torch.float, device=self.device)
-
+            # -- 3. Sample descriptors at keypoint locations ---------------------
             sampled_desc0, sampled_meta0 = _extract_descriptors(
                 gpu_kp0, desc0, meta_desc0, (h0, w0)
             )
@@ -188,12 +275,12 @@ class Lisrd(BaseModel):
                 gpu_kp1, desc1, meta_desc1, (h1, w1)
             )
 
-            # -- 4. Mutual nearest neighbour matching ------------------------
+            # -- 4. Mutual nearest neighbour matching ----------------------------
             matches = _lisrd_matcher(
-                sampled_desc0, sampled_meta0, sampled_desc1, sampled_meta1
+                sampled_desc0, sampled_desc1, sampled_meta0, sampled_meta1
             )
 
-            # -- 5. Confidence from meta-weighted descriptor similarity ------
+            # -- 5. Confidence --------------------------------------------------
             idx0, idx1 = matches[:, 0], matches[:, 1]
             mconf = _compute_confidence(
                 sampled_desc0[idx0],
@@ -202,10 +289,10 @@ class Lisrd(BaseModel):
                 sampled_meta1[idx1],
             )
 
-        # -- 6. Pack outputs (coordinates in pixel space, (x,y) = (col,row))
-        # kp is (row, col, response); swap to (x, y).
-        all_kpts0 = torch.tensor(kp0[:, [1, 0]], dtype=torch.float, device=self.device)
-        all_kpts1 = torch.tensor(kp1[:, [1, 0]], dtype=torch.float, device=self.device)
+        # -- 6. Pack outputs ----------------------------------------------------
+        # kps0/kps1 are already in (x, y) format.
+        all_kpts0 = kps0
+        all_kpts1 = kps1
 
         matched_kpts0 = all_kpts0[idx0]
         matched_kpts1 = all_kpts1[idx1]
@@ -217,52 +304,3 @@ class Lisrd(BaseModel):
             "mkeypoints1": matched_kpts1,
             "mconf": mconf,
         }
-
-    @staticmethod
-    def _detect_sift_keypoints(img_tensor, num_keypoints):
-        """OpenCV SIFT keypoint detection.
-
-        Args:
-            img_tensor: ``(1, 3, H, W)`` float32 tensor in [0, 255].
-            num_keypoints: maximum number of keypoints.
-
-        Returns:
-            ``np.ndarray`` of shape ``(N, 3)`` with columns (row, col, response).
-        """
-        img_np = img_tensor[0].cpu().numpy().transpose(1, 2, 0)  # HWC
-        img_np = np.uint8(img_np)
-        gray = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
-
-        sift = cv2.SIFT_create(nfeatures=num_keypoints, contrastThreshold=0.01)
-        keypoints = sift.detect(gray, None)
-
-        if len(keypoints) == 0:
-            return np.array([[0.0, 0.0, 0.0]], dtype=np.float32)
-
-        return np.array(
-            [[k.pt[1], k.pt[0], k.response] for k in keypoints],
-            dtype=np.float32,
-        )
-
-
-def _compute_confidence(desc0, desc1, meta0, meta1):
-    """Meta-descriptor weighted cosine similarity for matched pairs.
-
-    Args:
-        desc0, desc1: ``(M, 4, D)`` — descriptors per invariance type.
-        meta0, meta1: ``(M, 4, D')`` — meta descriptors per invariance type.
-
-    Returns:
-        ``(M,)`` tensor of confidence scores.
-    """
-    desc0 = F.normalize(desc0, dim=2)
-    desc1 = F.normalize(desc1, dim=2)
-    meta0 = F.normalize(meta0, dim=2)
-    meta1 = F.normalize(meta1, dim=2)
-
-    desc_sim = torch.sum(desc0 * desc1, dim=2)  # (M, 4)
-    meta_sim = torch.sum(meta0 * meta1, dim=2)  # (M, 4)
-
-    weights = F.softmax(meta_sim, dim=1)
-    confidence = torch.sum(desc_sim * weights, dim=1)  # (M,)
-    return confidence

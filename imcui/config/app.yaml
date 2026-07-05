@@ -700,24 +700,36 @@ matcher_zoo:
       project: https://feixue94.github.io/
       display: true
 
-  LISRD(ViDiT):
-    matcher: lisrd-vidit
+  LISRD+SuperPoint:
+    matcher: lisrd-superpoint
     standalone: true
     skip_ci: true
     info:
-      name: LISRD(ViDiT)
+      name: LISRD+SuperPoint
       source: "ECCV 2020"
       github: https://github.com/rpautrat/LISRD
       paper: https://arxiv.org/abs/2007.08988
       display: true
       efficiency: medium
 
-  LISRD(Aachen):
-    matcher: lisrd-aachen
+  LISRD+ALIKED:
+    matcher: lisrd-aliked
     standalone: true
     skip_ci: true
     info:
-      name: LISRD(Aachen)
+      name: LISRD+ALIKED
+      source: "ECCV 2020"
+      github: https://github.com/rpautrat/LISRD
+      paper: https://arxiv.org/abs/2007.08988
+      display: true
+      efficiency: medium
+
+  LISRD+SIFT:
+    matcher: lisrd-sift
+    standalone: true
+    skip_ci: true
+    info:
+      name: LISRD+SIFT
       source: "ECCV 2020"
       github: https://github.com/rpautrat/LISRD
       paper: https://arxiv.org/abs/2007.08988
