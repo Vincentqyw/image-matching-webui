@@ -77,6 +77,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -e
           NAME="${{ steps.extract.outputs.repo_name }}"
           REPO_URL="${{ steps.extract.outputs.repo_url }}"
 
@@ -85,23 +86,23 @@ jobs:
 
           BRANCH="feat/add-${NAME}-$(date +%s)"
           git checkout -b "$BRANCH"
-          git add .
+
+          # Only stage actual integration changes (ignore workspace debris)
+          git add imcui/hloc/ imcui/config/ imcui/third_party/ config/ 2>/dev/null || true
+          git add -u imcui/hloc/ imcui/config/ imcui/third_party/ config/ 2>/dev/null || true
 
           if git diff --cached --quiet; then
-            echo "❌ No changes detected after integration. The skill may have failed to produce output."
+            printf 'No changes detected after integration. Exiting.\n'
             exit 1
           fi
 
-          git commit -m "feat: integrate $NAME
-
-
-          Source: $REPO_URL"
+          git commit -m "feat: integrate ${NAME} - ${REPO_URL}"
           git push origin "$BRANCH"
-          gh pr create \
-            --title "feat: integrate $NAME" \
-            --body "Auto-integrated from #${{ github.event.issue.number }}.
 
-          Source: $REPO_URL"
+          gh pr create \
+            --head "$BRANCH" \
+            --title "feat: integrate ${NAME}" \
+            --body "Auto-integrated from issue #${{ github.event.issue.number }}. Source: ${REPO_URL}"
 
       - name: Comment success
         if: success()
