@@ -70,11 +70,17 @@ jobs:
         run: |
           echo "Integrating: ${{ steps.extract.outputs.repo_name }}"
           echo "From: ${{ steps.extract.outputs.repo_url }}"
-          # stream-json = real-time output; fromjson? silently skips non-JSON lines
+          # --verbose required for stream-json to work
+          # jq extracts text + thinking from assistant messages in real-time
           set -o pipefail
-          claude --print --output-format stream-json \
+          claude --print --verbose --output-format stream-json \
             "/integrate-matcher ${{ steps.extract.outputs.repo_url }}" \
-            2>&1 | jq -R 'fromjson? | select(type=="object" and .type=="assistant") | .message.content[].text // .text // empty'
+            2>&1 | jq -R 'fromjson? | select(type=="object") |
+            if .type=="assistant" then
+              (.message.content[]? | (.text // .thinking // empty))
+            elif .type=="system" and (.subtype=="hook_response" or .subtype=="hook_started") then
+              "[system: \(.hook_name // .subtype)]"
+            else empty end'
 
       - name: Create PR
         env:
