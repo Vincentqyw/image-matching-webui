@@ -34,9 +34,12 @@ jobs:
               "$GH_REPO" "$CACHE"
           fi
 
-          # Copy to workspace
+          # Fix permissions (git pack files may be read-only)
+          chmod -R u+rw "$CACHE" 2>/dev/null || true
+
+          # Copy to workspace (rsync handles permissions cleanly)
           rm -rf "$GITHUB_WORKSPACE"/*
-          cp -a "$CACHE"/. "$GITHUB_WORKSPACE"/
+          rsync -a --no-perms "$CACHE"/ "$GITHUB_WORKSPACE"/
           echo "Workspace ready: $GITHUB_WORKSPACE"
 
       - name: Extract repo URL from issue
