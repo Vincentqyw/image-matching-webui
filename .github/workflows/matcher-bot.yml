@@ -70,8 +70,11 @@ jobs:
         run: |
           echo "Integrating: ${{ steps.extract.outputs.repo_name }}"
           echo "From: ${{ steps.extract.outputs.repo_url }}"
-          # Use script to force line-buffered output in GitHub Actions
-          script -q /dev/null claude --print "/integrate-matcher ${{ steps.extract.outputs.repo_url }}"
+          # stream-json = real-time output (not batch), pipefail = preserve exit code
+          set -o pipefail
+          claude --print --output-format stream-json \
+            "/integrate-matcher ${{ steps.extract.outputs.repo_url }}" \
+            2>&1 | jq -r 'select(.type=="assistant") | .message.content[].text // .text // empty'
 
       - name: Create PR
         env:
