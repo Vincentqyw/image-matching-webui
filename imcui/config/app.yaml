@@ -453,6 +453,30 @@ matcher_zoo:
       paper: https://arxiv.org/pdf/2306.13643
       project: null
       display: true
+  superpoint+sphereglue:
+    matcher: superpoint-sphereglue
+    feature: superpoint_max
+    standalone: false
+    skip_ci: true
+    info:
+      name: SphereGlue #dispaly name
+      source: "CVPRW 2023"
+      github: https://github.com/vishalsharbidar/SphereGlue
+      paper: https://openaccess.thecvf.com/content/CVPR2023W/IMW/papers/Gava_SphereGlue_Learning_Keypoint_Matching_on_High_Resolution_Spherical_Images_CVPRW_2023_paper.pdf
+      display: true
+      efficiency: medium
+  sift+sphereglue:
+    matcher: sift-sphereglue
+    feature: sift
+    standalone: false
+    skip_ci: true
+    info:
+      name: SphereGlue #dispaly name
+      source: "CVPRW 2023"
+      github: https://github.com/vishalsharbidar/SphereGlue
+      paper: https://openaccess.thecvf.com/content/CVPR2023W/IMW/papers/Gava_SphereGlue_Learning_Keypoint_Matching_on_High_Resolution_Spherical_Images_CVPRW_2023_paper.pdf
+      display: true
+      efficiency: medium
   disk:
     matcher: NN-mutual
     feature: disk
