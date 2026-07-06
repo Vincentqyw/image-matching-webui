@@ -104,5 +104,5 @@
     path = imcui/third_party/LISRD
     url = https://github.com/agipro/LISRD
 [submodule "imcui/third_party/SphereGlue"]
-	path = imcui/third_party/SphereGlue
-	url = https://github.com/agipro/SphereGlue.git
+    path = imcui/third_party/SphereGlue
+    url = https://github.com/agipro/SphereGlue.git
