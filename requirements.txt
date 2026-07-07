@@ -1,3 +1,4 @@
+--find-links https://data.pyg.org/whl/torch-2.12.1+cpu.html
 datasets
 e2cnn
 easydict

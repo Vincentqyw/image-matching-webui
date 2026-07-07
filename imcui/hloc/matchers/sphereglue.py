@@ -11,7 +11,23 @@ from ..utils.base_model import BaseModel
 sphereglue_path = Path(__file__).parent / "../../third_party/SphereGlue"
 sys.path.append(str(sphereglue_path))
 
-from model.sphereglue import SphereGlue as SG  # noqa: E402
+_SPHEREGLUE_INSTALL_HINT = (
+    "SphereGlue requires torch-geometric and pyg-lib. Install them with:\n"
+    "  pip install torch-geometric\n"
+    "  pip install pyg-lib -f https://data.pyg.org/whl/torch-$(python -c "
+    '"import torch; print(torch.__version__)")+cpu.html\n'
+    "(replace +cpu with +cu121 for CUDA 12.1)"
+)
+
+
+def _load_sphereglue():
+    """Lazy-import SphereGlue so the heavy torch_geometric dep is only
+    loaded when the user actually selects this matcher."""
+    try:
+        from model.sphereglue import SphereGlue as SG  # noqa: E402
+    except ImportError as e:
+        raise ImportError(_SPHEREGLUE_INSTALL_HINT) from e
+    return SG
 
 
 class SphereGlue(BaseModel):
@@ -54,6 +70,8 @@ class SphereGlue(BaseModel):
 
     def _init(self, conf):
         logger.info("Loading SphereGlue model: %s", conf["model_name"])
+
+        SG = _load_sphereglue()
 
         sg_config = {
             "K": conf["K"],
