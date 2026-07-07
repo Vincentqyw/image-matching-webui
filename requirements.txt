@@ -1,4 +1,3 @@
---find-links https://data.pyg.org/whl/torch-2.12.1+cpu.html
 datasets
 e2cnn
 easydict
@@ -24,7 +23,6 @@ poselib
 protobuf
 psutil
 pycolmap<3.13
-pyg-lib
 pytlsd  # gluestick, <3.12
 pytorch-lightning  # ==1.4.9
 PyYAML
