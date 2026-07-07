@@ -54,6 +54,7 @@ The tool currently supports various popular image matching algorithms, namely:
 | LightGlue      | ✅ | ICCV    | 2023 | [Link](https://github.com/cvg/LightGlue) |
 | DarkFeat       | ✅ | AAAI    | 2023 | [Link](https://github.com/THU-LYJ-Lab/DarkFeat) |
 | SFD2           | ✅ | CVPR    | 2023 | [Link](https://github.com/feixue94/sfd2) |
+| SphereGlue     | ✅ | CVPRW   | 2023 | [Link](https://github.com/vishalsharbidar/SphereGlue) |
 | IMP            | ✅ | CVPR    | 2023 | [Link](https://github.com/feixue94/imp-release) |
 | ASTR           | ❌ | CVPR    | 2023 | [Link](https://github.com/ASTR2023/ASTR) |
 | SEM            | ❌ | CVPR    | 2023 | [Link](https://github.com/SEM2023/SEM) |

@@ -223,6 +223,7 @@ BOTH files must be updated identically. Add an entry under `matcher_zoo`:
 <DisplayName>:
   matcher: <matcher-config-name>    # Must match key in matchers.py
   standalone: true                   # true = takes two images directly (no separate extractor needed)
+  skip_ci: false                     # DEFAULT: false. Only set to true for heavy matchers (see rule below)
   info:
     name: <DisplayName>              # Display name in WebUI dropdown
     source: "Venue Year"             # e.g., "ECCV 2026", "ICCV 2023"
@@ -238,6 +239,17 @@ Key rules:
 - For feature+matcher combos, use `<extractor>+<matcher>` format (e.g., `superpoint+lightglue`)
 - Set `enable: false` for very heavy models that most users won't use by default
 - **CRITICAL**: Both `config/app.yaml` and `imcui/config/app.yaml` must be kept in sync
+
+##### `skip_ci` rule
+
+`skip_ci` defaults to `false` — you can **omit the field entirely** for most matchers. Only set `skip_ci: true` when the model is **too heavy to run in CI** (GitHub Actions CPU-only Ubuntu runner with 7GB RAM):
+
+| Condition | `skip_ci` |
+|-----------|-----------|
+| Lightweight matcher (e.g., LightGlue, SuperGlue, XFeat, ALIKED-based) | `false` (or omit) |
+| Heavy dense matcher prone to CI OOM/timeout (e.g., RoMa, DKM, GIM, Mast3R, LoMa-L/G/R, MINIMA large) | `true` |
+
+Rule of thumb: if the model has variants like B/L/G/R, the "B" (base) variant usually passes CI, larger ones may not. When unsure, **omit `skip_ci`** (defaults to `false`) and let CI tell you — if it OOMs, set it to `true` in a follow-up commit.
 
 ### Step 5: Handle Platform Compatibility
 
@@ -320,9 +332,35 @@ After integrating "DaD" published at ARXIV 2025:
 ```
 Insert between RIPE (ICCV 2025) and MINIMA (ARXIV 2024).
 
-### Step 7: Verification Checklist
+### Step 7: Pre-Commit Check (MANDATORY)
 
-After integration, verify:
+**Before committing, pre-commit MUST pass.** This is non-negotiable — commits that fail pre-commit will be rejected at the PR stage.
+
+```bash
+# Run ALL pre-commit hooks on all files
+pre-commit run -a
+
+# Or run specific hooks if you only changed certain files
+pre-commit run ruff --all-files       # Python linting
+pre-commit run mypy --all-files       # Type checking (if new Python code)
+```
+
+Common issues and fixes:
+
+| Hook | Common failure | Fix |
+|------|---------------|-----|
+| `ruff` | unused imports, line too long | Remove unused imports, wrap long lines |
+| `ruff-format` | inconsistent indentation | Let ruff format: `ruff format <file>` |
+| `mypy` | missing type annotations | Add type hints to new functions |
+| `trailing-whitespace` | blank lines with spaces | Strip trailing whitespace |
+| `check-yaml` | invalid YAML syntax | Fix indentation/quoting in app.yaml |
+| `end-of-file-fixer` | missing newline at EOF | Add trailing newline |
+
+If `pre-commit run -a` fails, **fix all errors** before proceeding to commit. Do NOT skip hooks with `--no-verify`.
+
+### Step 8: Verification Checklist
+
+After integration and pre-commit pass, verify:
 
 1. **Import test**: `python -c "from imcui.hloc.matchers import <name>"`
 2. **Model loading**: The model loads without errors on CPU/MPS/CUDA
@@ -331,6 +369,59 @@ After integration, verify:
 5. **Keypoints display**: UI "Open for More: Keypoints" shows detected keypoints
 6. **Match lines display**: UI shows correct match lines between images
 7. **Both config files**: `config/app.yaml` and `imcui/config/app.yaml` are identical for the new matcher
+8. **Pre-commit passes**: `pre-commit run -a` exits with zero
+
+### Step 9: Commit and Create PR
+
+Once pre-commit passes and all verification checks are green:
+
+```bash
+# Stage the changes
+git add .gitmodules imcui/third_party/<RepoName>
+git add imcui/hloc/matchers/<name>.py
+git add imcui/hloc/configs/matchers.py
+git add imcui/config/app.yaml
+git add config/app.yaml
+git add README.md
+
+# Commit with a descriptive message following convention
+git commit -m "feat: integrate <MatcherName>
+
+Add <MatcherName> matcher from <venue> <year>.
+
+- Add submodule: imcui/third_party/<RepoName>
+- Add matcher implementation: imcui/hloc/matchers/<name>.py
+- Add matcher config entries
+- Update app.yaml matcher zoo (both package and user configs)
+- Update README.md algorithm table
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+# Push and create PR
+git push origin main
+gh pr create --title "feat: integrate <MatcherName>" \
+  --body "Integrate <MatcherName> matcher from <paper-link>.
+
+## Changes
+- [x] Submodule added
+- [x] Matcher implementation
+- [x] Config entries in both app.yaml files
+- [x] README.md updated
+- [x] Pre-commit passes
+
+## Tested on
+- [ ] CPU
+- [ ] CUDA
+- [ ] MPS
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+```
+
+**Important notes:**
+- Use `feat:` prefix for new matcher integrations (following conventional commits)
+- Always include `Co-Authored-By: Claude <noreply@anthropic.com>` in commit messages
+- End PR body with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
+- If CI fails after pushing, check the logs — if it's an OOM on your new matcher, set `skip_ci: true` in a follow-up commit
 
 ## File Change Summary
 
@@ -345,6 +436,8 @@ For each integration, these files are typically modified:
 | `config/app.yaml` | Modify | Add WebUI display config |
 | `imcui/config/app.yaml` | Modify | Add WebUI display config (must match config/app.yaml) |
 | `README.md` | Modify | Update supported algorithms table (add row or flip ❌→✅) |
+
+Before committing all changes, run `pre-commit run -a` — all hooks must pass.
 
 ## Reference Implementations
 

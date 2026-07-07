@@ -99,6 +99,44 @@ confs = {
             "force_resize": False,
         },
     },
+    "superpoint-sphereglue": {
+        "output": "matches-sphereglue",
+        "model": {
+            "name": "sphereglue",
+            "match_threshold": 0.2,
+            "sinkhorn_iterations": 20,
+            "max_kpts": 20000,
+            "knn": 20,
+            "descriptor_dim": 256,
+            "output_dim": 512,
+            "model_name": "sphereglue_superpoint.pth",
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "force_resize": False,
+        },
+    },
+    "sift-sphereglue": {
+        "output": "matches-sift-sphereglue",
+        "model": {
+            "name": "sphereglue",
+            "match_threshold": 0.2,
+            "sinkhorn_iterations": 20,
+            "max_kpts": 20000,
+            "knn": 20,
+            "descriptor_dim": 128,
+            "output_dim": 256,
+            "model_name": "sphereglue_sift.pth",
+        },
+        "preprocessing": {
+            "grayscale": True,
+            "resize_max": 1024,
+            "dfactor": 8,
+            "force_resize": False,
+        },
+    },
     "raco-lightglue": {
         "output": "matches-raco-lightglue",
         "model": {
