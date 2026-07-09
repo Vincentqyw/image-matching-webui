@@ -836,6 +836,123 @@ confs = {
             "dfactor": 8,
         },
     },
+    # CLIDD — Cross-Layer Independent Deformable Description (ARXIV 2026)
+    # Dense detector+descriptor, processes images independently then matches.
+    # Input must be divisible by 32 (CLIDD's internal stride).
+    "clidd-a48": {
+        "output": "matches-clidd-a48",
+        "model": {
+            "name": "clidd",
+            "model_name": "A48",
+            "top_k": 4096,
+            "radius": 2,
+            "score_thresh": -5,
+            "match_beta": 20.0,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 32,
+        },
+    },
+    "clidd-n64": {
+        "output": "matches-clidd-n64",
+        "model": {
+            "name": "clidd",
+            "model_name": "N64",
+            "top_k": 4096,
+            "radius": 2,
+            "score_thresh": -5,
+            "match_beta": 20.0,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 32,
+        },
+    },
+    "clidd-s64": {
+        "output": "matches-clidd-s64",
+        "model": {
+            "name": "clidd",
+            "model_name": "S64",
+            "top_k": 4096,
+            "radius": 2,
+            "score_thresh": -5,
+            "match_beta": 20.0,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 32,
+        },
+    },
+    "clidd-m64": {
+        "output": "matches-clidd-m64",
+        "model": {
+            "name": "clidd",
+            "model_name": "M64",
+            "top_k": 4096,
+            "radius": 2,
+            "score_thresh": -5,
+            "match_beta": 20.0,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 32,
+        },
+    },
+    "clidd-l64": {
+        "output": "matches-clidd-l64",
+        "model": {
+            "name": "clidd",
+            "model_name": "L64",
+            "top_k": 4096,
+            "radius": 2,
+            "score_thresh": -5,
+            "match_beta": 20.0,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 32,
+        },
+    },
+    "clidd-g128": {
+        "output": "matches-clidd-g128",
+        "model": {
+            "name": "clidd",
+            "model_name": "G128",
+            "top_k": 4096,
+            "radius": 2,
+            "score_thresh": -5,
+            "match_beta": 20.0,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "force_resize": True,
+            "resize_max": 1024,
+            "width": 640,
+            "height": 480,
+            "dfactor": 32,
+        },
+    },
     "lisrd-superpoint": {
         "output": "matches-lisrd-superpoint",
         "model": {
