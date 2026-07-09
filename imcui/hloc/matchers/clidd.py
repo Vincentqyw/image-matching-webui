@@ -26,7 +26,11 @@ except ImportError:
     _mock_plugin = types.ModuleType("model.triton_plugin")
 
     def _fallback_deformable_sample_project(
-        input, grid, weight, bias, *,
+        input,
+        grid,
+        weight,
+        bias,
+        *,
         is_input_nhwc=False,
         align_corners=False,
     ):
@@ -46,24 +50,28 @@ except ImportError:
 
         B, N, M_grid, _ = grid.shape
         C_out, C_in, _, W_weight = weight.shape
-        assert W_weight == M_grid, (
-            f"Weight last dim {W_weight} != grid M {M_grid}"
-        )
+        assert W_weight == M_grid, f"Weight last dim {W_weight} != grid M {M_grid}"
 
         output = torch.zeros(
-            B, N, C_out, device=input_chw.device, dtype=input_chw.dtype,
+            B,
+            N,
+            C_out,
+            device=input_chw.device,
+            dtype=input_chw.dtype,
         )
 
         for m in range(M_grid):
             grid_m = grid[:, :, m, :].unsqueeze(1)  # (B, 1, N, 2)
             sampled = F.grid_sample(
-                input_chw, grid_m,
-                mode="bilinear", padding_mode="zeros",
+                input_chw,
+                grid_m,
+                mode="bilinear",
+                padding_mode="zeros",
                 align_corners=align_corners,
             )
             sampled = sampled.squeeze(2).permute(0, 2, 1)  # (B, N, C_in)
-            w_m = weight[:, :, 0, m]                        # (C_out, C_in)
-            output += sampled @ w_m.T                      # (B, N, C_out)
+            w_m = weight[:, :, 0, m]  # (C_out, C_in)
+            output += sampled @ w_m.T  # (B, N, C_out)
 
         if bias is not None:
             output = output + bias.view(1, 1, -1)
@@ -76,7 +84,9 @@ except ImportError:
 from clidd import CLIDD as _CLIDD  # noqa: E402
 
 # All CLIDD model variants defined in clidd.py
-CLIDD_VARIANTS = list(_CLIDD.cfgs.keys())  # ['A48','N64','T64','S64','M64','L64','G128','E128','U128']
+CLIDD_VARIANTS = list(
+    _CLIDD.cfgs.keys()
+)  # ['A48','N64','T64','S64','M64','L64','G128','E128','U128']
 
 _WEIGHT_BASE_URL = "https://github.com/HITCSC/CLIDD/releases/download/v1.0"
 
@@ -141,7 +151,10 @@ class CLIDD(BaseModel):
         try:
             os.chdir(str(clidd_path))
             self.net = _CLIDD(
-                model_name, top_k=top_k, radius=radius, score=score_thresh,
+                model_name,
+                top_k=top_k,
+                radius=radius,
+                score=score_thresh,
             ).eval()
         finally:
             os.chdir(_saved_cwd)
@@ -169,10 +182,10 @@ class CLIDD(BaseModel):
         all_kpts1 = []
 
         for b in range(B):
-            kpts0 = out0[b]["keypoints"]        # (N0, 2) in pixel coords
-            kpts1 = out1[b]["keypoints"]        # (N1, 2) in pixel coords
-            desc0 = out0[b]["descriptors"]       # (N0, D)
-            desc1 = out1[b]["descriptors"]       # (N1, D)
+            kpts0 = out0[b]["keypoints"]  # (N0, 2) in pixel coords
+            kpts1 = out1[b]["keypoints"]  # (N1, 2) in pixel coords
+            desc0 = out0[b]["descriptors"]  # (N0, D)
+            desc1 = out1[b]["descriptors"]  # (N1, D)
 
             # Store all detected keypoints
             all_kpts0.append(kpts0)

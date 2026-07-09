@@ -107,5 +107,5 @@
     path = imcui/third_party/SphereGlue
     url = https://github.com/agipro/SphereGlue.git
 [submodule "imcui/third_party/CLIDD"]
-	path = imcui/third_party/CLIDD
-	url = https://github.com/HITCSC/CLIDD
+    path = imcui/third_party/CLIDD
+    url = https://github.com/HITCSC/CLIDD
