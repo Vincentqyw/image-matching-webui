@@ -283,7 +283,7 @@ def parse_option_args(args: List[str], default_options) -> Dict[str, Any]:
         target_type = type(getattr(default_options, key))
         if not isinstance(value, target_type):
             raise ValueError(
-                f'Incorrect type for option "{key}":' f" {type(value)} vs {target_type}"
+                f'Incorrect type for option "{key}": {type(value)} vs {target_type}'
             )
         options[key] = value
     return options

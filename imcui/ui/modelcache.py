@@ -156,8 +156,10 @@ class ARCSizeAwareModelCache:
             all_entries.append((k, v))
 
         all_entries.sort(
-            key=lambda x: self._calculate_weight(x[1])
-            + (0.5 if x[1]["device"] == target_device else 0)
+            key=lambda x: (
+                self._calculate_weight(x[1])
+                + (0.5 if x[1]["device"] == target_device else 0)
+            )
         )
 
         freed = 0

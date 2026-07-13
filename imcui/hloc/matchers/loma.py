@@ -62,8 +62,7 @@ class LoMa(BaseModel):
     def _init(self, conf):
         model_name = self.conf["model_name"]
         assert model_name in LOMA_CONFIGS, (
-            f"Unknown LoMa model: {model_name}, "
-            f"available: {list(LOMA_CONFIGS.keys())}"
+            f"Unknown LoMa model: {model_name}, available: {list(LOMA_CONFIGS.keys())}"
         )
         loma_cfg = LOMA_CONFIGS[model_name]
         cfg = loma_cfg()

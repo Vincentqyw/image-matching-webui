@@ -141,5 +141,5 @@ def evaluate(model, results, list_file=None, ext=".bin", only_localized=False):
     threshs_R = [1.0, 2.0, 3.0, 5.0, 2.0, 5.0, 10.0]
     for th_t, th_R in zip(threshs_t, threshs_R):
         ratio = np.mean((errors_t < th_t) & (errors_R < th_R))
-        out += f"\n\t{th_t*100:.0f}cm, {th_R:.0f}deg : {ratio*100:.2f}%"
+        out += f"\n\t{th_t * 100:.0f}cm, {th_R:.0f}deg : {ratio * 100:.2f}%"
     logger.info(out)
