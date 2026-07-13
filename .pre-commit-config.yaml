@@ -19,7 +19,8 @@
 ci:
   autoupdate_commit_msg: "chore: update pre-commit hooks"
   autofix_commit_msg: "style: pre-commit fixes"
-  autoupdate_schedule: never
+  autoupdate_schedule: quarterly
+  skip: [autoupdate]
 
 repos:
 # Standard hooks
