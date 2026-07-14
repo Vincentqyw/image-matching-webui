@@ -54,6 +54,69 @@ matcher_zoo:
       github: https://github.com/Parskatt/dad
       display: true
       efficiency: medium  # low, medium, high
+  CLIDD(A48):
+    matcher: clidd-a48
+    standalone: true
+    info:
+      name: CLIDD(A48)
+      source: "ARXIV 2026"
+      paper: https://arxiv.org/abs/2601.09230
+      github: https://github.com/HITCSC/CLIDD
+      display: true
+      efficiency: high  # low, medium, high — 0.004M params
+  CLIDD(N64):
+    matcher: clidd-n64
+    standalone: true
+    info:
+      name: CLIDD(N64)
+      source: "ARXIV 2026"
+      paper: https://arxiv.org/abs/2601.09230
+      github: https://github.com/HITCSC/CLIDD
+      display: true
+      efficiency: high  # low, medium, high
+  CLIDD(S64):
+    matcher: clidd-s64
+    standalone: true
+    info:
+      name: CLIDD(S64)
+      source: "ARXIV 2026"
+      paper: https://arxiv.org/abs/2601.09230
+      github: https://github.com/HITCSC/CLIDD
+      display: true
+      efficiency: medium  # low, medium, high
+  CLIDD(M64):
+    matcher: clidd-m64
+    standalone: true
+    skip_ci: true
+    info:
+      name: CLIDD(M64)
+      source: "ARXIV 2026"
+      paper: https://arxiv.org/abs/2601.09230
+      github: https://github.com/HITCSC/CLIDD
+      display: true
+      efficiency: medium  # low, medium, high
+  CLIDD(L64):
+    matcher: clidd-l64
+    standalone: true
+    skip_ci: true
+    info:
+      name: CLIDD(L64)
+      source: "ARXIV 2026"
+      paper: https://arxiv.org/abs/2601.09230
+      github: https://github.com/HITCSC/CLIDD
+      display: true
+      efficiency: medium  # low, medium, high
+  CLIDD(G128):
+    matcher: clidd-g128
+    standalone: true
+    skip_ci: true
+    info:
+      name: CLIDD(G128)
+      source: "ARXIV 2026"
+      paper: https://arxiv.org/abs/2601.09230
+      github: https://github.com/HITCSC/CLIDD
+      display: true
+      efficiency: low  # low, medium, high
   LoMa-B:
     matcher: loma-b
     standalone: true
