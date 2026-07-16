@@ -495,7 +495,7 @@ def match_and_assign(
 
     # Invalidate matches that are far from selected bin by reassignment
     if max_kps is not None:
-        logger.info(f'Reassign matches with max_error={conf["max_error"]}.')
+        logger.info(f"Reassign matches with max_error={conf['max_error']}.")
         assign_matches(pairs, match_path, cpdict, max_error=conf["max_error"])
 
 
@@ -737,7 +737,7 @@ def main(
     overwrite: bool = False,
 ) -> Path:
     logger.info(
-        "Extracting semi-dense features with configuration:" f"\n{pprint.pformat(conf)}"
+        f"Extracting semi-dense features with configuration:\n{pprint.pformat(conf)}"
     )
 
     if features is None:
@@ -747,7 +747,7 @@ def main(
         features_q = features
         if matches is None:
             raise ValueError(
-                "Either provide both features and matches as Path" " or both as names."
+                "Either provide both features and matches as Path or both as names."
             )
     else:
         if export_dir is None:
@@ -755,9 +755,9 @@ def main(
                 "Provide an export_dir if features and matches"
                 f" are not file paths: {features}, {matches}."
             )
-        features_q = Path(export_dir, f'{features}{conf["output"]}.h5')
+        features_q = Path(export_dir, f"{features}{conf['output']}.h5")
         if matches is None:
-            matches = Path(export_dir, f'{conf["output"]}_{pairs.stem}.h5')
+            matches = Path(export_dir, f"{conf['output']}_{pairs.stem}.h5")
 
     if features_ref is None:
         features_ref = []
