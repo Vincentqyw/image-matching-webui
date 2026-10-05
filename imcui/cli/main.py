@@ -3,9 +3,11 @@ Command Line Interface (CLI) for Image Matching WebUI application.
 This module provides a Click-based CLI to launch the ImageMatchingApp with configurable options.
 """
 
+from pathlib import Path
+
 import click
 from loguru import logger
-from pathlib import Path
+
 from imcui.ui.app_class import ImageMatchingApp
 
 

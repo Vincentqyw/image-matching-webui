@@ -12,10 +12,10 @@ from .utils import (
 )
 
 relocalization_files = {
-    "training": "RelocalizationFilesTrain//relocalizationFile_recording_2020-03-24_17-36-22.txt",  # noqa: E501
-    "validation": "RelocalizationFilesVal/relocalizationFile_recording_2020-03-03_12-03-23.txt",  # noqa: E501
-    "test0": "RelocalizationFilesTest/relocalizationFile_recording_2020-03-24_17-45-31_*.txt",  # noqa: E501
-    "test1": "RelocalizationFilesTest/relocalizationFile_recording_2020-04-23_19-37-00_*.txt",  # noqa: E501
+    "training": "RelocalizationFilesTrain//relocalizationFile_recording_2020-03-24_17-36-22.txt",
+    "validation": "RelocalizationFilesVal/relocalizationFile_recording_2020-03-03_12-03-23.txt",
+    "test0": "RelocalizationFilesTest/relocalizationFile_recording_2020-03-24_17-45-31_*.txt",
+    "test1": "RelocalizationFilesTest/relocalizationFile_recording_2020-04-23_19-37-00_*.txt",
 }
 
 parser = argparse.ArgumentParser()

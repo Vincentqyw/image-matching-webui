@@ -12,9 +12,9 @@ from ..utils.base_model import BaseModel
 se2loftr_path = Path(__file__).parent / "../../third_party/SE2LoFTR"
 sys.path.append(str(se2loftr_path))
 
-from src.utils.misc import lower_config
-from src.loftr import LoFTR
 from configs.loftr.outdoor.loftr_ds_e2_dense_8rot import cfg as _rot8_cfg
+from src.loftr import LoFTR
+from src.utils.misc import lower_config
 
 
 def resize_to_divisible(img, divisible_size):

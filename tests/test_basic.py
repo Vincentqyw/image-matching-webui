@@ -1,13 +1,14 @@
-import cv2
 import sys
 from pathlib import Path
+
+import cv2
 
 ROOT = Path(__file__).parents[1]
 sys.path.insert(0, str(ROOT))
 
+from imcui.api import ImageMatchingAPI
 from imcui.hloc import logger
 from imcui.ui.utils import DEVICE, get_matcher_zoo, load_config
-from imcui.api import ImageMatchingAPI
 
 
 def test_all():

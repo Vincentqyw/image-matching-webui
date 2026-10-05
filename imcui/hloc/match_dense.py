@@ -1,10 +1,10 @@
 import argparse
 import pprint
 from collections import Counter, defaultdict
+from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
 
 import cv2
 import h5py
@@ -15,13 +15,12 @@ from scipy.spatial import KDTree
 from tqdm import tqdm
 
 from . import logger, matchers
+from .configs import confs_dict
 from .extract_features import read_image, resize_image
 from .match_features import find_unique_new_pairs
 from .utils.base_model import dynamic_load
 from .utils.io import list_h5_names
 from .utils.parsers import names_to_pair, parse_retrieval
-
-from .configs import confs_dict
 
 confs = confs_dict["matchers"]
 
@@ -36,12 +35,12 @@ def to_cpts(kpts, ps):
 
 def assign_keypoints(
     kpts: np.ndarray,
-    other_cpts: Union[List[Tuple], np.ndarray],
+    other_cpts: list[tuple] | np.ndarray,
     max_error: float,
     update: bool = False,
-    ref_bins: Optional[List[Counter]] = None,
-    scores: Optional[np.ndarray] = None,
-    cell_size: Optional[int] = None,
+    ref_bins: list[Counter] | None = None,
+    scores: np.ndarray | None = None,
+    cell_size: int | None = None,
 ):
     if not update:
         # Without update this is just a NN search
@@ -195,11 +194,11 @@ class ImagePairDataset(torch.utils.data.Dataset):
 
 @torch.no_grad()
 def match_dense(
-    conf: Dict,
-    pairs: List[Tuple[str, str]],
+    conf: dict,
+    pairs: list[tuple[str, str]],
     image_dir: Path,
     match_path: Path,  # out
-    existing_refs: Optional[List] = [],
+    existing_refs: list | None = [],
 ):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     Model = dynamic_load(matchers, conf["model"]["name"])
@@ -255,7 +254,7 @@ def match_dense(
 
 # default: quantize all!
 def load_keypoints(
-    conf: Dict, feature_paths_refs: List[Path], quantize: Optional[set] = None
+    conf: dict, feature_paths_refs: list[Path], quantize: set | None = None
 ):
     name2ref = {
         n: i for i, p in enumerate(feature_paths_refs) for n in list_h5_names(p)
@@ -297,14 +296,14 @@ def load_keypoints(
 
 
 def aggregate_matches(
-    conf: Dict,
-    pairs: List[Tuple[str, str]],
+    conf: dict,
+    pairs: list[tuple[str, str]],
     match_path: Path,
     feature_path: Path,
-    required_queries: Optional[Set[str]] = None,
-    max_kps: Optional[int] = None,
-    cpdict: Dict[str, Iterable] = defaultdict(list),
-    bindict: Dict[str, List[Counter]] = defaultdict(list),
+    required_queries: set[str] | None = None,
+    max_kps: int | None = None,
+    cpdict: dict[str, Iterable] = defaultdict(list),
+    bindict: dict[str, list[Counter]] = defaultdict(list),
 ):
     if required_queries is None:
         required_queries = set(sum(pairs, ()))
@@ -405,9 +404,9 @@ def aggregate_matches(
 
 
 def assign_matches(
-    pairs: List[Tuple[str, str]],
+    pairs: list[tuple[str, str]],
     match_path: Path,
-    keypoints: Union[List[Path], Dict[str, np.array]],
+    keypoints: list[Path] | dict[str, np.array],
     max_error: float,
 ):
     if isinstance(keypoints, list):
@@ -435,13 +434,13 @@ def assign_matches(
 
 @torch.no_grad()
 def match_and_assign(
-    conf: Dict,
+    conf: dict,
     pairs_path: Path,
     image_dir: Path,
     match_path: Path,  # out
     feature_path_q: Path,  # out
-    feature_paths_refs: Optional[List[Path]] = [],
-    max_kps: Optional[int] = 8192,
+    feature_paths_refs: list[Path] | None = [],
+    max_kps: int | None = 8192,
     overwrite: bool = False,
 ) -> Path:
     for path in feature_paths_refs:
@@ -495,7 +494,7 @@ def match_and_assign(
 
     # Invalidate matches that are far from selected bin by reassignment
     if max_kps is not None:
-        logger.info(f'Reassign matches with max_error={conf["max_error"]}.')
+        logger.info(f"Reassign matches with max_error={conf['max_error']}.")
         assign_matches(pairs, match_path, cpdict, max_error=conf["max_error"])
 
 
@@ -726,18 +725,18 @@ def match_images(model, image_0, image_1, conf, device="cpu"):
 
 @torch.no_grad()
 def main(
-    conf: Dict,
+    conf: dict,
     pairs: Path,
     image_dir: Path,
-    export_dir: Optional[Path] = None,
-    matches: Optional[Path] = None,  # out
-    features: Optional[Path] = None,  # out
-    features_ref: Optional[Path] = None,
-    max_kps: Optional[int] = 8192,
+    export_dir: Path | None = None,
+    matches: Path | None = None,  # out
+    features: Path | None = None,  # out
+    features_ref: Path | None = None,
+    max_kps: int | None = 8192,
     overwrite: bool = False,
 ) -> Path:
     logger.info(
-        "Extracting semi-dense features with configuration:" f"\n{pprint.pformat(conf)}"
+        f"Extracting semi-dense features with configuration:\n{pprint.pformat(conf)}"
     )
 
     if features is None:
@@ -747,7 +746,7 @@ def main(
         features_q = features
         if matches is None:
             raise ValueError(
-                "Either provide both features and matches as Path" " or both as names."
+                "Either provide both features and matches as Path or both as names."
             )
     else:
         if export_dir is None:
@@ -755,9 +754,9 @@ def main(
                 "Provide an export_dir if features and matches"
                 f" are not file paths: {features}, {matches}."
             )
-        features_q = Path(export_dir, f'{features}{conf["output"]}.h5')
+        features_q = Path(export_dir, f"{features}{conf['output']}.h5")
         if matches is None:
-            matches = Path(export_dir, f'{conf["output"]}_{pairs.stem}.h5')
+            matches = Path(export_dir, f"{conf['output']}_{pairs.stem}.h5")
 
     if features_ref is None:
         features_ref = []

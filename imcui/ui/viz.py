@@ -1,7 +1,6 @@
-import typing
 import io
+import typing
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
 
 import cv2
 import matplotlib
@@ -23,11 +22,11 @@ _WSPACE = 0.005
 
 
 def _figure_size_for_images(
-    images: List[np.ndarray],
+    images: list[np.ndarray],
     dpi: int,
     ncols: int = 1,
     title_margin_inches: float = _TITLE_MARGIN_INCHES,
-) -> Tuple[Tuple[float, float], float, List[float]]:
+) -> tuple[tuple[float, float], float, list[float]]:
     """Compute figure size, axes ``top`` fraction, and width ratios.
 
     Each subplot's width is proportional to its image's aspect ratio so
@@ -74,11 +73,11 @@ def _stroked_text(ax, x, y, text, fontsize=12, color="w", lw=2, **kwargs):
 
 
 def plot_images(
-    imgs: List[np.ndarray],
-    titles: Optional[List[str]] = None,
-    cmaps: Union[str, List[str]] = "gray",
+    imgs: list[np.ndarray],
+    titles: list[str] | None = None,
+    cmaps: str | list[str] = "gray",
     dpi: int = 100,
-    size: Optional[int] = None,
+    size: int | None = None,
     pad: float = 0.0,
 ) -> plt.Figure:
     """Plot a set of images horizontally with minimal whitespace (paper-style).
@@ -117,10 +116,10 @@ def plot_images(
 
 
 def plot_color_line_matches(
-    lines: List[np.ndarray],
-    correct_matches: Optional[np.ndarray] = None,
+    lines: list[np.ndarray],
+    correct_matches: np.ndarray | None = None,
     lw: float = 2.0,
-    indices: Tuple[int, int] = (0, 1),
+    indices: tuple[int, int] = (0, 1),
 ) -> matplotlib.figure.Figure:
     """Plot line matches for existing images with multiple colors.
 
@@ -142,13 +141,13 @@ def plot_color_line_matches(
         alphas[~np.array(correct_matches)] = 0.2
 
     fig = plt.gcf()
-    ax = typing.cast(List[matplotlib.axes.Axes], fig.axes)
+    ax = typing.cast(list[matplotlib.axes.Axes], fig.axes)
     assert len(ax) > max(indices)
     axes = [ax[i] for i in indices]
     fig.canvas.draw()
 
     # Plot the lines
-    for a, l in zip(axes, lines):  # noqa: E741
+    for a, l in zip(axes, lines):
         # Transform the points into the figure coordinate system
         transFigure = fig.transFigure.inverted()
         endpoint0 = transFigure.transform(a.transData.transform(l[:, 0]))
@@ -175,14 +174,14 @@ def make_matching_figure(
     mkpts0: np.ndarray,
     mkpts1: np.ndarray,
     color: np.ndarray,
-    titles: Optional[List[str]] = None,
-    kpts0: Optional[np.ndarray] = None,
-    kpts1: Optional[np.ndarray] = None,
-    text: List[str] = [],
+    titles: list[str] | None = None,
+    kpts0: np.ndarray | None = None,
+    kpts1: np.ndarray | None = None,
+    text: list[str] = [],
     dpi: int = 75,
-    path: Optional[Path] = None,
+    path: Path | None = None,
     pad: float = 0.0,
-) -> Optional[plt.Figure]:
+) -> plt.Figure | None:
     """Draw image pair with matches (paper-style, minimal whitespace).
 
     Figure size is computed from image pixel dimensions.  A fixed top margin
@@ -304,15 +303,15 @@ def fig2im(fig: matplotlib.figure.Figure) -> np.ndarray:
 
 
 def draw_matches_core(
-    mkpts0: List[np.ndarray],
-    mkpts1: List[np.ndarray],
+    mkpts0: list[np.ndarray],
+    mkpts1: list[np.ndarray],
     img0: np.ndarray,
     img1: np.ndarray,
     conf: np.ndarray,
-    titles: Optional[List[str]] = None,
-    texts: Optional[List[str]] = None,
+    titles: list[str] | None = None,
+    texts: list[str] | None = None,
     dpi: int = 150,
-    path: Optional[str] = None,
+    path: str | None = None,
     pad: float = 0.0,
 ) -> np.ndarray:
     """Draw matches between two images."""
@@ -354,9 +353,9 @@ def draw_matches_core(
 def draw_image_pairs(
     img0: np.ndarray,
     img1: np.ndarray,
-    text: List[str] = [],
+    text: list[str] = [],
     dpi: int = 75,
-    path: Optional[str] = None,
+    path: str | None = None,
     pad: float = 0.0,
 ) -> np.ndarray:
     """Draw image pair horizontally with minimal whitespace (paper-style).
@@ -396,11 +395,11 @@ def draw_image_pairs(
         return fig2im(fig)
 
 
-def display_keypoints(pred: dict, titles: List[str] = []):
+def display_keypoints(pred: dict, titles: list[str] = []):
     img0 = pred["image0_orig"]
     img1 = pred["image1_orig"]
     output_keypoints = plot_images([img0, img1], titles=titles, dpi=300)
-    if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
+    if "keypoints0_orig" in pred and "keypoints1_orig" in pred:
         plot_keypoints([pred["keypoints0_orig"], pred["keypoints1_orig"]], ps=4)
         text = (
             f"# keypoints0: {len(pred['keypoints0_orig'])} \n"
@@ -412,12 +411,12 @@ def display_keypoints(pred: dict, titles: List[str] = []):
 
 
 def display_matches(
-    pred: Dict[str, np.ndarray],
-    titles: List[str] = [],
-    texts: List[str] = [],
+    pred: dict[str, np.ndarray],
+    titles: list[str] = [],
+    texts: list[str] = [],
     dpi: int = 300,
     tag: str = "KPTS_RAW",  # KPTS_RAW, KPTS_RANSAC, LINES_RAW, LINES_RANSAC,
-) -> Tuple[np.ndarray, int]:
+) -> tuple[np.ndarray, int]:
     """
     Displays the matches between two images.
 

@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 
 from .. import MODEL_REPO_ID, logger
-
 from ..utils.base_model import BaseModel
 
 darkfeat_path = Path(__file__).parent / "../../third_party/DarkFeat"
@@ -24,7 +23,7 @@ class DarkFeat(BaseModel):
             repo_id=MODEL_REPO_ID,
             filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
-        logger.info("Loaded DarkFeat model: {}".format(model_path))
+        logger.info(f"Loaded DarkFeat model: {model_path}")
         self.net = DarkFeat_(model_path)
         logger.info("Load DarkFeat model done.")
 

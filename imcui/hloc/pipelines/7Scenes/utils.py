@@ -1,7 +1,6 @@
 import logging
 
 import numpy as np
-
 from hloc.utils.read_write_model import read_model, write_model
 
 logger = logging.getLogger(__name__)

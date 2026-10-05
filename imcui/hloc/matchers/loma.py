@@ -23,15 +23,16 @@ import loma.device as _loma_device
 if not torch.cuda.is_available():
     _loma_device.amp_dtype = torch.float32
 
-from loma import LoMa as LoMaModel, LoMaB, LoMaB128, LoMaL, LoMaG, LoMaR
-from loma.device import device as loma_device
-from loma.loma import filter_matches, to_pixel_coords
+import loma.descriptor.dedode as _dedode
 
 # Also patch the amp_dtype in submodules that imported it via
 # "from loma.device import amp_dtype" — these are local bindings
 # that don't update when we change _loma_device.amp_dtype.
 import loma.detector.dad as _dad
-import loma.descriptor.dedode as _dedode
+from loma import LoMa as LoMaModel
+from loma import LoMaB, LoMaB128, LoMaG, LoMaL, LoMaR
+from loma.device import device as loma_device
+from loma.loma import filter_matches, to_pixel_coords
 
 if not torch.cuda.is_available():
     _dad.amp_dtype = torch.float32
@@ -62,8 +63,7 @@ class LoMa(BaseModel):
     def _init(self, conf):
         model_name = self.conf["model_name"]
         assert model_name in LOMA_CONFIGS, (
-            f"Unknown LoMa model: {model_name}, "
-            f"available: {list(LOMA_CONFIGS.keys())}"
+            f"Unknown LoMa model: {model_name}, available: {list(LOMA_CONFIGS.keys())}"
         )
         loma_cfg = LOMA_CONFIGS[model_name]
         cfg = loma_cfg()

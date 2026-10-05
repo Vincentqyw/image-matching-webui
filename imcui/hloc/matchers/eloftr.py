@@ -17,7 +17,6 @@ from EfficientLoFTR.src.loftr import (
     reparameter,
 )
 
-
 from ..utils.base_model import BaseModel
 
 

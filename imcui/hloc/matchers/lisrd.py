@@ -25,8 +25,8 @@ from ..utils.base_model import BaseModel
 lisrd_path = Path(__file__).parent / "../../third_party/LISRD"
 sys.path.append(str(lisrd_path))
 
-from lisrd.models import get_model as get_lisrd_model  # noqa: E402
-from lisrd.models.base_model import Mode  # noqa: E402
+from lisrd.models import get_model as get_lisrd_model
+from lisrd.models.base_model import Mode
 
 MODEL_REPO_ID = "Realcat/imcui_checkpoints"
 

@@ -1,23 +1,22 @@
 # server.py
+import argparse
 import warnings
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import ray
 import torch
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
+from loguru import logger
 from PIL import Image
 from ray import serve
-import argparse
-from loguru import logger
 
-from . import ImagesInput, to_base64_nparray
-from .core import ImageMatchingAPI
 from ..hloc import DEVICE
 from ..hloc.utils.io import read_yaml
 from ..ui import get_version
+from . import ImagesInput, to_base64_nparray
+from .core import ImageMatchingAPI
 
 warnings.simplefilter("ignore")
 app = FastAPI()
@@ -146,7 +145,7 @@ class ImageMatchingService:
             # Return an error message if an exception occurs
             return JSONResponse(content={"error": str(e)}, status_code=500)
 
-    def load_image(self, file_path: Union[str, UploadFile]) -> np.ndarray:
+    def load_image(self, file_path: str | UploadFile) -> np.ndarray:
         """
         Reads an image from a file path or an UploadFile object.
 

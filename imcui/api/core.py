@@ -1,7 +1,7 @@
 # api.py
 import warnings
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import cv2
 import matplotlib.pyplot as plt
@@ -139,7 +139,7 @@ class ImageMatchingAPI(torch.nn.Module):
         return ret
 
     @torch.inference_mode()
-    def extract(self, img0: np.ndarray, **kwargs) -> Dict[str, np.ndarray]:
+    def extract(self, img0: np.ndarray, **kwargs) -> dict[str, np.ndarray]:
         """Extract features from a single image.
 
         Args:
@@ -177,7 +177,7 @@ class ImageMatchingAPI(torch.nn.Module):
         self,
         img0: np.ndarray,
         img1: np.ndarray,
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Forward pass of the image matching API.
 
@@ -210,8 +210,8 @@ class ImageMatchingAPI(torch.nn.Module):
 
     def _geometry_check(
         self,
-        pred: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        pred: dict[str, Any],
+    ) -> dict[str, Any]:
         """
         Filter matches using RANSAC. If keypoints are available, filter by keypoints.
         If lines are available, filter by lines. If both keypoints and lines are
@@ -235,7 +235,7 @@ class ImageMatchingAPI(torch.nn.Module):
 
     def visualize(
         self,
-        log_path: Optional[Path] = None,
+        log_path: Path | None = None,
     ) -> None:
         """
         Visualize the matches.
@@ -257,13 +257,13 @@ class ImageMatchingAPI(torch.nn.Module):
             "Image 0 - Keypoints",
             "Image 1 - Keypoints",
         ]
-        pred: Dict[str, Any] = self.pred
+        pred: dict[str, Any] = self.pred
         image0: np.ndarray = pred["image0_orig"]
         image1: np.ndarray = pred["image1_orig"]
         output_keypoints: np.ndarray = plot_images(
             [image0, image1], titles=titles, dpi=300
         )
-        if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
+        if "keypoints0_orig" in pred and "keypoints1_orig" in pred:
             plot_keypoints([pred["keypoints0_orig"], pred["keypoints1_orig"]])
             text: str = (
                 f"# keypoints0: {len(pred['keypoints0_orig'])} \n"

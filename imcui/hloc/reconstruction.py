@@ -2,7 +2,7 @@ import argparse
 import multiprocessing
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pycolmap
 
@@ -32,15 +32,15 @@ def import_images(
     image_dir: Path,
     database_path: Path,
     camera_mode: pycolmap.CameraMode,
-    image_list: Optional[List[str]] = None,
-    options: Optional[Dict[str, Any]] = None,
+    image_list: list[str] | None = None,
+    options: dict[str, Any] | None = None,
 ):
     logger.info("Importing images into the database...")
     if options is None:
         options = {}
     images = list(image_dir.iterdir())
     if len(images) == 0:
-        raise IOError(f"No images found in {image_dir}.")
+        raise OSError(f"No images found in {image_dir}.")
     with pycolmap.ostream():
         pycolmap.import_images(
             database_path,
@@ -51,7 +51,7 @@ def import_images(
         )
 
 
-def get_image_ids(database_path: Path) -> Dict[str, int]:
+def get_image_ids(database_path: Path) -> dict[str, int]:
     db = COLMAPDatabase.connect(database_path)
     images = {}
     for name, image_id in db.execute("SELECT name, image_id FROM images;"):
@@ -65,7 +65,7 @@ def run_reconstruction(
     database_path: Path,
     image_dir: Path,
     verbose: bool = False,
-    options: Optional[Dict[str, Any]] = None,
+    options: dict[str, Any] | None = None,
 ) -> pycolmap.Reconstruction:
     models_path = sfm_dir / "models"
     models_path.mkdir(exist_ok=True, parents=True)
@@ -73,11 +73,10 @@ def run_reconstruction(
     if options is None:
         options = {}
     options = {"num_threads": min(multiprocessing.cpu_count(), 16), **options}
-    with OutputCapture(verbose):
-        with pycolmap.ostream():
-            reconstructions = pycolmap.incremental_mapping(
-                database_path, image_dir, models_path, options=options
-            )
+    with OutputCapture(verbose), pycolmap.ostream():
+        reconstructions = pycolmap.incremental_mapping(
+            database_path, image_dir, models_path, options=options
+        )
 
     if len(reconstructions) == 0:
         logger.error("Could not reconstruct any model!")
@@ -92,9 +91,7 @@ def run_reconstruction(
             largest_index = index
             largest_num_images = num_images
     assert largest_index is not None
-    logger.info(
-        f"Largest model is #{largest_index} " f"with {largest_num_images} images."
-    )
+    logger.info(f"Largest model is #{largest_index} with {largest_num_images} images.")
 
     for filename in ["images.bin", "cameras.bin", "points3D.bin"]:
         if (sfm_dir / filename).exists():
@@ -112,10 +109,10 @@ def main(
     camera_mode: pycolmap.CameraMode = pycolmap.CameraMode.AUTO,
     verbose: bool = False,
     skip_geometric_verification: bool = False,
-    min_match_score: Optional[float] = None,
-    image_list: Optional[List[str]] = None,
-    image_options: Optional[Dict[str, Any]] = None,
-    mapper_options: Optional[Dict[str, Any]] = None,
+    min_match_score: float | None = None,
+    image_list: list[str] | None = None,
+    image_options: dict[str, Any] | None = None,
+    mapper_options: dict[str, Any] | None = None,
 ) -> pycolmap.Reconstruction:
     assert features.exists(), features
     assert pairs.exists(), pairs
@@ -172,15 +169,13 @@ if __name__ == "__main__":
         "--image_options",
         nargs="+",
         default=[],
-        help="List of key=value from {}".format(pycolmap.ImageReaderOptions().todict()),
+        help=f"List of key=value from {pycolmap.ImageReaderOptions().todict()}",
     )
     parser.add_argument(
         "--mapper_options",
         nargs="+",
         default=[],
-        help="List of key=value from {}".format(
-            pycolmap.IncrementalMapperOptions().todict()
-        ),
+        help=f"List of key=value from {pycolmap.IncrementalMapperOptions().todict()}",
     )
     args = parser.parse_args().__dict__
 

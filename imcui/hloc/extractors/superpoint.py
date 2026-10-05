@@ -4,11 +4,10 @@ from pathlib import Path
 import torch
 
 from .. import MODEL_REPO_ID, logger
-
 from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
-from SuperGluePretrainedNetwork.models import superpoint  # noqa E402
+from SuperGluePretrainedNetwork.models import superpoint
 
 
 # The original keypoint sampling is incorrect. We patch it here but

@@ -36,7 +36,7 @@ class SOLD2(BaseModel):
             repo_id=MODEL_REPO_ID,
             filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
-        logger.info("Loading SOLD2 model: {}".format(model_path))
+        logger.info(f"Loading SOLD2 model: {model_path}")
 
         mode = "dynamic"  # 'dynamic' or 'static'
         match_config = {

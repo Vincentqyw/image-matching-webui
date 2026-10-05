@@ -1,7 +1,6 @@
 import argparse
 import collections.abc as collections
 from pathlib import Path
-from typing import Optional
 
 import h5py
 import numpy as np
@@ -51,7 +50,7 @@ def pairs_from_score_matrix(
     scores: torch.Tensor,
     invalid: np.array,
     num_select: int,
-    min_score: Optional[float] = None,
+    min_score: float | None = None,
 ):
     assert scores.shape == invalid.shape
     if isinstance(scores, np.ndarray):

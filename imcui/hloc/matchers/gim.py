@@ -111,7 +111,7 @@ class GIM(BaseModel):
         ckpt_name = self.ckpt_name_dict[conf["weights"]]
         model_path = self._download_model(
             repo_id=MODEL_REPO_ID,
-            filename="{}/{}".format(Path(__file__).stem, ckpt_name),
+            filename=f"{Path(__file__).stem}/{ckpt_name}",
         )
         self.aspect_ratio = 896 / 672
         model = load_model(conf["weights"], model_path)

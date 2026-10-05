@@ -4,7 +4,6 @@ from pathlib import Path
 import torch
 
 from .. import MODEL_REPO_ID
-
 from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))

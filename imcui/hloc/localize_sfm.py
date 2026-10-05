@@ -2,7 +2,6 @@ import argparse
 import pickle
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Union
 
 import numpy as np
 import pycolmap
@@ -14,7 +13,7 @@ from .utils.parsers import parse_image_lists, parse_retrieval
 
 
 def do_covisibility_clustering(
-    frame_ids: List[int], reconstruction: pycolmap.Reconstruction
+    frame_ids: list[int], reconstruction: pycolmap.Reconstruction
 ):
     clusters = []
     visited = set()
@@ -72,7 +71,7 @@ def pose_from_cluster(
     localizer: QueryLocalizer,
     qname: str,
     query_camera: pycolmap.Camera,
-    db_ids: List[int],
+    db_ids: list[int],
     features_path: Path,
     matches_path: Path,
     **kwargs,
@@ -126,7 +125,7 @@ def pose_from_cluster(
 
 
 def main(
-    reference_sfm: Union[Path, pycolmap.Reconstruction],
+    reference_sfm: Path | pycolmap.Reconstruction,
     queries: Path,
     retrieval: Path,
     features: Path,
@@ -135,7 +134,7 @@ def main(
     ransac_thresh: int = 12,
     covisibility_clustering: bool = False,
     prepend_camera_name: bool = False,
-    config: Dict = None,
+    config: dict = None,
 ):
     assert retrieval.exists(), retrieval
     assert features.exists(), features

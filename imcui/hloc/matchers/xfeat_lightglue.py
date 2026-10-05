@@ -1,7 +1,6 @@
 import torch
 
 from .. import logger
-
 from ..utils.base_model import BaseModel
 
 

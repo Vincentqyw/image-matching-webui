@@ -3,7 +3,6 @@ import base64
 import os
 import pickle
 import time
-from typing import Dict, List
 
 import cv2
 import numpy as np
@@ -96,7 +95,7 @@ def do_api_requests(url=API_URL_EXTRACT, **kwargs):
         print(f"An error occurred: {e}")
 
 
-def send_request_match(path0: str, path1: str) -> Dict[str, np.ndarray]:
+def send_request_match(path0: str, path1: str) -> dict[str, np.ndarray]:
     """
     Send a request to the API to generate a match between two images.
 
@@ -129,7 +128,7 @@ def send_request_match(path0: str, path1: str) -> Dict[str, np.ndarray]:
 
 def send_request_extract(
     input_images: str, viz: bool = False
-) -> List[Dict[str, np.ndarray]]:
+) -> list[dict[str, np.ndarray]]:
     """
     Send a request to the API to extract features from an image.
 

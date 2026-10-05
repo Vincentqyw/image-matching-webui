@@ -1,7 +1,8 @@
 import sys
 from pathlib import Path
+
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
-from .. import logger, MODEL_REPO_ID
 
 ripe_path = Path(__file__).parent / "../../third_party/RIPE"
 sys.path.append(str(ripe_path))

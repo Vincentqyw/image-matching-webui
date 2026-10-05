@@ -4,7 +4,6 @@ from pathlib import Path
 import torchvision.transforms as tvf
 
 from .. import MODEL_REPO_ID, logger
-
 from ..utils.base_model import BaseModel
 
 r2d2_path = Path(__file__).parents[2] / "third_party/r2d2"

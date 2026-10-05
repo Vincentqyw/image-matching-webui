@@ -1,9 +1,11 @@
 import hashlib
 import json
-import time
 import threading
+import time
 from collections import OrderedDict
+
 import torch
+
 from ..hloc import logger
 
 
@@ -156,8 +158,10 @@ class ARCSizeAwareModelCache:
             all_entries.append((k, v))
 
         all_entries.sort(
-            key=lambda x: self._calculate_weight(x[1])
-            + (0.5 if x[1]["device"] == target_device else 0)
+            key=lambda x: (
+                self._calculate_weight(x[1])
+                + (0.5 if x[1]["device"] == target_device else 0)
+            )
         )
 
         freed = 0
@@ -328,7 +332,7 @@ class LRUModelCache:
             try:
                 raw_model = model_loader_func(model_conf)
             except Exception as e:
-                raise RuntimeError(f"Model loading failed: {str(e)}")
+                raise RuntimeError(f"Model loading failed: {e!s}")
 
             try:
                 model = raw_model.to(device)

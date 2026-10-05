@@ -17,7 +17,7 @@ TEST_SLICES = [2, 3, 4, 5, 6, 13, 14, 15, 16, 17, 18, 19, 20, 21]
 def generate_query_list(dataset, path, slice_):
     cameras = {}
     with open(dataset / "intrinsics.txt", "r") as f:
-        for line in f.readlines():
+        for line in f:
             if line[0] == "#" or line == "\n":
                 continue
             data = line.split()
@@ -26,7 +26,7 @@ def generate_query_list(dataset, path, slice_):
 
     queries = dataset / f"{slice_}/test-images-{slice_}.txt"
     with open(queries, "r") as f:
-        queries = [q.rstrip("\n") for q in f.readlines()]
+        queries = [q.rstrip("\n") for q in f]
 
     out = [[q] + cameras[q.split("_")[2]] for q in queries]
     with open(path, "w") as f:

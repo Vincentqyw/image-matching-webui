@@ -3,10 +3,10 @@ from pathlib import Path
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-import torchvision.models as models
 from scipy.io import loadmat
+from torch import nn
+from torchvision import models
 
 from .. import logger
 from ..utils.base_model import BaseModel

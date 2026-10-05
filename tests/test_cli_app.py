@@ -3,10 +3,11 @@ Test cases for CLI and app.py functionality.
 """
 
 import os
+import subprocess
 import sys
 import tempfile
-import subprocess
 from pathlib import Path
+
 import pytest
 import yaml
 from loguru import logger
