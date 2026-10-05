@@ -1,8 +1,7 @@
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List
-
+from typing import Any
 
 from ..hloc import (
     extract_features,
@@ -22,7 +21,7 @@ from .viz import fig2im
 
 
 class SfmEngine:
-    def __init__(self, cfg: Dict[str, Any] = None):
+    def __init__(self, cfg: dict[str, Any] = None):
         self.cfg = cfg
         if "outputs" in cfg and Path(cfg["outputs"]):
             outputs = Path(cfg["outputs"])
@@ -36,7 +35,7 @@ class SfmEngine:
         key: str,
         images: Path,
         camera_model: str,
-        camera_params: List[float],
+        camera_params: list[float],
         max_keypoints: int,
         keypoint_threshold: float,
         match_threshold: float,
@@ -111,7 +110,7 @@ class SfmEngine:
             "max_extra_param": 1e15,
         }
 
-        sfm_dir = self.outputs / "sfm_{}".format(key)
+        sfm_dir = self.outputs / f"sfm_{key}"
         sfm_pairs = self.outputs / "pairs-sfm.txt"
         sfm_dir.mkdir(exist_ok=True, parents=True)
 
@@ -152,11 +151,9 @@ class SfmEngine:
         with open(model_3d, "w") as f:
             for p, c in vertices:
                 # Write vertex position
-                f.write("v {} {} {}\n".format(p[0], p[1], p[2]))
+                f.write(f"v {p[0]} {p[1]} {p[2]}\n")
                 # Write vertex normal (color)
-                f.write(
-                    "vn {} {} {}\n".format(c[0] / 255.0, c[1] / 255.0, c[2] / 255.0)
-                )
+                f.write(f"vn {c[0] / 255.0} {c[1] / 255.0} {c[2] / 255.0}\n")
         viz_2d = visualization.visualize_sfm_2d(
             model, temp_images, color_by="visibility", n=2, dpi=300
         )

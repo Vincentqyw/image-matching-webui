@@ -3,21 +3,23 @@ import pickle
 import random
 import time
 import warnings
+from collections.abc import Callable
 from itertools import combinations
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from datasets import load_dataset
-import spaces
+from typing import Any
 
 import cv2
 import gradio as gr
 import matplotlib.pyplot as plt
 import numpy as np
 import poselib
+import spaces
 import torch
+from datasets import load_dataset
 from PIL import Image
 
 from ..hloc import (
+    DATASETS_REPO_ID,
     DEVICE,
     extract_features,
     extractors,
@@ -25,11 +27,10 @@ from ..hloc import (
     match_dense,
     match_features,
     matchers,
-    DATASETS_REPO_ID,
 )
 from ..hloc.utils.base_model import dynamic_load
-from .viz import display_keypoints, display_matches, fig2im, plot_images
 from .modelcache import ARCSizeAwareModelCache as ModelCache
+from .viz import display_keypoints, display_matches, fig2im, plot_images
 
 warnings.simplefilter("ignore")
 
@@ -53,7 +54,7 @@ MATCHER_ZOO = None
 model_cache = ModelCache()
 
 
-def load_config(config_name: str) -> Dict[str, Any]:
+def load_config(config_name: str) -> dict[str, Any]:
     """
     Load a YAML configuration file.
 
@@ -67,15 +68,15 @@ def load_config(config_name: str) -> Dict[str, Any]:
 
     with open(config_name, "r") as stream:
         try:
-            config: Dict[str, Any] = yaml.safe_load(stream)
+            config: dict[str, Any] = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             logger.error(exc)
     return config
 
 
 def get_matcher_zoo(
-    matcher_zoo: Dict[str, Dict[str, Union[str, bool]]],
-) -> Dict[str, Dict[str, Union[Callable, bool]]]:
+    matcher_zoo: dict[str, dict[str, str | bool]],
+) -> dict[str, dict[str, Callable | bool]]:
     """
     Restore matcher configurations from a dictionary.
 
@@ -109,7 +110,7 @@ def parse_match_config(conf):
         }
 
 
-def get_model(match_conf: Dict[str, Any]):
+def get_model(match_conf: dict[str, Any]):
     """
     Load a matcher model from the provided configuration.
 
@@ -124,7 +125,7 @@ def get_model(match_conf: Dict[str, Any]):
     return model
 
 
-def get_feature_model(conf: Dict[str, Dict[str, Any]]):
+def get_feature_model(conf: dict[str, dict[str, Any]]):
     """
     Load a feature extraction model from the provided configuration.
 
@@ -204,8 +205,7 @@ def gen_examples(data_root: Path):
             if file.lower().endswith((".jpg", ".jpeg", ".png"))
         ]
         pairs = list(combinations(imgs_list, 2))
-        if len(pairs) < count:
-            count = len(pairs)
+        count = min(count, len(pairs))
         selected = random.sample(range(len(pairs)), count)
         return [pairs[i] for i in selected]
 
@@ -218,7 +218,7 @@ def gen_examples(data_root: Path):
         for file in os.listdir(path):
             if file.lower().endswith((".jpg", ".jpeg", ".png")):
                 for rot in rot_list:
-                    file_rot = "{}_rot{}.jpg".format(Path(file).stem, rot)
+                    file_rot = f"{Path(file).stem}_rot{rot}.jpg"
                     if (path_rot / file_rot).exists():
                         pairs.append(
                             [
@@ -226,8 +226,7 @@ def gen_examples(data_root: Path):
                                 path_rot / file_rot,
                             ]
                         )
-        if len(pairs) < count:
-            count = len(pairs)
+        count = min(count, len(pairs))
         selected = random.sample(range(len(pairs)), count)
         return [pairs[i] for i in selected]
 
@@ -239,7 +238,7 @@ def gen_examples(data_root: Path):
         for file in os.listdir(path):
             if file.lower().endswith((".jpg", ".jpeg", ".png")):
                 for scale in scale_list:
-                    file_scale = "{}_scale{}.jpg".format(Path(file).stem, scale)
+                    file_scale = f"{Path(file).stem}_scale{scale}.jpg"
                     if (path_scale / file_scale).exists():
                         pairs.append(
                             [
@@ -247,8 +246,7 @@ def gen_examples(data_root: Path):
                                 path_scale / file_scale,
                             ]
                         )
-        if len(pairs) < count:
-            count = len(pairs)
+        count = min(count, len(pairs))
         selected = random.sample(range(len(pairs)), count)
         return [pairs[i] for i in selected]
 
@@ -331,7 +329,7 @@ def _filter_matches_opencv(
     confidence: float = 0.99,
     max_iter: int = 2000,
     geometry_type: str = "Homography",
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Filters matches between two sets of keypoints using OpenCV's findHomography.
 
@@ -358,7 +356,7 @@ def _filter_matches_opencv(
                 maxIters=max_iter,
             )
         except cv2.error:
-            logger.error("compute findHomography error, len(kp0): {}".format(len(kp0)))
+            logger.error(f"compute findHomography error, len(kp0): {len(kp0)}")
             return None, None
     elif geometry_type == "Fundamental":
         try:
@@ -371,9 +369,7 @@ def _filter_matches_opencv(
                 maxIters=max_iter,
             )
         except cv2.error:
-            logger.error(
-                "compute findFundamentalMat error, len(kp0): {}".format(len(kp0))
-            )
+            logger.error(f"compute findFundamentalMat error, len(kp0): {len(kp0)}")
             return None, None
     mask = np.array(mask.ravel().astype("bool"), dtype="bool")
     return M, mask
@@ -457,7 +453,7 @@ def proc_ransac_matches(
 
 
 def filter_matches(
-    pred: Dict[str, Any],
+    pred: dict[str, Any],
     ransac_method: str = DEFAULT_RANSAC_METHOD,
     ransac_reproj_threshold: float = DEFAULT_RANSAC_REPROJ_THRESHOLD,
     ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
@@ -479,16 +475,14 @@ def filter_matches(
     Returns:
         Dict[str, Any]: filtered matches.
     """
-    mkpts0: Optional[np.ndarray] = None
-    mkpts1: Optional[np.ndarray] = None
-    feature_type: Optional[str] = None
-    if "mkeypoints0_orig" in pred.keys() and "mkeypoints1_orig" in pred.keys():
+    mkpts0: np.ndarray | None = None
+    mkpts1: np.ndarray | None = None
+    feature_type: str | None = None
+    if "mkeypoints0_orig" in pred and "mkeypoints1_orig" in pred:
         mkpts0 = pred["mkeypoints0_orig"]
         mkpts1 = pred["mkeypoints1_orig"]
         feature_type = "KEYPOINT"
-    elif (
-        "line_keypoints0_orig" in pred.keys() and "line_keypoints1_orig" in pred.keys()
-    ):
+    elif "line_keypoints0_orig" in pred and "line_keypoints1_orig" in pred:
         mkpts0 = pred["line_keypoints0_orig"]
         mkpts1 = pred["line_keypoints1_orig"]
         feature_type = "LINE"
@@ -496,7 +490,7 @@ def filter_matches(
         return set_null_pred(feature_type, pred)
     if mkpts0 is None or mkpts0 is None:
         return set_null_pred(feature_type, pred)
-    if ransac_method not in ransac_zoo.keys():
+    if ransac_method not in ransac_zoo:
         ransac_method = DEFAULT_RANSAC_METHOD
 
     if len(mkpts0) < DEFAULT_MIN_NUM_MATCHES:
@@ -530,12 +524,12 @@ def filter_matches(
 
 
 def compute_geometry(
-    pred: Dict[str, Any],
+    pred: dict[str, Any],
     ransac_method: str = DEFAULT_RANSAC_METHOD,
     ransac_reproj_threshold: float = DEFAULT_RANSAC_REPROJ_THRESHOLD,
     ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
     ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
-) -> Dict[str, List[float]]:
+) -> dict[str, list[float]]:
     """
     Compute geometric information of matches, including Fundamental matrix,
     Homography matrix, and rectification matrices (if available).
@@ -550,22 +544,20 @@ def compute_geometry(
     Returns:
         Dict[str, List[float]]: geometric information in form of a dict.
     """
-    mkpts0: Optional[np.ndarray] = None
-    mkpts1: Optional[np.ndarray] = None
+    mkpts0: np.ndarray | None = None
+    mkpts1: np.ndarray | None = None
 
-    if "mkeypoints0_orig" in pred.keys() and "mkeypoints1_orig" in pred.keys():
+    if "mkeypoints0_orig" in pred and "mkeypoints1_orig" in pred:
         mkpts0 = pred["mkeypoints0_orig"]
         mkpts1 = pred["mkeypoints1_orig"]
-    elif (
-        "line_keypoints0_orig" in pred.keys() and "line_keypoints1_orig" in pred.keys()
-    ):
+    elif "line_keypoints0_orig" in pred and "line_keypoints1_orig" in pred:
         mkpts0 = pred["line_keypoints0_orig"]
         mkpts1 = pred["line_keypoints1_orig"]
 
     if mkpts0 is not None and mkpts1 is not None:
         if len(mkpts0) < 2 * DEFAULT_MIN_NUM_MATCHES:
             return {}
-        geo_info: Dict[str, List[float]] = {}
+        geo_info: dict[str, list[float]] = {}
 
         F, mask_f = proc_ransac_matches(
             mkpts0,
@@ -613,9 +605,9 @@ def compute_geometry(
 def wrap_images(
     img0: np.ndarray,
     img1: np.ndarray,
-    geo_info: Optional[Dict[str, List[float]]],
+    geo_info: dict[str, list[float]] | None,
     geom_type: str,
-) -> Tuple[Optional[str], Optional[Dict[str, List[float]]]]:
+) -> tuple[str | None, dict[str, list[float]] | None]:
     """
     Wraps the images based on the geometric transformation used to align them.
 
@@ -639,7 +631,7 @@ def wrap_images(
 
         H = np.array(geo_info["Homography"])
 
-        title: List[str] = []
+        title: list[str] = []
         if geom_type == "Homography":
             H_inv = np.linalg.inv(H)
             rectified_image1 = cv2.warpPerspective(img1, H_inv, (w0, h0))
@@ -668,9 +660,9 @@ def wrap_images(
 def generate_warp_images(
     input_image0: np.ndarray,
     input_image1: np.ndarray,
-    matches_info: Dict[str, Any],
+    matches_info: dict[str, Any],
     choice: str,
-) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+) -> tuple[np.ndarray | None, np.ndarray | None]:
     """
     Changes the estimate of the geometric transformation used to align the images.
 
@@ -683,11 +675,7 @@ def generate_warp_images(
     Returns:
         A tuple containing the updated images and the warpped images.
     """
-    if (
-        matches_info is None
-        or len(matches_info) < 1
-        or "geom_info" not in matches_info.keys()
-    ):
+    if matches_info is None or len(matches_info) < 1 or "geom_info" not in matches_info:
         return None, None
     geom_info = matches_info["geom_info"]
     warped_image = None
@@ -700,7 +688,7 @@ def generate_warp_images(
         return None, None
 
 
-def send_to_match(state_cache: Dict[str, Any]):
+def send_to_match(state_cache: dict[str, Any]):
     """
     Send the state cache to the match function.
 
@@ -720,13 +708,13 @@ def send_to_match(state_cache: Dict[str, Any]):
 
 
 def run_ransac(
-    state_cache: Dict[str, Any],
+    state_cache: dict[str, Any],
     choice_geometry_type: str,
     ransac_method: str = DEFAULT_RANSAC_METHOD,
     ransac_reproj_threshold: int = DEFAULT_RANSAC_REPROJ_THRESHOLD,
     ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
     ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
-) -> Tuple[Optional[np.ndarray], Optional[Dict[str, int]]]:
+) -> tuple[np.ndarray | None, dict[str, int] | None]:
     """
     Run RANSAC matches and return the output images and the number of matches.
 
@@ -759,7 +747,7 @@ def run_ransac(
         ransac_confidence=ransac_confidence,
         ransac_max_iter=ransac_max_iter,
     )
-    logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"RANSAC matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # plot images with ransac matches
@@ -770,7 +758,7 @@ def run_ransac(
     output_matches_ransac, num_matches_ransac = display_matches(
         state_cache, titles=titles, tag="KPTS_RANSAC"
     )
-    logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"Display matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # compute warp images
@@ -842,18 +830,18 @@ def run_matching(
     ransac_confidence: float = DEFAULT_RANSAC_CONFIDENCE,
     ransac_max_iter: int = DEFAULT_RANSAC_MAX_ITER,
     choice_geometry_type: str = DEFAULT_SETTING_GEOMETRY,
-    matcher_zoo: Dict[str, Any] = None,
+    matcher_zoo: dict[str, Any] = None,
     force_resize: bool = False,
     image_width: int = 640,
     image_height: int = 480,
     use_cached_model: bool = True,
-) -> Tuple[
+) -> tuple[
     np.ndarray,
     np.ndarray,
     np.ndarray,
-    Dict[str, int],
-    Dict[str, Dict[str, Any]],
-    Dict[str, Dict[str, float]],
+    dict[str, int],
+    dict[str, dict[str, Any]],
+    dict[str, dict[str, float]],
     np.ndarray,
 ]:
     """Match two images using the given parameters.
@@ -923,7 +911,7 @@ def run_matching(
         logger.info(f"Loaded cached model {cache_key}")
     else:
         matcher = get_model(match_conf)
-    logger.info(f"Loading model using: {time.time()-t0:.3f}s")
+    logger.info(f"Loading model using: {time.time() - t0:.3f}s")
     t1 = time.time()
     yield generate_fake_outputs(
         output_keypoints, output_matches_raw, output_matches_ransac, match_conf, {}, {}
@@ -986,7 +974,7 @@ def run_matching(
     # gr.Info(
     #     f"Matching images done using: {time.time()-t1:.3f}s",
     # )
-    logger.info(f"Matching images done using: {time.time()-t1:.3f}s")
+    logger.info(f"Matching images done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # plot images with keypoints
@@ -1029,7 +1017,7 @@ def run_matching(
     )
 
     # gr.Info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
-    logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"RANSAC matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # plot images with ransac matches
@@ -1050,7 +1038,7 @@ def run_matching(
     )
 
     # gr.Info(f"Display matches done using: {time.time()-t1:.3f}s")
-    logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"Display matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
     # plot wrapped images
     output_wrapped, warped_image = generate_warp_images(
@@ -1061,7 +1049,7 @@ def run_matching(
     )
     plt.close("all")
     # gr.Info(f"In summary, total time: {time.time()-t0:.3f}s")
-    logger.info(f"TOTAL time: {time.time()-t0:.3f}s")
+    logger.info(f"TOTAL time: {time.time() - t0:.3f}s")
 
     state_cache = pred
     state_cache["num_matches_raw"] = num_matches_raw

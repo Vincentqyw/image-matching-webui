@@ -1,7 +1,6 @@
 import argparse
 import collections.abc as collections
 from pathlib import Path
-from typing import List, Optional, Union
 
 from . import logger
 from .utils.io import list_h5_names
@@ -10,10 +9,10 @@ from .utils.parsers import parse_image_lists
 
 def main(
     output: Path,
-    image_list: Optional[Union[Path, List[str]]] = None,
-    features: Optional[Path] = None,
-    ref_list: Optional[Union[Path, List[str]]] = None,
-    ref_features: Optional[Path] = None,
+    image_list: Path | list[str] | None = None,
+    features: Path | None = None,
+    ref_list: Path | list[str] | None = None,
+    ref_features: Path | None = None,
 ):
     if image_list is not None:
         if isinstance(image_list, (str, Path)):

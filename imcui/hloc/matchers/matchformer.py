@@ -12,8 +12,8 @@ from ..utils.base_model import BaseModel
 matchformer_path = Path(__file__).parent / "../../third_party/MatchFormer"
 sys.path.append(str(matchformer_path))
 
-from model.matchformer import Matchformer as MF
 from config.defaultmf import get_cfg_defaults as mf_cfg_defaults
+from model.matchformer import Matchformer as MF
 
 
 def resize_to_divisible(img, divisible_size):

@@ -4,7 +4,6 @@ from pathlib import Path
 import torch
 
 from .. import MODEL_REPO_ID, logger
-
 from ..utils.base_model import BaseModel
 
 alike_path = Path(__file__).parent / "../../third_party/ALIKE"
@@ -33,7 +32,7 @@ class Alike(BaseModel):
             repo_id=MODEL_REPO_ID,
             filename="{}/{}.pth".format(Path(__file__).stem, self.conf["model_name"]),
         )
-        logger.info("Loaded Alike model from {}".format(model_path))
+        logger.info(f"Loaded Alike model from {model_path}")
         configs[conf["model_name"]]["model_path"] = model_path
         self.net = Alike_(
             **configs[conf["model_name"]],

@@ -1,7 +1,8 @@
 import sys
 from pathlib import Path
+
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
-from .. import logger, MODEL_REPO_ID
 
 liftfeat_path = Path(__file__).parent / "../../third_party/LiftFeat"
 sys.path.insert(0, str(liftfeat_path))

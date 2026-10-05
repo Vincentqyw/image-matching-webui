@@ -8,8 +8,6 @@ Works for a small number of points and cameras, might be slow otherwise.
 Written by Paul-Edouard Sarlin and Philipp Lindenberger.
 """
 
-from typing import Optional
-
 import numpy as np
 import plotly.graph_objects as go
 import pycolmap
@@ -57,8 +55,8 @@ def plot_points(
     pts: np.ndarray,
     color: str = "rgba(255, 0, 0, 1)",
     ps: int = 2,
-    colorscale: Optional[str] = None,
-    name: Optional[str] = None,
+    colorscale: str | None = None,
+    name: str | None = None,
 ):
     """Plot a set of 3D points."""
     x, y, z = pts.T
@@ -80,11 +78,11 @@ def plot_camera(
     t: np.ndarray,
     K: np.ndarray,
     color: str = "rgb(0, 0, 255)",
-    name: Optional[str] = None,
-    legendgroup: Optional[str] = None,
+    name: str | None = None,
+    legendgroup: str | None = None,
     fill: bool = False,
     size: float = 1.0,
-    text: Optional[str] = None,
+    text: str | None = None,
 ):
     """Plot a camera frustum from pose and intrinsic matrix."""
     W, H = K[0, 2] * 2, K[1, 2] * 2
@@ -143,7 +141,7 @@ def plot_camera_colmap(
     fig: go.Figure,
     image: pycolmap.Image,
     camera: pycolmap.Camera,
-    name: Optional[str] = None,
+    name: str | None = None,
     **kwargs,
 ):
     """Plot a camera frustum from PyCOLMAP objects"""
@@ -172,7 +170,7 @@ def plot_reconstruction(
     rec: pycolmap.Reconstruction,
     max_reproj_error: float = 6.0,
     color: str = "rgb(0, 0, 255)",
-    name: Optional[str] = None,
+    name: str | None = None,
     min_track_length: int = 2,
     points: bool = True,
     cameras: bool = True,

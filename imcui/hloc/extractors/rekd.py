@@ -4,7 +4,6 @@ from pathlib import Path
 import torch
 
 from .. import MODEL_REPO_ID, logger
-
 from ..utils.base_model import BaseModel
 
 rekd_path = Path(__file__).parent / "../../third_party"

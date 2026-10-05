@@ -13,7 +13,6 @@ from XoFTR.src.config.default import get_cfg_defaults
 from XoFTR.src.utils.misc import lower_config
 from XoFTR.src.xoftr import XoFTR as XoFTR_
 
-
 from ..utils.base_model import BaseModel
 
 

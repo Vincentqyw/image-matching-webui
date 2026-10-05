@@ -1,11 +1,11 @@
 import warnings
+from pathlib import Path
 
 import torch
 from kornia.feature import LoFTR as LoFTR_
 from kornia.feature.loftr.loftr import default_cfg
-from pathlib import Path
-from .. import logger, MODEL_REPO_ID
 
+from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 

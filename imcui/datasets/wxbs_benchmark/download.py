@@ -1,4 +1,4 @@
-from wxbs_benchmark.dataset import *  # noqa: F403
+from wxbs_benchmark.dataset import *
 
-dset = EVDDataset(".EVD", download=True)  # noqa: F405
-dset = WxBSDataset(".WxBS", subset="test", download=True)  # noqa: F405
+dset = EVDDataset(".EVD", download=True)
+dset = WxBSDataset(".WxBS", subset="test", download=True)

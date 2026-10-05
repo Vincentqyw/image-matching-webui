@@ -24,7 +24,7 @@ def _load_sphereglue():
     """Lazy-import SphereGlue so the heavy torch_geometric dep is only
     loaded when the user actually selects this matcher."""
     try:
-        from model.sphereglue import SphereGlue as SG  # noqa: E402
+        from model.sphereglue import SphereGlue as SG
     except ImportError as e:
         raise ImportError(_SPHEREGLUE_INSTALL_HINT) from e
     return SG

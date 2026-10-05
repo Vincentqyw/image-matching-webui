@@ -7,14 +7,13 @@ import torch
 from torchvision.transforms import ToPILImage
 
 from .. import DEVICE, MODEL_REPO_ID
-
 from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party/COTR"))
 from COTR.inference.sparse_engine import SparseEngine
 from COTR.models import build_model
-from COTR.options.options import *  # noqa: F403
-from COTR.options.options_utils import *  # noqa: F403
+from COTR.options.options import *
+from COTR.options.options_utils import *
 from COTR.utils import utils as utils_cotr
 
 utils_cotr.fix_randomness(0)
@@ -32,7 +31,7 @@ class COTR(BaseModel):
 
     def _init(self, conf):
         parser = argparse.ArgumentParser()
-        set_COTR_arguments(parser)  # noqa: F405
+        set_COTR_arguments(parser)
         opt = parser.parse_args()
         opt.command = " ".join(sys.argv)
         opt.load_weights_path = self._download_model(

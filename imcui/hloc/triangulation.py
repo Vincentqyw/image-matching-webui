@@ -3,7 +3,7 @@ import contextlib
 import io
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pycolmap
@@ -35,7 +35,7 @@ class OutputCapture:
 
 def create_db_from_model(
     reconstruction: pycolmap.Reconstruction, database_path: Path
-) -> Dict[str, int]:
+) -> dict[str, int]:
     if database_path.exists():
         logger.warning("The database already exists, deleting it.")
         database_path.unlink()
@@ -62,7 +62,7 @@ def create_db_from_model(
 
 
 def import_features(
-    image_ids: Dict[str, int], database_path: Path, features_path: Path
+    image_ids: dict[str, int], database_path: Path, features_path: Path
 ):
     logger.info("Importing features into the database...")
     db = COLMAPDatabase.connect(database_path)
@@ -77,17 +77,17 @@ def import_features(
 
 
 def import_matches(
-    image_ids: Dict[str, int],
+    image_ids: dict[str, int],
     database_path: Path,
     pairs_path: Path,
     matches_path: Path,
-    min_match_score: Optional[float] = None,
+    min_match_score: float | None = None,
     skip_geometric_verification: bool = False,
 ):
     logger.info("Importing matches into the database...")
 
     with open(str(pairs_path), "r") as f:
-        pairs = [p.split() for p in f.readlines()]
+        pairs = [p.split() for p in f]
 
     db = COLMAPDatabase.connect(database_path)
 
@@ -113,17 +113,16 @@ def estimation_and_geometric_verification(
     database_path: Path, pairs_path: Path, verbose: bool = False
 ):
     logger.info("Performing geometric verification of the matches...")
-    with OutputCapture(verbose):
-        with pycolmap.ostream():
-            pycolmap.verify_matches(
-                database_path,
-                pairs_path,
-                options=dict(ransac=dict(max_num_trials=20000, min_inlier_ratio=0.1)),
-            )
+    with OutputCapture(verbose), pycolmap.ostream():
+        pycolmap.verify_matches(
+            database_path,
+            pairs_path,
+            options=dict(ransac=dict(max_num_trials=20000, min_inlier_ratio=0.1)),
+        )
 
 
 def geometric_verification(
-    image_ids: Dict[str, int],
+    image_ids: dict[str, int],
     reference: pycolmap.Reconstruction,
     database_path: Path,
     features_path: Path,
@@ -200,21 +199,20 @@ def run_triangulation(
     image_dir: Path,
     reference_model: pycolmap.Reconstruction,
     verbose: bool = False,
-    options: Optional[Dict[str, Any]] = None,
+    options: dict[str, Any] | None = None,
 ) -> pycolmap.Reconstruction:
     model_path.mkdir(parents=True, exist_ok=True)
     logger.info("Running 3D triangulation...")
     if options is None:
         options = {}
-    with OutputCapture(verbose):
-        with pycolmap.ostream():
-            reconstruction = pycolmap.triangulate_points(
-                reference_model,
-                database_path,
-                image_dir,
-                model_path,
-                options=options,
-            )
+    with OutputCapture(verbose), pycolmap.ostream():
+        reconstruction = pycolmap.triangulate_points(
+            reference_model,
+            database_path,
+            image_dir,
+            model_path,
+            options=options,
+        )
     return reconstruction
 
 
@@ -227,9 +225,9 @@ def main(
     matches: Path,
     skip_geometric_verification: bool = False,
     estimate_two_view_geometries: bool = False,
-    min_match_score: Optional[float] = None,
+    min_match_score: float | None = None,
     verbose: bool = False,
-    mapper_options: Optional[Dict[str, Any]] = None,
+    mapper_options: dict[str, Any] | None = None,
 ) -> pycolmap.Reconstruction:
     assert reference_model.exists(), reference_model
     assert features.exists(), features
@@ -267,7 +265,7 @@ def main(
     return reconstruction
 
 
-def parse_option_args(args: List[str], default_options) -> Dict[str, Any]:
+def parse_option_args(args: list[str], default_options) -> dict[str, Any]:
     options = {}
     for arg in args:
         idx = arg.find("=")
@@ -283,7 +281,7 @@ def parse_option_args(args: List[str], default_options) -> Dict[str, Any]:
         target_type = type(getattr(default_options, key))
         if not isinstance(value, target_type):
             raise ValueError(
-                f'Incorrect type for option "{key}":' f" {type(value)} vs {target_type}"
+                f'Incorrect type for option "{key}": {type(value)} vs {target_type}'
             )
         options[key] = value
     return options

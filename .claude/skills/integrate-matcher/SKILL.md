@@ -153,20 +153,20 @@ The `_forward` method MUST return a dict with these keys:
 **Dense matchers that output matched keypoints only:**
 ```python
 pred = {
-    "keypoints0": kpts0,      # torch.Tensor, shape (N, 2), pixel coords in resized image
-    "keypoints1": kpts1,      # torch.Tensor, shape (N, 2)
-    "mconf": confidence,      # torch.Tensor, shape (N,), match confidence scores
+    "keypoints0": kpts0,  # torch.Tensor, shape (N, 2), pixel coords in resized image
+    "keypoints1": kpts1,  # torch.Tensor, shape (N, 2)
+    "mconf": confidence,  # torch.Tensor, shape (N,), match confidence scores
 }
 ```
 
 **Dense matchers that can separate detected vs matched keypoints (PREFERRED):**
 ```python
 pred = {
-    "keypoints0": all_kpts0,     # All detected keypoints (for UI "Keypoints" display)
-    "keypoints1": all_kpts1,     # All detected keypoints
-    "mkeypoints0": matched_kpts0, # Matched keypoints (for UI match lines)
-    "mkeypoints1": matched_kpts1, # Matched keypoints
-    "mconf": confidence,          # Match confidence scores
+    "keypoints0": all_kpts0,  # All detected keypoints (for UI "Keypoints" display)
+    "keypoints1": all_kpts1,  # All detected keypoints
+    "mkeypoints0": matched_kpts0,  # Matched keypoints (for UI match lines)
+    "mkeypoints1": matched_kpts1,  # Matched keypoints
+    "mconf": confidence,  # Match confidence scores
 }
 ```
 

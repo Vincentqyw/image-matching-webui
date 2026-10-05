@@ -64,7 +64,7 @@ def parse_poses(path, colmap=False):
     """Parse a list of poses in COLMAP or MLAD quaternion convention."""
     poses = []
     with open(path) as f:
-        for line in f.readlines():
+        for line in f:
             line = line.rstrip("\n")
             if line[0] == "#" or line == "":
                 continue
@@ -84,7 +84,7 @@ def parse_relocalization(path, has_poses=False):
     """Parse a relocalization file, possibly with poses."""
     reloc = []
     with open(path) as f:
-        for line in f.readlines():
+        for line in f:
             line = line.rstrip("\n")
             if line[0] == "#" or line == "":
                 continue
@@ -162,7 +162,7 @@ def generate_localization_pairs(sequence, reloc, num, ref_pairs, out_path):
     query_to_ref_ts = {}
     for reloc in relocs:
         with open(reloc, "r") as f:
-            for line in f.readlines():
+            for line in f:
                 line = line.rstrip("\n")
                 if line[0] == "#" or line == "":
                     continue
@@ -227,5 +227,5 @@ def evaluate_submission(submission_dir, relocs, ths=[0.1, 0.2, 0.5]):
         recall = [np.mean(error <= th) for th in ths]
         s = f"Relocalization evaluation {submission_dir.name}/{reloc.name}\n"
         s += " / ".join([f"{th:>7}m" for th in ths]) + "\n"
-        s += " / ".join([f"{100*r:>7.3f}%" for r in recall])
+        s += " / ".join([f"{100 * r:>7.3f}%" for r in recall])
         logger.info(s)

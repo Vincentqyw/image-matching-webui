@@ -12,7 +12,6 @@ try:
 except ImportError:
     pycolmap = None
 from .. import logger
-
 from ..utils.base_model import BaseModel
 
 
@@ -132,7 +131,7 @@ class SIFT(BaseModel):
         else:
             backends = {"opencv", "pycolmap", "pycolmap_cpu", "pycolmap_cuda"}
             raise ValueError(
-                f"Unknown backend: {backend} not in " f"{{{','.join(backends)}}}."
+                f"Unknown backend: {backend} not in {{{','.join(backends)}}}."
             )
         logger.info("Load SIFT model done.")
 
@@ -202,7 +201,7 @@ class SIFT(BaseModel):
         pred = []
         for k in range(len(image)):
             img = image[k]
-            if "image_size" in data.keys():
+            if "image_size" in data:
                 # avoid extracting points in padded areas
                 w, h = data["image_size"][k]
                 img = img[:, :h, :w]

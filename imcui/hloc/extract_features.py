@@ -3,7 +3,6 @@ import collections.abc as collections
 import pprint
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Dict, List, Optional, Union
 
 import cv2
 import h5py
@@ -14,11 +13,10 @@ import torchvision.transforms.functional as F
 from tqdm import tqdm
 
 from . import extractors, logger
+from .configs import confs_dict
 from .utils.base_model import dynamic_load
 from .utils.io import list_h5_names, read_image
 from .utils.parsers import parse_image_lists
-
-from .configs import confs_dict
 
 confs = confs_dict["extractors"]
 
@@ -172,16 +170,16 @@ def extract(model, image_0, conf):
 
 @torch.no_grad()
 def main(
-    conf: Dict,
+    conf: dict,
     image_dir: Path,
-    export_dir: Optional[Path] = None,
+    export_dir: Path | None = None,
     as_half: bool = True,
-    image_list: Optional[Union[Path, List[str]]] = None,
-    feature_path: Optional[Path] = None,
+    image_list: Path | list[str] | None = None,
+    feature_path: Path | None = None,
     overwrite: bool = False,
 ) -> Path:
     logger.info(
-        "Extracting local features with configuration:" f"\n{pprint.pformat(conf)}"
+        f"Extracting local features with configuration:\n{pprint.pformat(conf)}"
     )
 
     dataset = ImageDataset(image_dir, conf["preprocessing"], image_list)

@@ -1,8 +1,8 @@
-from typing import Tuple
 from pathlib import Path
-import numpy as np
+
 import cv2
 import h5py
+import numpy as np
 import yaml
 
 from .parsers import names_to_pair, names_to_pair_old
@@ -65,7 +65,7 @@ def find_pair(hfile: h5py.File, name0: str, name1: str):
     )
 
 
-def get_matches(path: Path, name0: str, name1: str) -> Tuple[np.ndarray]:
+def get_matches(path: Path, name0: str, name1: str) -> tuple[np.ndarray]:
     with h5py.File(str(path), "r", libver="latest") as hfile:
         pair, reverse = find_pair(hfile, name0, name1)
         matches = hfile[pair]["matches0"].__array__()

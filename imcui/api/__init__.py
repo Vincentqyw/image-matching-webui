@@ -12,15 +12,15 @@ from .core import ImageMatchingAPI
 
 
 class ImagesInput(BaseModel):
-    data: List[str] = []
-    max_keypoints: List[int] = []
-    timestamps: List[str] = []
+    data: list[str] = []
+    max_keypoints: list[int] = []
+    timestamps: list[str] = []
     grayscale: bool = False
-    image_hw: List[List[int]] = [[], []]
+    image_hw: list[list[int]] = [[], []]
     feature_type: int = 0
-    rotates: List[float] = []
-    scales: List[float] = []
-    reference_points: List[List[float]] = []
+    rotates: list[float] = []
+    scales: list[float] = []
+    reference_points: list[list[float]] = []
     binarize: bool = False
 
 

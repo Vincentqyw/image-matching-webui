@@ -5,7 +5,7 @@ from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
 sys.path.append(str(Path(__file__).parent / "../../third_party"))
-from SuperGluePretrainedNetwork.models.superglue import (  # noqa: E402
+from SuperGluePretrainedNetwork.models.superglue import (
     SuperGlue as SG,
 )
 

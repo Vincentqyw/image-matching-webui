@@ -1,9 +1,9 @@
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
-import spaces  # noqa: F401  # ZeroGPU
 
 import gradio as gr
 import numpy as np
+import spaces  # ZeroGPU
 from easydict import EasyDict as edict
 from omegaconf import OmegaConf
 
@@ -411,7 +411,7 @@ class ImageMatchingApp:
                         outputs=[output_wrapped, geometry_result],
                     )
             with gr.Tab("Structure from Motion(under-dev)"):
-                sfm_ui = AppSfmUI(  # noqa: F841
+                sfm_ui = AppSfmUI(
                     {
                         **self.cfg,
                         "matcher_zoo": self.matcher_zoo,
@@ -463,23 +463,23 @@ class ImageMatchingApp:
     def ui_reset_state(
         self,
         *args: Any,
-    ) -> Tuple[
-        Optional[np.ndarray],
-        Optional[np.ndarray],
+    ) -> tuple[
+        np.ndarray | None,
+        np.ndarray | None,
         float,
         int,
         float,
         str,
-        Dict[str, Any],
-        Dict[str, Any],
+        dict[str, Any],
+        dict[str, Any],
         str,
-        Optional[np.ndarray],
-        Optional[np.ndarray],
-        Optional[np.ndarray],
-        Dict[str, Any],
-        Dict[str, Any],
-        Optional[np.ndarray],
-        Dict[str, Any],
+        np.ndarray | None,
+        np.ndarray | None,
+        np.ndarray | None,
+        dict[str, Any],
+        dict[str, Any],
+        np.ndarray | None,
+        dict[str, Any],
         str,
         int,
         float,
@@ -526,7 +526,7 @@ class ImageMatchingApp:
 
     def display_supported_algorithms(self, style="tab"):
         def get_link(link, tag="Link"):
-            return "[{}]({})".format(tag, link) if link is not None else "None"
+            return f"[{tag}]({link})" if link is not None else "None"
 
         data = []
         cfg = self.cfg["matcher_zoo"]
@@ -583,7 +583,7 @@ class ImageMatchingApp:
 
 
 class AppBaseUI:
-    def __init__(self, cfg: Dict[str, Any] = {}):
+    def __init__(self, cfg: dict[str, Any] = {}):
         self.cfg = OmegaConf.create(cfg)
         self.inputs = edict({})
         self.outputs = edict({})
@@ -600,7 +600,7 @@ class AppBaseUI:
 
 
 class AppSfmUI(AppBaseUI):
-    def __init__(self, cfg: Dict[str, Any] = None):
+    def __init__(self, cfg: dict[str, Any] = None):
         super().__init__(cfg)
         assert "matcher_zoo" in self.cfg
         self.matcher_zoo = self.cfg["matcher_zoo"]

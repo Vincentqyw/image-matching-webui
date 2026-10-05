@@ -40,7 +40,7 @@ class DoG(BaseModel):
         elif conf["descriptor"] == "hardnet":
             self.describe = kornia.feature.HardNet(pretrained=True)
         elif conf["descriptor"] not in ["sift", "rootsift"]:
-            raise ValueError(f'Unknown descriptor: {conf["descriptor"]}')
+            raise ValueError(f"Unknown descriptor: {conf['descriptor']}")
 
         self.sift = None  # lazily instantiated on the first image
         self.dummy_param = torch.nn.Parameter(torch.empty(0))
@@ -104,7 +104,7 @@ class DoG(BaseModel):
                         patches[start_idx:end_idx]
                     )
         else:
-            raise ValueError(f'Unknown descriptor: {self.conf["descriptor"]}')
+            raise ValueError(f"Unknown descriptor: {self.conf['descriptor']}")
 
         keypoints = torch.from_numpy(keypoints[:, :2])  # keep only x, y
         scales = torch.from_numpy(scales)
@@ -114,11 +114,7 @@ class DoG(BaseModel):
         if self.conf["max_keypoints"] != -1:
             # TODO: check that the scores from PyCOLMAP are 100% correct,
             # follow https://github.com/mihaidusmanu/pycolmap/issues/8
-            max_number = (
-                scores.shape[0]
-                if scores.shape[0] < self.conf["max_keypoints"]
-                else self.conf["max_keypoints"]
-            )
+            max_number = min(self.conf["max_keypoints"], scores.shape[0])
             values, indices = torch.topk(scores, max_number)
             keypoints = keypoints[indices]
             scales = scales[indices]

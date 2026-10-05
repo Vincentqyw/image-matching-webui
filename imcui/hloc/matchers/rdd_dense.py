@@ -1,9 +1,11 @@
 import sys
-import yaml
-import torch
 from pathlib import Path
+
+import torch
+import yaml
+
+from .. import DEVICE, MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
-from .. import logger, MODEL_REPO_ID, DEVICE
 
 rdd_path = Path(__file__).parent / "../../third_party/rdd"
 sys.path.append(str(rdd_path))

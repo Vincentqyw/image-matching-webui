@@ -2,10 +2,9 @@ import sys
 from pathlib import Path
 
 import torch
-import torchvision.transforms as transforms
+from torchvision import transforms
 
 from .. import MODEL_REPO_ID, logger
-
 from ..utils.base_model import BaseModel
 
 dedode_path = Path(__file__).parent / "../../third_party/DeDoDe"
@@ -40,7 +39,7 @@ class DeDoDe(BaseModel):
             repo_id=MODEL_REPO_ID,
             filename="{}/{}".format(Path(__file__).stem, conf["model_descriptor_name"]),
         )
-        logger.info("Loaded DarkFeat model: {}".format(model_detector_path))
+        logger.info(f"Loaded DarkFeat model: {model_detector_path}")
         self.normalizer = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )

@@ -4,7 +4,6 @@ from functools import partial
 from pathlib import Path
 from queue import Queue
 from threading import Thread
-from typing import Dict, List, Optional, Tuple, Union
 
 import h5py
 import numpy as np
@@ -12,9 +11,9 @@ import torch
 from tqdm import tqdm
 
 from . import logger, matchers
+from .configs import confs_dict
 from .utils.base_model import dynamic_load
 from .utils.parsers import names_to_pair, names_to_pair_old, parse_retrieval
-from .configs import confs_dict
 
 confs = confs_dict["matchers"]
 
@@ -84,28 +83,28 @@ def writer_fn(inp, match_path):
 
 
 def main(
-    conf: Dict,
+    conf: dict,
     pairs: Path,
-    features: Union[Path, str],
-    export_dir: Optional[Path] = None,
-    matches: Optional[Path] = None,
-    features_ref: Optional[Path] = None,
+    features: Path | str,
+    export_dir: Path | None = None,
+    matches: Path | None = None,
+    features_ref: Path | None = None,
     overwrite: bool = False,
 ) -> Path:
     if isinstance(features, Path) or Path(features).exists():
         features_q = features
         if matches is None:
             raise ValueError(
-                "Either provide both features and matches as Path" " or both as names."
+                "Either provide both features and matches as Path or both as names."
             )
     else:
         if export_dir is None:
             raise ValueError(
-                "Provide an export_dir if features is not" f" a file path: {features}."
+                f"Provide an export_dir if features is not a file path: {features}."
             )
         features_q = Path(export_dir, features + ".h5")
         if matches is None:
-            matches = Path(export_dir, f'{features}_{conf["output"]}_{pairs.stem}.h5')
+            matches = Path(export_dir, f"{features}_{conf['output']}_{pairs.stem}.h5")
 
     if features_ref is None:
         features_ref = features_q
@@ -114,7 +113,7 @@ def main(
     return matches
 
 
-def find_unique_new_pairs(pairs_all: List[Tuple[str]], match_path: Path = None):
+def find_unique_new_pairs(pairs_all: list[tuple[str]], match_path: Path = None):
     """Avoid to recompute duplicates to save time."""
     pairs = set()
     for i, j in pairs_all:
@@ -139,16 +138,14 @@ def find_unique_new_pairs(pairs_all: List[Tuple[str]], match_path: Path = None):
 
 @torch.no_grad()
 def match_from_paths(
-    conf: Dict,
+    conf: dict,
     pairs_path: Path,
     match_path: Path,
     feature_path_q: Path,
     feature_path_ref: Path,
     overwrite: bool = False,
 ) -> Path:
-    logger.info(
-        "Matching local features with configuration:" f"\n{pprint.pformat(conf)}"
-    )
+    logger.info(f"Matching local features with configuration:\n{pprint.pformat(conf)}")
 
     if not feature_path_q.exists():
         raise FileNotFoundError(f"Query feature file {feature_path_q}.")
@@ -192,10 +189,7 @@ def scale_keypoints(kpts, scale):
         and len(scale) == 2
         and np.any(scale != np.array([1.0, 1.0]))
     ):
-        if isinstance(kpts, torch.Tensor):
-            kpts[:, 0] *= scale[0]  # scale x-dimension
-            kpts[:, 1] *= scale[1]  # scale y-dimension
-        elif isinstance(kpts, np.ndarray):
+        if isinstance(kpts, torch.Tensor) or isinstance(kpts, np.ndarray):
             kpts[:, 0] *= scale[0]  # scale x-dimension
             kpts[:, 1] *= scale[1]  # scale y-dimension
     return kpts
