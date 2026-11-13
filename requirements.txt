@@ -1,1 +1,2 @@
 imcui==0.1.4
+pyarrow<26
