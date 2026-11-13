@@ -65,6 +65,15 @@ confs = {
             "force_resize": False,
         },
     },
+    "flexglue": {
+        "output": "matches-flexglue",
+        "model": {
+            "name": "flexglue",
+            "match_threshold": 0.1,
+            "max_distance_px": 3.0,
+            "min_covisibility": 0.0,
+        },
+    },
     "aliked-lightglue": {
         "output": "matches-aliked-lightglue",
         "model": {

@@ -138,7 +138,6 @@ class ImageMatchingApp:
                                         label="Max features",
                                         value=1000,
                                     )
-                                # TODO: add line settings
                                 with gr.Row():
                                     detect_keypoints_threshold = gr.Slider(
                                         minimum=0,
@@ -147,13 +146,20 @@ class ImageMatchingApp:
                                         label="Keypoint threshold",
                                         value=0.015,
                                     )
-                                    detect_line_threshold = gr.Slider(  # noqa: F841
-                                        minimum=0.1,
-                                        maximum=1,
+                                    min_covisibility = gr.Slider(
+                                        minimum=0.0,
+                                        maximum=1.0,
                                         step=0.01,
-                                        label="Line threshold",
-                                        value=0.2,
+                                        label="Covisibility threshold",
+                                        value=self.cfg["defaults"]["min_covisibility"],
                                     )
+                                max_match_distance = gr.Slider(
+                                    minimum=0.0,
+                                    maximum=20.0,
+                                    step=0.5,
+                                    label="Max match distance (px)",
+                                    value=self.cfg["defaults"]["max_distance_px"],
+                                )
 
                             with gr.Tab("RANSAC Setting"):
                                 with gr.Row(equal_height=False):
@@ -241,6 +247,8 @@ class ImageMatchingApp:
                             image_force_resize_cb,
                             image_setting_width,
                             image_setting_height,
+                            max_match_distance,
+                            min_covisibility,
                         ]
 
                         # Add some examples
@@ -366,6 +374,8 @@ class ImageMatchingApp:
                         choice_geometry_type,
                         output_pred,
                         image_force_resize_cb,
+                        max_match_distance,
+                        min_covisibility,
                     ]
                     button_reset.click(
                         fn=self.ui_reset_state,
@@ -522,6 +532,8 @@ class ImageMatchingApp:
             self.cfg["defaults"]["setting_geometry"],  # geometry: str
             None,  # predictions
             False,
+            self.cfg["defaults"]["max_distance_px"],  # max match distance
+            self.cfg["defaults"]["min_covisibility"],  # covisibility threshold
         )
 
     def display_supported_algorithms(self, style="tab"):

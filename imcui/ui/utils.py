@@ -846,6 +846,8 @@ def run_matching(
     force_resize: bool = False,
     image_width: int = 640,
     image_height: int = 480,
+    max_distance_px: float = 3.0,
+    min_covisibility: float = 0.0,
     use_cached_model: bool = True,
 ) -> Tuple[
     np.ndarray,
@@ -874,6 +876,10 @@ def run_matching(
         force_resize (bool, optional): force resize. Defaults to False.
         image_width (int, optional): image width. Defaults to 640.
         image_height (int, optional): image height. Defaults to 480.
+        max_distance_px (float, optional): maximum match distance in pixels of
+            the 512x512 resized images (FlexGlue). Defaults to 3.0.
+        min_covisibility (float, optional): reject pairs below this covisibility
+            score (FlexGlue). Defaults to 0.0.
         use_cached_model (bool, optional): use cached model. Defaults to False.
 
     Returns:
@@ -905,6 +911,10 @@ def run_matching(
     # update match config
     match_conf["model"]["match_threshold"] = match_threshold
     match_conf["model"]["max_keypoints"] = extract_max_keypoints
+    # FlexGlue-only filters; other matchers don't declare them.
+    if "max_distance_px" in match_conf["model"]:
+        match_conf["model"]["max_distance_px"] = max_distance_px
+        match_conf["model"]["min_covisibility"] = min_covisibility
     cache_key = "{}_{}".format(key, match_conf["model"]["name"])
 
     efficiency = model["info"].get("efficiency", "high")
@@ -923,6 +933,9 @@ def run_matching(
         logger.info(f"Loaded cached model {cache_key}")
     else:
         matcher = get_model(match_conf)
+    if "max_distance_px" in matcher.conf:  # FlexGlue-only filters
+        matcher.conf["max_distance_px"] = max_distance_px
+        matcher.conf["min_covisibility"] = min_covisibility
     logger.info(f"Loading model using: {time.time()-t0:.3f}s")
     t1 = time.time()
     yield generate_fake_outputs(

@@ -13,6 +13,8 @@ defaults:
   ransac_max_iter: 10000
   ransac_num_samples: 4
   match_threshold: 0.2
+  max_distance_px: 3.0
+  min_covisibility: 0.0
   setting_geometry: Homography
 
 matcher_zoo:
@@ -543,6 +545,45 @@ matcher_zoo:
       paper: https://arxiv.org/pdf/2304.03608.pdf
       project: null
       display: true
+  FlexGlue (SuperPoint):
+    matcher: flexglue
+    feature: superpoint_max
+    standalone: false
+    skip_ci: true
+    info:
+      name: FlexGlue (SuperPoint)
+      source: "ARXIV 2026"
+      github: https://github.com/cvg/FlexGlue
+      paper: https://arxiv.org/abs/2610.32976
+      project: null
+      display: true
+      efficiency: medium
+  FlexGlue (ALIKED):
+    matcher: flexglue
+    feature: aliked-n16
+    standalone: false
+    skip_ci: true
+    info:
+      name: FlexGlue (ALIKED)
+      source: "ARXIV 2026"
+      github: https://github.com/cvg/FlexGlue
+      paper: https://arxiv.org/abs/2610.32976
+      project: null
+      display: true
+      efficiency: medium
+  FlexGlue (DISK):
+    matcher: flexglue
+    feature: disk
+    standalone: false
+    skip_ci: true
+    info:
+      name: FlexGlue (DISK)
+      source: "ARXIV 2026"
+      github: https://github.com/cvg/FlexGlue
+      paper: https://arxiv.org/abs/2610.32976
+      project: null
+      display: true
+      efficiency: medium
   raco+lightglue:
     matcher: raco-lightglue
     feature: raco
