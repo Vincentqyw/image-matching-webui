@@ -639,6 +639,35 @@ confs = {
             "dfactor": 8,
         },
     },
+    "redi_match": {
+        "output": "matches-redi_match",
+        "model": {
+            "name": "redi_match",
+            "model_name": "outdoor.pth",
+            "resolution": "medium",
+            "max_keypoints": 2000,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            # REDI-Match resizes inputs to its own square resolution.
+            "resize_max": 0,
+            "dfactor": 8,
+        },
+    },
+    "redi_match_indoor": {
+        "output": "matches-redi_match_indoor",
+        "model": {
+            "name": "redi_match",
+            "model_name": "indoor.pth",
+            "resolution": "medium",
+            "max_keypoints": 2000,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "resize_max": 0,
+            "dfactor": 8,
+        },
+    },
     "dad_roma": {
         "output": "matches-dad_roma",
         "model": {

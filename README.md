@@ -36,6 +36,7 @@ The tool currently supports various popular image matching algorithms, namely:
 | FlexGlue       | ✅ | ARXIV   | 2026 | [Link](https://github.com/cvg/FlexGlue) |
 | LoMa           | ✅ | ECCV    | 2026 | [Link](https://github.com/davnords/LoMa) |
 | RaCo           | ✅ | 3DV     | 2026 | [Link](https://github.com/cvg/RaCo) |
+| REDI-Match     | ✅ | ARXIV   | 2026 | [Link](https://github.com/YinjiGe/REDI-Match) |
 | RIPE           | ✅ | ICCV    | 2025 | [Link](https://github.com/fraunhoferhhi/RIPE)  |
 | RDD            | ✅ | CVPR    | 2025 | [Link](https://github.com/xtcpete/rdd)  |
 | LiftFeat       | ✅ | ICRA    | 2025 | [Link](https://github.com/lyp-deeplearning/LiftFeat) |

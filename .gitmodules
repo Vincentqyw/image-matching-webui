@@ -109,3 +109,6 @@
 [submodule "imcui/third_party/FlexGlue"]
     path = imcui/third_party/FlexGlue
     url = https://github.com/cvg/FlexGlue.git
+[submodule "imcui/third_party/REDI-Match"]
+    path = imcui/third_party/REDI-Match
+    url = https://github.com/YinjiGe/REDI-Match.git
