@@ -6,7 +6,7 @@ This module provides a Click-based CLI to launch the ImageMatchingApp with confi
 import click
 from loguru import logger
 from pathlib import Path
-from imcui.ui.app_class import ImageMatchingApp
+from imcui.ui.examples import classic_examples_root
 
 
 def get_default_config_path():
@@ -44,9 +44,9 @@ def get_example_data_default_path():
     Returns:
         Path: Path to the default example data root directory.
     """
-    get_example_data_default_path = Path(__file__).parent.parent / "datasets"
-    logger.info(f"Using example data root: {get_example_data_default_path}")
-    return get_example_data_default_path
+    default_path = classic_examples_root()
+    logger.info(f"Using example data root: {default_path}")
+    return default_path
 
 
 @click.command()
@@ -81,11 +81,16 @@ def get_example_data_default_path():
 @click.option(
     "--example-data-root",
     "-d",
-    type=click.Path(exists=True, file_okay=False, readable=True),
+    type=click.Path(file_okay=False, readable=True),
     default=lambda: str(get_example_data_default_path()),
     show_default=True,
     help="Root directory containing example datasets for demonstration purposes. "
     "Should contain subdirectories with image pairs for matching.",
+)
+@click.option(
+    "--download-examples",
+    is_flag=True,
+    help="Download the curated HardMatch examples (about 4.5 MB) and exit.",
 )
 @click.option(
     "--verbose",
@@ -97,7 +102,9 @@ def get_example_data_default_path():
 @click.version_option(
     version="1.0.0", message="Image Matching WebUI Version %(version)s"
 )
-def main(server_name, server_port, config, example_data_root, verbose):
+def main(
+    server_name, server_port, config, example_data_root, download_examples, verbose
+):
     """
     Launch the Image Matching WebUI application.
 
@@ -122,7 +129,18 @@ def main(server_name, server_port, config, example_data_root, verbose):
     \b
     # Start with verbose logging
     python -m imcui.cli --verbose
+
+    \b
+    # Download the curated HardMatch examples and exit
+    python -m imcui.cli --download-examples
     """
+    if download_examples:
+        from imcui.ui.examples import download_hardmatch, load_examples_manifest
+
+        cache = download_hardmatch(load_examples_manifest())
+        click.echo(f"HardMatch examples cached at {cache}")
+        return
+
     if verbose:
         click.echo("Starting Image Matching WebUI...")
         click.echo(f"Server: {server_name}:{server_port}")
@@ -130,6 +148,9 @@ def main(server_name, server_port, config, example_data_root, verbose):
         click.echo(f"Example data root: {example_data_root}")
 
     try:
+        # Import here so `--download-examples` does not pull in torch/gradio.
+        from imcui.ui.app_class import ImageMatchingApp
+
         # Initialize and run the ImageMatchingApp
         ImageMatchingApp(
             server_name,

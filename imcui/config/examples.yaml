@@ -1,0 +1,86 @@
+# Curated HardMatch pairs shown in the WebUI gallery.
+# Images are downloaded on demand from HuggingFace; none are bundled.
+hardmatch:
+  source:
+    repo_id: Realcat/hardmatch
+    repo_type: dataset
+    revision: main
+    url: https://huggingface.co/datasets/Realcat/hardmatch
+  cache_subdir: hardmatch
+  files:
+    - A_lr.jpg
+    - B_lr.jpg
+    - A_metadata.json
+    - B_metadata.json
+    - categories.txt
+    - corresp_lr.txt
+  settings:
+    matcher: FlexGlue (ALIKED)
+    match_threshold: 0.1
+    max_keypoints: 4096
+    keypoint_threshold: 0.0
+    ransac_method: CV2_USAC_MAGSAC
+    ransac_reproj_threshold: 8
+    ransac_confidence: 0.9999
+    ransac_max_iter: 10000
+  pairs:
+    - title: "Kazan Cathedral: snowy day vs floodlit night"
+      path: cathedral/St._Nicholas_Cathedral_(Kazan)/pair_00118
+      categories: [outdoor, season, illumination, building]
+      attribution:
+        A: {author: Vadim Indeikin, license: CC BY-SA 3.0}
+        B: {author: Vyacheslav Buharov, license: CC BY-SA 2.0}
+    - title: "Chachani: snow-covered vs bare slopes"
+      path: volcano/Chachani/pair_00750
+      categories: [outdoor, season, nature]
+      attribution:
+        A: {author: Bas Wallet, license: CC BY 2.0}
+        B: {author: Lunaloop, license: CC BY-SA 4.0}
+    - title: "Santorini: daytime vs sunset aerial"
+      path: island/Santorini/pair_0001
+      categories: [outdoor, aerial, season, nature]
+      attribution:
+        A: {author: Alexey laa, license: CC BY-SA 4.0}
+        B: {author: kallerna, license: CC BY-SA 4.0}
+    - title: "Tatiana-B: near-identical sister ships"
+      path: cargo_ship/Tatiana-B/pair_00100
+      categories: [outdoor, object, doppelgänger]
+      attribution:
+        A: {author: The Great Stahl, license: CC BY-SA 4.0}
+        B: {author: Christian Ferrer, license: CC BY 4.0}
+    - title: "Carlsbad Caverns: repetitive limestone in changing light"
+      path: cave_interior/Carlsbad_Caverns/pair_0003
+      categories: [indoor, illumination, texture]
+      attribution:
+        A: {author: Jirka Matousek, license: CC BY 2.0}
+        B: {author: Jirka Matousek, license: CC BY 2.0}
+    - title: "El Escorial Library: wide vs central view"
+      path: library_interior/Library_room_of_the_Monastery_of_San_Lorenzo_de_El_Escorial/pair_00351
+      categories: [indoor, illumination, viewpoint]
+      attribution:
+        A: {author: Miguel Angel Masegosa Martínez, license: CC BY 2.0}
+        B: {author: El fosilmaníaco, license: CC BY-SA 3.0 es}
+    - title: "Pesaro obelisk: 1969 photograph vs engraving"
+      path: obelisk/Pesaro_obelisk/pair_00403
+      categories: [outdoor, drawing, time]
+      attribution:
+        A: {author: Paolo Monti, license: CC BY-SA 4.0}
+        B: {author: Incisore sconosciuto, license: Public domain}
+    - title: "Bao Bao: two poses"
+      path: famous_animals/Bao_Bao/pair_0001
+      categories: [outdoor, dynamic]
+      attribution:
+        A: {author: Stefanie Triltsch, license: CC BY-SA 2.5}
+        B: {author: Stefanie Triltsch, license: CC BY-SA 2.5}
+    - title: "Amoco Cadiz anchor: overcast vs golden hour"
+      path: anchor/Amoco_Cadiz_Anchor_Monument/pair_00038
+      categories: [outdoor, time, object]
+      attribution:
+        A: {author: Gzen92, license: CC BY-SA 4.0}
+        B: {author: Ludovic Péron, license: CC BY-SA 3.0}
+    - title: "Full moon: close-up vs over the rooftops"
+      path: moon/moon/pair_0008
+      categories: [celestial]
+      attribution:
+        A: {author: Lensofasif, license: CC BY-SA 4.0}
+        B: {author: José Lodos Benavente, license: CC0}

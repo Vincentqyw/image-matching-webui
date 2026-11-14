@@ -33,7 +33,6 @@ from .modelcache import ModelCache
 
 warnings.simplefilter("ignore")
 
-ROOT = Path(__file__).parents[1]
 # some default values
 DEFAULT_SETTING_THRESHOLD = 0.1
 DEFAULT_SETTING_MAX_FEATURES = 2000
@@ -145,6 +144,8 @@ def download_example_images(repo_id, output_dir):
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     for example in dataset["train"]:  # Assuming the dataset is in the "train" split
         file_path = example["path"]
+        if not file_path.startswith("sacre_coeur/"):
+            continue
         image = example["image"]  # Access the PIL.Image object directly
         full_path = os.path.join(output_dir, file_path)
         Path(os.path.dirname(full_path)).mkdir(parents=True, exist_ok=True)
@@ -180,13 +181,7 @@ def gen_examples(data_root: Path):
         "FlexGlue (ALIKED)",
     ]
     data_root = Path(data_root)
-    if not Path(data_root).exists():
-        try:
-            download_example_images(DATASETS_REPO_ID, data_root)
-        except Exception as e:
-            logger.error(f"download_example_images error : {e}")
-            data_root = ROOT / "datasets"
-    if not Path(data_root / "sacre_coeur/mapping").exists():
+    if not (data_root / "sacre_coeur/mapping").exists():
         download_example_images(DATASETS_REPO_ID, data_root)
 
     def distribute_elements(A, B):
@@ -253,30 +248,10 @@ def gen_examples(data_root: Path):
         selected = random.sample(range(len(pairs)), count)
         return [pairs[i] for i in selected]
 
-    # extramely hard examples
-    def gen_image_pairs_wxbs(count: int = None):
-        prefix = "wxbs_benchmark/.WxBS/v1.1"
-        wxbs_path = data_root / prefix
-        pairs = []
-        for catg in os.listdir(wxbs_path):
-            catg_path = wxbs_path / catg
-            if not catg_path.is_dir():
-                continue
-            for scene in os.listdir(catg_path):
-                scene_path = catg_path / scene
-                if not scene_path.is_dir():
-                    continue
-                img1_path = scene_path / "01.png"
-                img2_path = scene_path / "02.png"
-                if img1_path.exists() and img2_path.exists():
-                    pairs.append([str(img1_path), str(img2_path)])
-        return pairs
-
     # image pair path
     pairs = gen_images_pairs()
     # pairs += gen_rot_image_pairs()
     pairs += gen_scale_image_pairs()
-    pairs += gen_image_pairs_wxbs()
     pairs_rotation = gen_rot_image_pairs()
     dist_examples = distribute_elements(pairs, example_algos)
     dist_examples_rotation = distribute_elements(

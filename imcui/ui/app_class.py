@@ -5,8 +5,17 @@ import spaces  # noqa: F401  # ZeroGPU
 import gradio as gr
 import numpy as np
 from easydict import EasyDict as edict
+from loguru import logger
 from omegaconf import OmegaConf
 
+from .examples import (
+    classic_examples_root,
+    download_hardmatch,
+    gen_hardmatch_examples,
+    hardmatch_cache_dir,
+    hardmatch_cache_ready,
+    load_examples_manifest,
+)
 from .sfm import SfmEngine
 from .utils import (
     GRADIO_VERSION,
@@ -55,8 +64,16 @@ class ImageMatchingApp:
         self.cfg = load_config(self.config_path)
         self.matcher_zoo = get_matcher_zoo(self.cfg["matcher_zoo"])
         self.app = None
+        self.examples_manifest = load_examples_manifest()
+        self.hardmatch_cache = hardmatch_cache_dir(self.examples_manifest)
+        try:
+            download_hardmatch(self.examples_manifest, self.hardmatch_cache)
+        except Exception as e:
+            # Startup must not fail when the examples cannot be fetched (e.g.
+            # offline, read-only cache); the UI then shows the download hint.
+            logger.warning(f"Could not download HardMatch examples: {e}")
         self.example_data_root = kwargs.get(
-            "example_data_root", Path(__file__).parents[1] / "datasets"
+            "example_data_root", classic_examples_root()
         )
         # final step
         self.init_interface()
@@ -253,19 +270,8 @@ class ImageMatchingApp:
 
                         # Add some examples
                         with gr.Row():
-                            # Example inputs
                             with gr.Accordion("Open for More: Examples", open=True):
-                                gr.Examples(
-                                    examples=gen_examples(self.example_data_root),
-                                    inputs=inputs,
-                                    outputs=[],
-                                    fn=run_matching,
-                                    cache_examples=False,
-                                    label=(
-                                        "Examples (click one of the images below to Run"
-                                        " Match). Thx: WxBS"
-                                    ),
-                                )
+                                self.add_examples(inputs)
                         with gr.Accordion("Supported Algorithms", open=False):
                             # add a table of supported algorithms
                             self.display_supported_algorithms()
@@ -430,6 +436,40 @@ class ImageMatchingApp:
                 )
                 sfm_ui.call_empty()
 
+    def add_examples(self, inputs):
+        label = "Click a pair to load it, then press Run Match."
+        with gr.Accordion("HardMatch: hard pairs", open=True):
+            if hardmatch_cache_ready(self.examples_manifest, self.hardmatch_cache):
+                gr.Examples(
+                    examples=gen_hardmatch_examples(
+                        self.examples_manifest,
+                        self.init_matcher_dropdown(),
+                        self.hardmatch_cache,
+                    ),
+                    inputs=inputs,
+                    cache_examples=False,
+                    label=label,
+                    api_name="load_hardmatch_example",
+                )
+                gr.Markdown(
+                    "Examples from [HardMatch]"
+                    "(https://github.com/davnords/HardMatch)."
+                )
+            else:
+                gr.Markdown(
+                    "HardMatch examples could not be downloaded at startup. "
+                    "Check the logs, or run `imcui --download-examples` "
+                    "(about 4.5 MB) and restart."
+                )
+        with gr.Accordion("Classic: Sacre Coeur", open=False):
+            gr.Examples(
+                examples=gen_examples(self.example_data_root),
+                inputs=inputs,
+                cache_examples=False,
+                label=label,
+                api_name="load_classic_example",
+            )
+
     def run(self):
         self.app.queue().launch(
             server_name=self.server_name,
@@ -439,6 +479,8 @@ class ImageMatchingApp:
             allowed_paths=[
                 str(Path(__file__).parents[0]),
                 str(Path(__file__).parents[1]),
+                str(self.example_data_root),
+                str(self.hardmatch_cache),
             ],
         )
 
