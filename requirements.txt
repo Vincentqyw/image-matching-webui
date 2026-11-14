@@ -22,6 +22,7 @@ plotly
 poselib
 protobuf
 psutil
+pyarrow<26  # 26+ requires numpy>=2, incompatible with numpy~=1.24
 pycolmap<3.13
 pytlsd  # gluestick, <3.12
 pytorch-lightning  # ==1.4.9
