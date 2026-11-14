@@ -81,6 +81,14 @@ repos:
     files: (\.cmake|CMakeLists.txt)(.in)?$
     exclude: ^imcui/third_party/
 
+# Keep uv.lock in sync with requirements.txt (dependencies are dynamic)
+- repo: https://github.com/astral-sh/uv-pre-commit
+  rev: "0.7.9"
+  hooks:
+  - id: uv-lock
+    files: ^(uv\.lock|pyproject\.toml|requirements\.txt)$
+    args: ["--refresh"]  # dynamic deps are cached; force requirements.txt re-read
+
 # Suggested hook if you add a .clang-format file
 - repo: https://github.com/pre-commit/mirrors-clang-format
   rev: v13.0.0

@@ -39,3 +39,6 @@ oryx-build-commands.txt
 dist
 tmp
 **.DS_Store**
+
+# uv lockfile is local-only (requirements.txt is the source of truth)
+uv.lock

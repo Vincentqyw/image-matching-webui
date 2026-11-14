@@ -423,6 +423,17 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2507.04839
       project: https://fraunhoferhhi.github.io/RIPE
       display: true
+  ripepp(+mnn):
+    matcher: NN-mutual
+    feature: ripepp
+    standalone: false
+    info:
+      name: RIPE++ #dispaly name
+      source: "ECCV 2026"
+      github: https://github.com/fraunhoferhhi/RIPEpp
+      paper: https://arxiv.org/abs/2608.19693
+      project: https://fraunhoferhhi.github.io/RIPEpp/
+      display: true
   rdd(sparse):
     matcher: NN-mutual
     feature: rdd

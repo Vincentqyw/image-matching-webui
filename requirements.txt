@@ -7,9 +7,11 @@ gdown
 gradio
 h5py
 huggingface_hub
+hydra-core  # ripepp model construction
 imageio
 Jinja2
 kornia
+lightning  # ripepp.utils.pylogger
 loguru
 matplotlib<3.9
 numpy~=1.24

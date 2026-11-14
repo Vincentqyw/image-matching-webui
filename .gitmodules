@@ -112,3 +112,6 @@
 [submodule "imcui/third_party/REDI-Match"]
     path = imcui/third_party/REDI-Match
     url = https://github.com/YinjiGe/REDI-Match.git
+[submodule "imcui/third_party/RIPEpp"]
+    path = imcui/third_party/RIPEpp
+    url = https://github.com/fraunhoferhhi/RIPEpp

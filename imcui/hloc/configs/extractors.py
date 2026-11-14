@@ -228,6 +228,18 @@ confs = {
             "resize_max": 1600,
         },
     },
+    "ripepp": {
+        "output": "feats-ripepp-n2048-r768",
+        "model": {
+            "name": "ripepp",
+            "max_keypoints": 2048,
+            "keypoint_threshold": 0.5,
+        },
+        "preprocessing": {
+            "grayscale": False,
+            "resize_max": 768,
+        },
+    },
     "aliked-n16-rot": {
         "output": "feats-aliked-n16-rot",
         "model": {
