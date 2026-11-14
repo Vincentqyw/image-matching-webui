@@ -18,9 +18,9 @@ def test_manifest_valid_and_covers_labels():
     manifest = load_examples_manifest()
     pairs = manifest["hardmatch"]["pairs"]
 
-    assert len(pairs) == 10
+    assert len(pairs) == 30
     assert {c for pair in pairs for c in pair["categories"]} == HARDMATCH_LABELS
-    assert len(hardmatch_required_files(manifest)) == 60
+    assert len(hardmatch_required_files(manifest)) == 180
 
     matchers = manifest["hardmatch"]["settings"]["matchers"]
     zoo = yaml.safe_load(APP_CONFIG.read_text(encoding="utf-8"))["matcher_zoo"]
@@ -45,7 +45,7 @@ def test_rows_shape_offline(tmp_path):
     matchers = manifest["hardmatch"]["settings"]["matchers"]
     rows = gen_hardmatch_examples(manifest, matchers, cache)
 
-    assert len(rows) == 10
+    assert len(rows) == 30
     for row in rows:
         assert len(row) == 10
         assert row[5] in matchers

@@ -462,7 +462,7 @@ class ImageMatchingApp:
                 gr.Markdown(
                     "HardMatch examples could not be downloaded at startup. "
                     "Check the logs, or run `imcui --download-examples` "
-                    "(about 4.5 MB) and restart."
+                    "(about 20 MB) and restart."
                 )
         with gr.Accordion("Classic: Sacre Coeur", open=False):
             gr.Examples(

@@ -90,7 +90,7 @@ def get_example_data_default_path():
 @click.option(
     "--download-examples",
     is_flag=True,
-    help="Download the curated HardMatch examples (about 4.5 MB) and exit.",
+    help="Download the curated HardMatch examples (about 20 MB) and exit.",
 )
 @click.option(
     "--verbose",

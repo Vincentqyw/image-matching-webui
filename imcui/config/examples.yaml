@@ -90,3 +90,123 @@ hardmatch:
       attribution:
         A: {author: Lensofasif, license: CC BY-SA 4.0}
         B: {author: José Lodos Benavente, license: CC0}
+    - title: "4X-ATH: on final approach vs on the ground"
+      path: airplane/4X-ATH_(aircraft)/pair_0001
+      categories: [outdoor, object]
+      attribution:
+        A: {author: ronen fefer, license: CC BY-SA 2.0}
+        B: {author: chen hayek, license: CC BY 2.5}
+    - title: "MQ-28 Ghost Bat: two airshow views"
+      path: drone/Boeing_MQ-28_Ghost_Bat/pair_00234
+      categories: [outdoor, object]
+      attribution:
+        A: {author: HoHo3143, license: CC BY-SA 4.0}
+        B: {author: HoHo3143, license: CC BY-SA 4.0}
+    - title: "Abavas Rumba: daylight vs morning mist"
+      path: waterfall/Abavas_rumba/pair_00778
+      categories: [outdoor, texture, nature]
+      attribution:
+        A: {author: Sergej Smirnov, license: CC BY 3.0}
+        B: {author: Maris Teteris, license: CC BY 3.0}
+    - title: "LZ 11 Viktoria Luise: photograph vs illustration"
+      path: zeppelin/LZ_11_Viktoria_Luise/pair_00839
+      categories: [outdoor, object]
+      attribution:
+        A: {author: Unknown, license: Public domain}
+        B: {author: Unknown, license: CC BY 4.0}
+    - title: "Lozova bell tower: close-up vs distant view"
+      path: bell_tower/Bell_tower_of_the_church_of_the_Intercession,_Lozova/pair_00058
+      categories: [outdoor, illumination, viewpoint, building]
+      attribution:
+        A: {author: Михайло Потупчик, license: CC BY-SA 4.0}
+        B: {author: Secret ua, license: CC BY-SA 4.0}
+    - title: "Amol suspension bridge: two viewpoints"
+      path: bridge/Amol_First_Metal_Bridge/pair_00062
+      categories: [outdoor]
+      attribution:
+        A: {author: MehdiTalk, license: CC BY-SA 3.0}
+        B: {author: Rezvanian, license: CC BY-SA 4.0}
+    - title: "Arbaiun canyon: 1993 vs today"
+      path: canyon/Arbaiun_canyon/pair_00084
+      categories: [outdoor, time, nature]
+      attribution:
+        A: {author: Colsandsol, license: CC BY-SA 4.0}
+        B: {author: LBM1948, license: CC BY-SA 4.0}
+    - title: "Calcite Springs: river vs trail sign"
+      path: hot_spring/Calcite_Springs/pair_00333
+      categories: [outdoor, nature]
+      attribution:
+        A: {author: YellowstoneNPS, license: Public domain}
+        B: {author: YellowstoneNPS, license: Public domain}
+    - title: "Altes Palais: 1990 rally vs today"
+      path: palace/Altes_Palais/pair_00466
+      categories: [outdoor, illumination, time, building]
+      attribution:
+        A: {author: Wolfried Paetzold, license: CC BY-SA 3.0 de}
+        B: {author: Rosentod, license: CC BY-SA 3.0}
+    - title: "Waisenberg ruins: winter vs summer"
+      path: ruins/Burgruine_Waisenberg/pair_00564
+      categories: [outdoor, time, nature]
+      attribution:
+        A: {author: Johann Jaritz, license: CC BY-SA 4.0}
+        B: {author: Niki.L, license: CC BY-SA 4.0}
+    - title: "Cadillac Place: two archival views"
+      path: skyscraper/Cadillac_Place/pair_00624
+      categories: [outdoor, time, viewpoint, building]
+      attribution:
+        A: {author: Historic American Buildings Survey, license: Public domain}
+        B: {author: Historic American Buildings Survey, creator, license: Public domain}
+    - title: "Am Hof: close-up vs square"
+      path: town_square/Am_Hof/pair_0001
+      categories: [outdoor, viewpoint, building]
+      attribution:
+        A: {author: Vigo Jansons (https//www.vigojansons.com/), license: CC BY-SA 4.0}
+        B: {author: Gryffindor, license: CC BY 2.5}
+    - title: "Aberdeen Bay wind farm: contrast crop vs original"
+      path: wind_farm/European_Offshore_Wind_Deployment_Centre/pair_00814
+      categories: [outdoor, illumination]
+      attribution:
+        A: {author: Zanaszanas, license: CC BY-SA 4.0}
+        B: {author: Zanaszanas, license: CC BY-SA 4.0}
+    - title: "Anemone Geyser: erupting vs dormant"
+      path: geyser/Anemone_Geyser/pair_00295
+      categories: [outdoor, texture, nature]
+      attribution:
+        A: {author: Yellowstone National Park, license: Public domain}
+        B: {author: James St. John, license: CC BY 2.0}
+    - title: "De Hoop windmill: two RCE views"
+      path: windmill/De_Hoop/pair_00823
+      categories: [outdoor, viewpoint, building]
+      attribution:
+        A: {author: Kris Roderburg, license: CC BY-SA 4.0}
+        B: {author: Kris Roderburg, license: CC BY-SA 4.0}
+    - title: "Bent Pyramid: two desert views"
+      path: pyramid/Bent_Pyramid/pair_00526
+      categories: [outdoor, texture]
+      attribution:
+        A: {author: Darer101, license: CC BY-SA 4.0}
+        B: {author: Olaf Tausch, license: CC BY 3.0}
+    - title: "Alte Oper: facade vs night view"
+      path: opera_houses/Alte_Oper/pair_00442
+      categories: [outdoor, illumination, building]
+      attribution:
+        A: {author: Olena, license: CC BY-SA 3.0}
+        B: {author: Moahim, license: CC BY-SA 4.0}
+    - title: "Maintenon aqueduct: chateau vs aqueduct"
+      path: aqueduct/Aqueduct_of_Maintenon/pair_00043
+      categories: [outdoor, time]
+      attribution:
+        A: {author: Harmonia Amanda, license: CC BY-SA 3.0}
+        B: {author: GIRAUD Patrick, license: CC BY-SA 3.0}
+    - title: "Glanum arch: 1930s vs today"
+      path: triumphal_arch/Arch_of_Glanum/pair_00712
+      categories: [outdoor, time, building]
+      attribution:
+        A: {author: Fortepan / Pierre Varga, license: CC BY-SA 3.0}
+        B: {author: Selmoval, license: CC BY-SA 4.0}
+    - title: "Milan archaeological museum: model vs atrium"
+      path: atrium/Atrium_of_Archaeological_Museum_of_Milan/pair_0001
+      categories: [indoor, viewpoint, object]
+      attribution:
+        A: {author: Carole Raddato from FRANKFURT, Germany, license: CC BY 2.0}
+        B: {author: Alberto Panzani, license: CC BY-SA 4.0}
