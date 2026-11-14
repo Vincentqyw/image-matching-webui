@@ -238,6 +238,28 @@ matcher_zoo:
       paper: https://arxiv.org/abs/2412.12906
       display: true
       efficiency: low  # low, medium, high
+  REDI-Match (outdoor):
+    matcher: redi_match
+    skip_ci: true
+    standalone: true
+    info:
+      name: REDI-Match (outdoor) #dispaly name
+      source: "ARXIV 2026"
+      github: https://github.com/YinjiGe/REDI-Match
+      paper: https://arxiv.org/abs/2606.24330
+      display: true
+      efficiency: high  # low, medium, high
+  REDI-Match (indoor):
+    matcher: redi_match_indoor
+    skip_ci: true
+    standalone: true
+    info:
+      name: REDI-Match (indoor) #dispaly name
+      source: "ARXIV 2026"
+      github: https://github.com/YinjiGe/REDI-Match
+      paper: https://arxiv.org/abs/2606.24330
+      display: true
+      efficiency: high  # low, medium, high
   dkm:
     matcher: dkm
     skip_ci: true
@@ -400,6 +422,17 @@ matcher_zoo:
       github: https://github.com/fraunhoferhhi/RIPE
       paper: https://arxiv.org/abs/2507.04839
       project: https://fraunhoferhhi.github.io/RIPE
+      display: true
+  ripepp(+mnn):
+    matcher: NN-mutual
+    feature: ripepp
+    standalone: false
+    info:
+      name: RIPE++ #dispaly name
+      source: "ECCV 2026"
+      github: https://github.com/fraunhoferhhi/RIPEpp
+      paper: https://arxiv.org/abs/2608.19693
+      project: https://fraunhoferhhi.github.io/RIPEpp/
       display: true
   rdd(sparse):
     matcher: NN-mutual
