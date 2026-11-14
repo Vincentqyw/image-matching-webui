@@ -98,7 +98,7 @@ Model weights are downloaded from HuggingFace Hub (`Realcat/imcui_checkpoints`) 
 1. Add the upstream repo as a submodule: `git submodule add <url> imcui/third_party/<Name>`
 2. Create extractor module (`imcui/hloc/extractors/<name>.py`) and/or matcher module (`imcui/hloc/matchers/<name>.py`) following the `example.py` template
 3. Register configs in `configs/extractors.py` and/or `configs/matchers.py`
-4. Add entry to `config/app.yaml` and `imcui/config/app.yaml`
+4. Add entry to `config/app.yaml` and `imcui/config/app.yaml`; its `info.name` must follow the display-name grammar documented above `matcher_zoo` (enforced by `validate_matcher_zoo`)
 5. Upload model weights to `Realcat/imcui_checkpoints` on HuggingFace
 
 See `.claude/skills/integrate-matcher/SKILL.md` for the detailed procedure.

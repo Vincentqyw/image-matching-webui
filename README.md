@@ -70,7 +70,7 @@ The tool currently supports various popular image matching algorithms, namely:
 | DKM            | ✅ | CVPR    | 2023 | [Link](https://github.com/Parskatt/DKM) |
 | NCMNet         | ❌ | CVPR    | 2023 | [Link](https://github.com/xinliu29/NCMNet) |
 | TopicFM        | ✅ | AAAI    | 2023 | [Link](https://github.com/Vincentqyw/TopicFM) |
-| AspanFormer    | ✅ | ECCV    | 2022 | [Link](https://github.com/Vincentqyw/ml-aspanformer) |
+| ASpanFormer    | ✅ | ECCV    | 2022 | [Link](https://github.com/Vincentqyw/ml-aspanformer) |
 | LANet          | ✅ | ACCV    | 2022 | [Link](https://github.com/wangch-g/lanet) |
 | LISRD          | ✅ | ECCV    | 2022 | [Link](https://github.com/rpautrat/LISRD) |
 | REKD           | ❌ | CVPR    | 2022 | [Link](https://github.com/bluedream1121/REKD) |

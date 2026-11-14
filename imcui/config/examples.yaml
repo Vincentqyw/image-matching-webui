@@ -15,7 +15,13 @@ hardmatch:
     - categories.txt
     - corresp_lr.txt
   settings:
-    matcher: FlexGlue (ALIKED)
+    matchers:
+      - FlexGlue (ALIKED)
+      - FlexGlue (SuperPoint)
+      - FlexGlue (DISK)
+      - superpoint+lightglue
+      - xfeat+lightglue
+      - REDI-Match (outdoor)
     match_threshold: 0.1
     max_keypoints: 4096
     keypoint_threshold: 0.0

@@ -6,6 +6,7 @@ the user cache directory; they are never written into the package.
 """
 
 import os
+import random
 from pathlib import Path
 
 import yaml
@@ -32,7 +33,7 @@ HARDMATCH_LABELS = {
 }
 
 SETTINGS_KEYS = (
-    "matcher",
+    "matchers",
     "match_threshold",
     "max_keypoints",
     "keypoint_threshold",
@@ -78,6 +79,8 @@ def load_examples_manifest(path: Path = EXAMPLES_MANIFEST_PATH) -> dict:
     settings = hardmatch["settings"]
     missing = [key for key in SETTINGS_KEYS if key not in settings]
     assert not missing, f"Missing HardMatch settings: {missing}"
+    matchers = settings["matchers"]
+    assert matchers and all(isinstance(m, str) and m for m in matchers)
 
     pairs = hardmatch["pairs"]
     assert pairs, "HardMatch manifest has no pairs"
@@ -164,18 +167,29 @@ def gen_hardmatch_examples(
     cache_dir: Path | None = None,
 ) -> list[list]:
     settings = manifest["hardmatch"]["settings"]
-    matcher = settings["matcher"]
+    matchers = settings["matchers"]
+    unknown = [m for m in matchers if m not in matcher_choices]
     assert (
-        matcher in matcher_choices
-    ), f"HardMatch example matcher {matcher!r} is not enabled in config/app.yaml"
+        not unknown
+    ), f"HardMatch example matchers not enabled in config/app.yaml: {unknown}"
     cache = Path(cache_dir) if cache_dir is not None else hardmatch_cache_dir(manifest)
     assert hardmatch_cache_ready(manifest, cache), (
         f"HardMatch examples are not cached under {cache}. "
         "Run `imcui --download-examples` first."
     )
 
+    pairs = manifest["hardmatch"]["pairs"]
+    # Shuffle matchers in full blocks so every matcher shows up at least once,
+    # while the pairing stays fixed across runs (seeded).
+    rng = random.Random(0)
+    assignment = []
+    while len(assignment) < len(pairs):
+        block = matchers[:]
+        rng.shuffle(block)
+        assignment += block
+
     rows = []
-    for pair in manifest["hardmatch"]["pairs"]:
+    for pair, matcher in zip(pairs, assignment):
         rows.append(
             [
                 str(cache / pair["path"] / "A_lr.jpg"),

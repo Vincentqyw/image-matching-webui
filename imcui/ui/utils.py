@@ -1,6 +1,7 @@
 import os
 import pickle
 import random
+import re
 import time
 import warnings
 from itertools import combinations
@@ -72,6 +73,34 @@ def load_config(config_name: str) -> Dict[str, Any]:
     return config
 
 
+def validate_matcher_zoo(
+    matcher_zoo: Dict[str, Dict[str, Union[str, bool]]],
+) -> None:
+    """Enforce the matcher display-name grammar documented in app.yaml."""
+    labels = [conf["info"]["name"] for conf in matcher_zoo.values()]
+    assert all(labels), "Every matcher_zoo entry needs info.name"
+    assert len(set(labels)) == len(labels), f"Duplicate matcher names: {labels}"
+    for key, conf in matcher_zoo.items():
+        label = conf["info"]["name"]
+        assert label[0].isupper(), f"{key}: name must start uppercase: {label!r}"
+        assert (
+            label == label.strip() and "  " not in label
+        ), f"{key}: extra whitespace in name: {label!r}"
+        assert (
+            "(" not in label or " (" in label
+        ), f"{key}: put a space before '(': {label!r}"
+        assert "(+" not in label and "+)" not in label, f"{key}: bad '+' in {label!r}"
+        # Strip well-formed " + " separators; a lone '+' left over is unspaced.
+        assert not re.search(
+            r"(?<!\+)\+(?!\+)", label.replace(" + ", "")
+        ), f"{key}: '+' needs one space on each side: {label!r}"
+        if not conf["standalone"]:
+            assert " + " in label, (
+                f"{key}: sparse pipeline name must read "
+                f"'<Feature> + <Matcher>': {label!r}"
+            )
+
+
 def get_matcher_zoo(
     matcher_zoo: Dict[str, Dict[str, Union[str, bool]]],
 ) -> Dict[str, Dict[str, Union[Callable, bool]]]:
@@ -86,6 +115,7 @@ def get_matcher_zoo(
         A dictionary with the matcher configurations, where the configuration is
             a function or a function instead of a string.
     """
+    validate_matcher_zoo(matcher_zoo)
     matcher_zoo_restored = {}
     for k, v in matcher_zoo.items():
         matcher_zoo_restored[k] = parse_match_config(v)

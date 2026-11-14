@@ -78,12 +78,15 @@ class ImageMatchingApp:
         # final step
         self.init_interface()
 
+    def enabled_matcher_keys(self):
+        return [k for k, v in self.cfg["matcher_zoo"].items() if v.get("enable", True)]
+
     def init_matcher_dropdown(self):
-        algos = []
-        for k, v in self.cfg["matcher_zoo"].items():
-            if v.get("enable", True):
-                algos.append(k)
-        return algos
+        zoo = self.cfg["matcher_zoo"]
+        return sorted(
+            ((zoo[k]["info"]["name"], k) for k in self.enabled_matcher_keys()),
+            key=lambda choice: choice[0].lower(),
+        )
 
     def init_interface(self):
         with gr.Blocks() as self.app:
@@ -443,7 +446,7 @@ class ImageMatchingApp:
                 gr.Examples(
                     examples=gen_hardmatch_examples(
                         self.examples_manifest,
-                        self.init_matcher_dropdown(),
+                        self.enabled_matcher_keys(),
                         self.hardmatch_cache,
                     ),
                     inputs=inputs,
