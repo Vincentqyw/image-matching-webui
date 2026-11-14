@@ -17,6 +17,8 @@
 # See https://github.com/pre-commit/pre-commit
 
 ci:
+  # uv-lock needs network + the uv cache; run it locally only.
+  skip: [uv-lock]
   autoupdate_commit_msg: "chore: update pre-commit hooks"
   autofix_commit_msg: "style: pre-commit fixes"
   autoupdate_schedule: quarterly
