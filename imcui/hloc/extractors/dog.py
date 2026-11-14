@@ -35,12 +35,21 @@ class DoG(BaseModel):
     max_batch_size = 1024
 
     def _init(self, conf):
-        if conf["descriptor"] == "sosnet":
-            self.describe = kornia.feature.SOSNet(pretrained=True)
-        elif conf["descriptor"] == "hardnet":
-            self.describe = kornia.feature.HardNet(pretrained=True)
-        elif conf["descriptor"] not in ["sift", "rootsift"]:
-            raise ValueError(f'Unknown descriptor: {conf["descriptor"]}')
+        descriptor = conf["descriptor"]
+        if descriptor in ("sosnet", "hardnet"):
+            cache_name = (
+                "sosnet_32x32_liberty.pth"
+                if descriptor == "sosnet"
+                else "checkpoint_liberty_with_aug.pth"
+            )
+            self._download_torch_checkpoint(f"dog/{cache_name}", cache_name)
+            self.describe = (
+                kornia.feature.SOSNet(pretrained=True)
+                if descriptor == "sosnet"
+                else kornia.feature.HardNet(pretrained=True)
+            )
+        elif descriptor not in ["sift", "rootsift"]:
+            raise ValueError(f"Unknown descriptor: {descriptor}")
 
         self.sift = None  # lazily instantiated on the first image
         self.dummy_param = torch.nn.Parameter(torch.empty(0))

@@ -3,7 +3,6 @@ from pathlib import Path
 
 import torch
 import torchvision.transforms as tfm
-from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
 from .. import logger
@@ -40,7 +39,7 @@ class SE2LoFTR(BaseModel):
         cfg = lower_config(_rot8_cfg)["loftr"]
 
         self.net = LoFTR(cfg)
-        weights_path = hf_hub_download(
+        weights_path = self._download_model(
             repo_id="vismatch/se2loftr",
             filename="se2loftr_rot8.safetensors",
         )

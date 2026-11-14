@@ -31,6 +31,10 @@ class Rdd(BaseModel):
         config["top_k"] = conf["max_keypoints"]
         config["detection_threshold"] = conf["keypoint_threshold"]
         config["device"] = DEVICE
+        # RDD's ResNet50 backbone requests torchvision's ImageNet weights.
+        self._download_torch_checkpoint(
+            "rdd/resnet50-0676ba61.pth", "resnet50-0676ba61.pth"
+        )
         self.net = build_rdd(config=config, weights=model_path)
         self.net.eval()
         logger.info("Loading RDD model done!")

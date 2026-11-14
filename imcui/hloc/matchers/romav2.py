@@ -17,11 +17,13 @@ class RoMaV2Matcher(BaseModel):
     default_conf = {
         "max_keypoints": 2048,
         "match_threshold": 0.2,
-        "weights_url": "https://github.com/Parskatt/RoMaV2/releases/download/weights/romav2.pt",
     }
     required_inputs = ["image0", "image1"]
 
     def _init(self, conf):
+        # RoMaV2's constructor unconditionally requests this upstream file.
+        self._download_torch_checkpoint("romav2/romav2.0.1.pt", "romav2.0.1.pt")
+
         # Temporarily override global device for proper initialization
         original_device = romav2_device.device
         target_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -29,10 +31,8 @@ class RoMaV2Matcher(BaseModel):
         try:
             cfg = RoMaV2.Cfg(compile=False)
             self.net = RoMaV2(cfg=cfg)
-            weights = torch.hub.load_state_dict_from_url(
-                conf["weights_url"], map_location="cpu"
-            )
-            self.net.load_state_dict(weights)
+            model_path = self._download_model(filename="romav2/romav2.pt")
+            self.net.load_state_dict(torch.load(model_path, map_location="cpu"))
         finally:
             romav2_device.device = original_device
 

@@ -67,6 +67,13 @@ class LoMa(BaseModel):
         )
         loma_cfg = LOMA_CONFIGS[model_name]
         cfg = loma_cfg()
+        weights_file = Path(cfg.weights_url).name
+        self._download_torch_checkpoint(f"loma/{weights_file}", weights_file)
+        self._download_torch_checkpoint("loma/dad.pth", "dad.pth")
+        if cfg.descriptor == "dedode_g":
+            self._download_torch_checkpoint(
+                "roma/dinov2_vitl14_pretrain.pth", "dinov2_vitl14_pretrain.pth"
+            )
         if not torch.cuda.is_available():
             cfg = dataclasses.replace(cfg, mp=False)
         logger.info(f"Loading LoMa model ({model_name})")

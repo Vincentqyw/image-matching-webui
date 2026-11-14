@@ -144,7 +144,7 @@ class ImageMatchingApp:
                                         maximum=1,
                                         step=0.001,
                                         label="Keypoint threshold",
-                                        value=0.015,
+                                        value=0.0,
                                     )
                                     min_covisibility = gr.Slider(
                                         minimum=0.0,

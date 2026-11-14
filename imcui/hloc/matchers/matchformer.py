@@ -3,7 +3,6 @@ from pathlib import Path
 
 import torch
 import torchvision.transforms as tfm
-from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
 from .. import logger
@@ -68,7 +67,7 @@ class MatchFormer(BaseModel):
             return cfg
 
         self.net = MF(config=lower_config(config)["matchformer"])
-        weights_path = hf_hub_download(
+        weights_path = self._download_model(
             repo_id="vismatch/matchformer",
             filename="matchformer_outdoor-large-LA.safetensors",
         )

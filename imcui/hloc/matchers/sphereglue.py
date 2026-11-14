@@ -87,21 +87,13 @@ class SphereGlue(BaseModel):
 
         self.net = SG(sg_config)
 
-        # ── load pretrained weights from HuggingFace ──────────────
-        try:
-            model_path = self._download_model(
-                repo_id=MODEL_REPO_ID,
-                filename="{}/{}".format(Path(__file__).stem, conf["model_name"]),
-            )
-            ckpt = torch.load(model_path, map_location="cpu")
-            self.net.load_state_dict(ckpt["MODEL_STATE_DICT"])
-            logger.info("Loaded SphereGlue weights from HuggingFace.")
-        except Exception as exc:
-            logger.warning(
-                "Could not load SphereGlue weights from HuggingFace: %s", exc
-            )
-            logger.warning("SphereGlue will use *random* weights!")
-
+        model_path = self._download_model(
+            repo_id=MODEL_REPO_ID,
+            filename="{}/{}".format(Path(__file__).stem, conf["model_name"]),
+        )
+        ckpt = torch.load(model_path, map_location="cpu")
+        self.net.load_state_dict(ckpt["MODEL_STATE_DICT"])
+        logger.info("Loaded SphereGlue weights from HuggingFace.")
         self.net.eval()
         logger.info("Load SphereGlue model done.")
 

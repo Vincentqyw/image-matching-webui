@@ -34,6 +34,9 @@ class GlueStick(BaseModel):
             repo_id=MODEL_REPO_ID,
             filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
         )
+        self._download_torch_checkpoint(
+            "gluestick/superpoint_v1.pth", "superpoint_v1.pth"
+        )
         logger.info("Loading GlueStick model...")
 
         gluestick_conf = {

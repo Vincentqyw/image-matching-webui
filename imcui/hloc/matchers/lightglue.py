@@ -1,9 +1,7 @@
-import os
 import sys
-import tempfile
 from pathlib import Path
 
-from .. import MODEL_REPO_ID, logger
+from .. import logger
 from ..utils.base_model import BaseModel
 
 lightglue_path = Path(__file__).parent / "../../third_party/LightGlue"
@@ -36,19 +34,25 @@ class LightGlue(BaseModel):
 
     def _init(self, conf):
         logger.info("Loading lightglue model, {}".format(conf["model_name"]))
-        try:
-            model_path = self._download_model(
-                repo_id=MODEL_REPO_ID,
-                filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
-            )
-        except Exception:
-            logger.info(
-                "Model not found on HuggingFace, will download from official release."
-            )
-            model_path = os.path.join(tempfile.gettempdir(), self.conf["model_name"])
-        conf["weights"] = str(model_path)
-        conf["filter_threshold"] = conf["match_threshold"]
-        self.net = LG(**conf)
+        feature = conf["features"]
+        assert feature in LG.features, feature
+        weights_name = conf["model_name"].removesuffix(".pth")
+        if weights_name != LG.features[feature]["weights"]:
+            # Upstream derives the cache filename from the features entry.
+            # Register an alias for checkpoints that are not the default for
+            # this feature (e.g. minima_lightglue).
+            LG.features[weights_name] = {
+                **LG.features[feature],
+                "weights": weights_name,
+            }
+            feature = weights_name
+        cache_name = f"{weights_name}_{LG.version.replace('.', '-')}.pth"
+        self._download_torch_checkpoint(
+            "{}/{}".format(Path(__file__).stem, conf["model_name"]), cache_name
+        )
+        net_conf = {k: v for k, v in conf.items() if k != "features"}
+        net_conf["filter_threshold"] = net_conf["match_threshold"]
+        self.net = LG(features=feature, **net_conf)
         logger.info("Load lightglue model done.")
 
     def _forward(self, data):

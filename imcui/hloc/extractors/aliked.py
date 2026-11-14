@@ -20,6 +20,8 @@ class ALIKED(BaseModel):
 
     def _init(self, conf):
         conf.pop("name")
+        cache_name = f"{conf['model_name']}.pth"
+        self._download_torch_checkpoint(f"aliked/{cache_name}", cache_name)
         self.model = ALIKED_(**conf)
 
     def _forward(self, data):

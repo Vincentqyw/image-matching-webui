@@ -37,7 +37,7 @@ ROOT = Path(__file__).parents[1]
 # some default values
 DEFAULT_SETTING_THRESHOLD = 0.1
 DEFAULT_SETTING_MAX_FEATURES = 2000
-DEFAULT_DEFAULT_KEYPOINT_THRESHOLD = 0.01
+DEFAULT_DEFAULT_KEYPOINT_THRESHOLD = 0.00
 DEFAULT_ENABLE_RANSAC = True
 DEFAULT_RANSAC_METHOD = "CV2_USAC_MAGSAC"
 DEFAULT_RANSAC_REPROJ_THRESHOLD = 8
@@ -176,7 +176,8 @@ def gen_examples(data_root: Path):
         "sift",
         "rord",
         "sift+lightglue",
-        # "GIM(dkm)",
+        "FlexGlue (SuperPoint)",
+        "FlexGlue (ALIKED)",
     ]
     data_root = Path(data_root)
     if not Path(data_root).exists():

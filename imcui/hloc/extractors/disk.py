@@ -16,6 +16,9 @@ class DISK(BaseModel):
     required_inputs = ["image"]
 
     def _init(self, conf):
+        assert conf["weights"] in ("depth", "epipolar"), conf["weights"]
+        cache_name = f"{conf['weights']}-save.pth"
+        self._download_torch_checkpoint(f"disk/{cache_name}", cache_name)
         self.model = kornia.feature.DISK.from_pretrained(conf["weights"])
         logger.info("Load DISK model done.")
 

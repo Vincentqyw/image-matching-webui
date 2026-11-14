@@ -65,6 +65,7 @@ class Dad(BaseModel):
         self.matcher.upsample_res = self.conf["upsample_res"]
         self.matcher.symmetric = False
 
+        self._download_torch_checkpoint("loma/dad.pth", "dad.pth")
         self.detector = dad_detector.load_DaD()
         logger.info("Load Dad + Roma model done.")
 

@@ -1,9 +1,16 @@
+import inspect
+import os
+import shutil
 import sys
 from abc import ABCMeta, abstractmethod
-from torch import nn
 from copy import copy
-import inspect
+from pathlib import Path
+
+import torch
 from huggingface_hub import hf_hub_download
+from torch import nn
+
+from .. import MODEL_REPO_ID
 
 
 class BaseModel(nn.Module, metaclass=ABCMeta):
@@ -34,13 +41,28 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
         """To be implemented by the child class."""
         raise NotImplementedError
 
-    def _download_model(self, repo_id=None, filename=None, **kwargs):
-        """Download model from hf hub and return the path."""
+    def _download_model(self, repo_id=None, filename=None):
+        """Download a model from HuggingFace and return its local path."""
         return hf_hub_download(
             repo_type="model",
-            repo_id=repo_id,
+            repo_id=repo_id or MODEL_REPO_ID,
             filename=filename,
         )
+
+    def _download_torch_checkpoint(self, filename, cache_name):
+        """Seed torch.hub's checkpoint cache from HuggingFace.
+
+        Some third-party models call torch.hub.load_state_dict_from_url with a
+        fixed upstream URL. Caching the HuggingFace copy under the same name
+        makes that call resolve locally, without patching third_party code.
+        """
+        dst = Path(torch.hub.get_dir()) / "checkpoints" / cache_name
+        if not dst.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            tmp = dst.with_name(f".{dst.name}.{os.getpid()}.tmp")
+            shutil.copyfile(self._download_model(filename=filename), tmp)
+            tmp.replace(dst)
+        return dst
 
 
 def dynamic_load(root, model):

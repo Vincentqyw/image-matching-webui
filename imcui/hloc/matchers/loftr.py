@@ -4,9 +4,16 @@ import torch
 from kornia.feature import LoFTR as LoFTR_
 from kornia.feature.loftr.loftr import default_cfg
 from pathlib import Path
-from .. import logger, MODEL_REPO_ID
 
+from .. import logger
 from ..utils.base_model import BaseModel
+
+# kornia's pretrained names mapped to the filenames it requests from torch.hub.
+KORNIA_WEIGHTS = {
+    "outdoor": "loftr_outdoor.ckpt",
+    "indoor": "loftr_indoor.ckpt",
+    "indoor_new": "loftr_indoor_ds_new.ckpt",
+}
 
 
 class LoFTR(BaseModel):
@@ -27,14 +34,16 @@ class LoFTR(BaseModel):
         if model_name is not None and "minima" in model_name:
             cfg["coarse"]["temp_bug_fix"] = True
             model_path = self._download_model(
-                repo_id=MODEL_REPO_ID,
-                filename="{}/{}".format(Path(__file__).stem, self.conf["model_name"]),
+                filename="{}/{}".format(Path(__file__).stem, conf["model_name"])
             )
             state_dict = torch.load(model_path, map_location="cpu")["state_dict"]
-            self.net = LoFTR_(pretrained=conf["weights"], config=cfg)
+            self.net = LoFTR_(pretrained=None, config=cfg)
             self.net.load_state_dict(state_dict)
             logger.info(f"ReLoaded LoFTR(minima) with weights {conf['model_name']}")
         else:
+            assert conf["weights"] in KORNIA_WEIGHTS, conf["weights"]
+            cache_name = KORNIA_WEIGHTS[conf["weights"]]
+            self._download_torch_checkpoint(f"loftr/{cache_name}", cache_name)
             self.net = LoFTR_(pretrained=conf["weights"], config=cfg)
             logger.info(f"Loaded LoFTR with weights {conf['weights']}")
 

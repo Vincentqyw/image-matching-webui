@@ -1,6 +1,3 @@
-import subprocess
-from pathlib import Path
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -8,7 +5,6 @@ import torch.nn.functional as F
 import torchvision.models as models
 from scipy.io import loadmat
 
-from .. import logger
 from ..utils.base_model import BaseModel
 
 EPS = 1e-6
@@ -42,24 +38,18 @@ class NetVLAD(BaseModel):
     default_conf = {"model_name": "VGG16-NetVLAD-Pitts30K", "whiten": True}
     required_inputs = ["image"]
 
-    # Models exported using
+    # MATLAB checkpoints, exported using
     # https://github.com/uzh-rpg/netvlad_tf_open/blob/master/matlab/net_class2struct.m.
-    dir_models = {
-        "VGG16-NetVLAD-Pitts30K": "https://cvg-data.inf.ethz.ch/hloc/netvlad/Pitts30K_struct.mat",
-        "VGG16-NetVLAD-TokyoTM": "https://cvg-data.inf.ethz.ch/hloc/netvlad/TokyoTM_struct.mat",
+    weight_files = {
+        "VGG16-NetVLAD-Pitts30K": "Pitts30K_struct.mat",
+        "VGG16-NetVLAD-TokyoTM": "TokyoTM_struct.mat",
     }
 
     def _init(self, conf):
-        assert conf["model_name"] in self.dir_models.keys()
-
-        # Download the checkpoint.
-        checkpoint = Path(torch.hub.get_dir(), "netvlad", conf["model_name"] + ".mat")
-        if not checkpoint.exists():
-            checkpoint.parent.mkdir(exist_ok=True, parents=True)
-            link = self.dir_models[conf["model_name"]]
-            cmd = ["wget", "--quiet", link, "-O", str(checkpoint)]
-            logger.info(f"Downloading the NetVLAD model with `{cmd}`.")
-            subprocess.run(cmd, check=True)
+        assert conf["model_name"] in self.weight_files, conf["model_name"]
+        checkpoint = self._download_model(
+            filename=f"netvlad/{self.weight_files[conf['model_name']]}"
+        )
 
         # Create the network.
         # Remove classification head.

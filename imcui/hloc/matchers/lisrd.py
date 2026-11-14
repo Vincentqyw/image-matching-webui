@@ -16,7 +16,7 @@ import torch
 import torch.nn.functional as F
 from kornia.color import rgb_to_grayscale
 
-from .. import logger
+from .. import MODEL_REPO_ID, logger
 from ..extractors.aliked import ALIKED as ALIKEDExtractor
 from ..extractors.sift import SIFT as SIFTExtractor
 from ..extractors.superpoint import SuperPoint as SuperPointExtractor
@@ -27,8 +27,6 @@ sys.path.append(str(lisrd_path))
 
 from lisrd.models import get_model as get_lisrd_model  # noqa: E402
 from lisrd.models.base_model import Mode  # noqa: E402
-
-MODEL_REPO_ID = "Realcat/imcui_checkpoints"
 
 LISRD_CONFIG: dict = {
     "name": "lisrd",

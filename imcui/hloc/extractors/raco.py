@@ -30,6 +30,7 @@ class RaCo(BaseModel):
 
     def _init(self, conf):
         raco_conf = {
+            "weights": self._download_model(filename="raco/raco.pth"),
             "max_num_keypoints": conf["max_num_keypoints"],
             "nms_radius": conf["nms_radius"],
             "subpixel_sampling": conf["subpixel_sampling"],
@@ -46,6 +47,8 @@ class RaCo(BaseModel):
             "detection_threshold": conf["aliked_detection_threshold"],
             "nms_radius": 2,
         }
+        cache_name = f"{aliked_conf['model_name']}.pth"
+        self._download_torch_checkpoint(f"aliked/{cache_name}", cache_name)
         self.aliked = ALIKED_(**aliked_conf)
 
     def _forward(self, data):
