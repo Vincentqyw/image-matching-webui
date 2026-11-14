@@ -1,5 +1,13 @@
 import numpy as np
 import pycolmap
+import torch
+
+
+def scale_keypoints(points: torch.Tensor, scale) -> torch.Tensor:
+    """Rescale (x, y) coordinates from a resized frame to the original frame."""
+    assert points.shape[-1] == len(scale), (points.shape, scale)
+    scale = torch.as_tensor(scale, dtype=points.dtype, device=points.device)
+    return points * scale
 
 
 def to_homogeneous(p):

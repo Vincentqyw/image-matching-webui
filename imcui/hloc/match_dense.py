@@ -18,6 +18,7 @@ from . import logger, matchers
 from .extract_features import read_image, resize_image
 from .match_features import find_unique_new_pairs
 from .utils.base_model import dynamic_load
+from .utils.geometry import scale_keypoints
 from .utils.io import list_h5_names
 from .utils.parsers import names_to_pair, parse_retrieval
 
@@ -118,12 +119,6 @@ def kpids_to_matches0(kpt_ids0, kpt_ids1, scores):
     # Remove n-to-1 matches
     matches, scores = get_unique_matches(matches, scores)
     return matches_to_matches0(matches, scores)
-
-
-def scale_keypoints(kpts, scale):
-    if np.any(scale != 1.0):
-        kpts *= kpts.new_tensor(scale)
-    return kpts
 
 
 class ImagePairDataset(torch.utils.data.Dataset):
@@ -499,12 +494,6 @@ def match_and_assign(
         assign_matches(pairs, match_path, cpdict, max_error=conf["max_error"])
 
 
-def scale_lines(lines, scale):
-    if np.any(scale != 1.0):
-        lines *= lines.new_tensor(scale)
-    return lines
-
-
 def match(model, path_0, path_1, conf):
     default_conf = {
         "grayscale": True,
@@ -701,13 +690,13 @@ def match_images(model, image_0, image_1, conf, device="cpu"):
 
         lines0_raw = torch.from_numpy(lines0_raw.copy())
         lines1_raw = torch.from_numpy(lines1_raw.copy())
-        lines0_raw = scale_lines(lines0_raw + 0.5, s0) - 0.5
-        lines1_raw = scale_lines(lines1_raw + 0.5, s1) - 0.5
+        lines0_raw = scale_keypoints(lines0_raw + 0.5, s0) - 0.5
+        lines1_raw = scale_keypoints(lines1_raw + 0.5, s1) - 0.5
 
         lines0 = torch.from_numpy(lines0.copy())
         lines1 = torch.from_numpy(lines1.copy())
-        lines0 = scale_lines(lines0 + 0.5, s0) - 0.5
-        lines1 = scale_lines(lines1 + 0.5, s1) - 0.5
+        lines0 = scale_keypoints(lines0 + 0.5, s0) - 0.5
+        lines1 = scale_keypoints(lines1 + 0.5, s1) - 0.5
 
         ret = {
             "image0_orig": image_0,

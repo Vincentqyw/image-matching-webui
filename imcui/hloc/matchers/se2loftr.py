@@ -8,6 +8,7 @@ from safetensors.torch import load_file
 
 from .. import logger
 from ..utils.base_model import BaseModel
+from ..utils.geometry import scale_keypoints
 
 se2loftr_path = Path(__file__).parent / "../../third_party/SE2LoFTR"
 sys.path.append(str(se2loftr_path))
@@ -71,10 +72,8 @@ class SE2LoFTR(BaseModel):
         mconf = batch.get("mconf", torch.ones(len(mkpts0), device=mkpts0.device))
 
         # Rescale back to original image coordinates
-        mkpts0[:, 0] *= w0 / W0
-        mkpts0[:, 1] *= h0 / H0
-        mkpts1[:, 0] *= w1 / W1
-        mkpts1[:, 1] *= h1 / H1
+        mkpts0 = scale_keypoints(mkpts0 + 0.5, [w0 / W0, h0 / H0]) - 0.5
+        mkpts1 = scale_keypoints(mkpts1 + 0.5, [w1 / W1, h1 / H1]) - 0.5
 
         return {
             "keypoints0": mkpts0,

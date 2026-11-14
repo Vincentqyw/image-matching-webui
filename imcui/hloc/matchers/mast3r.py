@@ -53,15 +53,15 @@ class Mast3r(Duster):
         pairs = make_pairs(
             images, scene_graph="complete", prefilter=None, symmetrize=True
         )
-        output = inference(pairs, self.net, DEVICE, batch_size=1)
+        output = inference(pairs, self.net, DEVICE, batch_size=1, verbose=False)
 
         # at this stage, you have the raw dust3r predictions
         _, pred1 = output["view1"], output["pred1"]
         _, pred2 = output["view2"], output["pred2"]
 
         desc1, desc2 = (
-            pred1["desc"][1].squeeze(0).detach(),
-            pred2["desc"][1].squeeze(0).detach(),
+            pred1["desc"][0].squeeze(0).detach(),
+            pred2["desc"][0].squeeze(0).detach(),
         )
 
         # find 2D-2D matches between the two images

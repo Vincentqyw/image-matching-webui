@@ -9,6 +9,7 @@ import numpy as np
 import torch
 
 from ..hloc import extract_features, logger, match_dense, match_features
+from ..hloc.utils.geometry import scale_keypoints
 from ..hloc.utils.viz import add_text, plot_keypoints
 from ..ui.utils import filter_matches, get_feature_model, get_model
 from ..ui.viz import display_matches, fig2im, plot_images
@@ -162,8 +163,8 @@ class ImageMatchingAPI(torch.nn.Module):
         # back to origin scale
         s0 = pred["original_size"] / pred["size"]
         pred["keypoints_orig"] = (
-            match_features.scale_keypoints(pred["keypoints"] + 0.5, s0) - 0.5
-        )
+            scale_keypoints(torch.from_numpy(pred["keypoints"] + 0.5), s0) - 0.5
+        ).numpy()
         # TODO: rotate back
         binarize = kwargs.get("binarize", False)
         if binarize:

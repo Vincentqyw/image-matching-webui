@@ -48,8 +48,8 @@ class XFeatDense(BaseModel):
         # we use results from one batch
         matches = matches[0]
         pred = {
-            "keypoints0": out0["keypoints"].squeeze(),
-            "keypoints1": out1["keypoints"].squeeze(),
+            "keypoints0": out0["keypoints"].squeeze(0),
+            "keypoints1": out1["keypoints"].squeeze(0),
             "mkeypoints0": matches[:, :2],
             "mkeypoints1": matches[:, 2:],
             "mconf": torch.ones_like(matches[:, 0]),

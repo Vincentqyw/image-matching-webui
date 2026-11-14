@@ -7,12 +7,12 @@ from threading import Thread
 from typing import Dict, List, Optional, Tuple, Union
 
 import h5py
-import numpy as np
 import torch
 from tqdm import tqdm
 
 from . import logger, matchers
 from .utils.base_model import dynamic_load
+from .utils.geometry import scale_keypoints
 from .utils.parsers import names_to_pair, names_to_pair_old, parse_retrieval
 from .configs import confs_dict
 
@@ -184,21 +184,6 @@ def match_from_paths(
         writer_queue.put((pair, pred))
     writer_queue.join()
     logger.info("Finished exporting matches.")
-
-
-def scale_keypoints(kpts, scale):
-    if (
-        isinstance(scale, (list, tuple, np.ndarray))
-        and len(scale) == 2
-        and np.any(scale != np.array([1.0, 1.0]))
-    ):
-        if isinstance(kpts, torch.Tensor):
-            kpts[:, 0] *= scale[0]  # scale x-dimension
-            kpts[:, 1] *= scale[1]  # scale y-dimension
-        elif isinstance(kpts, np.ndarray):
-            kpts[:, 0] *= scale[0]  # scale x-dimension
-            kpts[:, 1] *= scale[1]  # scale y-dimension
-    return kpts
 
 
 @torch.no_grad()
