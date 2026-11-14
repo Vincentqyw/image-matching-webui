@@ -223,14 +223,6 @@ def match_images(model, feat0, feat1):
         "keypoints1": feat1["keypoints"],
         "scores1": feat1["scores"][0].unsqueeze(0),
         "descriptors1": desc1,
-        # Original images and keypoint scaling, for matchers that re-describe
-        # the images themselves (e.g. FlexGlue).
-        "image0_orig": feat0["image_orig"],
-        "image1_orig": feat1["image_orig"],
-        "size0": feat0["size"],
-        "size1": feat1["size"],
-        "original_size0": feat0["original_size"],
-        "original_size1": feat1["original_size"],
     }
     if "scales" in feat0:
         input_dict = {**input_dict, "scales0": feat0["scales"]}

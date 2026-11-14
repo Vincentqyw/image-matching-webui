@@ -106,3 +106,6 @@
 [submodule "imcui/third_party/SphereGlue"]
     path = imcui/third_party/SphereGlue
     url = https://github.com/agipro/SphereGlue.git
+[submodule "imcui/third_party/FlexGlue"]
+    path = imcui/third_party/FlexGlue
+    url = https://github.com/cvg/FlexGlue.git

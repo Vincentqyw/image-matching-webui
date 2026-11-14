@@ -1,18 +1,18 @@
-import cv2
-import numpy as np
-import onnxruntime as ort
+import sys
+from pathlib import Path
+
 import torch
 
 from .. import MODEL_REPO_ID, logger
 from ..utils.base_model import BaseModel
 
-# Sessions are shared across matcher-zoo entries, which only differ in the
-# keypoint extractor used.
-_sessions = {}
+sys.path.append(str(Path(__file__).parent / "../../third_party/FlexGlue"))
+
+from flexglue import FlexGlue as FlexGlueModel
 
 
 class FlexGlue(BaseModel):
-    """Sparse matcher: keypoints from any detector, matched with FlexGlue ONNX."""
+    """Sparse matcher: keypoints from any detector, matched by FlexGlue."""
 
     default_conf = {
         "match_threshold": 0.1,
@@ -20,73 +20,45 @@ class FlexGlue(BaseModel):
         "min_covisibility": 0.0,
     }
     required_inputs = [
-        "image0_orig",
-        "image1_orig",
+        "image0",
+        "image1",
         "keypoints0",
         "keypoints1",
-        "size0",
-        "size1",
-        "original_size0",
-        "original_size1",
     ]
 
     def _init(self, _conf):
-        providers = ["CPUExecutionProvider"]
-        matcher_name = "flexglue_matcher.onnx"
-        if "CUDAExecutionProvider" in ort.get_available_providers():
-            providers.insert(0, "CUDAExecutionProvider")
-            matcher_name = "flexglue_matcher_fp16.onnx"
-        logger.info(f"Loading FlexGlue ONNX models ({matcher_name})")
-        self.descriptor = self._session("flexglue_descriptor.onnx", providers)
-        self.matcher = self._session(matcher_name, providers)
+        logger.info("Loading FlexGlue model (PyTorch)")
+        weights = self._download_model(MODEL_REPO_ID, "flexglue/flexglue.pth")
+        self.net = FlexGlueModel(weights=str(weights))
         logger.info("Load FlexGlue model done.")
 
-    def _session(self, name, providers):
-        if name not in _sessions:
-            options = ort.SessionOptions()
-            options.log_severity_level = 3  # errors only
-            path = self._download_model(MODEL_REPO_ID, f"flexglue/{name}")
-            _sessions[name] = ort.InferenceSession(
-                str(path), sess_options=options, providers=providers
-            )
-        return _sessions[name]
-
-    def _describe(self, image):
-        assert image.dtype == np.uint8 and image.ndim == 3 and image.shape[2] == 3
-        _, _, height, width = self.descriptor.get_inputs()[0].shape
-        image = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
-        image = image.transpose(2, 0, 1)[None].astype(np.float32) / 255.0
-        return self.descriptor.run(None, {"image": image})[0]
-
     def _forward(self, data):
-        image0, image1 = data["image0_orig"], data["image1_orig"]
-        # Keypoints are in the preprocessed image frame; move them to the
-        # original frame FlexGlue expects (corner convention, center of the
-        # top-left pixel at (0.5, 0.5)).
-        kpts0 = (data["keypoints0"][0].cpu().numpy() + 0.5) * (
-            np.asarray(data["original_size0"]) / np.asarray(data["size0"])
-        )
-        kpts1 = (data["keypoints1"][0].cpu().numpy() + 0.5) * (
-            np.asarray(data["original_size1"]) / np.asarray(data["size1"])
-        )
-        if len(kpts0) == 0 or len(kpts1) == 0:
+        # FlexGlue's mutual nearest neighbours need keypoints on both sides.
+        if data["keypoints0"].shape[1] == 0 or data["keypoints1"].shape[1] == 0:
+            num = data["keypoints0"].shape[1]
             return {
-                "matches0": torch.full((1, len(kpts0)), -1, dtype=torch.long),
-                "matching_scores0": torch.zeros((1, len(kpts0))),
+                "matches0": torch.full((1, num), -1, dtype=torch.long),
+                "matching_scores0": torch.zeros((1, num)),
             }
-        feeds = {
-            "features0": self._describe(image0),
-            "features1": self._describe(image1),
-            "kpts0": kpts0[None].astype(np.float32),
-            "kpts1": kpts1[None].astype(np.float32),
-            "image_size0": np.array([image0.shape[1::-1]], dtype=np.float32),
-            "image_size1": np.array([image1.shape[1::-1]], dtype=np.float32),
-            "filter_threshold": np.array(self.conf["match_threshold"], np.float32),
-            "max_distance_px": np.array(self.conf["max_distance_px"], np.float32),
-            "min_covisibility": np.array(self.conf["min_covisibility"], np.float32),
-        }
-        matches0, mscores0, _ = self.matcher.run(None, feeds)
+        device = next(self.net.parameters()).device
+        # The extractor's own (normalized) preprocessed images: the keypoints
+        # are in that frame, and FlexGlue resizes to 512x512 regardless.
+        inputs = [
+            {
+                "image": data[f"image{i}"].to(device),
+                "keypoints": data[f"keypoints{i}"].to(device),
+            }
+            for i in (0, 1)
+        ]
+        pred = self.net.match(
+            *inputs,
+            sparse=True,
+            filter_threshold=self.conf["match_threshold"],
+            max_distance_px=self.conf["max_distance_px"],
+            min_covisibility=self.conf["min_covisibility"],
+            mp="float16" if device.type == "cuda" else None,
+        )
         return {
-            "matches0": torch.from_numpy(matches0),
-            "matching_scores0": torch.from_numpy(mscores0),
+            "matches0": pred["matches0"],
+            "matching_scores0": pred["matching_scores0"],
         }
