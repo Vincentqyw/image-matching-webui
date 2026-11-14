@@ -17,6 +17,13 @@ defaults:
   min_covisibility: 0.0
   setting_geometry: Homography
 
+# Display names in `Matching Model` follow one grammar:
+#   sparse pipeline:  <Feature> + <Matcher>[ (<Variant>)]
+#   standalone model: <Model>[ (<Variant>)]
+# Use one space around "+" (mutual NN is always spelled out as MNN), one
+# space before a "(Variant)", and keep each brand's own spelling (SuperPoint,
+# LightGlue, MASt3R, RIPE++). Names must be unique; keys stay unchanged.
+# Enforced by validate_matcher_zoo() and tests/test_examples.py.
 matcher_zoo:
   # example config
   Example:
@@ -31,7 +38,7 @@ matcher_zoo:
     # info
     info:
       # dispaly name in `Matching Model`
-      name: example(example)
+      name: Example
       # conference/journal/workshop Year
       source: "CVPR XXXX"
       # github link
@@ -50,7 +57,7 @@ matcher_zoo:
     skip_ci: true
     standalone: true
     info:
-      name: Dad(RoMa) #dispaly name
+      name: DAD (RoMa) #dispaly name
       source: "ARXIV 2025"
       paper: https://arxiv.org/abs/2503.07347
       github: https://github.com/Parskatt/dad
@@ -104,7 +111,7 @@ matcher_zoo:
     matcher: minima_loftr
     standalone: true
     info:
-      name: MINIMA(LoFTR) #dispaly name
+      name: MINIMA (LoFTR) #dispaly name
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
       github: https://github.com/LSXI7/MINIMA
@@ -114,7 +121,7 @@ matcher_zoo:
     skip_ci: true
     standalone: true
     info:
-      name: MINIMA(RoMa) #dispaly name
+      name: MINIMA (RoMa) #dispaly name
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
       github: https://github.com/LSXI7/MINIMA
@@ -125,7 +132,7 @@ matcher_zoo:
     feature: superpoint_max
     standalone: false
     info:
-      name: MINIMA(LightGlue) #dispaly name
+      name: SuperPoint + MINIMA (LightGlue) #dispaly name
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
       github: https://github.com/LSXI7/MINIMA
@@ -136,7 +143,7 @@ matcher_zoo:
     standalone: true
     skip_ci: true
     info:
-      name: MINIMA(ELoFTR) #dispaly name
+      name: MINIMA (EfficientLoFTR) #dispaly name
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
       github: https://github.com/LSXI7/MINIMA
@@ -147,7 +154,7 @@ matcher_zoo:
     standalone: true
     skip_ci: true
     info:
-      name: MINIMA(XoFTR) #dispaly name
+      name: MINIMA (XoFTR) #dispaly name
       source: "ARXIV 2024"
       paper: https://arxiv.org/abs/2412.19412
       github: https://github.com/LSXI7/MINIMA
@@ -170,7 +177,7 @@ matcher_zoo:
     standalone: true
     skip_ci: true
     info:
-      name: Mast3R #dispaly name
+      name: MASt3R #dispaly name
       source: "CVPR 2024"
       github: https://github.com/naver/mast3r
       paper: https://arxiv.org/abs/2406.09756
@@ -195,7 +202,7 @@ matcher_zoo:
     standalone: true
     enable: true
     info:
-      name: GIM(RoMa) #dispaly name
+      name: GIM (RoMa) #dispaly name
       source: "ICLR 2024"
       github: https://github.com/xuelunshen/gim
       paper: https://arxiv.org/abs/2402.11095
@@ -208,7 +215,7 @@ matcher_zoo:
     matcher: gim(dkm)
     standalone: true
     info:
-      name: GIM(DKM) #dispaly name
+      name: GIM (DKM) #dispaly name
       source: "ICLR 2024"
       github: https://github.com/xuelunshen/gim
       paper: https://arxiv.org/abs/2402.11095
@@ -243,7 +250,7 @@ matcher_zoo:
     skip_ci: true
     standalone: true
     info:
-      name: REDI-Match (outdoor) #dispaly name
+      name: REDI-Match (Outdoor) #dispaly name
       source: "ARXIV 2026"
       github: https://github.com/YinjiGe/REDI-Match
       paper: https://arxiv.org/abs/2606.24330
@@ -254,7 +261,7 @@ matcher_zoo:
     skip_ci: true
     standalone: true
     info:
-      name: REDI-Match (indoor) #dispaly name
+      name: REDI-Match (Indoor) #dispaly name
       source: "ARXIV 2026"
       github: https://github.com/YinjiGe/REDI-Match
       paper: https://arxiv.org/abs/2606.24330
@@ -287,7 +294,7 @@ matcher_zoo:
     matcher: eloftr
     standalone: true
     info:
-      name: Efficient LoFTR #dispaly name
+      name: EfficientLoFTR #dispaly name
       source: "CVPR 2024"
       github: https://github.com/zju3dv/efficientloftr
       paper: https://zju3dv.github.io/efficientloftr/files/EfficientLoFTR.pdf
@@ -352,7 +359,7 @@ matcher_zoo:
     matcher: aspanformer
     standalone: true
     info:
-      name: ASpanformer #dispaly name
+      name: ASpanFormer #dispaly name
       source: "ECCV 2022"
       github: https://github.com/Vincentqyw/ml-aspanformer
       paper: https://arxiv.org/abs/2208.14201
@@ -374,7 +381,7 @@ matcher_zoo:
     matcher: xfeat_lightglue
     standalone: true
     info:
-      name: xfeat+lightglue
+      name: XFeat + LightGlue
       source: "CVPR 2024"
       github: https://github.com/Vincentqyw/omniglue-onnx
       paper: https://arxiv.org/abs/2405.12979
@@ -385,7 +392,7 @@ matcher_zoo:
     feature: xfeat
     standalone: false
     info:
-      name: XFeat #dispaly name
+      name: XFeat + MNN #dispaly name
       source: "CVPR 2024"
       github: https://github.com/verlab/accelerated_features
       paper: https://arxiv.org/abs/2404.19174
@@ -395,7 +402,7 @@ matcher_zoo:
     matcher: xfeat_dense
     standalone: true
     info:
-      name: XFeat #dispaly name
+      name: XFeat (Dense) #dispaly name
       source: "CVPR 2024"
       github: https://github.com/verlab/accelerated_features
       paper: https://arxiv.org/abs/2404.19174
@@ -406,7 +413,7 @@ matcher_zoo:
     feature: liftfeat
     standalone: false
     info:
-      name: LiftFeat #dispaly name
+      name: LiftFeat + MNN #dispaly name
       source: "ICRA 2025"
       github: https://github.com/lyp-deeplearning/LiftFeat
       paper: https://arxiv.org/abs/2505.0342
@@ -417,7 +424,7 @@ matcher_zoo:
     feature: ripe
     standalone: false
     info:
-      name: RIPE #dispaly name
+      name: RIPE + MNN #dispaly name
       source: "ICCV 2025"
       github: https://github.com/fraunhoferhhi/RIPE
       paper: https://arxiv.org/abs/2507.04839
@@ -428,7 +435,7 @@ matcher_zoo:
     feature: ripepp
     standalone: false
     info:
-      name: RIPE++ #dispaly name
+      name: RIPE++ + MNN #dispaly name
       source: "ECCV 2026"
       github: https://github.com/fraunhoferhhi/RIPEpp
       paper: https://arxiv.org/abs/2608.19693
@@ -439,7 +446,7 @@ matcher_zoo:
     feature: rdd
     standalone: false
     info:
-      name: RDD(sparse) #dispaly name
+      name: RDD + MNN #dispaly name
       source: "CVPR 2025"
       github: https://github.com/xtcpete/rdd
       paper: https://arxiv.org/abs/2505.08013
@@ -449,7 +456,7 @@ matcher_zoo:
     matcher: rdd_dense
     standalone: true
     info:
-      name: RDD(dense) #dispaly name
+      name: RDD (Dense) #dispaly name
       source: "CVPR 2025"
       github: https://github.com/xtcpete/rdd
       paper: https://arxiv.org/abs/2505.08013
@@ -460,7 +467,7 @@ matcher_zoo:
     feature: dedode
     standalone: false
     info:
-      name: DeDoDe #dispaly name
+      name: DeDoDe + Dual-Softmax #dispaly name
       source: "3DV 2024"
       github: https://github.com/Parskatt/DeDoDe
       paper: https://arxiv.org/abs/2308.08479
@@ -471,7 +478,7 @@ matcher_zoo:
     feature: superpoint_max
     standalone: false
     info:
-      name: SuperGlue #dispaly name
+      name: SuperPoint + SuperGlue #dispaly name
       source: "CVPR 2020"
       github: https://github.com/magicleap/SuperGluePretrainedNetwork
       paper: https://arxiv.org/abs/1911.11763
@@ -482,7 +489,7 @@ matcher_zoo:
     feature: superpoint_max
     standalone: false
     info:
-      name: LightGlue #dispaly name
+      name: SuperPoint + LightGlue #dispaly name
       source: "ICCV 2023"
       github: https://github.com/cvg/LightGlue
       paper: https://arxiv.org/pdf/2306.13643
@@ -494,7 +501,7 @@ matcher_zoo:
     standalone: false
     skip_ci: true
     info:
-      name: SphereGlue #dispaly name
+      name: SuperPoint + SphereGlue #dispaly name
       source: "CVPRW 2023"
       github: https://github.com/vishalsharbidar/SphereGlue
       paper: https://openaccess.thecvf.com/content/CVPR2023W/IMW/papers/Gava_SphereGlue_Learning_Keypoint_Matching_on_High_Resolution_Spherical_Images_CVPRW_2023_paper.pdf
@@ -506,7 +513,7 @@ matcher_zoo:
     standalone: false
     skip_ci: true
     info:
-      name: SphereGlue #dispaly name
+      name: SIFT + SphereGlue #dispaly name
       source: "CVPRW 2023"
       github: https://github.com/vishalsharbidar/SphereGlue
       paper: https://openaccess.thecvf.com/content/CVPR2023W/IMW/papers/Gava_SphereGlue_Learning_Keypoint_Matching_on_High_Resolution_Spherical_Images_CVPRW_2023_paper.pdf
@@ -517,7 +524,7 @@ matcher_zoo:
     feature: disk
     standalone: false
     info:
-      name: DISK
+      name: DISK + MNN
       source: "NeurIPS 2020"
       github: https://github.com/cvlab-epfl/disk
       paper: https://arxiv.org/abs/2006.13566
@@ -528,7 +535,7 @@ matcher_zoo:
     feature: disk
     standalone: false
     info:
-      name: DISK
+      name: DISK + Dual-Softmax
       source: "NeurIPS 2020"
       github: https://github.com/cvlab-epfl/disk
       paper: https://arxiv.org/abs/2006.13566
@@ -539,7 +546,7 @@ matcher_zoo:
     feature: superpoint_max
     standalone: false
     info:
-      name: SuperPoint
+      name: SuperPoint + Dual-Softmax
       source: "CVPRW 2018"
       github: https://github.com/magicleap/SuperPointPretrainedNetwork
       paper: https://arxiv.org/abs/1712.07629
@@ -550,7 +557,7 @@ matcher_zoo:
     feature: sift
     standalone: false
     info:
-      name: LightGlue #dispaly name
+      name: SIFT + LightGlue #dispaly name
       source: "ICCV 2023"
       github: https://github.com/cvg/LightGlue
       paper: https://arxiv.org/pdf/2306.13643
@@ -561,7 +568,7 @@ matcher_zoo:
     feature: disk
     standalone: false
     info:
-      name: LightGlue
+      name: DISK + LightGlue
       source: "ICCV 2023"
       github: https://github.com/cvg/LightGlue
       paper: https://arxiv.org/pdf/2306.13643
@@ -572,7 +579,7 @@ matcher_zoo:
     feature: aliked-n16
     standalone: false
     info:
-      name: ALIKED
+      name: ALIKED + LightGlue
       source: "ICCV 2023"
       github: https://github.com/Shiaoming/ALIKED
       paper: https://arxiv.org/pdf/2304.03608.pdf
@@ -584,7 +591,7 @@ matcher_zoo:
     standalone: false
     skip_ci: true
     info:
-      name: FlexGlue (SuperPoint)
+      name: SuperPoint + FlexGlue
       source: "ARXIV 2026"
       github: https://github.com/cvg/FlexGlue
       paper: https://arxiv.org/abs/2610.32976
@@ -597,7 +604,7 @@ matcher_zoo:
     standalone: false
     skip_ci: true
     info:
-      name: FlexGlue (ALIKED)
+      name: ALIKED + FlexGlue
       source: "ARXIV 2026"
       github: https://github.com/cvg/FlexGlue
       paper: https://arxiv.org/abs/2610.32976
@@ -610,7 +617,7 @@ matcher_zoo:
     standalone: false
     skip_ci: true
     info:
-      name: FlexGlue (DISK)
+      name: DISK + FlexGlue
       source: "ARXIV 2026"
       github: https://github.com/cvg/FlexGlue
       paper: https://arxiv.org/abs/2610.32976
@@ -622,7 +629,7 @@ matcher_zoo:
     feature: raco
     standalone: false
     info:
-      name: RaCo
+      name: RaCo + LightGlue
       source: "3DV 2026"
       github: https://github.com/cvg/RaCo
       paper: https://arxiv.org/pdf/2602.15755
@@ -633,7 +640,7 @@ matcher_zoo:
     feature: superpoint_max
     standalone: false
     info:
-      name: SuperPoint #dispaly name
+      name: SuperPoint + MNN #dispaly name
       source: "CVPRW 2018"
       github: https://github.com/magicleap/SuperPointPretrainedNetwork
       paper: https://arxiv.org/abs/1712.07629
@@ -644,7 +651,7 @@ matcher_zoo:
     feature: sift
     standalone: false
     info:
-      name: SGMNet #dispaly name
+      name: SIFT + SGMNet #dispaly name
       source: "ICCV 2021"
       github: https://github.com/vdvchen/SGMNet
       paper: https://arxiv.org/abs/2108.08771
@@ -655,7 +662,7 @@ matcher_zoo:
     feature: sosnet
     standalone: false
     info:
-      name: SOSNet #dispaly name
+      name: SOSNet + MNN #dispaly name
       source: "CVPR 2019"
       github: https://github.com/scape-research/SOSNet
       paper: https://arxiv.org/abs/1904.05019
@@ -666,7 +673,7 @@ matcher_zoo:
     feature: hardnet
     standalone: false
     info:
-      name: HardNet #dispaly name
+      name: HardNet + MNN #dispaly name
       source: "NeurIPS 2017"
       github: https://github.com/DagnyT/hardnet
       paper: https://arxiv.org/abs/1705.10872
@@ -677,7 +684,7 @@ matcher_zoo:
     feature: d2net-ss
     standalone: false
     info:
-      name: D2Net #dispaly name
+      name: D2-Net + MNN #dispaly name
       source: "CVPR 2019"
       github: https://github.com/Vincentqyw/d2-net
       paper: https://arxiv.org/abs/1905.03561
@@ -688,7 +695,7 @@ matcher_zoo:
     feature: rord
     standalone: false
     info:
-      name: RoRD #dispaly name
+      name: RoRD + MNN #dispaly name
       source: "IROS 2021"
       github: https://github.com/UditSinghParihar/RoRD
       paper: https://arxiv.org/abs/2103.08573
@@ -699,7 +706,7 @@ matcher_zoo:
     feature: alike
     standalone: false
     info:
-      name: ALIKE #dispaly name
+      name: ALIKE + MNN #dispaly name
       source: "TMM 2022"
       github: https://github.com/Shiaoming/ALIKE
       paper: https://arxiv.org/abs/2112.02906
@@ -710,7 +717,7 @@ matcher_zoo:
     feature: lanet
     standalone: false
     info:
-      name: LANet #dispaly name
+      name: LANet + MNN #dispaly name
       source: "ACCV 2022"
       github: https://github.com/wangch-g/lanet
       paper: https://openaccess.thecvf.com/content/ACCV2022/papers/Wang_Rethinking_Low-level_Features_for_Interest_Point_Detection_and_Description_ACCV_2022_paper.pdf
@@ -721,7 +728,7 @@ matcher_zoo:
     feature: r2d2
     standalone: false
     info:
-      name: R2D2 #dispaly name
+      name: R2D2 + MNN #dispaly name
       source: "NeurIPS 2019"
       github: https://github.com/naver/r2d2
       paper: https://arxiv.org/abs/1906.06195
@@ -732,7 +739,7 @@ matcher_zoo:
     feature: darkfeat
     standalone: false
     info:
-      name: DarkFeat #dispaly name
+      name: DarkFeat + MNN #dispaly name
       source: "AAAI 2023"
       github: https://github.com/THU-LYJ-Lab/DarkFeat
       paper: null
@@ -743,7 +750,7 @@ matcher_zoo:
     feature: sift
     standalone: false
     info:
-      name: SIFT #dispaly name
+      name: SIFT + MNN #dispaly name
       source: "IJCV 2004"
       github: null
       paper: https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf
@@ -778,7 +785,7 @@ matcher_zoo:
     feature: sfd2
     standalone: false
     info:
-      name: SFD2+IMP #dispaly name
+      name: SFD2 + IMP #dispaly name
       source: "CVPR 2023"
       github: https://github.com/feixue94/imp-release
       paper: https://arxiv.org/pdf/2304.14837
@@ -791,7 +798,7 @@ matcher_zoo:
     feature: sfd2
     standalone: false
     info:
-      name: SFD2+MNN #dispaly name
+      name: SFD2 + MNN #dispaly name
       source: "CVPR 2023"
       github: https://github.com/feixue94/sfd2
       paper: https://arxiv.org/abs/2304.14845
@@ -803,7 +810,7 @@ matcher_zoo:
     standalone: true
     skip_ci: true
     info:
-      name: LISRD+SuperPoint
+      name: LISRD (SuperPoint)
       source: "ECCV 2020"
       github: https://github.com/rpautrat/LISRD
       paper: https://arxiv.org/abs/2007.08988
@@ -815,7 +822,7 @@ matcher_zoo:
     standalone: true
     skip_ci: true
     info:
-      name: LISRD+ALIKED
+      name: LISRD (ALIKED)
       source: "ECCV 2020"
       github: https://github.com/rpautrat/LISRD
       paper: https://arxiv.org/abs/2007.08988
@@ -827,7 +834,7 @@ matcher_zoo:
     standalone: true
     skip_ci: true
     info:
-      name: LISRD+SIFT
+      name: LISRD (SIFT)
       source: "ECCV 2020"
       github: https://github.com/rpautrat/LISRD
       paper: https://arxiv.org/abs/2007.08988
