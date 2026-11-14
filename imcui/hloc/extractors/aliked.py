@@ -20,6 +20,11 @@ class ALIKED(BaseModel):
 
     def _init(self, conf):
         conf.pop("name")
+        # The WebUI passes generic slider values; upstream ALIKED uses its own names.
+        conf["max_num_keypoints"] = conf.pop("max_keypoints", conf["max_num_keypoints"])
+        conf["detection_threshold"] = conf.pop(
+            "keypoint_threshold", conf["detection_threshold"]
+        )
         cache_name = f"{conf['model_name']}.pth"
         self._download_torch_checkpoint(f"aliked/{cache_name}", cache_name)
         self.model = ALIKED_(**conf)

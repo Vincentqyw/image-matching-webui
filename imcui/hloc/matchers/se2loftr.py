@@ -37,6 +37,7 @@ class SE2LoFTR(BaseModel):
 
     def _init(self, conf):
         cfg = lower_config(_rot8_cfg)["loftr"]
+        cfg["match_coarse"]["thr"] = conf["match_threshold"]
 
         self.net = LoFTR(cfg)
         weights_path = self._download_model(
@@ -51,6 +52,8 @@ class SE2LoFTR(BaseModel):
     def _forward(self, data):
         img0 = data["image0"]
         img1 = data["image1"]
+        assert img0.shape[0] == 1 and img1.shape[0] == 1
+        img0, img1 = img0[0], img1[0]
 
         _, h0, w0 = img0.shape
         _, h1, w1 = img1.shape
@@ -73,6 +76,9 @@ class SE2LoFTR(BaseModel):
         # Rescale back to original image coordinates
         mkpts0 = scale_keypoints(mkpts0 + 0.5, [w0 / W0, h0 / H0]) - 0.5
         mkpts1 = scale_keypoints(mkpts1 + 0.5, [w1 / W1, h1 / H1]) - 0.5
+        if self.conf["max_keypoints"] > 0 and len(mkpts0) > self.conf["max_keypoints"]:
+            idxs = mconf.topk(self.conf["max_keypoints"]).indices
+            mkpts0, mkpts1, mconf = mkpts0[idxs], mkpts1[idxs], mconf[idxs]
 
         return {
             "keypoints0": mkpts0,

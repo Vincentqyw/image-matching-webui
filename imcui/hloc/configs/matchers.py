@@ -680,6 +680,7 @@ confs = {
             "name": "rdd_dense",
             "model_name": "RDD-v2.pth",
             "max_keypoints": 2000,
+            "keypoint_threshold": 0.1,
             "match_threshold": 0.2,
         },
         "preprocessing": {

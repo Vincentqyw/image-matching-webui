@@ -29,7 +29,7 @@ from ..hloc import (
 )
 from ..hloc.utils.base_model import dynamic_load
 from .viz import display_keypoints, display_matches, fig2im, plot_images
-from .modelcache import ARCSizeAwareModelCache as ModelCache
+from .modelcache import ModelCache
 
 warnings.simplefilter("ignore")
 
@@ -881,7 +881,7 @@ def run_matching(
             the 512x512 resized images (FlexGlue). Defaults to 3.0.
         min_covisibility (float, optional): reject pairs below this covisibility
             score (FlexGlue). Defaults to 0.0.
-        use_cached_model (bool, optional): use cached model. Defaults to False.
+        use_cached_model (bool, optional): use cached model. Defaults to True.
 
     Returns:
         tuple:
@@ -912,6 +912,9 @@ def run_matching(
     # update match config
     match_conf["model"]["match_threshold"] = match_threshold
     match_conf["model"]["max_keypoints"] = extract_max_keypoints
+    # RDD dense uses this at init; other matchers don't declare it.
+    if "keypoint_threshold" in match_conf["model"]:
+        match_conf["model"]["keypoint_threshold"] = keypoint_threshold
     # FlexGlue-only filters; other matchers don't declare them.
     if "max_distance_px" in match_conf["model"]:
         match_conf["model"]["max_distance_px"] = max_distance_px

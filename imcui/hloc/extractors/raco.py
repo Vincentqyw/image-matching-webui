@@ -29,6 +29,8 @@ class RaCo(BaseModel):
     required_inputs = ["image"]
 
     def _init(self, conf):
+        # The WebUI passes the generic max_keypoints slider; RaCo uses its own name.
+        conf["max_num_keypoints"] = conf.pop("max_keypoints", conf["max_num_keypoints"])
         raco_conf = {
             "weights": self._download_model(filename="raco/raco.pth"),
             "max_num_keypoints": conf["max_num_keypoints"],

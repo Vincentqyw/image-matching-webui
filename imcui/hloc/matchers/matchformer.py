@@ -55,15 +55,12 @@ class MatchFormer(BaseModel):
         config.MATCHFORMER.RESOLUTION = (8, 2)
         config.MATCHFORMER.COARSE.D_MODEL = 256
         config.MATCHFORMER.COARSE.D_FFN = 256
+        config.MATCHFORMER.MATCH_COARSE.THR = conf["match_threshold"]
 
-        # Flatten config keys to lowercase for the model
+        # Flatten yacs config keys to lowercase for the model
         def lower_config(cfg):
-            if hasattr(cfg, "__dict__"):
-                return {
-                    k.lower(): lower_config(v) if hasattr(v, "__dict__") else v
-                    for k, v in cfg.__dict__.items()
-                    if not k.startswith("_")
-                }
+            if isinstance(cfg, dict):
+                return {k.lower(): lower_config(v) for k, v in cfg.items()}
             return cfg
 
         self.net = MF(config=lower_config(config)["matchformer"])
@@ -81,6 +78,8 @@ class MatchFormer(BaseModel):
     def _forward(self, data):
         img0 = data["image0"]
         img1 = data["image1"]
+        assert img0.shape[0] == 1 and img1.shape[0] == 1
+        img0, img1 = img0[0], img1[0]
 
         _, h0, w0 = img0.shape
         _, h1, w1 = img1.shape
@@ -103,6 +102,9 @@ class MatchFormer(BaseModel):
 
         mkpts0 = scale_keypoints(mkpts0 + 0.5, [w0 / W0, h0 / H0]) - 0.5
         mkpts1 = scale_keypoints(mkpts1 + 0.5, [w1 / W1, h1 / H1]) - 0.5
+        if self.conf["max_keypoints"] > 0 and len(mkpts0) > self.conf["max_keypoints"]:
+            idxs = mconf.topk(self.conf["max_keypoints"]).indices
+            mkpts0, mkpts1, mconf = mkpts0[idxs], mkpts1[idxs], mconf[idxs]
 
         return {
             "keypoints0": mkpts0,

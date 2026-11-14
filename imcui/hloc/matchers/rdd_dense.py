@@ -1,6 +1,5 @@
 import sys
 import yaml
-import torch
 from pathlib import Path
 from ..utils.base_model import BaseModel
 from .. import logger, MODEL_REPO_ID, DEVICE
@@ -44,14 +43,15 @@ class RddDense(BaseModel):
         logger.info("Loading RDD model done!")
 
     def _forward(self, data):
-        img0 = data["image0"]
-        img1 = data["image1"]
-        mkpts_0, mkpts_1, conf = self.net.match_dense(
-            img0, img1, thr=self.conf["match_threshold"]
+        # RDD_helper.match_dense hardcodes n_limit=30000; call the pieces so the
+        # Max features slider actually caps the keypoints used for matching.
+        out0 = self.net.RDD.extract_dense(
+            data["image0"], n_limit=self.conf["max_keypoints"]
+        )[0]
+        out1 = self.net.RDD.extract_dense(
+            data["image1"], n_limit=self.conf["max_keypoints"]
+        )[0]
+        mkpts_0, mkpts_1, mconf = self.net.dense_matcher(
+            out0, out1, thr=self.conf["match_threshold"], err_thr=self.net.RDD.stride
         )
-        pred = {
-            "keypoints0": torch.from_numpy(mkpts_0),
-            "keypoints1": torch.from_numpy(mkpts_1),
-            "mconf": torch.from_numpy(conf),
-        }
-        return pred
+        return {"keypoints0": mkpts_0, "keypoints1": mkpts_1, "mconf": mconf}
