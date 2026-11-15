@@ -31,19 +31,36 @@ from .utils import (
 )
 
 DESCRIPTION = """
-<div style="text-align: left;">
-  <h1 style="font-size: 2rem; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem;">
-    Image Matching WebUI
-  </h1>
+<div class="imcui-hero">
+  <h1>Image Matching WebUI</h1>
+  <p class="imcui-subtitle">
+    An interactive workbench for state-of-the-art local feature matching.
+  </p>
+  <p class="imcui-body">
+    Sparse and dense matchers with robust RANSAC verification, evaluated on the
+    curated HardMatch gallery.
+  </p>
+  <p class="imcui-body imcui-callout">
+    <strong>Latency:</strong> GPU inference is fast; image transfer, network
+    bandwidth, and browser rendering dominate. Run locally for maximum speed.
+  </p>
+  <p class="imcui-links">
+    <a href="https://github.com/Vincentqyw/image-matching-webui">Code</a>
+    <a href="https://pypi.org/project/imcui/" title="pip install imcui">Install</a>
+    <a href="https://huggingface.co/spaces/Realcat/image-matching-webui?duplicate=true">Duplicate this Space</a>
+    <a href="https://github.com/Vincentqyw/image-matching-webui/issues">Report a bug</a>
+  </p>
+  <p class="imcui-note">
+    Built by <a href="https://github.com/Vincentqyw">vincent qin</a>. GPU inference
+    supported by HuggingFace.
+  </p>
+  <p class="imcui-license">
+    <strong>Licensing:</strong> third-party algorithms retain their own licenses;
+    please review each
+    <a href="https://github.com/Vincentqyw/image-matching-webui/tree/main/imcui/third_party">project's terms</a>
+    before use.
+  </p>
 </div>
-
-This Space demonstrates [Image Matching WebUI](https://github.com/Vincentqyw/image-matching-webui) by vincent qin. Feel free to play with it, or duplicate to run image matching without a queue!
-<br/>
-🚀 **Now GPU-accelerated!** Thanks to HuggingFace's community grant, all algorithms run on GPU for fast, responsive inference.
-
-🔎 For more details about supported local features and matchers, please refer to https://github.com/Vincentqyw/image-matching-webui
-
-🐛 Your feedback is valuable to me. Please do not hesitate to report any bugs [here](https://github.com/Vincentqyw/image-matching-webui/issues).
 """
 
 CSS = """
@@ -54,6 +71,83 @@ CSS = """
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+.imcui-hero {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 4px 0 0;
+}
+.imcui-hero h1 {
+    align-self: flex-start;
+    margin: 0 0 8px;
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(120deg, #667eea, #764ba2 55%, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.imcui-subtitle {
+    margin: 0 0 12px;
+    font-size: 1rem;
+    color: var(--body-text-color-subdued);
+}
+.imcui-body {
+    margin: 0 0 14px;
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+.imcui-callout {
+    padding: 10px 14px;
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 8px 8px 0;
+    background: var(--background-fill-secondary);
+    font-size: 0.88rem;
+}
+.imcui-links {display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 10px}
+.imcui-links a {
+    padding: 5px 14px;
+    border: 1px solid var(--border-color-primary);
+    border-radius: 8px;
+    background: var(--background-fill-secondary);
+    color: var(--body-text-color) !important;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: border-color 0.15s, color 0.15s;
+}
+.imcui-links a:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent) !important;
+}
+.imcui-note {
+    margin: auto 0 0;
+    font-size: 0.8rem;
+    color: var(--body-text-color-subdued);
+}
+.imcui-license {
+    margin: 4px 0 0;
+    font-size: 0.75rem;
+    color: var(--body-text-color-subdued);
+}
+.imcui-header {align-items: stretch}
+#logo-img {
+    height: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+    background: radial-gradient(circle at 50% 45%, #1b2a3a 0%, #0a0f16 75%);
+}
+#logo-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+    .imcui-hero h1 {font-size: 1.8rem}
+}
 """
 
 
@@ -92,13 +186,13 @@ class ImageMatchingApp:
     def init_interface(self):
         with gr.Blocks() as self.app:
             with gr.Tab("Image Matching"):
-                with gr.Row():
-                    with gr.Column(scale=1):
+                with gr.Row(elem_classes="imcui-header"):
+                    with gr.Column(scale=1, min_width=380):
                         gr.Image(
                             str(Path(__file__).parent.parent / "assets/logo.webp"),
                             elem_id="logo-img",
                             show_label=False,
-                            buttons=["fullscreen"],
+                            buttons=[],
                         )
                     with gr.Column(scale=3):
                         gr.Markdown(DESCRIPTION)
