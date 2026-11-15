@@ -1,6 +1,5 @@
 import argparse
 from pathlib import Path
-from imcui.ui.app_class import ImageMatchingApp
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -26,6 +25,9 @@ if __name__ == "__main__":
         help="config file",
     )
     args = parser.parse_args()
+
+    from imcui.ui.app_class import ImageMatchingApp
+
     ImageMatchingApp(
         args.server_name,
         args.server_port,
