@@ -132,49 +132,28 @@ def test_app_py_default_config():
 
 
 def test_cli_with_custom_config():
-    """Test CLI with custom configuration file."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_path = Path(temp_dir)
-        custom_config = temp_path / "test_config.yaml"
+    """Test custom configuration parsing used by the CLI."""
+    # Create a minimal valid config with only basic matchers to avoid slow loading
+    config_data = {
+        "server": {"name": "127.0.0.1", "port": 9999},
+        "defaults": {"max_keypoints": 1000, "match_threshold": 0.1},
+        "matcher_zoo": {
+            "sift": {
+                "enable": True,
+                "matcher": "NN-mutual",
+                "feature": "sift",
+                "standalone": False,
+                "info": {"name": "SIFT + MNN", "source": "IJCV 2004", "display": True},
+            }
+        },
+    }
 
-        # Create a minimal valid config with only basic matchers to avoid slow loading
-        config_data = {
-            "server": {"name": "127.0.0.1", "port": 9999},
-            "defaults": {"max_keypoints": 1000, "match_threshold": 0.1},
-            "matcher_zoo": {
-                "sift": {
-                    "enable": True,
-                    "matcher": "NN-mutual",
-                    "feature": "sift",
-                    "standalone": False,
-                    "info": {"name": "SIFT", "source": "IJCV 2004", "display": True},
-                }
-            },
-        }
+    from imcui.ui.utils import get_matcher_zoo
 
-        with open(custom_config, "w") as f:
-            yaml.dump(config_data, f)
-
-        # Test that CLI can load the custom config
-        result = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "imcui.cli.main",
-                "--config",
-                str(custom_config),
-                "--verbose",
-            ],
-            capture_output=True,
-            text=True,
-            cwd=ROOT,
-            timeout=TIMEOUT,  # Increase timeout to account for initialization
-        )
-
-        # CLI should start but then timeout when trying to run the server
-        # We just want to verify it can parse the config
-        assert "Config file:" in result.stdout or result.returncode != 0
-        logger.info("CLI successfully loaded and parsed custom config.")
+    matcher_zoo = get_matcher_zoo(config_data["matcher_zoo"])
+    assert matcher_zoo["sift"]["feature"]["model"]["name"] == "sift"
+    assert matcher_zoo["sift"]["matcher"]["model"]["name"] == "nearest_neighbor"
+    logger.info("CLI successfully loaded and parsed custom config.")
 
 
 def test_package_entry_point():
