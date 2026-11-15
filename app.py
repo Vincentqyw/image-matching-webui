@@ -30,5 +30,4 @@ if __name__ == "__main__":
         args.server_name,
         args.server_port,
         config=args.config,
-        example_data_root=Path("imcui/datasets"),
     ).run()

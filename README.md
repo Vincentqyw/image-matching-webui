@@ -225,7 +225,7 @@ imcui --help
 | `--server-name` | `-s` | `0.0.0.0` | Hostname or IP address to bind the server to |
 | `--server-port` | `-p` | `7860` | Port number to run the server on |
 | `--config` | `-c` | Auto-detected | Path to custom configuration YAML file |
-| `--example-data-root` | `-d` | `imcui/datasets` | Root directory containing example datasets |
+| `--example-data-root` | `-d` | Auto-download to user cache | Root directory containing example datasets |
 | `--verbose` | `-v` | `False` | Enable verbose output for debugging |
 | `--version` | | | Show version information and exit |
 

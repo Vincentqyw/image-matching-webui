@@ -63,9 +63,6 @@ def examples_cache_root() -> Path:
 
 
 def classic_examples_root() -> Path:
-    package_data = Path(__file__).parents[1] / "datasets"
-    if (package_data / "sacre_coeur" / "mapping").is_dir():
-        return package_data
     return examples_cache_root() / "imcui_examples"
 
 

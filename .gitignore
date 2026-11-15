@@ -26,8 +26,6 @@ output.pkl
 log.txt
 experiments*
 gen_example.py
-datasets/lines/terrace0.JPG
-datasets/lines/terrace1.JPG
 datasets/South-Building*
 *.pkl
 oryx-build-commands.txt

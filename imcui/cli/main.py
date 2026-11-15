@@ -84,8 +84,8 @@ def get_example_data_default_path():
     type=click.Path(file_okay=False, readable=True),
     default=lambda: str(get_example_data_default_path()),
     show_default=True,
-    help="Root directory containing example datasets for demonstration purposes. "
-    "Should contain subdirectories with image pairs for matching.",
+    help="Root directory containing example datasets. Defaults to the user cache; "
+    "the classic subset is downloaded there on first use.",
 )
 @click.option(
     "--download-examples",

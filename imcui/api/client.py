@@ -181,29 +181,11 @@ def get_api_version():
 
 
 if __name__ == "__main__":
-    from pathlib import Path
-
     parser = argparse.ArgumentParser(
-        description="Send text to stable audio server and receive generated audio."
+        description="Send images to the Image Matching WebUI API server."
     )
-    parser.add_argument(
-        "--image0",
-        required=False,
-        help="Path for the file's melody",
-        default=str(
-            Path(__file__).parents[1]
-            / "datasets/sacre_coeur/mapping_rot/02928139_3448003521_rot45.jpg"
-        ),
-    )
-    parser.add_argument(
-        "--image1",
-        required=False,
-        help="Path for the file's melody",
-        default=str(
-            Path(__file__).parents[1]
-            / "datasets/sacre_coeur/mapping_rot/02928139_3448003521_rot90.jpg"
-        ),
-    )
+    parser.add_argument("--image0", required=True, help="Path to the first image")
+    parser.add_argument("--image1", required=True, help="Path to the second image")
     args = parser.parse_args()
 
     # get api version
