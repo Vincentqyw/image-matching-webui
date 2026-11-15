@@ -1,3 +1,4 @@
+import html
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 import spaces  # noqa: F401  # ZeroGPU
@@ -581,62 +582,73 @@ class ImageMatchingApp:
             self.cfg["defaults"]["min_covisibility"],  # covisibility threshold
         )
 
-    def display_supported_algorithms(self, style="tab"):
-        def get_link(link, tag="Link"):
-            return "[{}]({})".format(tag, link) if link is not None else "None"
-
-        data = []
-        cfg = self.cfg["matcher_zoo"]
-        if style == "md":
-            markdown_table = "| Algo. | Conference | Code | Project | Paper |\n"
-            markdown_table += "| ----- | ---------- | ---- | ------- | ----- |\n"
-
-            for _, v in cfg.items():
-                if not v["info"].get("display", True):
-                    continue
-                github_link = get_link(v["info"].get("github", ""))
-                project_link = get_link(v["info"].get("project", ""))
-                paper_link = get_link(
-                    v["info"]["paper"],
-                    (
-                        Path(v["info"]["paper"]).name[-10:]
-                        if v["info"]["paper"] is not None
-                        else "Link"
-                    ),
-                )
-
-                markdown_table += "{}|{}|{}|{}|{}\n".format(
-                    v["info"].get("name", ""),
-                    v["info"].get("source", ""),
-                    github_link,
-                    project_link,
-                    paper_link,
-                )
-            return gr.Markdown(markdown_table)
-        elif style == "tab":
-            for k, v in cfg.items():
-                if not v["info"].get("display", True):
-                    continue
-                data.append(
-                    [
-                        v["info"].get("name", ""),
-                        v["info"].get("source", ""),
-                        v["info"].get("github", ""),
-                        v["info"].get("paper", ""),
-                        v["info"].get("project", ""),
-                    ]
-                )
-            tab = gr.Dataframe(
-                headers=["Algo.", "Conference", "Code", "Paper", "Project"],
-                datatype=["str", "str", "str", "str", "str"],
-                column_count=5,
-                column_limits=(5, 5),
-                value=data,
-                # wrap=True,
-                # min_width = 1000,
-                # height=1000,
+    def display_supported_algorithms(self):
+        def link(url, label):
+            if not url:
+                return ""
+            return (
+                f'<a href="{html.escape(url, quote=True)}" target="_blank" '
+                f'rel="noopener">{label}</a>'
             )
-            return tab
+
+        zoo = sorted(
+            self.cfg["matcher_zoo"].items(),
+            key=lambda item: item[1]["info"]["name"].lower(),
+        )
+        rows = []
+        for _, conf in zoo:
+            info = conf["info"]
+            if not info.get("display", True):
+                continue
+            links = "".join(
+                [
+                    link(info.get("paper"), "Paper"),
+                    link(info.get("github"), "Code"),
+                    link(info.get("project"), "Project"),
+                ]
+            )
+            rows.append(
+                "<tr>"
+                f'<td class="algo-name">{html.escape(info["name"])}</td>'
+                f'<td class="algo-venue">{html.escape(info.get("source") or "")}</td>'
+                f'<td class="algo-links">{links or "—"}</td>'
+                "</tr>"
+            )
+
+        table = (
+            '<div class="algo-table-wrap">'
+            "<style>"
+            ".algo-table-wrap{overflow-x:auto}"
+            ".algo-count{margin:0 0 6px;font-size:.8rem;"
+            "color:var(--body-text-color-subdued)}"
+            ".algo-table{width:100%;border:0!important;"
+            "border-collapse:collapse;font-size:.9rem}"
+            ".algo-table th{text-align:left;padding:8px 12px;font-size:.75rem;"
+            "letter-spacing:.05em;text-transform:uppercase;font-weight:600;"
+            "color:var(--body-text-color-subdued);"
+            "border:0!important;"
+            "border-bottom:1px solid var(--border-color-primary)!important}"
+            ".algo-table td{padding:7px 12px;"
+            "border:0!important;"
+            "border-bottom:1px solid var(--border-color-primary)!important;"
+            "vertical-align:middle}"
+            ".algo-table tbody tr:hover{background:var(--background-fill-secondary)}"
+            ".algo-name{font-weight:600;white-space:nowrap}"
+            ".algo-venue{color:var(--body-text-color-subdued);white-space:nowrap}"
+            ".algo-links a{display:inline-block;margin-right:5px;padding:1px 9px;"
+            "border:1px solid var(--border-color-primary);border-radius:999px;"
+            "background:var(--background-fill-secondary);"
+            "color:var(--body-text-color)!important;text-decoration:none!important;"
+            "font-size:.78rem}"
+            ".algo-links a:hover{border-color:var(--color-accent);"
+            "color:var(--color-accent)}"
+            "</style>"
+            f'<p class="algo-count">{len(rows)} algorithms</p>'
+            '<table class="algo-table"><thead><tr>'
+            "<th>Algorithm</th><th>Venue</th><th>Links</th>"
+            "</tr></thead><tbody>" + "".join(rows) + "</tbody></table></div>"
+        )
+        return gr.HTML(table)
 
 
 class AppBaseUI:
