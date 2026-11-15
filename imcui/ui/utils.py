@@ -7,7 +7,6 @@ import warnings
 from itertools import combinations
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from datasets import load_dataset
 import spaces
 
 import cv2
@@ -26,9 +25,9 @@ from ..hloc import (
     match_dense,
     match_features,
     matchers,
-    DATASETS_REPO_ID,
 )
 from ..hloc.utils.base_model import dynamic_load
+from .examples import CLASSIC_ROTATIONS, CLASSIC_SCALES, download_classic_examples
 from .viz import display_keypoints, display_matches, fig2im, plot_images
 from .modelcache import ModelCache
 
@@ -168,22 +167,6 @@ def get_feature_model(conf: Dict[str, Dict[str, Any]]):
     return model
 
 
-def download_example_images(repo_id, output_dir):
-    logger.info(f"Download example dataset from huggingface: {repo_id}")
-    dataset = load_dataset(repo_id)
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
-    for example in dataset["train"]:  # Assuming the dataset is in the "train" split
-        file_path = example["path"]
-        if not file_path.startswith("sacre_coeur/"):
-            continue
-        image = example["image"]  # Access the PIL.Image object directly
-        full_path = os.path.join(output_dir, file_path)
-        Path(os.path.dirname(full_path)).mkdir(parents=True, exist_ok=True)
-        image.save(full_path)
-    logger.info(f"Images saved to {output_dir} successfully.")
-    return Path(output_dir)
-
-
 def gen_examples(data_root: Path):
     random.seed(1)
     example_algos = [
@@ -212,7 +195,7 @@ def gen_examples(data_root: Path):
     ]
     data_root = Path(data_root)
     if not (data_root / "sacre_coeur/mapping").exists():
-        download_example_images(DATASETS_REPO_ID, data_root)
+        download_classic_examples(data_root)
 
     def distribute_elements(A, B):
         new_B = np.array(B, copy=True).flatten()
@@ -239,11 +222,10 @@ def gen_examples(data_root: Path):
     def gen_rot_image_pairs(count: int = 5):
         path = data_root / "sacre_coeur/mapping"
         path_rot = data_root / "sacre_coeur/mapping_rot"
-        rot_list = [45, 180, 90, 225, 270]
         pairs = []
         for file in os.listdir(path):
             if file.lower().endswith((".jpg", ".jpeg", ".png")):
-                for rot in rot_list:
+                for rot in CLASSIC_ROTATIONS:
                     file_rot = "{}_rot{}.jpg".format(Path(file).stem, rot)
                     if (path_rot / file_rot).exists():
                         pairs.append(
@@ -260,11 +242,10 @@ def gen_examples(data_root: Path):
     def gen_scale_image_pairs(count: int = 5):
         path = data_root / "sacre_coeur/mapping"
         path_scale = data_root / "sacre_coeur/mapping_scale"
-        scale_list = [0.3, 0.5]
         pairs = []
         for file in os.listdir(path):
             if file.lower().endswith((".jpg", ".jpeg", ".png")):
-                for scale in scale_list:
+                for scale in CLASSIC_SCALES:
                     file_scale = "{}_scale{}.jpg".format(Path(file).stem, scale)
                     if (path_scale / file_scale).exists():
                         pairs.append(
@@ -765,7 +746,7 @@ def run_ransac(
         ransac_confidence=ransac_confidence,
         ransac_max_iter=ransac_max_iter,
     )
-    logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"RANSAC matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # plot images with ransac matches
@@ -776,7 +757,7 @@ def run_ransac(
     output_matches_ransac, num_matches_ransac = display_matches(
         state_cache, titles=titles, tag="KPTS_RANSAC"
     )
-    logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"Display matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # compute warp images
@@ -945,7 +926,7 @@ def run_matching(
     if "max_distance_px" in matcher.conf:  # FlexGlue-only filters
         matcher.conf["max_distance_px"] = max_distance_px
         matcher.conf["min_covisibility"] = min_covisibility
-    logger.info(f"Loading model using: {time.time()-t0:.3f}s")
+    logger.info(f"Loading model using: {time.time() - t0:.3f}s")
     t1 = time.time()
     yield generate_fake_outputs(
         output_keypoints, output_matches_raw, output_matches_ransac, match_conf, {}, {}
@@ -1008,7 +989,7 @@ def run_matching(
     # gr.Info(
     #     f"Matching images done using: {time.time()-t1:.3f}s",
     # )
-    logger.info(f"Matching images done using: {time.time()-t1:.3f}s")
+    logger.info(f"Matching images done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # plot images with keypoints
@@ -1051,7 +1032,7 @@ def run_matching(
     )
 
     # gr.Info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
-    logger.info(f"RANSAC matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"RANSAC matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
 
     # plot images with ransac matches
@@ -1072,7 +1053,7 @@ def run_matching(
     )
 
     # gr.Info(f"Display matches done using: {time.time()-t1:.3f}s")
-    logger.info(f"Display matches done using: {time.time()-t1:.3f}s")
+    logger.info(f"Display matches done using: {time.time() - t1:.3f}s")
     t1 = time.time()
     # plot wrapped images
     output_wrapped, warped_image = generate_warp_images(
@@ -1083,7 +1064,7 @@ def run_matching(
     )
     plt.close("all")
     # gr.Info(f"In summary, total time: {time.time()-t0:.3f}s")
-    logger.info(f"TOTAL time: {time.time()-t0:.3f}s")
+    logger.info(f"TOTAL time: {time.time() - t0:.3f}s")
 
     state_cache = pred
     state_cache["num_matches_raw"] = num_matches_raw

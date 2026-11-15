@@ -90,7 +90,8 @@ def get_example_data_default_path():
 @click.option(
     "--download-examples",
     is_flag=True,
-    help="Download the curated HardMatch examples (about 20 MB) and exit.",
+    help="Download the curated example galleries (HardMatch, fisheye, classic) "
+    "and exit.",
 )
 @click.option(
     "--verbose",
@@ -131,14 +132,22 @@ def main(
     python -m imcui.cli --verbose
 
     \b
-    # Download the curated HardMatch examples and exit
+    # Download the curated example galleries and exit
     python -m imcui.cli --download-examples
     """
     if download_examples:
-        from imcui.ui.examples import download_hardmatch, load_examples_manifest
+        from imcui.ui.examples import (
+            download_classic_examples,
+            download_gallery,
+            load_examples_manifest,
+        )
 
-        cache = download_hardmatch(load_examples_manifest())
-        click.echo(f"HardMatch examples cached at {cache}")
+        manifest = load_examples_manifest()
+        for name in manifest:
+            cache = download_gallery(manifest, name)
+            click.echo(f"{name} examples cached at {cache}")
+        cache = download_classic_examples(classic_examples_root())
+        click.echo(f"classic examples cached at {cache}")
         return
 
     if verbose:

@@ -11,10 +11,10 @@ from omegaconf import OmegaConf
 
 from .examples import (
     classic_examples_root,
-    download_hardmatch,
-    gen_hardmatch_examples,
-    hardmatch_cache_dir,
-    hardmatch_cache_ready,
+    download_gallery,
+    gallery_cache_dir,
+    gallery_cache_ready,
+    gen_gallery_examples,
     load_examples_manifest,
 )
 from .sfm import SfmEngine
@@ -160,13 +160,17 @@ class ImageMatchingApp:
         self.matcher_zoo = get_matcher_zoo(self.cfg["matcher_zoo"])
         self.app = None
         self.examples_manifest = load_examples_manifest()
-        self.hardmatch_cache = hardmatch_cache_dir(self.examples_manifest)
-        try:
-            download_hardmatch(self.examples_manifest, self.hardmatch_cache)
-        except Exception as e:
-            # Startup must not fail when the examples cannot be fetched (e.g.
-            # offline, read-only cache); the UI then shows the download hint.
-            logger.warning(f"Could not download HardMatch examples: {e}")
+        self.gallery_caches = {
+            name: gallery_cache_dir(self.examples_manifest, name)
+            for name in self.examples_manifest
+        }
+        for name, cache in self.gallery_caches.items():
+            try:
+                download_gallery(self.examples_manifest, name, cache)
+            except Exception as e:
+                # Startup must not fail when the examples cannot be fetched
+                # (e.g. offline, read-only cache); the UI then shows a hint.
+                logger.warning(f"Could not download {name} examples: {e}")
         self.example_data_root = kwargs.get(
             "example_data_root", classic_examples_root()
         )
@@ -536,29 +540,29 @@ class ImageMatchingApp:
 
     def add_examples(self, inputs):
         label = "Click a pair to load it, then press Run Match."
-        with gr.Accordion("HardMatch: hard pairs", open=True):
-            if hardmatch_cache_ready(self.examples_manifest, self.hardmatch_cache):
-                gr.Examples(
-                    examples=gen_hardmatch_examples(
-                        self.examples_manifest,
-                        self.enabled_matcher_keys(),
-                        self.hardmatch_cache,
-                    ),
-                    inputs=inputs,
-                    cache_examples=False,
-                    label=label,
-                    api_name="load_hardmatch_example",
-                )
-                gr.Markdown(
-                    "Examples from [HardMatch]"
-                    "(https://github.com/davnords/HardMatch)."
-                )
-            else:
-                gr.Markdown(
-                    "HardMatch examples could not be downloaded at startup. "
-                    "Check the logs, or run `imcui --download-examples` "
-                    "(about 20 MB) and restart."
-                )
+        for name, gallery in self.examples_manifest.items():
+            cache = self.gallery_caches[name]
+            with gr.Accordion(gallery["ui"]["title"], open=gallery["ui"]["open"]):
+                if gallery_cache_ready(self.examples_manifest, name, cache):
+                    gr.Examples(
+                        examples=gen_gallery_examples(
+                            self.examples_manifest,
+                            name,
+                            self.enabled_matcher_keys(),
+                            cache,
+                        ),
+                        inputs=inputs,
+                        cache_examples=False,
+                        label=label,
+                        api_name=f"load_{name}_example",
+                    )
+                    gr.Markdown(gallery["ui"]["note"])
+                else:
+                    gr.Markdown(
+                        f"{gallery['ui']['title']} examples could not be "
+                        "downloaded at startup. Check the logs, or run "
+                        "`imcui --download-examples` and restart."
+                    )
         with gr.Accordion("Classic: Sacre Coeur", open=False):
             gr.Examples(
                 examples=gen_examples(self.example_data_root),
@@ -578,7 +582,7 @@ class ImageMatchingApp:
                 str(Path(__file__).parents[0]),
                 str(Path(__file__).parents[1]),
                 str(self.example_data_root),
-                str(self.hardmatch_cache),
+                *(str(cache) for cache in self.gallery_caches.values()),
             ],
         )
 

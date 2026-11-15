@@ -1,6 +1,10 @@
-# Curated HardMatch pairs shown in the WebUI gallery.
+# Curated example galleries shown in the WebUI.
 # Images are downloaded on demand from HuggingFace; none are bundled.
 hardmatch:
+  ui:
+    title: "HardMatch: hard pairs"
+    open: true
+    note: "Examples from [HardMatch](https://github.com/davnords/HardMatch)."
   source:
     repo_id: Realcat/hardmatch
     repo_type: dataset
@@ -14,6 +18,9 @@ hardmatch:
     - B_metadata.json
     - categories.txt
     - corresp_lr.txt
+  image_names:
+    A: A_lr.jpg
+    B: B_lr.jpg
   settings:
     matchers:
       - FlexGlue (ALIKED)
@@ -210,3 +217,84 @@ hardmatch:
       attribution:
         A: {author: Carole Raddato from FRANKFURT, Germany, license: CC BY 2.0}
         B: {author: Alberto Panzani, license: CC BY-SA 4.0}
+
+fisheye:
+  ui:
+    title: "Fisheye: wide-angle pairs"
+    open: false
+    note: >-
+      Raw fisheye frames with no undistortion, so homography and fundamental
+      matrix estimates are approximate. Sources: Hilti-Trimble SLAM Challenge
+      2026 and Sunny/Cloudy/Sunset; see the
+      [dataset card](https://huggingface.co/datasets/Realcat/imcui_examples)
+      for licenses.
+  source:
+    repo_id: Realcat/imcui_examples
+    repo_type: dataset
+    revision: main
+    url: https://huggingface.co/datasets/Realcat/imcui_examples
+  cache_subdir: imcui_examples
+  files:
+    - A.jpg
+    - B.jpg
+  image_names:
+    A: A.jpg
+    B: B.jpg
+  settings:
+    matchers:
+      - superpoint+lightglue
+      - disk+lightglue
+      - aliked+lightglue
+      - sift+lightglue
+      - FlexGlue (ALIKED)
+      - xfeat+lightglue
+    match_threshold: 0.1
+    max_keypoints: 4096
+    keypoint_threshold: 0.0
+    ransac_method: CV2_USAC_MAGSAC
+    ransac_reproj_threshold: 8
+    ransac_confidence: 0.9999
+    ransac_max_iter: 10000
+  pairs:
+    - title: "Construction floor: around a pillar"
+      path: fisheye/construction/pillar_turn
+      categories: [indoor, building]
+      source_frames: [10000000000000.jpg, 10001501519000.jpg]
+      attribution:
+        A: {author: Hilti-Trimble SLAM Challenge 2026, license: CC BY-NC-SA 3.0}
+        B: {author: Hilti-Trimble SLAM Challenge 2026, license: CC BY-NC-SA 3.0}
+    - title: "Construction corridor: two nearby frames"
+      path: fisheye/construction/corridor
+      categories: [indoor, building]
+      source_frames: [10048982292000.jpg, 10050316938000.jpg]
+      attribution:
+        A: {author: Hilti-Trimble SLAM Challenge 2026, license: CC BY-NC-SA 3.0}
+        B: {author: Hilti-Trimble SLAM Challenge 2026, license: CC BY-NC-SA 3.0}
+    - title: "Construction glazed walkway: along the corridor"
+      path: fisheye/construction/glazed_walkway
+      categories: [indoor, building]
+      source_frames: [10073473404000.jpg, 10074808108000.jpg]
+      attribution:
+        A: {author: Hilti-Trimble SLAM Challenge 2026, license: CC BY-NC-SA 3.0}
+        B: {author: Hilti-Trimble SLAM Challenge 2026, license: CC BY-NC-SA 3.0}
+    - title: "Street facade: two panning views"
+      path: fisheye/street/facade_row
+      categories: [outdoor, building]
+      source_frames: [0306.png, 0312.png]
+      attribution:
+        A: {author: Changhee Won, license: "Unspecified (research/demo)"}
+        B: {author: Changhee Won, license: "Unspecified (research/demo)"}
+    - title: "Avenue: two panning views"
+      path: fisheye/street/avenue
+      categories: [outdoor, building]
+      source_frames: [0455.png, 0475.png]
+      attribution:
+        A: {author: Changhee Won, license: "Unspecified (research/demo)"}
+        B: {author: Changhee Won, license: "Unspecified (research/demo)"}
+    - title: "Intersection: two panning views"
+      path: fisheye/street/intersection
+      categories: [outdoor, building]
+      source_frames: [0909.png, 0929.png]
+      attribution:
+        A: {author: Changhee Won, license: "Unspecified (research/demo)"}
+        B: {author: Changhee Won, license: "Unspecified (research/demo)"}
