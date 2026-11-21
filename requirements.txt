@@ -1,2 +1,2 @@
-imcui==0.2.2
+imcui==0.2.3
 pyarrow<26
