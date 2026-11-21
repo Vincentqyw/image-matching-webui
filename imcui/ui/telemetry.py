@@ -24,6 +24,8 @@ def _post(url: str, token: str, key: str, name: str) -> None:
         headers={
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
+            # Cloudflare's edge rejects Python's default UA with error 1010.
+            "User-Agent": "Mozilla/5.0 (compatible; imcui-telemetry/1.0)",
         },
     )
     try:

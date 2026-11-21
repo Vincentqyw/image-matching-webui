@@ -71,6 +71,8 @@ names.
 
 - If `MATCH_TELEMETRY_URL` is unset (local dev, CI), `imcui.ui.telemetry.record`
   is a no-op.
+- Cloudflare's edge rejects Python's default `Python-urllib/*` User-Agent with
+  `error code: 1010`, so `telemetry.py` sends a Mozilla-compatible UA.
 - The Space runs the released `imcui` wheel, so run this with a version that
   includes `imcui/ui/telemetry.py` (>= the release that added it).
 - D1 free tier (5M reads / 100k writes per day) is far above what this needs.
