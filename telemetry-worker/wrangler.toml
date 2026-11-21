@@ -1,0 +1,8 @@
+name = "imcui-telemetry"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "imcui-counts"
+database_id = "1c6df588-f3ba-4443-914a-2e09868596e1"

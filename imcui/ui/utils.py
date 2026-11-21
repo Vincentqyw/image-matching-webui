@@ -27,6 +27,7 @@ from ..hloc import (
     matchers,
 )
 from ..hloc.utils.base_model import dynamic_load
+from . import telemetry
 from .examples import CLASSIC_ROTATIONS, CLASSIC_SCALES, download_classic_examples
 from .viz import display_keypoints, display_matches, fig2im, plot_images
 from .modelcache import ModelCache
@@ -990,6 +991,7 @@ def run_matching(
     #     f"Matching images done using: {time.time()-t1:.3f}s",
     # )
     logger.info(f"Matching images done using: {time.time() - t1:.3f}s")
+    telemetry.record(key)
     t1 = time.time()
 
     # plot images with keypoints

@@ -40,3 +40,7 @@ tmp
 
 # uv lockfile is local-only (requirements.txt is the source of truth)
 uv.lock
+
+# telemetry worker
+telemetry-worker/.wrangler/
+telemetry-worker/node_modules/
