@@ -104,7 +104,7 @@ function emptyChart() {
     <div class="empty">
       <span class="empty-icon">⌛</span>
       <strong>No runs recorded yet</strong>
-      <span>Stats start appearing after the next imcui release.</span>
+      <span>Runs appear here as people use the Space.</span>
     </div>`;
 }
 
