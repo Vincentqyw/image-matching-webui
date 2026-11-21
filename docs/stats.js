@@ -1,9 +1,27 @@
-// Replace with the URL printed by `wrangler deploy` (README.md).
+// Replace with the URL printed by `wrangler deploy` (infra/telemetry-worker/README.md).
 const STATS_URL = "https://imcui-telemetry.realcat.workers.dev/stats";
 
-const TOP_VISIBLE = 10; // models shown by default before toggling the legend
+const PALETTE = [
+  "#667eea",
+  "#f97316",
+  "#10b981",
+  "#ec4899",
+  "#0ea5e9",
+  "#8b5cf6",
+  "#eab308",
+  "#14b8a6",
+  "#ef4444",
+  "#64748b",
+];
+const TOP_N = 8;
+const LEADERBOARD_PREVIEW = 12;
+const DAY = 86400000;
 
-const prettyKey = (key) => key.split("+").join(" + ");
+const el = (id) => document.getElementById(id);
+const prefersDark = () =>
+  window.matchMedia("(prefers-color-scheme: dark)").matches;
+const colorAt = (index) =>
+  PALETTE[index] ?? `hsl(${(index * 137.5) % 360}, 60%, 55%)`;
 
 const escapeHtml = (text) =>
   text.replace(
@@ -14,117 +32,295 @@ const escapeHtml = (text) =>
       ],
   );
 
-function colorFor(text) {
-  let hash = 2166136261;
-  for (let i = 0; i < text.length; i++) {
-    hash = Math.imul(hash ^ text.charCodeAt(i), 16777619);
-  }
-  return `hsl(${(hash >>> 0) % 360}, 62%, 52%)`;
+const dayMs = (day) => Date.parse(`${day}T00:00:00Z`);
+const fromMs = (ms) => new Date(ms).toISOString().slice(0, 10);
+const shortDay = (day) =>
+  new Date(`${day}T00:00:00Z`).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+
+function withAlpha(hex, alpha) {
+  const value = parseInt(hex.slice(1), 16);
+  return `rgba(${(value >> 16) & 255}, ${(value >> 8) & 255}, ${
+    value & 255
+  }, ${alpha})`;
 }
 
-function showError(message) {
-  const box = document.getElementById("error");
-  box.textContent = message;
-  box.hidden = false;
+function continuousDays(startDay, endDay) {
+  const days = [];
+  for (let time = dayMs(startDay); time <= dayMs(endDay); time += DAY) {
+    days.push(fromMs(time));
+  }
+  return days;
 }
 
-const plotlyConfig = { responsive: true, displaylogo: false };
-
-function render(data) {
-  const { daily, totals, updated } = data;
-  if (daily.length === 0) {
-    showError("No match runs recorded yet.");
-    return;
-  }
-
+function processRaw({ daily, totals, updated }) {
   const days = [...new Set(daily.map((row) => row.day))].sort();
   const perKey = new Map();
+  const dayTotals = new Map();
   for (const { day, key, n } of daily) {
     if (!perKey.has(key)) perKey.set(key, new Map());
     perKey.get(key).set(day, n);
+    dayTotals.set(day, (dayTotals.get(day) ?? 0) + n);
   }
   const ordered = [...totals].sort((a, b) => b.n - a.n);
-  const grandTotal = ordered.reduce((sum, row) => sum + row.n, 0);
+  const rank = new Map(ordered.map((row, index) => [row.key, index]));
+  const names = new Map(ordered.map((row) => [row.key, row.name]));
+  return { days, perKey, dayTotals, totals: ordered, rank, names, updated };
+}
 
-  document.getElementById("meta").textContent =
-    `${grandTotal.toLocaleString()} runs · ${ordered.length} matchers · ` +
-    `data fetched ${new Date(updated).toLocaleString()}`;
+let model = null;
+let range = 30;
+let expanded = false;
 
-  const template = window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "plotly_dark"
-    : "plotly_white";
+function renderKpis(m) {
+  const total = m.totals.reduce((sum, row) => sum + row.n, 0);
+  const lastDay = m.days[m.days.length - 1];
+  const weekStart = fromMs(dayMs(lastDay) - 6 * DAY);
+  let week = 0;
+  let peakDay = lastDay;
+  let peak = 0;
+  for (const [day, n] of m.dayTotals) {
+    if (day >= weekStart) week += n;
+    if (n > peak) {
+      peak = n;
+      peakDay = day;
+    }
+  }
 
-  Plotly.newPlot(
-    "daily",
-    ordered.map(({ key }, index) => ({
+  el("kpi-total").textContent = total.toLocaleString();
+  el("kpi-matchers").textContent = m.totals.length.toLocaleString();
+  el("kpi-week").textContent = week.toLocaleString();
+  el("kpi-peak").textContent = peak.toLocaleString();
+  el("kpi-peak-sub").textContent = shortDay(peakDay);
+  el("meta").textContent = `${total.toLocaleString()} runs · data fetched ${new Date(
+    m.updated,
+  ).toLocaleString("en-US")}`;
+}
+
+function emptyChart() {
+  el("daily").innerHTML = `
+    <div class="empty">
+      <span class="empty-icon">⌛</span>
+      <strong>No runs recorded yet</strong>
+      <span>Stats start appearing after the next imcui release.</span>
+    </div>`;
+}
+
+function renderChart(m) {
+  if (!m.totals.length) {
+    emptyChart();
+    return;
+  }
+
+  const end = m.days[m.days.length - 1];
+  const rangeStart = range
+    ? fromMs(dayMs(end) - (range - 1) * DAY)
+    : m.days[0];
+  const start = rangeStart > m.days[0] ? rangeStart : m.days[0];
+  const days = continuousDays(start, end);
+
+  const topKeys = m.totals
+    .map((row) => row.key)
+    .filter((key) => days.some((day) => (m.perKey.get(key)?.get(day) ?? 0) > 0))
+    .slice(0, TOP_N);
+
+  const traces = topKeys.map((key) => {
+    const color = colorAt(m.rank.get(key));
+    return {
       x: days,
-      y: days.map((day) => perKey.get(key)?.get(day) ?? 0),
-      name: prettyKey(key),
-      mode: "lines+markers",
-      line: { color: colorFor(key), width: 2 },
-      marker: { size: 5 },
-      visible: index < TOP_VISIBLE ? true : "legendonly",
-      hovertemplate: `<b>${escapeHtml(prettyKey(key))}</b><br>%{x}<br>runs: %{y}<extra></extra>`,
-    })),
-    {
-      template,
-      margin: { t: 10, r: 16, b: 80, l: 56 },
-      xaxis: { type: "date" },
-      yaxis: { rangemode: "tozero", title: "runs" },
-      legend: { orientation: "h", y: -0.35 },
-    },
-    plotlyConfig,
-  );
+      y: days.map((day) => m.perKey.get(key)?.get(day) ?? 0),
+      name: m.names.get(key),
+      type: "scatter",
+      mode: "lines",
+      stackgroup: "one",
+      line: { width: 1, color },
+      fillcolor: withAlpha(color, 0.72),
+      hovertemplate: "%{y:,.0f}<extra>%{fullData.name}</extra>",
+    };
+  });
 
-  const barRows = ordered.slice().reverse();
-  Plotly.newPlot(
-    "totals",
-    [
-      {
-        type: "bar",
-        orientation: "h",
-        x: barRows.map((row) => row.n),
-        y: barRows.map((row) => prettyKey(row.key)),
-        marker: { color: barRows.map((row) => colorFor(row.key)) },
-        hovertemplate: "%{y}<br>%{x:,} runs<extra></extra>",
+  const other = days.map((day) => {
+    const shown = topKeys.reduce(
+      (sum, key) => sum + (m.perKey.get(key)?.get(day) ?? 0),
+      0,
+    );
+    return (m.dayTotals.get(day) ?? 0) - shown;
+  });
+  if (other.some((n) => n > 0)) {
+    traces.push({
+      x: days,
+      y: other,
+      name: "Other",
+      type: "scatter",
+      mode: "lines",
+      stackgroup: "one",
+      line: { width: 1, color: "#94a3b8" },
+      fillcolor: withAlpha("#94a3b8", 0.55),
+      hovertemplate: "%{y:,.0f}<extra>%{fullData.name}</extra>",
+    });
+  }
+
+  const dark = prefersDark();
+  Plotly.react(
+    "daily",
+    traces,
+    {
+      template: dark ? "plotly_dark" : "plotly_white",
+      height: 360,
+      margin: { t: 8, r: 6, b: 34, l: 52 },
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "rgba(0,0,0,0)",
+      hovermode: "x unified",
+      hoverlabel: dark
+        ? {
+            bgcolor: "#1c2433",
+            bordercolor: "#33415c",
+            font: { color: "#e8edf4", size: 12 },
+          }
+        : {
+            bgcolor: "#ffffff",
+            bordercolor: "#dfe4ec",
+            font: { color: "#15181e", size: 12 },
+          },
+      xaxis: {
+        type: "date",
+        showgrid: false,
+        fixedrange: true,
+        tickformat: "%b %d",
+        tickfont: { size: 11 },
       },
-    ],
-    {
-      template,
-      height: Math.max(320, barRows.length * 20),
-      margin: { t: 10, r: 24, b: 40, l: 190 },
-      xaxis: { title: "total runs" },
+      yaxis: {
+        rangemode: "tozero",
+        zeroline: false,
+        fixedrange: true,
+        gridcolor: dark ? "#232c3b" : "#e8ecf2",
+        tickfont: { size: 11 },
+        title: { text: "runs", font: { size: 11 } },
+      },
+      showlegend: false,
     },
-    plotlyConfig,
+    { responsive: true, displayModeBar: false },
   );
 
-  const lastDay = Date.parse(`${days[days.length - 1]}T00:00:00Z`);
-  const weekStart = new Date(lastDay - 6 * 86400000).toISOString().slice(0, 10);
+  renderLegend(traces);
+  el("chart-note").textContent = `${topKeys.length} matchers + other · ${
+    range ? `last ${days.length} days` : "all time"
+  }`;
+}
 
-  const rows = ordered
-    .map(({ key, n }) => {
-      const week = [...perKey.get(key)]
-        .filter(([day]) => day >= weekStart)
-        .reduce((sum, [, count]) => sum + count, 0);
-      return (
-        `<tr><td>${escapeHtml(prettyKey(key))}</td>` +
-        `<td>${n.toLocaleString()}</td><td>${week.toLocaleString()}</td>` +
-        `<td>${((n / grandTotal) * 100).toFixed(1)}%</td></tr>`
-      );
-    })
+function renderLegend(traces) {
+  const legend = el("legend");
+  legend.innerHTML = "";
+  traces.forEach((trace, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.innerHTML = `<i style="background:${trace.line.color}"></i>${escapeHtml(
+      trace.name,
+    )}`;
+    button.addEventListener("click", () => {
+      const hidden = button.classList.toggle("off");
+      Plotly.restyle("daily", { visible: hidden ? "legendonly" : true }, [
+        index,
+      ]);
+    });
+    legend.append(button);
+  });
+}
+
+function renderBoard(m) {
+  if (!m.totals.length) {
+    el("board").innerHTML = '<li class="empty">No runs recorded yet.</li>';
+    el("show-all").hidden = true;
+    return;
+  }
+
+  const rows = expanded ? m.totals : m.totals.slice(0, LEADERBOARD_PREVIEW);
+  const max = m.totals[0].n;
+  el("board").innerHTML = rows
+    .map(
+      (row, index) => `
+      <li class="row">
+        <span class="rank">${String(index + 1).padStart(2, "0")}</span>
+        <span class="dot" style="background:${colorAt(index)}"></span>
+        <span class="name" title="${escapeHtml(row.key)}">${escapeHtml(
+          row.name,
+        )}</span>
+        <span class="track"><span style="width:${(
+          (row.n / max) *
+          100
+        ).toFixed(1)}%;background:${colorAt(index)}"></span></span>
+        <span class="count">${row.n.toLocaleString()}</span>
+      </li>`,
+    )
     .join("");
 
-  document.getElementById("table").innerHTML =
-    "<table><thead><tr><th>Matcher</th><th>Total</th>" +
-    `<th>Last 7 days</th><th>Share</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const button = el("show-all");
+  button.hidden = m.totals.length <= LEADERBOARD_PREVIEW;
+  button.textContent = expanded
+    ? "Show less"
+    : `Show all ${m.totals.length} matchers`;
 }
+
+function renderEmpty(updated) {
+  for (const id of ["kpi-total", "kpi-matchers", "kpi-week", "kpi-peak"]) {
+    el(id).textContent = "0";
+  }
+  el("kpi-peak").textContent = "—";
+  el("kpi-peak-sub").textContent = "no data";
+  el("meta").textContent = `No runs recorded · data fetched ${new Date(
+    updated,
+  ).toLocaleString("en-US")}`;
+  emptyChart();
+  renderBoard({ totals: [] });
+}
+
+function render(m) {
+  if (!m.days.length) {
+    renderEmpty(m.updated);
+    return;
+  }
+  renderKpis(m);
+  renderChart(m);
+  renderBoard(m);
+}
+
+document.querySelectorAll(".seg button").forEach((button) => {
+  button.addEventListener("click", () => {
+    range = Number(button.dataset.range);
+    document.querySelectorAll(".seg button").forEach((other) => {
+      const active = other === button;
+      other.classList.toggle("active", active);
+      other.setAttribute("aria-pressed", String(active));
+    });
+    if (model) renderChart(model);
+  });
+});
+
+el("show-all").addEventListener("click", () => {
+  expanded = !expanded;
+  if (model) renderBoard(model);
+});
+
+window
+  .matchMedia("(prefers-color-scheme: dark)")
+  .addEventListener("change", () => {
+    if (model?.days.length) renderChart(model);
+  });
 
 fetch(STATS_URL)
   .then((response) => {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();
   })
-  .then(render)
-  .catch((error) =>
-    showError(`Could not load stats from ${STATS_URL}\n${error.message}`),
-  );
+  .then((data) => {
+    model = processRaw(data);
+    render(model);
+  })
+  .catch((error) => {
+    el("error").hidden = false;
+    el("error").textContent = `Could not load stats from ${STATS_URL}\n${error.message}`;
+    el("meta").textContent = "Stats unavailable";
+    emptyChart();
+  });

@@ -3,6 +3,9 @@
 
 const CORS = { "Access-Control-Allow-Origin": "*" };
 
+const isLabel = (value) =>
+  typeof value === "string" && value.length > 0 && value.length <= 80;
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -11,16 +14,19 @@ export default {
       if (request.headers.get("Authorization") !== `Bearer ${env.TELEMETRY_TOKEN}`) {
         return new Response("forbidden", { status: 403 });
       }
-      const { key } = await request.json();
-      if (typeof key !== "string" || key.length === 0) {
+      const { key, name } = await request.json();
+      if (!isLabel(key) || !isLabel(name)) {
         return new Response("bad request", { status: 400 });
       }
       const day = new Date().toISOString().slice(0, 10); // UTC
-      await env.DB.prepare(
-        "INSERT INTO counts (day, key, n) VALUES (?1, ?2, 1) ON CONFLICT(day, key) DO UPDATE SET n = n + 1",
-      )
-        .bind(day, key)
-        .run();
+      await env.DB.batch([
+        env.DB.prepare(
+          "INSERT INTO counts (day, key, n) VALUES (?1, ?2, 1) ON CONFLICT(day, key) DO UPDATE SET n = n + 1",
+        ).bind(day, key),
+        env.DB.prepare(
+          "INSERT INTO names (key, name) VALUES (?1, ?2) ON CONFLICT(key) DO UPDATE SET name = excluded.name",
+        ).bind(key, name),
+      ]);
       return new Response("ok");
     }
 
@@ -28,7 +34,7 @@ export default {
       const [daily, totals] = await env.DB.batch([
         env.DB.prepare("SELECT day, key, n FROM counts ORDER BY day, key"),
         env.DB.prepare(
-          "SELECT key, SUM(n) AS n FROM counts GROUP BY key ORDER BY n DESC",
+          "SELECT c.key, n.name, SUM(c.n) AS n FROM counts c JOIN names n ON n.key = c.key GROUP BY c.key, n.name ORDER BY n DESC",
         ),
       ]);
       return Response.json(

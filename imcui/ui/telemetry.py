@@ -1,6 +1,6 @@
 """Anonymous per-matcher usage counting for the hosted WebUI.
 
-Disabled unless MATCH_TELEMETRY_URL is set. See telemetry-worker/README.md.
+Disabled unless MATCH_TELEMETRY_URL is set. See infra/telemetry-worker/README.md.
 """
 
 import json
@@ -17,10 +17,10 @@ assert (_URL is None) == (
 ), "MATCH_TELEMETRY_URL and MATCH_TELEMETRY_TOKEN must be set together"
 
 
-def _post(url: str, token: str, key: str) -> None:
+def _post(url: str, token: str, key: str, name: str) -> None:
     request = urllib.request.Request(
         url,
-        data=json.dumps({"key": key}).encode(),
+        data=json.dumps({"key": key, "name": name}).encode(),
         headers={
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
@@ -32,9 +32,9 @@ def _post(url: str, token: str, key: str) -> None:
         logger.warning("Telemetry post failed", exc_info=True)
 
 
-def record(key: str) -> None:
-    """Count one completed match run for the matcher_zoo entry ``key``."""
+def record(key: str, name: str) -> None:
+    """Count one completed run for ``key``; ``name`` is its matcher_zoo label."""
     if _URL is None:
         return
     assert _TOKEN is not None  # guaranteed by the module-level assert
-    threading.Thread(target=_post, args=(_URL, _TOKEN, key), daemon=True).start()
+    threading.Thread(target=_post, args=(_URL, _TOKEN, key, name), daemon=True).start()

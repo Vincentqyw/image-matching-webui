@@ -4,106 +4,577 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>imcui — matcher usage</title>
+    <meta
+      name="description"
+      content="Anonymous, per-matcher usage statistics for the Image Matching WebUI Hugging Face Space."
+    />
     <script src="https://cdn.plot.ly/plotly-4.1.1.min.js" charset="utf-8"></script>
     <style>
       :root {
         color-scheme: light dark;
-        --fg: #1f2328;
-        --muted: #59636e;
-        --bg: #ffffff;
-        --line: #d1d9e0;
+        --bg: #f7f8fb;
+        --card: #ffffff;
+        --fg: #15181e;
+        --muted: #5f6b7a;
+        --border: #e5e9ef;
+        --track: #edf0f5;
+        --shadow: 0 1px 2px rgba(16, 24, 40, 0.04),
+          0 12px 32px rgba(16, 24, 40, 0.05);
+        --brand-1: #667eea;
+        --brand-2: #764ba2;
+        --brand-3: #f97316;
+        --grid: #e8ecf2;
       }
       @media (prefers-color-scheme: dark) {
         :root {
-          --fg: #e6edf3;
-          --muted: #9198a1;
-          --bg: #0d1117;
-          --line: #30363d;
+          --bg: #0a0e15;
+          --card: #111722;
+          --fg: #e8edf4;
+          --muted: #93a0b4;
+          --border: #1e2735;
+          --track: #1a2231;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 18px 40px rgba(0, 0, 0, 0.35);
+          --grid: #232c3b;
         }
       }
       * {
         box-sizing: border-box;
       }
+      html {
+        scroll-behavior: smooth;
+      }
       body {
-        margin: 0 auto;
-        max-width: 1100px;
-        padding: 40px 20px 80px;
+        margin: 0;
         background: var(--bg);
         color: var(--fg);
         font:
-          16px/1.5 -apple-system,
+          16px/1.55 Inter,
+          -apple-system,
           BlinkMacSystemFont,
           "Segoe UI",
+          Roboto,
           Helvetica,
           Arial,
           sans-serif;
+        -webkit-font-smoothing: antialiased;
       }
-      h1 {
-        font-size: 28px;
-        margin: 0 0 4px;
+      body::before {
+        content: "";
+        position: fixed;
+        inset: -30% -10% auto;
+        height: 70vh;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(600px 320px at 18% 0%, rgba(102, 126, 234, 0.2), transparent 70%),
+          radial-gradient(520px 280px at 82% 0%, rgba(249, 115, 22, 0.13), transparent 70%);
       }
-      h2 {
-        font-size: 18px;
-        margin: 40px 0 12px;
-      }
-      p {
-        margin: 4px 0;
+      .page {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 24px 64px;
       }
       a {
         color: inherit;
+        text-decoration: none;
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 22px 0;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        background: linear-gradient(135deg, var(--brand-1), var(--brand-2) 55%, var(--brand-3));
+        color: #fff;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+      }
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.25;
+      }
+      .brand-text strong {
+        font-size: 15px;
+        letter-spacing: -0.01em;
+      }
+      .brand-text span {
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      .links {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .links a {
+        padding: 6px 12px;
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
+        transition: background 0.15s, color 0.15s;
+      }
+      .links a:hover {
+        background: var(--card);
+        color: var(--fg);
+        box-shadow: var(--shadow);
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        align-items: center;
+        gap: 48px;
+        padding: 40px 0 36px;
+      }
+      .eyebrow {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0 0 16px;
+        font-size: clamp(2.1rem, 4.6vw, 3.3rem);
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        line-height: 1.06;
+      }
+      .grad {
+        background: linear-gradient(110deg, var(--brand-1), var(--brand-2) 50%, var(--brand-3));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+      }
+      .lede {
+        margin: 0 0 24px;
+        max-width: 46ch;
+        color: var(--muted);
+        font-size: 16.5px;
+      }
+      .cta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--card);
+        font-size: 14px;
+        font-weight: 650;
+        box-shadow: var(--shadow);
+        transition: transform 0.15s, border-color 0.15s;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        border-color: var(--brand-1);
+      }
+      .btn.primary {
+        border: 0;
+        background: linear-gradient(120deg, var(--brand-1), var(--brand-2));
+        color: #fff;
+        box-shadow: 0 10px 26px rgba(102, 126, 234, 0.4);
+      }
+      .hero-art {
+        position: relative;
+      }
+      .hero-art img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: 0 24px 60px rgba(102, 126, 234, 0.22);
+      }
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+      }
+      .kpi {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 18px 20px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+      .kpi-label {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+      .kpi strong {
+        font-size: 1.85rem;
+        font-weight: 750;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.2;
+      }
+      .kpi-sub {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .card {
+        margin-top: 16px;
+        padding: 22px 24px 18px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+      .card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 6px;
+      }
+      h2 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
       }
       .muted {
+        margin: 2px 0 0;
         color: var(--muted);
-        font-size: 14px;
+        font-size: 12.5px;
       }
-      .error {
-        padding: 12px 16px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        color: #cf222e;
-        white-space: pre-wrap;
+      .seg {
+        display: inline-flex;
+        flex-shrink: 0;
+        padding: 3px;
+        border-radius: 999px;
+        background: var(--track);
       }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
+      .seg button {
+        padding: 5px 12px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 650;
+        cursor: pointer;
       }
-      th,
-      td {
-        padding: 6px 10px;
-        border-bottom: 1px solid var(--line);
+      .seg button.active {
+        background: var(--card);
+        color: var(--fg);
+        box-shadow: 0 1px 3px rgba(16, 24, 40, 0.12);
+      }
+      #daily {
+        min-height: 340px;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 16px;
+        margin-top: 10px;
+      }
+      .legend button {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 3px 0;
+        border: 0;
+        background: none;
+        color: var(--muted);
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+        transition: opacity 0.15s;
+      }
+      .legend button.off {
+        opacity: 0.35;
+      }
+      .legend i {
+        width: 9px;
+        height: 9px;
+        border-radius: 3px;
+      }
+      .board {
+        display: grid;
+        gap: 0;
+        margin: 8px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 34px 12px minmax(120px, 1.15fr) minmax(120px, 2fr) 76px;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-top: 1px solid var(--border);
+      }
+      .row:first-child {
+        border-top: 0;
+      }
+      .rank {
+        color: var(--muted);
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .name {
+        overflow: hidden;
+        font-size: 13.5px;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .track {
+        height: 8px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: var(--track);
+      }
+      .track span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+      }
+      .count {
+        font-size: 13.5px;
+        font-weight: 650;
+        font-variant-numeric: tabular-nums;
         text-align: right;
       }
-      th:first-child,
-      td:first-child {
-        text-align: left;
+      .link-btn {
+        margin-top: 12px;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--brand-1);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 650;
+        cursor: pointer;
       }
-      th {
+      @media (prefers-color-scheme: dark) {
+        .link-btn {
+          color: #8ea0ff;
+        }
+      }
+      .empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 64px 20px;
         color: var(--muted);
-        font-weight: 600;
+        text-align: center;
+      }
+      .empty-icon {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--track);
+        font-size: 20px;
+      }
+      .error {
+        margin-top: 16px;
+        padding: 12px 16px;
+        border: 1px solid #f3b7b7;
+        border-radius: 12px;
+        background: #fff1f1;
+        color: #b42318;
+        font-size: 13px;
+        white-space: pre-wrap;
+      }
+      @media (prefers-color-scheme: dark) {
+        .error {
+          border-color: #5c1f1f;
+          background: #2a1111;
+          color: #ff9b9b;
+        }
+      }
+      footer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      footer a {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      @media (max-width: 900px) {
+        .hero {
+          grid-template-columns: 1fr;
+          gap: 28px;
+          padding-top: 20px;
+        }
+        .hero-art {
+          order: -1;
+        }
+        .kpis {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 620px) {
+        .nav {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .row {
+          grid-template-columns: 28px 10px minmax(100px, 1fr) 64px;
+        }
+        .track {
+          display: none;
+        }
+        .card {
+          padding: 18px 16px 14px;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>imcui — matcher usage</h1>
-    <p class="muted">
-      Anonymous count of completed runs per matcher in the
-      <a href="https://huggingface.co/spaces/Realcat/image-matching-webui"
-        >public Hugging Face Space</a
-      >. Only the matcher key is recorded — no images, IPs, or user identifiers.
-    </p>
-    <p class="muted" id="meta"></p>
+    <div class="page">
+      <header class="nav">
+        <a class="brand" href="https://github.com/Vincentqyw/image-matching-webui">
+          <span class="brand-mark">IM</span>
+          <span class="brand-text">
+            <strong>Image Matching WebUI</strong>
+            <span>Matcher usage</span>
+          </span>
+        </a>
+        <nav class="links">
+          <a href="https://github.com/Vincentqyw/image-matching-webui">GitHub</a>
+          <a href="https://huggingface.co/spaces/Realcat/image-matching-webui">HF Space</a>
+          <a href="https://pypi.org/project/imcui">PyPI</a>
+        </nav>
+      </header>
 
-    <div class="error" id="error" hidden></div>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Anonymous stats · updated on load</p>
+          <h1>Which matchers do people <span class="grad">actually use?</span></h1>
+          <p class="lede">
+            Every completed run in the public Hugging Face Space is counted by
+            matcher key — no images, IPs, or user identifiers.
+          </p>
+          <div class="cta">
+            <a class="btn primary" href="https://huggingface.co/spaces/Realcat/image-matching-webui"
+              >Open the Space →</a
+            >
+            <a class="btn" href="https://github.com/Vincentqyw/image-matching-webui/tree/main/docs"
+              >View source</a
+            >
+          </div>
+        </div>
+        <div class="hero-art">
+          <img src="logo.webp" alt="Image Matching WebUI" />
+        </div>
+      </section>
 
-    <h2>Runs per day</h2>
-    <div id="daily"></div>
+      <section class="kpis">
+        <div class="kpi">
+          <span class="kpi-label">Total runs</span>
+          <strong id="kpi-total">—</strong>
+          <span class="kpi-sub">all time</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Matchers used</span>
+          <strong id="kpi-matchers">—</strong>
+          <span class="kpi-sub">at least one run</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Last 7 days</span>
+          <strong id="kpi-week">—</strong>
+          <span class="kpi-sub" id="kpi-week-sub">completed runs</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Peak day</span>
+          <strong id="kpi-peak">—</strong>
+          <span class="kpi-sub" id="kpi-peak-sub">runs</span>
+        </div>
+      </section>
 
-    <h2>Total runs</h2>
-    <div id="totals"></div>
+      <div class="error" id="error" hidden></div>
 
-    <h2>Breakdown</h2>
-    <div id="table"></div>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Runs per day</h2>
+            <p class="muted" id="chart-note">Top matchers, stacked</p>
+          </div>
+          <div class="seg" role="group" aria-label="Time range">
+            <button data-range="7" aria-pressed="false">7d</button>
+            <button data-range="30" aria-pressed="true" class="active">30d</button>
+            <button data-range="0" aria-pressed="false">All</button>
+          </div>
+        </div>
+        <div id="daily"></div>
+        <div class="legend" id="legend"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Leaderboard</h2>
+            <p class="muted">Ranked by total completed runs</p>
+          </div>
+        </div>
+        <ol class="board" id="board"></ol>
+        <button class="link-btn" id="show-all" hidden></button>
+      </section>
+
+      <footer>
+        <span id="meta">Loading…</span>
+        <span>
+          <a href="https://huggingface.co/spaces/Realcat/image-matching-webui"
+            >Hugging Face Space</a
+          >
+          ·
+          <a href="https://github.com/Vincentqyw/image-matching-webui"
+            >image-matching-webui</a
+          >
+        </span>
+      </footer>
+    </div>
 
     <script src="stats.js"></script>
   </body>

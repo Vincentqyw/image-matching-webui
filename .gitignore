@@ -42,5 +42,5 @@ tmp
 uv.lock
 
 # telemetry worker
-telemetry-worker/.wrangler/
-telemetry-worker/node_modules/
+infra/telemetry-worker/.wrangler/
+infra/telemetry-worker/node_modules/
