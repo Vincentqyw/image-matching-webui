@@ -38,14 +38,8 @@ const shortDay = (day) =>
   new Date(`${day}T00:00:00Z`).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
+    timeZone: "UTC",
   });
-
-function withAlpha(hex, alpha) {
-  const value = parseInt(hex.slice(1), 16);
-  return `rgba(${(value >> 16) & 255}, ${(value >> 8) & 255}, ${
-    value & 255
-  }, ${alpha})`;
-}
 
 function continuousDays(startDay, endDay) {
   const days = [];
@@ -126,20 +120,27 @@ function renderChart(m) {
     .filter((key) => days.some((day) => (m.perKey.get(key)?.get(day) ?? 0) > 0))
     .slice(0, TOP_N);
 
-  const traces = topKeys.map((key) => {
-    const color = colorAt(m.rank.get(key));
-    return {
-      x: days,
-      y: days.map((day) => m.perKey.get(key)?.get(day) ?? 0),
-      name: m.names.get(key),
-      type: "scatter",
-      mode: "lines",
-      stackgroup: "one",
-      line: { width: 1, color },
-      fillcolor: withAlpha(color, 0.72),
-      hovertemplate: "%{y:,.0f}<extra>%{fullData.name}</extra>",
-    };
+  // One line per matcher, so every point sits at its own count on the axis.
+  const line = (name, color, y) => ({
+    x: days,
+    y,
+    name,
+    type: "scatter",
+    mode: "lines+markers",
+    line: { width: 1.5, color },
+    marker: { size: 5, color },
+    hovertemplate: "%{y:,.0f}<extra>%{fullData.name}</extra>",
   });
+  // Label about a week's worth of days; a category axis labels every one.
+  const step = Math.ceil(days.length / 7);
+  const tickDays = days.filter((_, index) => index % step === 0);
+  const traces = topKeys.map((key) =>
+    line(
+      m.names.get(key),
+      colorAt(m.rank.get(key)),
+      days.map((day) => m.perKey.get(key)?.get(day) ?? 0),
+    ),
+  );
 
   const other = days.map((day) => {
     const shown = topKeys.reduce(
@@ -149,17 +150,7 @@ function renderChart(m) {
     return (m.dayTotals.get(day) ?? 0) - shown;
   });
   if (other.some((n) => n > 0)) {
-    traces.push({
-      x: days,
-      y: other,
-      name: "Other",
-      type: "scatter",
-      mode: "lines",
-      stackgroup: "one",
-      line: { width: 1, color: "#94a3b8" },
-      fillcolor: withAlpha("#94a3b8", 0.55),
-      hovertemplate: "%{y:,.0f}<extra>%{fullData.name}</extra>",
-    });
+    traces.push(line("Other", "#94a3b8", other));
   }
 
   const dark = prefersDark();
@@ -185,10 +176,11 @@ function renderChart(m) {
             font: { color: "#15181e", size: 12 },
           },
       xaxis: {
-        type: "date",
+        type: "category",
         showgrid: false,
         fixedrange: true,
-        tickformat: "%b %d",
+        tickvals: tickDays,
+        ticktext: tickDays.map(shortDay),
         tickfont: { size: 11 },
       },
       yaxis: {
@@ -206,7 +198,7 @@ function renderChart(m) {
 
   renderLegend(traces);
   el("chart-note").textContent = `${topKeys.length} matchers + other · ${
-    range ? `last ${days.length} days` : "all time"
+    range ? `last ${days.length} day${days.length === 1 ? "" : "s"}` : "all time"
   }`;
 }
 
