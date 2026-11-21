@@ -48,6 +48,7 @@ DESCRIPTION = """
     <a href="https://github.com/Vincentqyw/image-matching-webui">Code</a>
     <a href="https://pypi.org/project/imcui/" title="pip install imcui">Install</a>
     <a href="https://huggingface.co/spaces/Realcat/image-matching-webui?duplicate=true">Duplicate this Space</a>
+    <a href="https://vincentqyw.github.io/image-matching-webui/" title="Which matchers people run on the hosted Space">Usage stats</a>
     <a href="https://github.com/Vincentqyw/image-matching-webui/issues">Report a bug</a>
   </p>
   <p class="imcui-note">
