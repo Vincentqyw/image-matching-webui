@@ -29,7 +29,13 @@ from ..hloc import (
 from ..hloc.utils.base_model import dynamic_load
 from . import telemetry
 from .examples import CLASSIC_ROTATIONS, CLASSIC_SCALES, download_classic_examples
-from .viz import display_keypoints, display_matches, fig2im, plot_images
+from .viz import (
+    display_keypoints,
+    display_matches,
+    fig2im,
+    fit_for_display,
+    plot_images,
+)
 from .modelcache import ModelCache
 
 warnings.simplefilter("ignore")
@@ -616,41 +622,29 @@ def wrap_images(
     Returns:
         A tuple containing a base64 encoded image string and a dictionary with the transformation matrix.
     """
-    h0, w0, _ = img0.shape
-    h1, w1, _ = img1.shape
-    if geo_info is not None and len(geo_info) != 0:
-        rectified_image0 = img0
-        rectified_image1 = None
-        if "Homography" not in geo_info:
-            logger.warning(f"{geom_type} not exist, maybe too less matches")
-            return None, None
-
-        H = np.array(geo_info["Homography"])
-
-        title: List[str] = []
-        if geom_type == "Homography":
-            H_inv = np.linalg.inv(H)
-            rectified_image1 = cv2.warpPerspective(img1, H_inv, (w0, h0))
-            title = ["Image 0", "Image 1 - warped"]
-        elif geom_type == "Fundamental":
-            if geom_type not in geo_info:
-                logger.warning(f"{geom_type} not exist, maybe too less matches")
-                return None, None
-            else:
-                H1, H2 = np.array(geo_info["H1"]), np.array(geo_info["H2"])
-                rectified_image0 = cv2.warpPerspective(img0, H1, (w0, h0))
-                rectified_image1 = cv2.warpPerspective(img1, H2, (w1, h1))
-                title = ["Image 0 - warped", "Image 1 - warped"]
-        else:
-            print("Error: Unknown geometry type")
-        fig = plot_images(
-            [rectified_image0.squeeze(), rectified_image1.squeeze()],
-            title,
-            dpi=300,
-        )
-        return fig2im(fig), rectified_image1
-    else:
+    if not geo_info:
         return None, None
+    if "Homography" not in geo_info:
+        logger.warning(f"{geom_type} not exist, maybe too less matches")
+        return None, None
+
+    # Both branches yield a matrix mapping image 1 into image 0's frame.
+    if geom_type == "Homography":
+        warp = np.linalg.inv(np.array(geo_info["Homography"]))
+    elif geom_type == "Fundamental":
+        H1, H2 = np.array(geo_info["H1"]), np.array(geo_info["H2"])
+        warp = np.linalg.inv(H1) @ H2
+    else:
+        raise NotImplementedError(f"Unknown geometry type: {geom_type}")
+
+    # The canvas is image 0's, so the pair always has matching dimensions.
+    h0, w0 = img0.shape[:2]
+    rectified_image1 = cv2.warpPerspective(img1, warp, (w0, h0))
+    fig = plot_images(
+        [fit_for_display(img)[0].squeeze() for img in (img0, rectified_image1)],
+        ["Image 0", "Image 1 - warped"],
+    )
+    return fig2im(fig), rectified_image1
 
 
 def generate_warp_images(
@@ -1000,6 +994,8 @@ def run_matching(
         "Image 1 - Keypoints",
     ]
     output_keypoints = display_keypoints(pred, titles=titles)
+    logger.info(f"Display keypoints done using: {time.time() - t1:.3f}s")
+    t1 = time.time()
     yield generate_fake_outputs(
         output_keypoints,
         output_matches_raw,
@@ -1015,6 +1011,8 @@ def run_matching(
         "Image 1 - Raw matched keypoints",
     ]
     output_matches_raw, num_matches_raw = display_matches(pred, titles=titles)
+    logger.info(f"Display raw matches done using: {time.time() - t1:.3f}s")
+    t1 = time.time()
     yield generate_fake_outputs(
         output_keypoints,
         output_matches_raw,

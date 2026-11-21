@@ -7,6 +7,7 @@ import cv2
 import matplotlib
 import matplotlib.patheffects as path_effects
 import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
 import numpy as np
 import seaborn as sns
 
@@ -20,6 +21,14 @@ np.random.shuffle(color_map)
 _TITLE_MARGIN_INCHES = 0.25
 # Small gap between subplots
 _WSPACE = 0.005
+# Figure width clamp (inches): at 150 dpi, 14-16 inches is 2100-2400 px, enough
+# for a retina browser but bounded, so a 12 MP upload does not turn into a
+# 6000 px figure.
+_MIN_FIG_WIDTH = 14.0
+_MAX_FIG_WIDTH = 16.0
+# Longest panel side at those caps (portrait pair); pre-resizing uploads to this
+# keeps Matplotlib from resampling multi-megapixel sources.
+_DISPLAY_MAX_SIDE = 1600
 
 
 def _figure_size_for_images(
@@ -33,30 +42,33 @@ def _figure_size_for_images(
     Each subplot's width is proportional to its image's aspect ratio so
     every image fills its subplot without side-whitespace, even when the
     two images have different dimensions.
-
-    A minimum figure width ensures high-PPI output.
     """
-    MIN_FIG_WIDTH = 14.0  # inches — at 300 dpi → 4200 px wide output
-
-    heights = [img.shape[0] for img in images]
-    widths = [img.shape[1] for img in images]
-    max_h = max(heights)
-
-    # Subplot width ratios = individual image W/H (aspect ratios).
-    width_ratios = [w / h for w, h in zip(widths, heights)]
-
+    ratios = [img.shape[1] / img.shape[0] for img in images]  # image ARs
     # Natural size — images at 1:1 pixel mapping.
-    axes_h = max_h / dpi
-    natural_fig_w = axes_h * sum(width_ratios)
-    if natural_fig_w < MIN_FIG_WIDTH:
-        scale = MIN_FIG_WIDTH / natural_fig_w
-        axes_h *= scale  # keep subplot AR == image AR
+    natural_w = max(img.shape[0] for img in images) / dpi * sum(ratios)
+    fig_w = min(max(natural_w, _MIN_FIG_WIDTH), _MAX_FIG_WIDTH)
+    axes_h = fig_w / sum(ratios)  # keep subplot AR == image AR
 
-    fig_w = max(natural_fig_w, MIN_FIG_WIDTH)
     fig_h = axes_h + title_margin_inches
-    top = axes_h / fig_h
+    return (fig_w, fig_h), axes_h / fig_h, ratios
 
-    return (fig_w, fig_h), top, width_ratios
+
+def fit_for_display(img: np.ndarray, *arrays):
+    """Downscale ``img`` (and coordinate arrays) to the size it is drawn at.
+
+    Matplotlib would otherwise resample a full-resolution upload into the
+    panel, which costs more than everything else in the render.  Images no
+    larger than ``_DISPLAY_MAX_SIDE`` are returned untouched.
+    """
+    h, w = img.shape[:2]
+    side = max(h, w)
+    if side <= _DISPLAY_MAX_SIDE:
+        return (img, *arrays)
+    scale = _DISPLAY_MAX_SIDE / side
+    img = cv2.resize(
+        img, (round(w * scale), round(h * scale)), interpolation=cv2.INTER_AREA
+    )
+    return (img, *(None if a is None else a * scale for a in arrays))
 
 
 def _stroked_text(ax, x, y, text, fontsize=12, color="w", lw=2, **kwargs):
@@ -73,11 +85,25 @@ def _stroked_text(ax, x, y, text, fontsize=12, color="w", lw=2, **kwargs):
     return t
 
 
+def _add_figure_lines(fig, pts0, pts1, colors, linewidths):
+    """Draw segments ``pts0``-``pts1`` (display coords) across the figure."""
+    to_fig = fig.transFigure.inverted()
+    fig.add_artist(
+        LineCollection(
+            np.stack([to_fig.transform(pts0), to_fig.transform(pts1)], axis=1),
+            colors=colors,
+            linewidths=linewidths,
+            transform=fig.transFigure,
+            zorder=1,
+        )
+    )
+
+
 def plot_images(
     imgs: List[np.ndarray],
     titles: Optional[List[str]] = None,
     cmaps: Union[str, List[str]] = "gray",
-    dpi: int = 100,
+    dpi: int = 150,
     size: Optional[int] = None,
     pad: float = 0.0,
 ) -> plt.Figure:
@@ -148,23 +174,15 @@ def plot_color_line_matches(
     fig.canvas.draw()
 
     # Plot the lines
+    rgba = np.column_stack([np.asarray(colors), alphas])
     for a, l in zip(axes, lines):  # noqa: E741
-        # Transform the points into the figure coordinate system
-        transFigure = fig.transFigure.inverted()
-        endpoint0 = transFigure.transform(a.transData.transform(l[:, 0]))
-        endpoint1 = transFigure.transform(a.transData.transform(l[:, 1]))
-        fig.lines += [
-            matplotlib.lines.Line2D(
-                (endpoint0[i, 0], endpoint1[i, 0]),
-                (endpoint0[i, 1], endpoint1[i, 1]),
-                zorder=1,
-                transform=fig.transFigure,
-                c=colors[i],
-                alpha=alphas[i],
-                linewidth=lw,
-            )
-            for i in range(n_lines)
-        ]
+        _add_figure_lines(
+            fig,
+            a.transData.transform(l[:, 0]),
+            a.transData.transform(l[:, 1]),
+            rgba,
+            lw,
+        )
 
     return fig
 
@@ -188,6 +206,8 @@ def make_matching_figure(
     Figure size is computed from image pixel dimensions.  A fixed top margin
     is reserved for titles.  Overlay text has a dark outline for readability.
     """
+    img0, mkpts0, kpts0 = fit_for_display(img0, mkpts0, kpts0)
+    img1, mkpts1, kpts1 = fit_for_display(img1, mkpts1, kpts1)
     figsize, top, width_ratios = _figure_size_for_images([img0, img1], dpi, ncols=2)
 
     # draw image pair
@@ -219,19 +239,13 @@ def make_matching_figure(
     # Draw match lines + matched-keypoint scatter
     if mkpts0.shape[0] != 0 and mkpts1.shape[0] != 0 and mkpts0.shape == mkpts1.shape:
         fig.canvas.draw()
-        transFigure = fig.transFigure.inverted()
-        fkpts0 = transFigure.transform(axes[0].transData.transform(mkpts0))
-        fkpts1 = transFigure.transform(axes[1].transData.transform(mkpts1))
-        fig.lines = [
-            matplotlib.lines.Line2D(
-                (fkpts0[i, 0], fkpts1[i, 0]),
-                (fkpts0[i, 1], fkpts1[i, 1]),
-                transform=fig.transFigure,
-                c=color[i],
-                linewidth=1.5,
-            )
-            for i in range(len(mkpts0))
-        ]
+        _add_figure_lines(
+            fig,
+            axes[0].transData.transform(mkpts0),
+            axes[1].transData.transform(mkpts1),
+            color,
+            1.5,
+        )
 
         axes[0].autoscale(enable=False)
         axes[1].autoscale(enable=False)
@@ -285,7 +299,7 @@ def fig2im(fig: matplotlib.figure.Figure) -> np.ndarray:
     Uses an in-memory PNG buffer so the output is immune to HiDPI
     (Retina) canvas-vs-buffer mismatches.  ``bbox_inches=None`` keeps the
     exact figure size so that figures with different title lengths stay
-    pixel-identical in width.
+    pixel-identical in width.  Closes ``fig``.
     """
     buf = io.BytesIO()
     fig.savefig(
@@ -298,6 +312,7 @@ def fig2im(fig: matplotlib.figure.Figure) -> np.ndarray:
     )
     buf.seek(0)
     rgba = plt.imread(buf)
+    plt.close(fig)
     if rgba.shape[-1] == 4:
         return (rgba[:, :, :3] * 255).astype(np.uint8)
     return (rgba * 255).astype(np.uint8)
@@ -397,25 +412,20 @@ def draw_image_pairs(
 
 
 def display_keypoints(pred: dict, titles: List[str] = []):
-    img0 = pred["image0_orig"]
-    img1 = pred["image1_orig"]
-    output_keypoints = plot_images([img0, img1], titles=titles, dpi=300)
-    if "keypoints0_orig" in pred.keys() and "keypoints1_orig" in pred.keys():
-        plot_keypoints([pred["keypoints0_orig"], pred["keypoints1_orig"]], ps=4)
-        text = (
-            f"# keypoints0: {len(pred['keypoints0_orig'])} \n"
-            + f"# keypoints1: {len(pred['keypoints1_orig'])}"
-        )
-        add_text(0, text, fs=12)
-    output_keypoints = fig2im(output_keypoints)
-    return output_keypoints
+    img0, kpts0 = fit_for_display(pred["image0_orig"], pred.get("keypoints0_orig"))
+    img1, kpts1 = fit_for_display(pred["image1_orig"], pred.get("keypoints1_orig"))
+    fig = plot_images([img0, img1], titles=titles)
+    if kpts0 is not None and kpts1 is not None:
+        plot_keypoints([kpts0, kpts1], ps=4)
+        add_text(0, f"# keypoints0: {len(kpts0)} \n# keypoints1: {len(kpts1)}", fs=12)
+    return fig2im(fig)
 
 
 def display_matches(
     pred: Dict[str, np.ndarray],
     titles: List[str] = [],
     texts: List[str] = [],
-    dpi: int = 300,
+    dpi: int = 150,
     tag: str = "KPTS_RAW",  # KPTS_RAW, KPTS_RANSAC, LINES_RAW, LINES_RANSAC,
 ) -> Tuple[np.ndarray, int]:
     """
@@ -478,31 +488,26 @@ def display_matches(
         and pred["line1_orig"] is not None
         # and (tag == "LINES_RAW" or tag == "LINES_RANSAC")
     ):
-        # lines
-        mtlines0 = pred["line0_orig"]
-        mtlines1 = pred["line1_orig"]
+        # lines — fit images and their coordinates at the same scale
+        img0, mtlines0, mkpts0 = fit_for_display(
+            img0, pred["line0_orig"], pred.get("line_keypoints0_orig")
+        )
+        img1, mtlines1, mkpts1 = fit_for_display(
+            img1, pred["line1_orig"], pred.get("line_keypoints1_orig")
+        )
         num_inliers = len(mtlines0)
-        fig_lines = plot_images(
+        plot_images(
             [img0.squeeze(), img1.squeeze()],
             ["Image 0 - matched lines", "Image 1 - matched lines"],
-            dpi=300,
         )
-        fig_lines = plot_color_line_matches([mtlines0, mtlines1], lw=2)
-        fig_lines = fig2im(fig_lines)
+        # plot_color_line_matches annotates the current figure
+        fig = fig2im(plot_color_line_matches([mtlines0, mtlines1], lw=2))
 
         # keypoints
-        mkpts0 = pred.get("line_keypoints0_orig")
-        mkpts1 = pred.get("line_keypoints1_orig")
-        fig = None
         if mkpts0 is not None and mkpts1 is not None:
             num_inliers = len(mkpts0)
-            if "mconf" in pred:
-                mconf = pred["mconf"]
-            else:
-                mconf = np.ones(len(mkpts0))
-            fig_mkpts = draw_matches_core(mkpts0, mkpts1, img0, img1, mconf, dpi=300)
-            fig_lines = cv2.resize(fig_lines, (fig_mkpts.shape[1], fig_mkpts.shape[0]))
-            fig = np.concatenate([fig_mkpts, fig_lines], axis=0)
-        else:
-            fig = fig_lines
+            mconf = pred["mconf"] if "mconf" in pred else np.ones(len(mkpts0))
+            fig_mkpts = draw_matches_core(mkpts0, mkpts1, img0, img1, mconf, dpi=dpi)
+            h, w = fig_mkpts.shape[:2]
+            fig = np.concatenate([fig_mkpts, cv2.resize(fig, (w, h))], axis=0)
     return fig, num_inliers
