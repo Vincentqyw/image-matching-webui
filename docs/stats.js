@@ -13,7 +13,6 @@ const PALETTE = [
   "#ef4444",
   "#64748b",
 ];
-const TOP_N = 8;
 const LEADERBOARD_PREVIEW = 12;
 const DAY = 86400000;
 
@@ -115,43 +114,34 @@ function renderChart(m) {
   const start = rangeStart > m.days[0] ? rangeStart : m.days[0];
   const days = continuousDays(start, end);
 
-  const topKeys = m.totals
+  const keys = m.totals
     .map((row) => row.key)
-    .filter((key) => days.some((day) => (m.perKey.get(key)?.get(day) ?? 0) > 0))
-    .slice(0, TOP_N);
+    .filter((key) => days.some((day) => (m.perKey.get(key)?.get(day) ?? 0) > 0));
 
-  // One line per matcher, so every point sits at its own count on the axis.
+  // One smoothed line per matcher, so every point sits at its own count on
+  // the axis.  A single day has no segment to draw, so show a marker instead.
   const line = (name, color, y) => ({
     x: days,
     y,
+    customdata: days.map(shortDay),
     name,
     type: "scatter",
-    mode: "lines+markers",
-    line: { width: 1.5, color },
+    mode: days.length > 1 ? "lines" : "markers",
+    line: { width: 1.5, color, shape: "spline", smoothing: 1 },
     marker: { size: 5, color },
-    hovertemplate: "%{y:,.0f}<extra>%{fullData.name}</extra>",
+    hovertemplate:
+      "<b>%{fullData.name}</b><br>%{customdata} · %{y:,.0f}<extra></extra>",
   });
   // Label about a week's worth of days; a category axis labels every one.
   const step = Math.ceil(days.length / 7);
   const tickDays = days.filter((_, index) => index % step === 0);
-  const traces = topKeys.map((key) =>
+  const traces = keys.map((key) =>
     line(
       m.names.get(key),
       colorAt(m.rank.get(key)),
       days.map((day) => m.perKey.get(key)?.get(day) ?? 0),
     ),
   );
-
-  const other = days.map((day) => {
-    const shown = topKeys.reduce(
-      (sum, key) => sum + (m.perKey.get(key)?.get(day) ?? 0),
-      0,
-    );
-    return (m.dayTotals.get(day) ?? 0) - shown;
-  });
-  if (other.some((n) => n > 0)) {
-    traces.push(line("Other", "#94a3b8", other));
-  }
 
   const dark = prefersDark();
   Plotly.react(
@@ -163,7 +153,7 @@ function renderChart(m) {
       margin: { t: 8, r: 6, b: 34, l: 52 },
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
-      hovermode: "x unified",
+      hovermode: "closest",
       hoverlabel: dark
         ? {
             bgcolor: "#1c2433",
@@ -197,7 +187,7 @@ function renderChart(m) {
   );
 
   renderLegend(traces);
-  el("chart-note").textContent = `${topKeys.length} matchers + other · ${
+  el("chart-note").textContent = `${keys.length} matchers · ${
     range ? `last ${days.length} day${days.length === 1 ? "" : "s"}` : "all time"
   }`;
 }
